@@ -1,0 +1,40 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+		{
+			"type": "shell",
+			"label": "C/C++: g++ root build",
+			"command": "/usr/bin/g++",
+			"args": [
+				"-I",
+				"`${ROOTSYS}/bin/root-config",
+				"--incdir`",
+				"-I",
+				"/usr/include/c++/9",
+				"${workspaceFolder}/*.cpp",
+				"`${ROOTSYS}/bin/root-config",
+				"--libs`"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "C/C++: g++ root build and run",
+			"command": "${workspaceFolder}/a.out",
+			"problemMatcher": [],
+			"dependsOn": [
+				"C/C++: g++ root build"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
