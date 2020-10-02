@@ -3,17 +3,22 @@
     "tasks": [
 		{
 			"type": "shell",
-			"label": "C/C++: g++ root build",
+			"label": "C++: g++ root build",
 			"command": "/usr/bin/g++",
 			"args": [
+				"-g",
 				"-I",
 				"`${ROOTSYS}/bin/root-config",
-				"--incdir`",
+				"--cflags`",
 				"-I",
 				"/usr/include/c++/9",
-				"${workspaceFolder}/*.cpp",
+				"\"${workspaceFolder}/\"*.cpp",
 				"`${ROOTSYS}/bin/root-config",
-				"--libs`"
+				"--ldflags",
+				"--glibs`",
+				"-lRooFit",
+				"-lRooFitCore",
+				"-lMinuit"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -25,16 +30,58 @@
 		},
 		{
 			"type": "shell",
-			"label": "C/C++: g++ root build and run",
+			"label": "C++: g++ root build release",
+			"command": "/usr/bin/g++",
+			"args": [
+				"-I",
+				"`${ROOTSYS}/bin/root-config",
+				"--cflags`",
+				"-I",
+				"/usr/include/c++/9",
+				"${workspaceFolder}/*.cpp",
+				"`${ROOTSYS}/bin/root-config",
+				"--ldflags",
+				"--glibs`",
+				"-lRooFit",
+				"-lRooFitCore",
+				"-lMinuit"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "C++: g++ root build and run",
 			"command": "${workspaceFolder}/a.out",
 			"problemMatcher": [],
 			"dependsOn": [
-				"C/C++: g++ root build"
+				"C++: g++ root build"
 			],
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"type": "shell",
+			"label": "C++: root Cling execute",
+			"command": "root",
+			"args": [
+				"-q",
+				"${file}"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			]
 		}
 	]
 }
