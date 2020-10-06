@@ -1,7 +1,7 @@
 
 #include "OniaCutter.h"
 
-Cutter::Cutter()
+OniaCutter::OniaCutter()
 {
     selectionBits = ((1 <<1) | (1 << 3));
     minTracks =6;
@@ -13,7 +13,7 @@ Cutter::Cutter()
     trigSelect = HLT_HIL1DoubleMuOpen_v1;
 }
 
-bool Cutter::operator()(Onia_Input* input,long index)
+bool OniaCutter::operator()(Onia_Input* input,long index)
 {
     //check for triggers
     if ((input->trig[index] & trigSelect) == trigSelect) return false;
@@ -34,7 +34,7 @@ bool Cutter::operator()(Onia_Input* input,long index)
     return true;
 }
 
-bool Cutter::isSoft(Onia_Input* input,long index)
+bool OniaCutter::isSoft(Onia_Input* input,long index)
 {
     bool passMuonTypePl = (input->SelectionType[index] & selectionBits) == (selectionBits);
     bool muplSoft = passMuonTypePl && ( input->nTrkWMea[index] >= minTracks)

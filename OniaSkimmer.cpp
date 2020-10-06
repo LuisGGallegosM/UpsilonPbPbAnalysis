@@ -25,7 +25,8 @@ void OniaSkimmer::Skim(std::function<bool(Onia_Input*,long)> cutter)
     int block =0;
     Long64_t entries= tree->GetEntries();
 
-    printf("%lld entries from %s tree\n", entries, tree->GetName());
+    printf("Onia Skimming start...");
+    printf("%lld entries from '%s' tree\n", entries, tree->GetName());
 
     for(Long64_t i=0;i<entries;++i)
     {
@@ -39,24 +40,28 @@ void OniaSkimmer::Skim(std::function<bool(Onia_Input*,long)> cutter)
 
         for(Long64_t j=0;j<oniaDataIn.size;++j)
         {
-            if (!cutter(&oniaDataIn,j)) continue;
-
-            //write data to output
-            TLorentzVector* mom4vec=(TLorentzVector*) oniaDataIn.mom4->At(j);
-            oniaDataOut.mass= mom4vec->M();
-            oniaDataOut.pT = mom4vec->Pt();
-            oniaDataOut.y = mom4vec->Rapidity();
-            oniaDataOut.phi = mom4vec->Phi();
-            oniaDataOut.eta = mom4vec->Eta();
-
-            tree_output->Fill();
+            if (cutter(&oniaDataIn,j))
+            {
+                WriteData(j);
+                tree_output->Fill();
+            }
         }
 
     }
-    printf("Total readed entries %lld from %s tree\n", entries, tree->GetName());
-    printf("Total output entries %lld to %s tree\n", tree_output->GetEntries(),tree_output->GetName());
+    printf("Total readed entries %lld from '%s' tree\n", entries, tree->GetName());
+    printf("Total output entries %lld to '%s' tree\n", tree_output->GetEntries(),tree_output->GetName());
     printf("..Saving tree\n");
     return;
+}
+
+void OniaSkimmer::WriteData(long index)
+{
+    TLorentzVector* mom4vec=(TLorentzVector*) oniaDataIn.mom4->At(index);
+    oniaDataOut.mass= mom4vec->M();
+    oniaDataOut.pT = mom4vec->Pt();
+    oniaDataOut.y = mom4vec->Rapidity();
+    oniaDataOut.phi = mom4vec->Phi();
+    oniaDataOut.eta = mom4vec->Eta();
 }
 
 /**
@@ -66,8 +71,6 @@ void OniaSkimmer::Skim(std::function<bool(Onia_Input*,long)> cutter)
 void OniaSkimmer::InitBranches()
 {
     TBranch* branch;
-
-    input_branches.clear();
 
     //input branches
     branch = tree->GetBranch("Reco_QQ_4mom");
@@ -129,7 +132,7 @@ void OniaSkimmer::InitBranches()
  * 
  * @param index the event index for GetEntry of each branch
  */
-void OniaSkimmer::GetEntries(int index)
+void OniaSkimmer::GetEntries(long index)
 {
     for(int i=0 ;i<input_branches.size();i++)
     {
@@ -144,7 +147,7 @@ TTree* OniaSkimmer::GetTree()
 }
 
 //***********************************************
-//Muon
+//Onia structs
 
 Onia_Input::Onia_Input()
 {

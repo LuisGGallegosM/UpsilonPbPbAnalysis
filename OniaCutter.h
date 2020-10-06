@@ -3,7 +3,7 @@
 #include "HLT_triggers.h"
 #include "OniaSkimmer.h"
 
-class Cutter
+class OniaCutter
 {
     private:
     Int_t selectionBits;
@@ -19,5 +19,5 @@ class Cutter
 
     public:
     bool operator()(Onia_Input* input, long index);
-    Cutter();
+    OniaCutter();
 };

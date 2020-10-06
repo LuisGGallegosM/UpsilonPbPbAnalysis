@@ -51,7 +51,8 @@ class OniaSkimmer
     TTree* tree_output;
 
     void InitBranches();
-    void GetEntries(int index);
+    void GetEntries(long index);
+    void WriteData(long index);
     
     public:
     OniaSkimmer(TTree* myTree);

@@ -37,7 +37,7 @@ void Main()
     }
 
     //execute skim
-    std::function<bool(Onia_Input*,long)> cutter = Cutter();
+    std::function<bool(Onia_Input*,long)> cutter = OniaCutter();
 
     OniaSkimmer skimmer = OniaSkimmer(myTree);
     skimmer.Skim(cutter);
