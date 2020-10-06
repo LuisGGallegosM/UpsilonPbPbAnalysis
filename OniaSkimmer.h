@@ -1,15 +1,7 @@
 
 #pragma once
 
-#include "TTree.h"
-#include "TLorentzVector.h"
-#include "TString.h"
-#include "TClonesArray.h"
-#include <new>
-#include <functional>
-
-#define maxBranchSize (1000)
-#define MAXTREESIZE (100000000)
+#include "Skimmer.h"
 
 struct Onia_Input
 {
@@ -41,22 +33,11 @@ struct Onia_Output
     Float_t eta;
 };
 
-class OniaSkimmer
+class OniaSkimmer : public Skimmer<Onia_Input,Onia_Output>
 {
     private:
-    std::vector<TBranch*> input_branches;
-    Onia_Input oniaDataIn;
-    Onia_Output oniaDataOut;
-    TTree* tree;
-    TTree* tree_output;
-
-    void InitBranches();
-    void GetEntries(long index);
     void WriteData(long index);
-    
     public:
     OniaSkimmer(TTree* myTree);
-    void Skim(std::function<bool(Onia_Input*,long)> cutter);
-    TTree* GetTree();
 };
 
