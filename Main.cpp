@@ -3,16 +3,13 @@
 #include "TTree.h"
 #include "TFile.h"
 #include "TString.h"
-#include "RooDataSet.h"
-#include "TApplication.h"
-#include "RooRealVar.h"
-#include "RooPlot.h"
-#include "TCanvas.h"
 
-#if !defined(__CLING__)
+#include "OniaSkimmer.h"
+#include "OniaCutter.h"
 
-#include "Skimmer.h"
-
+#if defined(__CLING__)
+    #include "OniaSkimmer.cpp"
+    #include "OniaCutter.cpp"
 #endif
 
 void Main()
@@ -40,8 +37,10 @@ void Main()
     }
 
     //execute skim
-    Skimmer skimmer = Skimmer(myTree);
-    skimmer.Skim();
+    std::function<bool(Onia_Input*,long)> cutter = Cutter();
+
+    OniaSkimmer skimmer = OniaSkimmer(myTree);
+    skimmer.Skim(cutter);
 
     TTree* outputTree= skimmer.GetTree();
 

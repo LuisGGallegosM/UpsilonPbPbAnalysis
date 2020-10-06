@@ -54,6 +54,8 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "SkimTree.C": "cpp"
+        "SkimTree.C": "cpp",
+        "list": "cpp",
+        "set": "cpp"
     }
 }
