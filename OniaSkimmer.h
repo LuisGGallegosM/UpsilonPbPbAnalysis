@@ -36,7 +36,7 @@ struct Onia_Output
 class OniaSkimmer : public Skimmer<Onia_Input,Onia_Output>
 {
     private:
-    void WriteData(long index);
+    void WriteData(Int_t index);
     public:
     OniaSkimmer(TTree* myTree);
 };

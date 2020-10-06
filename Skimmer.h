@@ -21,9 +21,9 @@ class Skimmer
     TTree* tree;
     TTree* tree_output;
 
-    virtual void WriteData(long index) = 0;
+    virtual void WriteData(Int_t index) = 0;
 
-    void GetEntries(long index)
+    void GetEntries(Long64_t index)
     {
         for(int i=0 ;i<input_branches.size();i++)
         {
@@ -41,7 +41,7 @@ class Skimmer
         tree_output->SetMaxTreeSize(MAXTREESIZE);
     }
 
-    void Skim(std::function<bool(T*,long)> cutter)
+    void Skim(std::function<bool(T*,Int_t)> cutter)
     {
         int block =0;
         Long64_t entries= tree->GetEntries();

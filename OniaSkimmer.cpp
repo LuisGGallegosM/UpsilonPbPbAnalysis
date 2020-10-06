@@ -61,7 +61,7 @@ OniaSkimmer::OniaSkimmer(TTree* myTree) : Skimmer(myTree)
     return;
 }
 
-void OniaSkimmer::WriteData(long index)
+void OniaSkimmer::WriteData(Int_t index)
 {
     TLorentzVector* mom4vec=(TLorentzVector*) dataIn.mom4->At(index);
     dataOut.mass= mom4vec->M();
