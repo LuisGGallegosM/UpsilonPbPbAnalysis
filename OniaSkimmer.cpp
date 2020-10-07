@@ -51,6 +51,10 @@ OniaSkimmer::OniaSkimmer(TTree* myTree) : Skimmer(myTree)
     branch->SetAddress(dataIn.trig);
     input_branches.push_back(branch);
 
+    branch = tree->GetBranch("Reco_mu_whichGen");
+    branch->SetAddress(dataIn.whichGen);
+    input_branches.push_back(branch);
+
     //output branches
     tree_output->Branch("mass", &dataOut.mass,"mass/F");
     tree_output->Branch("eta", &dataOut.eta,"eta/F");
@@ -74,6 +78,11 @@ void OniaSkimmer::WriteData(Int_t index)
 //***********************************************
 //Onia structs
 
+Int_t Onia_Input::getSize()
+{
+    return size;
+}
+
 Onia_Input::Onia_Input()
 {
     mom4 = new TClonesArray("TLorentzVector");
@@ -86,6 +95,7 @@ Onia_Input::Onia_Input()
     dz = new Float_t[maxBranchSize]; 
     VtxProb = new Float_t[maxBranchSize];
     trig = new ULong64_t[maxBranchSize];
+    whichGen = new Int_t[maxBranchSize];
 }
 
 Onia_Input::~Onia_Input()
@@ -100,4 +110,5 @@ Onia_Input::~Onia_Input()
     delete[] dz;
     delete[] VtxProb;
     delete[] trig;
+    delete[] whichGen;
 }

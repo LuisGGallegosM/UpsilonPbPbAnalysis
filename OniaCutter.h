@@ -15,9 +15,9 @@ class OniaCutter
     bool isMC;
     ULong64_t trigSelect;
 
-    bool isSoft(Onia_Input* input, Long64_t index);
+    bool isSoft(Onia_Input* input, Int_t index);
 
     public:
-    bool operator()(Onia_Input* input, Long64_t index);
+    bool operator()(Onia_Input* input, Int_t index);
     OniaCutter();
 };

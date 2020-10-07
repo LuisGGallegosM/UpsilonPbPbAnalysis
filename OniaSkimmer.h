@@ -19,6 +19,9 @@ struct Onia_Input
     UInt_t runNb;
     UInt_t eventNb;
     UInt_t lumi;
+    Int_t* whichGen;
+
+    Int_t getSize();
 
     Onia_Input();
     ~Onia_Input();

@@ -13,7 +13,7 @@ OniaCutter::OniaCutter()
     trigSelect = HLT_HIL1DoubleMuOpen_v1;
 }
 
-bool OniaCutter::operator()(Onia_Input* input,Long64_t index)
+bool OniaCutter::operator()(Onia_Input* input,Int_t index)
 {
     //check for triggers
     if ((input->trig[index] & trigSelect) == trigSelect) return false;
@@ -21,8 +21,14 @@ bool OniaCutter::operator()(Onia_Input* input,Long64_t index)
     int mupl_idx = input->mupl_idx[index];//plus muon index
     int mumi_idx = input->mumi_idx[index];//minus muon index
 
-    //cehck if missing index, missing when equals -1
+    //check if missing index, missing when equals -1
     if ((mupl_idx <0) || (mumi_idx<0)) return false;
+
+    if(isMC)
+    {
+        if(input->whichGen[mupl_idx] == -1) return false;
+        if(input->whichGen[mumi_idx] == -1) return false;
+    }
 
     //check if plus and minus muons are soft
     if (!isSoft(input,mupl_idx)) return false;
@@ -34,7 +40,7 @@ bool OniaCutter::operator()(Onia_Input* input,Long64_t index)
     return true;
 }
 
-bool OniaCutter::isSoft(Onia_Input* input,Long64_t index)
+bool OniaCutter::isSoft(Onia_Input* input,Int_t index)
 {
     bool passMuonTypePl = (input->SelectionType[index] & selectionBits) == (selectionBits);
     bool muplSoft = passMuonTypePl && ( input->nTrkWMea[index] >= minTracks)

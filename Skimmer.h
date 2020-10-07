@@ -46,8 +46,8 @@ class Skimmer
         int block =0;
         Long64_t entries= tree->GetEntries();
 
-        printf("Onia Skimming start...");
-        printf("%lld entries from '%s' tree\n", entries, tree->GetName());
+        printf("Skimming of '%s' tree starting...\n",tree->GetName());
+        printf("%lld entries in tree\n", entries);
 
         for(Long64_t i=0;i<entries;++i)
         {
@@ -59,7 +59,7 @@ class Skimmer
                 
             GetEntries(i);
 
-            for(Long64_t j=0;j<dataIn.size;++j)
+            for(Long64_t j=0;j<dataIn.getSize();++j)
             {
                 if (cutter(&dataIn,j))
                 {
@@ -70,8 +70,7 @@ class Skimmer
 
         }
         printf("Total readed entries %lld from '%s' tree\n", entries, tree->GetName());
-        printf("Total output entries %lld to '%s' tree\n", tree_output->GetEntries(),tree_output->GetName());
-        printf("..Saving tree\n");
+        printf("Total output entries %lld to '%s' tree\nDone.\n", tree_output->GetEntries(),tree_output->GetName());
         return;
     }
     TTree* GetTree()
