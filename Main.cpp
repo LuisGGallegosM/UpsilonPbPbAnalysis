@@ -12,6 +12,8 @@
 #if defined(__CLING__)
 #include "OniaSkimmer.cpp"
 #include "OniaCutter.cpp"
+#include "JetSkimmer.cpp"
+#include "JetCutter.cpp"
 #endif
 
 bool oniaSkim(TFile *file);
@@ -38,7 +40,7 @@ void Main()
 
     outputfile.Close();
     file.Close();
-    std::cout << "Success\n";
+    std::cout << "Success.\n TTrees wrote to '" << outputfilename.Data() << "' root file\n";
     return;
 }
 
