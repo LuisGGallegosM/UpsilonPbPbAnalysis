@@ -62,7 +62,7 @@ bool oniaSkim(TFile *file)
 
     TTree *outputTree = skimmer.GetTree();
 
-    outputTree->Write();
+    outputTree->Write(0,TObject::kOverwrite);
     return true;
 }
 
@@ -84,7 +84,7 @@ bool jetSkim(TFile *file)
 
     TTree *outputTree = skimmer.GetTree();
 
-    outputTree->Write();
+    outputTree->Write(0,TObject::kOverwrite);
     return true;
 }
 
