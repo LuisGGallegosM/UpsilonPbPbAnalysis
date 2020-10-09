@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Skimmer.h"
+#include "OniaSkimmer.h"
 
 struct Jet_Input
 {
@@ -32,11 +33,14 @@ struct Jet_Output
     Float_t jtPu;
     Float_t jtM;
     Float_t jtArea;
+    Float_t z;
 };
 
 class JetSkimmer : public Skimmer<Jet_Input,Jet_Output>
 {
+    Onia_Aux* oniaData;
+
     void WriteData(Int_t index, Long64_t entry);
     public:
-    JetSkimmer(TTree* treeIn,const char* treeOutName);
+    JetSkimmer(TTree* treeIn,const char* treeOutName, Onia_Aux* auxData);
 };

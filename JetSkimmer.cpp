@@ -1,7 +1,7 @@
 #include "JetSkimmer.h"
 
-JetSkimmer::JetSkimmer(TTree* treeIn,const char* treeOutName)
-: Skimmer(treeIn,treeOutName) 
+JetSkimmer::JetSkimmer(TTree* treeIn,const char* treeOutName,Onia_Aux* oniaAuxData)
+: Skimmer(treeIn,treeOutName) , oniaData(oniaAuxData)
 {
     TBranch* branch;
 
@@ -25,6 +25,7 @@ JetSkimmer::JetSkimmer(TTree* treeIn,const char* treeOutName)
     addOutput("jtArea",&dataOut.jtArea);
     addOutput("jtPu",&dataOut.jtPu);
     addOutput("jtEvt",&dataOut.evt);
+    addOutput("z", &dataOut.z);
 
     return;
 }
@@ -39,6 +40,10 @@ void JetSkimmer::WriteData(Int_t index, Long64_t entry)
     dataOut.jtY = dataIn.jtY[index];
     dataOut.jtPu = dataIn.jtPu[index];
     dataOut.jtArea = dataIn.jtArea[index];
+
+    Onia_Output oniaOut = oniaData->events[dataIn.evt];   
+    dataOut.z = oniaOut.pT / dataIn.jtPt[index];
+
 }
 
 //***********************************************

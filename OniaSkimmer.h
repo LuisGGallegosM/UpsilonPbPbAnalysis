@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <set>
+#include <unordered_map>
 #include <memory>
 #include "Skimmer.h"
 
@@ -41,7 +41,7 @@ struct Onia_Output
 
 struct Onia_Aux
 {
-    std::unordered_set<Long64_t> evNumGot;
+    std::unordered_map<Long64_t,Onia_Output> events;
 };
 
 class OniaSkimmer : public Skimmer<Onia_Input,Onia_Output>

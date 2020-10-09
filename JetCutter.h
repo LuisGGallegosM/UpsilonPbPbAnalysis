@@ -7,6 +7,8 @@ class JetCutter
 {
     private:
     Onia_Aux* auxData;
+    Float_t minPt;
+    Float_t maxPt;
 
     public:
     bool operator()(Jet_Input* input, Int_t index);

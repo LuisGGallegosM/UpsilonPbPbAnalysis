@@ -30,7 +30,7 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName)
     addOutput("Evt",&dataOut.Evt);
 
     auxData = std::make_unique<Onia_Aux>();
-    auxData->evNumGot.reserve(200000);
+    auxData->events.reserve(200000);
 
     return;
 }
@@ -45,7 +45,7 @@ void OniaSkimmer::WriteData(Int_t index, Long64_t entry)
     dataOut.eta = mom4vec->Eta();
     dataOut.Evt = entry;
 
-    auxData->evNumGot.insert(entry);
+    auxData->events.insert({entry,dataOut});
 }
 
 //***********************************************

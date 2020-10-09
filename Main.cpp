@@ -84,7 +84,7 @@ bool jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
     //execute skim
     JetCutter cutter(auxData);
     
-    JetSkimmer skimmer = JetSkimmer(myTree,wroteTreeName);
+    JetSkimmer skimmer(myTree,wroteTreeName,auxData);
     TTree* wroteTree =skimmer.Skim(cutter);
 
     wroteTree->Write(0,TObject::kOverwrite);
