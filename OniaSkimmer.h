@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <set>
+#include <memory>
 #include "Skimmer.h"
 
 struct Onia_Input
@@ -29,6 +31,7 @@ struct Onia_Input
 
 struct Onia_Output
 {
+    Int_t Evt;
     Float_t mass;
     Float_t pT;
     Float_t y;
@@ -36,11 +39,18 @@ struct Onia_Output
     Float_t eta;
 };
 
+struct Onia_Aux
+{
+    std::unordered_set<Long64_t> evNumGot;
+};
+
 class OniaSkimmer : public Skimmer<Onia_Input,Onia_Output>
 {
     private:
-    void WriteData(Int_t index);
+    void WriteData(Int_t index, Long64_t entry);
     public:
-    OniaSkimmer(TTree* myTree);
+    OniaSkimmer(TTree* treeIn,const char* treeOutName);
+
+    std::unique_ptr<Onia_Aux> auxData;
 };
 

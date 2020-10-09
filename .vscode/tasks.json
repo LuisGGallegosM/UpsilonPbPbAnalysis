@@ -18,7 +18,8 @@
 				"--glibs`",
 				"-lRooFit",
 				"-lRooFitCore",
-				"-lMinuit"
+				"-lMinuit",
+				"-std=c++14"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"

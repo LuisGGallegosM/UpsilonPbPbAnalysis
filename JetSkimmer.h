@@ -36,7 +36,7 @@ struct Jet_Output
 
 class JetSkimmer : public Skimmer<Jet_Input,Jet_Output>
 {
-    void WriteData(Int_t index);
+    void WriteData(Int_t index, Long64_t entry);
     public:
-    JetSkimmer(TTree* myTree);
+    JetSkimmer(TTree* treeIn,const char* treeOutName);
 };

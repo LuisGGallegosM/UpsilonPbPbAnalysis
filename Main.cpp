@@ -16,8 +16,8 @@
 #include "JetCutter.cpp"
 #endif
 
-bool oniaSkim(TFile *file);
-bool jetSkim(TFile *file);
+bool oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData);
+bool jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData);
 
 void Main()
 {
@@ -25,7 +25,7 @@ void Main()
     TString filename("files/merged_HiForestAOD.root");
     TFile file(filename.Data(), "READ");
 
-    //ooutput file
+    //output file
     TString outputfilename("files/merged_HiForestAOD_skimmed.root");
     TFile outputfile(outputfilename.Data(), "RECREATE");
 
@@ -35,8 +35,12 @@ void Main()
         return;
     }
 
-    oniaSkim(&file);
-    jetSkim(&file);
+    //tree to write skimmed data
+    std::unique_ptr<Onia_Aux> auxData;
+
+
+    oniaSkim(&file,"onia_skimmed",&auxData);
+    jetSkim(&file,"jet_skimmed",auxData.get());
 
     outputfile.Close();
     file.Close();
@@ -44,7 +48,7 @@ void Main()
     return;
 }
 
-bool oniaSkim(TFile *file)
+bool oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData)
 {
     TTree *myTree = (TTree *)file->Get("hionia/myTree");
     if (myTree == nullptr)
@@ -57,16 +61,17 @@ bool oniaSkim(TFile *file)
     //execute skim
     OniaCutter cutter;
 
-    OniaSkimmer skimmer = OniaSkimmer(myTree);
-    skimmer.Skim(cutter);
+    OniaSkimmer skimmer = OniaSkimmer(myTree,wroteTreeName);
+    TTree* wroteTree = skimmer.Skim(cutter);
 
-    TTree *outputTree = skimmer.GetTree();
+    (*auxData) = std::move(skimmer.auxData);
 
-    outputTree->Write(0,TObject::kOverwrite);
+    wroteTree->Write(0,TObject::kOverwrite);
+
     return true;
 }
 
-bool jetSkim(TFile *file)
+bool jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
 {
     TTree *myTree = (TTree *)file->Get("ak3PFJetAnalyzer/t");
     if (myTree == nullptr)
@@ -77,14 +82,12 @@ bool jetSkim(TFile *file)
     }
 
     //execute skim
-    JetCutter cutter;
+    JetCutter cutter(auxData);
     
-    JetSkimmer skimmer = JetSkimmer(myTree);
-    skimmer.Skim(cutter);
+    JetSkimmer skimmer = JetSkimmer(myTree,wroteTreeName);
+    TTree* wroteTree =skimmer.Skim(cutter);
 
-    TTree *outputTree = skimmer.GetTree();
-
-    outputTree->Write(0,TObject::kOverwrite);
+    wroteTree->Write(0,TObject::kOverwrite);
     return true;
 }
 

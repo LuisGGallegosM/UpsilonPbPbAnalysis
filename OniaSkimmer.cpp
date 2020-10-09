@@ -2,70 +2,40 @@
 
 #include "OniaSkimmer.h"
 
-OniaSkimmer::OniaSkimmer(TTree* myTree) : Skimmer(myTree) 
+OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName) 
+: Skimmer(treeIn,treeOutName)
 {
     TBranch* branch;
 
     //input branches
-    branch = tree->GetBranch("Reco_QQ_4mom");
-    branch->SetAddress(&dataIn.mom4);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_QQ_size");
-    branch->SetAddress(&dataIn.size);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_QQ_mupl_idx");
-    branch->SetAddress(dataIn.mupl_idx);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_QQ_mumi_idx");
-    branch->SetAddress(dataIn.mumi_idx);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_mu_SelectionType");
-    branch->SetAddress(dataIn.SelectionType);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_mu_nTrkWMea");
-    branch->SetAddress(dataIn.nTrkWMea);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_mu_nPixWMea");
-    branch->SetAddress(dataIn.nPixWMea);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_mu_dxy");
-    branch->SetAddress(dataIn.dxy);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_mu_dz");
-    branch->SetAddress(dataIn.dz);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_QQ_VtxProb");
-    branch->SetAddress(dataIn.VtxProb);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_QQ_trig");
-    branch->SetAddress(dataIn.trig);
-    input_branches.push_back(branch);
-
-    branch = tree->GetBranch("Reco_mu_whichGen");
-    branch->SetAddress(dataIn.whichGen);
-    input_branches.push_back(branch);
+    addInput("Reco_QQ_4mom",&dataIn.mom4);
+    addInput("Reco_QQ_size",&dataIn.size);
+    addInput("Reco_QQ_mupl_idx",dataIn.mupl_idx);
+    addInput("Reco_QQ_mumi_idx",dataIn.mumi_idx);
+    addInput("Reco_mu_SelectionType",dataIn.SelectionType);
+    addInput("Reco_mu_nTrkWMea",dataIn.nTrkWMea);
+    addInput("Reco_mu_nPixWMea",dataIn.nPixWMea);
+    addInput("Reco_mu_dxy",dataIn.dxy);
+    addInput("Reco_mu_dz",dataIn.dz);
+    addInput("Reco_QQ_VtxProb",dataIn.VtxProb);
+    addInput("Reco_QQ_trig",dataIn.trig);
+    addInput("Reco_mu_whichGen",dataIn.whichGen);
 
     //output branches
-    tree_output->Branch("mass", &dataOut.mass,"mass/F");
-    tree_output->Branch("eta", &dataOut.eta,"eta/F");
-    tree_output->Branch("phi", &dataOut.phi,"phi/F");
-    tree_output->Branch("pT", &dataOut.pT,"pT/F");
-    tree_output->Branch("y", &dataOut.y,"y/F");
+    addOutput("mass",&dataOut.mass);
+    addOutput("eta",&dataOut.eta);
+    addOutput("phi",&dataOut.phi);
+    addOutput("pT",&dataOut.pT);
+    addOutput("y",&dataOut.y);
+    addOutput("Evt",&dataOut.Evt);
+
+    auxData = std::make_unique<Onia_Aux>();
+    auxData->evNumGot.reserve(200000);
 
     return;
 }
 
-void OniaSkimmer::WriteData(Int_t index)
+void OniaSkimmer::WriteData(Int_t index, Long64_t entry)
 {
     TLorentzVector* mom4vec=(TLorentzVector*) dataIn.mom4->At(index);
     dataOut.mass= mom4vec->M();
@@ -73,6 +43,9 @@ void OniaSkimmer::WriteData(Int_t index)
     dataOut.y = mom4vec->Rapidity();
     dataOut.phi = mom4vec->Phi();
     dataOut.eta = mom4vec->Eta();
+    dataOut.Evt = entry;
+
+    auxData->evNumGot.insert(entry);
 }
 
 //***********************************************
