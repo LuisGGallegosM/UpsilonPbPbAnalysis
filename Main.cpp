@@ -1,97 +1,44 @@
-#include <iostream>
-#include <vector>
-#include "TTree.h"
-#include "TFile.h"
-#include "TString.h"
 
-#include "OniaSkimmer.h"
-#include "OniaCutter.h"
-#include "JetSkimmer.h"
-#include "JetCutter.h"
+#include "Main.h"
 
-#if defined(__CLING__)
-#include "OniaSkimmer.cpp"
-#include "OniaCutter.cpp"
-#include "JetSkimmer.cpp"
-#include "JetCutter.cpp"
-#endif
-
-bool oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData);
-bool jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData);
+void massfit(const char* filename);
 
 void Main()
 {
-    //input file
-    TString filename("files/merged_HiForestAOD.root");
-    TFile file(filename.Data(), "READ");
+    char filename[] ="files/merged_HiForestAOD.root";
+    char outputfilename[] = "files/merged_HiForestAOD_skimmed.root";
 
-    //output file
-    TString outputfilename("files/merged_HiForestAOD_skimmed.root");
-    TFile outputfile(outputfilename.Data(), "RECREATE");
+    //Skim(filename,outputfilename);
 
-    if (file.IsZombie()) //input file is found?
-    {
-        std::cout << "file cannot readed\n";
-        return;
-    }
+    massfit(outputfilename);
 
-    //tree to write skimmed data
-    std::unique_ptr<Onia_Aux> auxData;
-
-
-    oniaSkim(&file,"onia_skimmed",&auxData);
-    jetSkim(&file,"jet_skimmed",auxData.get());
-
-    outputfile.Close();
-    file.Close();
-    std::cout << "Success.\n TTrees wrote to '" << outputfilename.Data() << "' root file\n";
     return;
 }
 
-bool oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData)
+void massfit(const char* filename)
 {
-    TTree *myTree = (TTree *)file->Get("hionia/myTree");
-    if (myTree == nullptr)
-    {
-        file->Close();
-        std::cout << "tree not found\n";
-        return false;
-    }
-
-    //execute skim
-    OniaCutter cutter;
-
-    OniaSkimmer skimmer = OniaSkimmer(myTree,wroteTreeName);
-    TTree* wroteTree = skimmer.Skim(cutter);
-
-    (*auxData) = std::move(skimmer.auxData);
-
-    wroteTree->Write(0,TObject::kOverwrite);
-
-    return true;
-}
-
-bool jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
-{
-    TTree *myTree = (TTree *)file->Get("ak3PFJetAnalyzer/t");
-    if (myTree == nullptr)
-    {
-        file->Close();
-        std::cout << "tree not found\n";
-        return false;
-    }
-
-    //execute skim
-    JetCutter cutter(auxData);
+    TFile file(filename, "READ");
+    TTree *tree_skimmed = (TTree *)file.Get(oniaTTreeName);
     
-    JetSkimmer skimmer(myTree,wroteTreeName,auxData);
-    TTree* wroteTree =skimmer.Skim(cutter);
+    OniaMassFitter massFitter(tree_skimmed);
 
-    wroteTree->Write(0,TObject::kOverwrite);
-    return true;
+    TFile newfile("files/oniafit.root","RECREATE");
+
+    
+    TH1* hist=massFitter.fit();
+    TH1* originalMass = massFitter.getOriginalHist();
+
+    hist->Write();
+    originalMass->Write();
+
+    TCanvas canvas("My plot","mass fit");
+    canvas.cd();
+    hist->Draw();
+    canvas.Update();
+    originalMass->Draw("SAME");
+    canvas.SaveAs("files/massfit.pdf");
+
 }
-
-
 
 #if !defined(__CLING__)
 
