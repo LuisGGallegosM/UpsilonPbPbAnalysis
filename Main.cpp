@@ -24,18 +24,17 @@ void massfit(const char* filename)
 
     TFile newfile("files/oniafit.root","RECREATE");
 
-    
-    TH1* hist=massFitter.fit();
-    TH1* originalMass = massFitter.getOriginalHist();
-
-    hist->Write();
-    originalMass->Write();
+    RooAbsReal* fittedFunc = massFitter.fit();
 
     TCanvas canvas("My plot","mass fit");
     canvas.cd();
-    hist->Draw();
-    canvas.Update();
-    originalMass->Draw("SAME");
+
+    RooPlot* plot = massFitter.getVar()->frame();
+    fittedFunc->plotOn(plot,Normalization(1.0,RooAbsReal::RelativeExpected));
+    massFitter.getDataset()->plotOn(plot);
+    plot->Draw();
+    canvas.Write();
+
     canvas.SaveAs("files/massfit.pdf");
 
 }

@@ -1,12 +1,16 @@
 #pragma once
 
+#include <string>
+
 #include "TH1.h"
+#include "TTree.h"
 #include "RooRealVar.h"
 #include "RooCBShape.h"
 #include "RooDataSet.h"
 #include "RooGlobalFunc.h"
 #include "RooFitResult.h"
 #include "RooAddPdf.h"
+#include "RooPlot.h"
 
 using namespace RooFit;
 
@@ -36,12 +40,12 @@ class CrystalBall
 
     public:
 
-    CrystalBall(RooRealVar& var):
-    mean("mean","mean of gaussian PDF",S1MeanMass,S1MeanMass_min,S1MeanMass_max),
-    sigma("sigma","width of gaussian",S1SigmaMass, S1SigmaMass_min, S1SigmaMass_max),
-    alpha("alpha","tail shift", S1AlphaMass,S1AlphaMass_min,S1AlphaMass_max),
-    n("n","power order",S1NMass, S1NMass_min, S1NMass_max),
-    cBall("cball","crystalBall",var,mean,sigma,alpha,n)
+    CrystalBall(RooRealVar& var, const char* name):
+    mean(Form("mean_%s",name),"mean of gaussian PDF",S1MeanMass,S1MeanMass_min,S1MeanMass_max),
+    sigma(Form("sigma_%s",name),"width of gaussian",S1SigmaMass, S1SigmaMass_min, S1SigmaMass_max),
+    alpha(Form("alpha_%s",name),"tail shift", S1AlphaMass,S1AlphaMass_min,S1AlphaMass_max),
+    n(Form("n_%s",name),"power order",S1NMass, S1NMass_min, S1NMass_max),
+    cBall(Form("cball_%s",name),"crystalBall",var,mean,sigma,alpha,n)
     {
     }
 
@@ -55,40 +59,41 @@ class OniaMassFitter
 {
     float massLow; 
     float massHigh;
+    TTree* tree;
     RooRealVar mass;
-    RooRealVar coeff; 
+    RooRealVar coeff1;
+    RooRealVar coeff2;
     CrystalBall cball1;
     CrystalBall cball2;
     RooAddPdf dcball;
     RooDataSet dataset;
 
     public:
-    OniaMassFitter(TTree* tree,float massLow_=8.5,float massHigh_=10.0):
-    massLow(massLow_), massHigh(massHigh_),
-    coeff("f1s","1S CB fraction", 0.5, 0.0, 1),
+    OniaMassFitter(TTree* tree_,float massLow_=8.5,float massHigh_=10.0):
+    massLow(massLow_), massHigh(massHigh_),tree(tree_),
+    coeff1("c1","1S CB fraction", 10001.0, 0.0, 10000000.0),
+    coeff2("c2","1S CB fraction", 10000.0, 0.0, 10000000.0),
     mass("mass","onia mass",massLow,massHigh),
-    dataset("mass dataset","mass dataset",tree,RooArgSet(mass)),
-    cball1(mass),
-    cball2(mass),
-    dcball("dcb","double crystal ball", RooArgList(*(cball1.getCB()),*(cball2.getCB()) ),RooArgList(coeff) )
+    dataset("mass dataset","mass dataset",tree_,mass),
+    cball1(mass,"1"),
+    cball2(mass,"2"),
+    dcball("dcb","double crystal ball", RooArgList(*(cball1.getCB()),*(cball2.getCB()) ),RooArgList(coeff1,coeff2) )
     {
-
     }
 
-    TH1* fit()
+    RooAbsReal* fit()
     {
-        RooFitResult* fitRes = dcball.fitTo(dataset,Save(), Hesse(kTRUE),Timer(kTRUE));
-        TH1* result= dcball.createHistogram("mass_fit", mass);
-        result->SetTitle("Invariant mass fit : double crystal ball");
-        result->SetOption("C");
-        return result;
+        dcball.fitTo(dataset, Hesse(kTRUE),Timer(kTRUE),Extended());
+        return &dcball;
     }
 
-    TH1* getOriginalHist()
+    RooDataSet* getDataset()
     {
-        TH1* result = dataset.createHistogram("mass",mass);
-        result->SetOption("E1");
-        result->SetTitle("Invariant mass : skimmed data");
-        return result;
+        return &dataset;
+    }
+
+    RooRealVar* getVar()
+    {
+        return &mass;
     }
 };
