@@ -4,6 +4,7 @@
 
 #include "TH1.h"
 #include "TTree.h"
+
 #include "RooRealVar.h"
 #include "RooCBShape.h"
 #include "RooDataSet.h"
@@ -14,21 +15,23 @@
 
 using namespace RooFit;
 
-#define S1MeanMass_max (9.69)
-#define S1MeanMass (9.46)
-#define S1MeanMass_min (9.26)
+//Using in CrystalBall function
 
-#define S1SigmaMass_max (0.6)
-#define S1SigmaMass (0.1)
-#define S1SigmaMass_min (0.001)
+#define S1MEANMASS_MAX  (9.69)
+#define S1MEANMASS      (9.46)
+#define S1MEANMASS_MIN  (9.26)
 
-#define S1AlphaMass_max (8.5)
-#define S1AlphaMass (2.522)
-#define S1AlphaMass_min (0.1)
+#define S1SIGMAMASS_MAX     (0.6)
+#define S1SIGMAMASS         (0.1)
+#define S1SIGMAMASS_MIN     (0.001)
 
-#define S1NMass_max (8.5)
-#define S1NMass (1.705)
-#define S1NMass_min (0.1)
+#define S1ALPHAMASS_MAX (8.5)
+#define S1ALPHAMASS     (2.522)
+#define S1ALPHAMASS_MIN (0.1)
+
+#define S1NMASS_MAX     (8.5)
+#define S1NMASS         (1.705)
+#define S1NMASS_MIN     (0.1)
 
 class CrystalBall
 {
@@ -40,19 +43,21 @@ class CrystalBall
 
     public:
 
-    CrystalBall(RooRealVar& var, const char* name):
-    mean(Form("mean_%s",name),"mean of gaussian PDF",S1MeanMass,S1MeanMass_min,S1MeanMass_max),
-    sigma(Form("sigma_%s",name),"width of gaussian",S1SigmaMass, S1SigmaMass_min, S1SigmaMass_max),
-    alpha(Form("alpha_%s",name),"tail shift", S1AlphaMass,S1AlphaMass_min,S1AlphaMass_max),
-    n(Form("n_%s",name),"power order",S1NMass, S1NMass_min, S1NMass_max),
-    cBall(Form("cball_%s",name),"crystalBall",var,mean,sigma,alpha,n)
-    {
-    }
+    /**
+     * @brief Construct a new Crystal Ball object. This represents a crystal ball
+     * function including all needed variables.
+     * 
+     * @param var observable variable in x axis.
+     * @param name a unique name to identify this crystal ball and its variables.
+     */
+    CrystalBall(RooRealVar& var, const char* name);
 
-    RooCBShape* getCB()
-    {
-        return &cBall;
-    }
+    /**
+     * @brief Get the crystal ball function.
+     * 
+     * @return RooCBShape* The interally saved crystal ball function.
+     */
+    RooCBShape* getCB();
 };
 
 class OniaMassFitter
@@ -69,31 +74,35 @@ class OniaMassFitter
     RooDataSet dataset;
 
     public:
-    OniaMassFitter(TTree* tree_,float massLow_=8.5,float massHigh_=10.0):
-    massLow(massLow_), massHigh(massHigh_),tree(tree_),
-    coeff1("c1","1S CB fraction", 10001.0, 0.0, 10000000.0),
-    coeff2("c2","1S CB fraction", 10000.0, 0.0, 10000000.0),
-    mass("mass","onia mass",massLow,massHigh),
-    dataset("mass dataset","mass dataset",tree_,mass),
-    cball1(mass,"1"),
-    cball2(mass,"2"),
-    dcball("dcb","double crystal ball", RooArgList(*(cball1.getCB()),*(cball2.getCB()) ),RooArgList(coeff1,coeff2) )
-    {
-    }
 
-    RooAbsReal* fit()
-    {
-        dcball.fitTo(dataset, Hesse(kTRUE),Timer(kTRUE),Extended());
-        return &dcball;
-    }
+    /**
+     * @brief Construct a new Onia Mass Fitter object. This objects allows
+     * to fit a dataset using a double crystal ball function.
+     * 
+     * @param tree_ Tree from where to get a branch called "mass" to fit
+     * @param massLow_ Mass low boundary.
+     * @param massHigh_ Mass high boundary.
+     */
+    OniaMassFitter(TTree* tree_,float massLow_=8.5,float massHigh_=10.0);
 
-    RooDataSet* getDataset()
-    {
-        return &dataset;
-    }
+    /**
+     * @brief Executes the fit using fitTo function.
+     * 
+     * @return RooAbsReal* fit function for mass.
+     */
+    RooAbsReal* fit();
 
-    RooRealVar* getVar()
-    {
-        return &mass;
-    }
+    /**
+     * @brief Get the Dataset object
+     * 
+     * @return RooDataSet* dataset saved from tree.
+     */
+    RooDataSet* getDataset();
+
+    /**
+     * @brief Get the mass observable variable.
+     * 
+     * @return RooRealVar* 
+     */
+    RooRealVar* getVar();
 };

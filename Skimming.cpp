@@ -1,8 +1,14 @@
 #include "Main.h"
 
-bool oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData);
-bool jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData);
+TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData);
+TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData);
 
+/**
+ * @brief Execute Onia Upsilon 1S skimming and Jets.
+ * 
+ * @param filename Name of file where to find the tree to skim.
+ * @param outputfilename Name of the root output file to save skimmed data.
+ */
 void Skim(const char* filename,const char* outputfilename)
 {
     //input file
@@ -20,8 +26,11 @@ void Skim(const char* filename,const char* outputfilename)
     //tree to write skimmed data
     std::unique_ptr<Onia_Aux> auxData;
 
-    oniaSkim(&file,oniaTTreeName,&auxData);
-    jetSkim(&file,jetTTreeName,auxData.get());
+    TTree* onia_skimmed =  oniaSkim(&file,ONIATTREENAME,&auxData);
+    onia_skimmed->Write(0,TObject::kOverwrite);
+
+    TTree* jet_skimmed = jetSkim(&file,JETTTREENAME,auxData.get());
+    jet_skimmed->Write(0,TObject::kOverwrite);
 
     outputfile.Close();
     file.Close();
@@ -29,14 +38,22 @@ void Skim(const char* filename,const char* outputfilename)
     return;
 }
 
-bool oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData)
+/**
+ * @brief Skim 
+ * 
+ * @param file File where to get the tree to skim.
+ * @param wroteTreeName Name of the skimmed tree to write
+ * @param auxData A place where to save auxiliary data used for jet skimming.
+ * @return Tree with skimmed data.
+ */
+TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData)
 {
     TTree *myTree = (TTree *)file->Get("hionia/myTree");
     if (myTree == nullptr)
     {
         file->Close();
         std::cout << "tree not found\n";
-        return false;
+        return nullptr;
     }
 
     //execute skim
@@ -47,27 +64,31 @@ bool oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* 
 
     (*auxData) = std::move(skimmer.auxData);
 
-    wroteTree->Write(0,TObject::kOverwrite);
-
-    return true;
+    return wroteTree;
 }
 
-bool jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
+/**
+ * @brief Same functionality as oniaSkim, but for jets.
+ * 
+ * @param file File where to get the tree to skim.
+ * @param wroteTreeName Name of the skimmed tree to write
+ * @param auxData A place where to get auxiliary data used for jet skimming.
+ * @return Tree with skimmed data.
+ */
+TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
 {
     TTree *myTree = (TTree *)file->Get("ak3PFJetAnalyzer/t");
     if (myTree == nullptr)
     {
         file->Close();
         std::cout << "tree not found\n";
-        return false;
+        return nullptr;
     }
 
-    //execute skim
     JetCutter cutter(auxData);
     
     JetSkimmer skimmer(myTree,wroteTreeName,auxData);
     TTree* wroteTree =skimmer.Skim(cutter);
 
-    wroteTree->Write(0,TObject::kOverwrite);
-    return true;
+    return wroteTree;
 }

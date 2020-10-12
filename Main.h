@@ -12,8 +12,8 @@
 #include "JetCutter.h"
 #include "OniaMassFit.h"
 
-#define oniaTTreeName ("onia_skimmed")
-#define jetTTreeName ("jet_skimmed")
+#define ONIATTREENAME ("onia_skimmed")
+#define JETTTREENAME ("jet_skimmed")
 
 void Skim(const char* filename,const char* outputfilename);
 
@@ -23,5 +23,6 @@ void Skim(const char* filename,const char* outputfilename);
 #include "JetSkimmer.cpp"
 #include "JetCutter.cpp"
 #include "Skimming.cpp"
+#include "OniaMassFit.cpp"
 #endif
 
