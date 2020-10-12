@@ -41,6 +41,7 @@ void massfit(const char* filename)
 
 /**
  * @brief Draws the data in variable var of dataset and fittedFunc in same plot.
+ * Save in current opened file
  * 
  * @param var variable to use in x axis.
  * @param dataset experimental/sim data points.

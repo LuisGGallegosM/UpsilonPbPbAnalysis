@@ -51,7 +51,6 @@ TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>
     TTree *myTree = (TTree *)file->Get("hionia/myTree");
     if (myTree == nullptr)
     {
-        file->Close();
         std::cout << "tree not found\n";
         return nullptr;
     }
@@ -80,7 +79,6 @@ TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
     TTree *myTree = (TTree *)file->Get("ak3PFJetAnalyzer/t");
     if (myTree == nullptr)
     {
-        file->Close();
         std::cout << "tree not found\n";
         return nullptr;
     }
