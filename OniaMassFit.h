@@ -14,8 +14,6 @@
 #include "RooAddPdf.h"
 #include "RooPlot.h"
 
-using namespace RooFit;
-
 //Using in CrystalBall function
 
 #define S1MEANMASS_MAX  (9.69)

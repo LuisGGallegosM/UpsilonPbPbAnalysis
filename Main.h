@@ -20,13 +20,13 @@
 #define JETTTREENAME ("jet_skimmed")
 
 //skimming
-
 void Skim(const char* filename,const char* outputfilename);
 
 //fitting
-
 void massfit(const char* filename, const char* outfilename);
-TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc);
+
+//drawing
+void Drawing(const char* filename);
 
 #if defined(__CLING__)
 #include "OniaSkimmer.cpp"

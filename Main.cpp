@@ -11,7 +11,10 @@ void Main()
     //Skim(filename,outputfilename);
 
     //Mass Fitting function
-    massfit(outputfilename,fitfilename);
+    //massfit(outputfilename,fitfilename);
+
+    //Generate drawings
+    Drawing(fitfilename);
 
     return;
 }

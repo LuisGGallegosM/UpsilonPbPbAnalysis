@@ -9,17 +9,17 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,float massLow_,float massHigh_):
     coeff1("c1","Crystal ball 1 coeff", 10001.0, 0.0, 10000000.0),
     coeff2("c2","Crystal ball 2 coeff", 10000.0, 0.0, 10000000.0),
     mass("mass","onia mass",massLow,massHigh),
-    dataset("mass dataset","mass dataset",tree_,mass),
+    dataset("dataset","mass dataset",tree_,mass),
     cball1(mass,"1"),
     cball2(mass,"2"),
-    dcball("dcb","double crystal ball", RooArgList(*(cball1.getCB()),*(cball2.getCB()) ),RooArgList(coeff1,coeff2) )
+    dcball("dcb_fit","double crystal ball", RooArgList(*(cball1.getCB()),*(cball2.getCB()) ),RooArgList(coeff1,coeff2) )
 {
 
 }
 
 RooAbsReal* OniaMassFitter::fit()
 {
-    dcball.fitTo(dataset, Hesse(kTRUE),Timer(kTRUE),Extended());
+    dcball.fitTo(dataset, RooFit::Hesse(kTRUE),RooFit::Timer(kTRUE),RooFit::Extended());
     return &dcball;
 }
 
