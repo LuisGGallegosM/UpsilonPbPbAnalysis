@@ -8,6 +8,7 @@
 #include "TString.h"
 #include "TH1.h"
 #include "TCanvas.h"
+#include "RooHist.h"
 
 #include "OniaSkimmer.h"
 #include "OniaCutter.h"
