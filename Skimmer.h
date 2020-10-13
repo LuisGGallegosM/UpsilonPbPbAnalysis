@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SKIMMER
+#define SKIMMER
 
 #include "TTree.h"
 #include "TLorentzVector.h"
@@ -101,3 +102,5 @@ class Skimmer
         input_branches.push_back(branch);
     }
 };
+
+#endif

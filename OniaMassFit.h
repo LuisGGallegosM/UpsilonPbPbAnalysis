@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ONIAMASSFIT
+#define ONIAMASSFIT
 
 #include <string>
 
@@ -106,3 +107,5 @@ class OniaMassFitter
      */
     RooRealVar* getVar();
 };
+
+#endif

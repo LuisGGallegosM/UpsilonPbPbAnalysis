@@ -1,4 +1,5 @@
-#pragma once
+#ifndef JETSKIMMER
+#define JETSKIMMER
 
 #include "Skimmer.h"
 #include "OniaSkimmer.h"
@@ -44,3 +45,5 @@ class JetSkimmer : public Skimmer<Jet_Input,Jet_Output>
     public:
     JetSkimmer(TTree* treeIn,const char* treeOutName, Onia_Aux* auxData);
 };
+
+#endif

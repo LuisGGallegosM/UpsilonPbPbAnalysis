@@ -1,5 +1,6 @@
 
-#pragma once
+#ifndef ONIASKIMMER
+#define ONIASKIMMER
 
 #include <unordered_map>
 #include <memory>
@@ -54,3 +55,4 @@ class OniaSkimmer : public Skimmer<Onia_Input,Onia_Output>
     std::unique_ptr<Onia_Aux> auxData;
 };
 
+#endif

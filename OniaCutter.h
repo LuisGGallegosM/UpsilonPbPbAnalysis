@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ONIACUTTER
+#define ONIACUTTER
 
 #include "HLT_triggers.h"
 #include "OniaSkimmer.h"
@@ -21,3 +22,5 @@ class OniaCutter
     bool operator()(Onia_Input* input, Int_t index);
     OniaCutter();
 };
+
+#endif

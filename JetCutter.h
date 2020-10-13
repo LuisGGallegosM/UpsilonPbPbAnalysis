@@ -1,4 +1,5 @@
-#pragma once
+#ifndef JETCUTTER
+#define JETCUTTER
 
 #include "JetSkimmer.h"
 #include "OniaSkimmer.h"
@@ -14,3 +15,5 @@ class JetCutter
     bool operator()(Jet_Input* input, Int_t index);
     JetCutter(Onia_Aux* auxDat);
 };
+
+#endif
