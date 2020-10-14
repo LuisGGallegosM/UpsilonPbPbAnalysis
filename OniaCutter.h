@@ -15,6 +15,7 @@ class OniaCutter
     Float_t minVtxProb;
     bool isMC;
     ULong64_t trigSelect;
+    Int_t sign;
 
     bool isSoft(Onia_Input* input, Int_t index);
 

@@ -23,6 +23,7 @@ struct Onia_Input
     UInt_t eventNb;
     UInt_t lumi;
     Int_t* whichGen;
+    Int_t* sign;
 
     Int_t getSize();
 

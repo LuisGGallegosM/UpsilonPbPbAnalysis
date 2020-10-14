@@ -19,6 +19,7 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName)
     addInput("Reco_mu_dz",dataIn.dz);
     addInput("Reco_QQ_VtxProb",dataIn.VtxProb);
     addInput("Reco_QQ_trig",dataIn.trig);
+    addInput("Reco_QQ_sign",dataIn.sign);
     addInput("Reco_mu_whichGen",dataIn.whichGen);
 
     //output branches
@@ -69,6 +70,7 @@ Onia_Input::Onia_Input()
     VtxProb = new Float_t[maxBranchSize];
     trig = new ULong64_t[maxBranchSize];
     whichGen = new Int_t[maxBranchSize];
+    sign = new Int_t[maxBranchSize];
 }
 
 Onia_Input::~Onia_Input()
@@ -84,4 +86,5 @@ Onia_Input::~Onia_Input()
     delete[] VtxProb;
     delete[] trig;
     delete[] whichGen;
+    delete[] sign;
 }
