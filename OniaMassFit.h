@@ -71,6 +71,7 @@ class OniaMassFitter
     CrystalBall cball2;
     RooAddPdf dcball;
     RooDataSet dataset;
+    RooFitResult* results;
 
     public:
 
@@ -82,7 +83,7 @@ class OniaMassFitter
      * @param massLow_ Mass low boundary.
      * @param massHigh_ Mass high boundary.
      */
-    OniaMassFitter(TTree* tree_,float massLow_=8.5,float massHigh_=10.0);
+    OniaMassFitter(TTree* tree_,float massLow_,float massHigh_);
 
     /**
      * @brief Executes the fit using fitTo function.
@@ -104,6 +105,8 @@ class OniaMassFitter
      * @return RooRealVar* 
      */
     RooRealVar* getVar();
+
+    RooFitResult* getResults();
 };
 
 #endif

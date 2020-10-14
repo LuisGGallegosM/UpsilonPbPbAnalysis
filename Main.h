@@ -15,18 +15,30 @@
 #include "JetSkimmer.h"
 #include "JetCutter.h"
 #include "OniaMassFit.h"
+#include "TextDrawer.h"
 
 #define ONIATTREENAME ("onia_skimmed")
 #define JETTTREENAME ("jet_skimmed")
+
+struct kineCutParam
+{
+    int nBins;
+    float ptLow;
+    float ptHigh;
+    float yLow;
+    float yHigh;
+    float massLow;
+    float massHigh;
+};
 
 //skimming
 void Skim(const char* filename,const char* outputfilename);
 
 //fitting
-void massfit(const char* filename, const char* outfilename);
+void massfit(const char* filename, const char* outfilename, const kineCutParam* kineCut);
 
 //drawing
-void Drawing(const char* filename);
+void Drawing(const char* filename, const kineCutParam* kineCut);
 
 #if defined(__CLING__)
 #include "OniaSkimmer.cpp"
@@ -36,6 +48,7 @@ void Drawing(const char* filename);
 #include "Skimming.cpp"
 #include "OniaMassFit.cpp"
 #include "Fitter.cpp"
+#include "TextDrawer.h"
 #endif
 
 #endif

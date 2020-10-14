@@ -8,7 +8,7 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,float massLow_,float massHigh_):
     massLow(massLow_), massHigh(massHigh_),tree(tree_),
     coeff1("c1","Crystal ball 1 coeff", 10001.0, 0.0, 10000000.0),
     coeff2("c2","Crystal ball 2 coeff", 10000.0, 0.0, 10000000.0),
-    mass("mass","onia mass",massLow,massHigh),
+    mass("mass","onia mass",massLow,massHigh,"GeV/c^{2}"),
     dataset("dataset","mass dataset",tree_,mass),
     cball1(mass,"1"),
     cball2(mass,"2"),
@@ -19,7 +19,7 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,float massLow_,float massHigh_):
 
 RooAbsReal* OniaMassFitter::fit()
 {
-    dcball.fitTo(dataset, RooFit::Hesse(kTRUE),RooFit::Timer(kTRUE),RooFit::Extended());
+    results=dcball.fitTo(dataset,RooFit::Save(),RooFit::Range(massLow,massHigh), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
     return &dcball;
 }
 
@@ -31,6 +31,11 @@ RooDataSet* OniaMassFitter::getDataset()
 RooRealVar* OniaMassFitter::getVar()
 {
     return &mass;
+}
+
+RooFitResult* OniaMassFitter::getResults()
+{
+    return results;
 }
 
 //Crystal ball member functions.
