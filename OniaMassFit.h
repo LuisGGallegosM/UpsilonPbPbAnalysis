@@ -32,6 +32,17 @@
 #define S1NMASS         (1.705)
 #define S1NMASS_MIN     (0.1)
 
+struct kineCutParam
+{
+    int nBins;
+    float ptLow;
+    float ptHigh;
+    float yLow;
+    float yHigh;
+    float massLow;
+    float massHigh;
+};
+
 class CrystalBall
 {
     RooRealVar mean;
@@ -61,10 +72,12 @@ class CrystalBall
 
 class OniaMassFitter
 {
-    float massLow; 
-    float massHigh;
+    const kineCutParam* kineCut;
+    std::string kineCutStr;
     TTree* tree;
     RooRealVar mass;
+    RooRealVar pT;
+    RooRealVar y;
     RooRealVar coeff1;
     RooRealVar coeff2;
     CrystalBall cball1;
@@ -72,6 +85,8 @@ class OniaMassFitter
     RooAddPdf dcball;
     RooDataSet dataset;
     RooFitResult* results;
+
+    std::string kineCutExp(const kineCutParam* kineCut);
 
     public:
 
@@ -83,7 +98,7 @@ class OniaMassFitter
      * @param massLow_ Mass low boundary.
      * @param massHigh_ Mass high boundary.
      */
-    OniaMassFitter(TTree* tree_,float massLow_,float massHigh_);
+    OniaMassFitter(TTree* tree_,const kineCutParam* kineCut);
 
     /**
      * @brief Executes the fit using fitTo function.

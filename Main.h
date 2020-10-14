@@ -20,17 +20,6 @@
 #define ONIATTREENAME ("onia_skimmed")
 #define JETTTREENAME ("jet_skimmed")
 
-struct kineCutParam
-{
-    int nBins;
-    float ptLow;
-    float ptHigh;
-    float yLow;
-    float yHigh;
-    float massLow;
-    float massHigh;
-};
-
 //skimming
 void Skim(const char* filename,const char* outputfilename);
 
@@ -48,7 +37,8 @@ void Drawing(const char* filename, const kineCutParam* kineCut);
 #include "Skimming.cpp"
 #include "OniaMassFit.cpp"
 #include "Fitter.cpp"
-#include "TextDrawer.h"
+#include "TextDrawer.cpp"
+#include "Drawing.cpp"
 #endif
 
 #endif

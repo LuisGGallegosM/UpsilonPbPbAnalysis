@@ -2,14 +2,18 @@
 
 #include "OniaMassFit.h"
 
+using namespace std;
+
 //OniaMassFitter member functions.
 
-OniaMassFitter::OniaMassFitter(TTree* tree_,float massLow_,float massHigh_):
-    massLow(massLow_), massHigh(massHigh_),tree(tree_),
+OniaMassFitter::OniaMassFitter(TTree* tree_,const kineCutParam* kineCut_):
+    kineCut(kineCut_),kineCutStr(kineCutExp(kineCut_)),tree(tree_),
     coeff1("c1","Crystal ball 1 coeff", 10001.0, 0.0, 10000000.0),
     coeff2("c2","Crystal ball 2 coeff", 10000.0, 0.0, 10000000.0),
-    mass("mass","onia mass",massLow,massHigh,"GeV/c^{2}"),
-    dataset("dataset","mass dataset",tree_,mass),
+    mass("mass","onia mass",kineCut->massLow,kineCut->massHigh,"GeV/c^{2}"),
+    pT("pT","momentum",kineCut->ptLow,kineCut->ptHigh,"GeV/c"),
+    y("y","rapidity",kineCut->yLow,kineCut->yHigh),
+    dataset("dataset","mass dataset",tree_, RooArgSet(mass,pT,y),kineCutStr.data()),
     cball1(mass,"1"),
     cball2(mass,"2"),
     dcball("dcb_fit","double crystal ball", RooArgList(*(cball1.getCB()),*(cball2.getCB()) ),RooArgList(coeff1,coeff2) )
@@ -17,9 +21,16 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,float massLow_,float massHigh_):
 
 }
 
+string OniaMassFitter::kineCutExp(const kineCutParam* kineCut)
+{
+    string str(Form("pT < %.3f && pT > %.3f",kineCut->ptHigh,kineCut->ptLow));
+    str.append(Form("&& y < %.3f && y > %.3f",kineCut->yHigh,kineCut->yLow));
+    return str;
+}
+
 RooAbsReal* OniaMassFitter::fit()
 {
-    results=dcball.fitTo(dataset,RooFit::Save(),RooFit::Range(massLow,massHigh), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
+    results=dcball.fitTo(dataset,RooFit::Save(),RooFit::Range(kineCut->massLow,kineCut->massHigh), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
     return &dcball;
 }
 

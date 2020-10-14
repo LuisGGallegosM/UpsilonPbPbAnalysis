@@ -21,11 +21,11 @@ void TextDrawer::setColor(int color)
 void TextDrawer::drawText(const char *text)
 {
    TLatex *tex = new TLatex(pos_text_x,pos_text_y-pos_y_diff*lines,text);
-   tex->SetTextFont(43);
+   tex->SetTextFont(63);
    tex->SetTextSize(text_size);
    tex->SetTextColor(text_color);
    tex->SetLineWidth(1);
    tex->SetNDC();
-   tex->Draw();
+   tex->Draw("same");
    ++lines;
 }

@@ -74,7 +74,7 @@
 			"command": "root",
 			"args": [
 				"-q",
-				"${file}"
+				"Main.cpp"
 			],
 			"group": {
 				"kind": "build",

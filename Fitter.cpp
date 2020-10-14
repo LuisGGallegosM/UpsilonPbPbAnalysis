@@ -13,7 +13,7 @@ void massfit(const char* filename, const char* outfilename, const kineCutParam* 
 
     TTree *tree_skimmed = (TTree *)file.Get(ONIATTREENAME);
     
-    OniaMassFitter massFitter(tree_skimmed, kineCut->massLow, kineCut->massHigh);
+    OniaMassFitter massFitter(tree_skimmed, kineCut);
 
     TFile newfile(outfilename,"RECREATE");
 

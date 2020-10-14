@@ -14,7 +14,7 @@ class TextDrawer
 
     public:
 
-    TextDrawer(float pos_x,float pox_y, float fontSize = 10.0f);
+    TextDrawer(float pos_x,float pox_y, float fontSize = 12.0f);
 
     void setYDiff(float y_diff);
 

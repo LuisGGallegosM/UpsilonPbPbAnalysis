@@ -14,7 +14,7 @@ void Main()
     kineCut.yHigh=2.4f;
     kineCut.massLow =8.5f;
     kineCut.massHigh =10.0f;
-    kineCut.nBins = (kineCut.massHigh- kineCut.massLow)*40;
+    kineCut.nBins = (kineCut.massHigh- kineCut.massLow)*20;
 
     //Skimming function
     //Skim(filename,outputfilename);
