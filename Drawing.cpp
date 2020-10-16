@@ -89,9 +89,11 @@ TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,R
     //draw fitted and dataset function
     graph->cd();
     RooPlot* plot = var->frame(kineCut->nBins);
-    fittedFunc->plotOn(plot,Name(FITFUNCNAME),Normalization(1.0,RooAbsReal::RelativeExpected));
-    fittedFunc->plotOn(plot,Name("cb1"),Components("cball_1"),LineStyle(2),LineColor(kGreen),Normalization(1.0,RooAbsReal::RelativeExpected));
-    fittedFunc->plotOn(plot,Name("cb2"),Components("cball_2"),LineStyle(2),LineColor(kRed),Normalization(1.0,RooAbsReal::RelativeExpected));
+    fittedFunc->plotOn(plot,Name(FITFUNCNAME),LineColor(kOrange+7),Normalization(1.0,RooAbsReal::RelativeExpected));
+    fittedFunc->plotOn(plot,Name("dcb"),Components("dcb"),LineStyle(9),LineColor(13),Normalization(1.0,RooAbsReal::RelativeExpected));
+    fittedFunc->plotOn(plot,Name("cb1"),Components("cball_1"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
+    fittedFunc->plotOn(plot,Name("cb2"),Components("cball_2"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
+    fittedFunc->plotOn(plot,Name("bkg"),Components("bkg"),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
     dataset->plotOn(plot,Name(DATASETNAME), MarkerSize(0.5), XErrorSize(0));
     TLegend* legend= drawLegend(plot);
 
@@ -124,11 +126,11 @@ void setGraphStyle(RooPlot* plot,const kineCutParam* kineCut)
 {
     float div= (kineCut->massHigh - kineCut->massLow)/(kineCut->nBins);
 
-    plot->SetTitle("PbPb #varUpsilon(1S) MC ( 5.02 TeV)");
+    plot->SetTitle("PbPb Nonprompt #varUpsilon(1S) MC ( 5.02 TeV)");
     plot->SetFillStyle(4000);
     plot->SetMarkerStyle(2);
     plot->SetMarkerSize(0.02);
-    //plot->SetAxisRange(kineCut->massLow,kineCut->massHigh);
+    plot->SetAxisRange(kineCut->massLow,kineCut->massHigh);
 
     plot->GetXaxis()->SetLabelSize(0);
     plot->GetXaxis()->SetTitleSize(0);
@@ -152,9 +154,9 @@ void setPullStyle(RooPlot* pullPlot)
     pullPlot->SetDrawOption("HIST");
     pullPlot->GetYaxis()->SetTitleOffset(0.31) ;
     pullPlot->GetYaxis()->SetTitle("Pull") ;
-    pullPlot->GetYaxis()->SetTitleSize(0.13) ;
+    pullPlot->GetYaxis()->SetTitleSize(0.10) ;
     pullPlot->GetYaxis()->SetLabelSize(0.09) ;
-    pullPlot->GetYaxis()->SetRangeUser(-6,6) ;
+    pullPlot->GetYaxis()->SetRangeUser(-7,7) ;
     pullPlot->GetYaxis()->CenterTitle();
     pullPlot->GetYaxis()->SetTickSize(0.02);
     pullPlot->GetYaxis()->SetNdivisions(505);
@@ -163,7 +165,7 @@ void setPullStyle(RooPlot* pullPlot)
     pullPlot->GetXaxis()->SetTitleOffset(1.20) ;
     pullPlot->GetXaxis()->SetLabelOffset(0.04) ;
     pullPlot->GetXaxis()->SetLabelSize(0.10) ;
-    pullPlot->GetXaxis()->SetTitleSize(0.15) ;
+    pullPlot->GetXaxis()->SetTitleSize(0.10) ;
     pullPlot->GetXaxis()->CenterTitle();
     pullPlot->GetXaxis()->SetRangeUser(8.5,10.0);
     pullPlot->GetXaxis()->SetTickSize(0.03);
@@ -172,12 +174,14 @@ void setPullStyle(RooPlot* pullPlot)
 
 TLegend* drawLegend(RooPlot* plot)
 {
-    TLegend* fitleg = new TLegend(0.75,0.65,0.85,0.85); 
-    fitleg->SetTextSize(15);
+    TLegend* fitleg = new TLegend(0.70,0.65,0.85,0.85);
+    fitleg->SetTextSize(12);
     fitleg->SetTextFont(43);
     fitleg->SetBorderSize(0);
     fitleg->AddEntry(plot->findObject(DATASETNAME),"Data","pe");
     fitleg->AddEntry(plot->findObject(FITFUNCNAME),"Total fit","l");
+    fitleg->AddEntry(plot->findObject("dcb"),"Signal","l");
+    fitleg->AddEntry(plot->findObject("bkg"),"Background","l");
     fitleg->AddEntry(plot->findObject("cb1"),"CBall 1","l");
     fitleg->AddEntry(plot->findObject("cb2"),"CBall 2","l");
     return fitleg;
@@ -190,8 +194,7 @@ void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const kineCutParam* kineCu
 
     float alpha_1 = params->getRealValue("alpha_1");
     float alpha_2 = params->getRealValue("alpha_2");
-    float c1 = params->getRealValue("c1");
-    float c2 = params->getRealValue("c2");
+    float fs = params->getRealValue("fs");
     float mean_1 =params->getRealValue("mean_1");
     float mean_2 =params->getRealValue("mean_2");
     float n_1 = params->getRealValue("n_1");
@@ -204,7 +207,7 @@ void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const kineCutParam* kineCu
     tdrawer.drawText( Form("m_{1}=%.3f, m_{2}=%.3f",mean_1,mean_2));
     tdrawer.drawText( Form("N_{1}=%.3f, N_{2}=%.3f",n_1,n_2));
     tdrawer.drawText( Form("#sigma_{1}=%.4f, #sigma_{2}=%.4f",sigma_1,sigma_2));
-    tdrawer.drawText( Form("f_{1}=%.4f",c1/(c1+c2)));
+    tdrawer.drawText( Form("f_{s}=%.4f",fs));
 
     TextDrawer tdrawer2(0.45,0.8);
     if (kineCut->ptLow == 0.0f)
@@ -236,7 +239,7 @@ void drawPullText(RooHist* hist,RooFitResult* fitResults)
     int nFitPar = fitResults->floatParsFinal().getSize();
     int ndf = nFullBins - nFitPar;
 
-    TLatex *tex = new TLatex(0.65,0.85,Form("#chi^{2}/ndf : %.1f / %d",chisq,ndf));
+    TLatex *tex = new TLatex(0.72,0.93,Form("#chi^{2}/ndf : %.1f / %d",chisq,ndf));
     tex->SetTextFont(43);
     tex->SetTextSize(12.0);
     tex->SetNDC();

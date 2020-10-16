@@ -13,12 +13,13 @@
 #include "RooFitResult.h"
 #include "RooAddPdf.h"
 #include "RooPlot.h"
+#include "RooChebychev.h"
 
 //Using in CrystalBall function
 
-#define S1MEANMASS_MAX  (9.69)
+#define S1MEANMASS_MAX  (9.56)
 #define S1MEANMASS      (9.46)
-#define S1MEANMASS_MIN  (9.26)
+#define S1MEANMASS_MIN  (9.36)
 
 #define S1SIGMAMASS_MAX     (0.6)
 #define S1SIGMAMASS         (0.1)
@@ -41,6 +42,18 @@ struct kineCutParam
     float yHigh;
     float massLow;
     float massHigh;
+};
+
+class Chevychev2
+{
+    RooRealVar ch4_k1;
+    RooRealVar ch4_k2;
+    RooChebychev chev;
+
+    public:
+    Chevychev2(RooRealVar& var,const char* name);
+
+    RooChebychev* getChev();
 };
 
 class CrystalBall
@@ -78,11 +91,14 @@ class OniaMassFitter
     RooRealVar mass;
     RooRealVar pT;
     RooRealVar y;
-    RooRealVar coeff1;
-    RooRealVar coeff2;
+    RooRealVar fs;
+    RooRealVar nSig;
+    RooRealVar nBkg;
     CrystalBall cball1;
     CrystalBall cball2;
+    Chevychev2 bkg;
     RooAddPdf dcball;
+    RooAddPdf dcballbkg;
     RooDataSet dataset;
     RooFitResult* results;
 
