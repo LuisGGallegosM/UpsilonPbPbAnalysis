@@ -2,3 +2,5 @@
 *.out
 *.pdf
 .fuse*
+.vscode
+.vs
