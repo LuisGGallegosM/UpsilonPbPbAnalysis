@@ -1,0 +1,91 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+		{
+			"type": "shell",
+			"label": "C++: g++ root build",
+			"command": "/usr/bin/g++",
+			"args": [
+				"-g",
+				"-I",
+				"`${ROOTSYS}/bin/root-config",
+				"--cflags`",
+				"-I",
+				"/usr/include/c++/9",
+				"\"${workspaceFolder}/\"*.cpp",
+				"\"${workspaceFolder}/Drawing/\"*.cpp",
+				"\"${workspaceFolder}/Fitting/\"*.cpp",
+				"\"${workspaceFolder}/Skimming/\"*.cpp",
+				"`${ROOTSYS}/bin/root-config",
+				"--ldflags",
+				"--glibs`",
+				"-lRooFit",
+				"-lRooFitCore",
+				"-lMinuit",
+				"-std=c++14"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "C++: g++ root build release",
+			"command": "/usr/bin/g++",
+			"args": [
+				"-I",
+				"`${ROOTSYS}/bin/root-config",
+				"--cflags`",
+				"-I",
+				"/usr/include/c++/9",
+				"${workspaceFolder}/*.cpp",
+				"`${ROOTSYS}/bin/root-config",
+				"--ldflags",
+				"--glibs`",
+				"-lRooFit",
+				"-lRooFitCore",
+				"-lMinuit"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "C++: g++ root build and run",
+			"command": "${workspaceFolder}/a.out",
+			"problemMatcher": [],
+			"dependsOn": [
+				"C++: g++ root build"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"type": "shell",
+			"label": "C++: root Cling execute",
+			"command": "root",
+			"args": [
+				"-q",
+				"Main.cpp"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [
+				"$gcc"
+			]
+		}
+	]
+}
