@@ -17,7 +17,7 @@ OniaCutter::OniaCutter()
 bool OniaCutter::operator()(Onia_Input* input,Int_t index)
 {
     //check for triggers
-    if ((input->trig[index] & trigSelect) == trigSelect) return false;
+    if ((input->trig[index] & trigSelect) != trigSelect) return false;
 
     if (input->sign[index] != sign) return false;
 

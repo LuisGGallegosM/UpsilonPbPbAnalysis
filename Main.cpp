@@ -17,13 +17,13 @@ void Main()
     kineCut.nBins = (kineCut.massHigh- kineCut.massLow)*20;
 
     //Skimming function
-    //Skim(filename,outputfilename);
+    Skim(filename,outputfilename);
 
     //Mass Fitting function
     //massfit(outputfilename,fitfilename,&kineCut);
 
     //Generate drawings
-    Drawing(fitfilename,&kineCut);
+    //Drawing(fitfilename,&kineCut);
 
     return;
 }
