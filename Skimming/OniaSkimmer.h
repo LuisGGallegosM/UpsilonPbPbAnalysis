@@ -8,7 +8,8 @@
 
 struct Onia_Input
 {
-    TClonesArray* mom4;
+    TClonesArray* mom4_QQ;
+    TClonesArray* mom4_mu;
     Int_t size;
     Int_t* mupl_idx;
     Int_t* mumi_idx;
@@ -39,6 +40,12 @@ struct Onia_Output
     Float_t y;
     Float_t phi;
     Float_t eta;
+    Float_t pT_mi;
+    Float_t eta_mi;
+    Float_t phi_mi;
+    Float_t pT_pl;
+    Float_t eta_pl;
+    Float_t phi_pl;
 };
 
 struct Onia_Aux

@@ -14,16 +14,19 @@ void Main()
     kineCut.yHigh=2.4f;
     kineCut.massLow =8.5f;
     kineCut.massHigh =10.0f;
-    kineCut.nBins = (kineCut.massHigh- kineCut.massLow)*20;
+    kineCut.singleMuPtLow=3.5f;
+    kineCut.singleMuEtaHigh=2.4f;
+    kineCut.nBins = (kineCut.massHigh- kineCut.massLow)*40;
+    kineCut.bkgOn =true;
 
     //Skimming function
-    Skim(filename,outputfilename);
+    //Skim(filename,outputfilename);
 
     //Mass Fitting function
-    //massfit(outputfilename,fitfilename,&kineCut);
+    massfit(outputfilename,fitfilename,&kineCut);
 
     //Generate drawings
-    //Drawing(fitfilename,&kineCut);
+    Drawing(fitfilename,&kineCut);
 
     return;
 }

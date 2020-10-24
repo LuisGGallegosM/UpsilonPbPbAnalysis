@@ -14,6 +14,8 @@
 #include "RooAddPdf.h"
 #include "RooPlot.h"
 #include "RooChebychev.h"
+#include "RooFormulaVar.h"
+#include "RooExtendPdf.h"
 
 //Using in CrystalBall function
 
@@ -21,17 +23,17 @@
 #define S1MEANMASS      (9.46)
 #define S1MEANMASS_MIN  (9.36)
 
-#define S1SIGMAMASS_MAX     (0.6)
+#define S1SIGMAMASS_MAX     (0.4)
 #define S1SIGMAMASS         (0.1)
-#define S1SIGMAMASS_MIN     (0.001)
+#define S1SIGMAMASS_MIN     (0.01)
 
-#define S1ALPHAMASS_MAX (8.5)
+#define S1ALPHAMASS_MAX (5.5)
 #define S1ALPHAMASS     (2.522)
-#define S1ALPHAMASS_MIN (0.1)
+#define S1ALPHAMASS_MIN (0.5)
 
-#define S1NMASS_MAX     (8.5)
+#define S1NMASS_MAX     (5.5)
 #define S1NMASS         (1.705)
-#define S1NMASS_MIN     (0.1)
+#define S1NMASS_MIN     (0.5)
 
 struct kineCutParam
 {
@@ -40,8 +42,11 @@ struct kineCutParam
     float ptHigh;
     float yLow;
     float yHigh;
+    float singleMuPtLow;
+    float singleMuEtaHigh;
     float massLow;
     float massHigh;
+    bool bkgOn;
 };
 
 class Chevychev2
@@ -58,6 +63,7 @@ class Chevychev2
 
 class CrystalBall
 {
+    protected:
     RooRealVar mean;
     RooRealVar sigma;
     RooRealVar alpha;
@@ -83,6 +89,21 @@ class CrystalBall
     RooCBShape* getCB();
 };
 
+class DoubleCrystalBall : protected CrystalBall
+{
+    RooFormulaVar mean_2;
+    RooRealVar sigma_2;
+    RooFormulaVar alpha_2;
+    RooFormulaVar n_2;
+    RooRealVar fs;
+    RooCBShape cBall_2;
+    RooAddPdf dcball;
+
+    public:
+    DoubleCrystalBall(RooRealVar& var, const char* name1, const char* name2);
+    RooAbsPdf* getDCB();
+};
+
 class OniaMassFitter
 {
     const kineCutParam* kineCut;
@@ -91,16 +112,17 @@ class OniaMassFitter
     RooRealVar mass;
     RooRealVar pT;
     RooRealVar y;
-    RooRealVar fs;
+    RooRealVar pT_mi;
+    RooRealVar eta_mi;
+    RooRealVar pT_pl;
+    RooRealVar eta_pl;
     RooRealVar nSig;
     RooRealVar nBkg;
-    CrystalBall cball1;
-    CrystalBall cball2;
+    DoubleCrystalBall dcball;
     Chevychev2 bkg;
-    RooAddPdf dcball;
-    RooAddPdf dcballbkg;
     RooDataSet dataset;
     RooFitResult* results;
+    std::unique_ptr<RooAbsPdf> output;
 
     std::string kineCutExp(const kineCutParam* kineCut);
 
@@ -121,7 +143,7 @@ class OniaMassFitter
      * 
      * @return RooAbsReal* fit function for mass.
      */
-    RooAbsReal* fit();
+    RooAbsReal* fit(bool bkgOn=false);
 
     /**
      * @brief Get the Dataset object

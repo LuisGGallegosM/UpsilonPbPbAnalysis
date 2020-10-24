@@ -14,6 +14,7 @@ class OniaCutter
     Float_t maxDz;
     Float_t minVtxProb;
     bool isMC;
+    bool checkSign;
     ULong64_t trigSelect;
     Int_t sign;
 

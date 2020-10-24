@@ -8,7 +8,8 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName)
     TBranch* branch;
 
     //input branches
-    addInput("Reco_QQ_4mom",&dataIn.mom4);
+    addInput("Reco_QQ_4mom",&dataIn.mom4_QQ);
+    addInput("Reco_mu_4mom",&dataIn.mom4_mu);
     addInput("Reco_QQ_size",&dataIn.size);
     addInput("Reco_QQ_mupl_idx",dataIn.mupl_idx);
     addInput("Reco_QQ_mumi_idx",dataIn.mumi_idx);
@@ -29,6 +30,12 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName)
     addOutput("pT",&dataOut.pT);
     addOutput("y",&dataOut.y);
     addOutput("Evt",&dataOut.Evt);
+    addOutput("pT_mi",&dataOut.pT_mi);
+    addOutput("pT_pl",&dataOut.pT_pl);
+    addOutput("eta_mi",&dataOut.eta_mi);
+    addOutput("eta_pl",&dataOut.eta_pl);
+    addOutput("phi_mi",&dataOut.phi_mi);
+    addOutput("phi_pl",&dataOut.phi_pl);
 
     auxData = std::make_unique<Onia_Aux>();
     auxData->events.reserve(200000);
@@ -38,13 +45,23 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName)
 
 void OniaSkimmer::WriteData(Int_t index, Long64_t entry)
 {
-    TLorentzVector* mom4vec=(TLorentzVector*) dataIn.mom4->At(index);
+    TLorentzVector* mom4vec=(TLorentzVector*) dataIn.mom4_QQ->At(index);
+    TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn.mom4_mu->At(dataIn.mumi_idx[index]);
+    TLorentzVector* mom4vec_mupl = (TLorentzVector*) dataIn.mom4_mu->At(dataIn.mupl_idx[index]);
     dataOut.mass= mom4vec->M();
     dataOut.pT = mom4vec->Pt();
     dataOut.y = mom4vec->Rapidity();
     dataOut.phi = mom4vec->Phi();
     dataOut.eta = mom4vec->Eta();
     dataOut.Evt = entry;
+
+    dataOut.pT_mi = mom4vec_mumi->Pt();
+    dataOut.eta_mi = mom4vec_mumi->Eta();
+    dataOut.phi_mi = mom4vec_mumi->Phi();
+
+    dataOut.pT_pl = mom4vec_mupl->Pt();
+    dataOut.eta_pl = mom4vec_mupl->Eta();
+    dataOut.phi_pl = mom4vec_mupl->Phi();
 
     auxData->events.insert({entry,dataOut});
 }
@@ -59,7 +76,8 @@ Int_t Onia_Input::getSize()
 
 Onia_Input::Onia_Input()
 {
-    mom4 = new TClonesArray("TLorentzVector");
+    mom4_QQ = new TClonesArray("TLorentzVector");
+    mom4_mu = new TClonesArray("TLorentzVector");
     mupl_idx = new Int_t[maxBranchSize];
     mumi_idx = new Int_t[maxBranchSize];
     SelectionType = new Int_t[maxBranchSize];
@@ -75,7 +93,8 @@ Onia_Input::Onia_Input()
 
 Onia_Input::~Onia_Input()
 {
-    delete mom4;
+    delete mom4_QQ;
+    delete mom4_mu;
     delete[] mupl_idx;
     delete[] mumi_idx;
     delete[] SelectionType;

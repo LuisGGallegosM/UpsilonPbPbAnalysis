@@ -36,7 +36,7 @@ void Drawing(const char* filename, const kineCutParam* kineCut);
 #include "Skimming/JetCutter.cpp"
 #include "Skimming.cpp"
 #include "Fitting/OniaMassFit.cpp"
-#include "Fitter.cpp"
+#include "Fitting.cpp"
 #include "Drawing/TextDrawer.cpp"
 #include "Drawing.cpp"
 #endif

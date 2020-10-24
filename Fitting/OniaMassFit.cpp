@@ -8,33 +8,47 @@ using namespace std;
 
 OniaMassFitter::OniaMassFitter(TTree* tree_,const kineCutParam* kineCut_):
     kineCut(kineCut_),kineCutStr(kineCutExp(kineCut_)),tree(tree_),
-    fs("fs","Crystal ball 1 coeff", 0.5, 0.0, 1.0),
-    nSig("nSig","Upsilon Signal", 100001.0, 0.0, 100000000.0),
-    nBkg("nBkg","Bkg signal", 10000.0, 0.0, 100000000.0),
+    nSig("nSig","Upsilon Signal", 0.0, 10000000.0),
+    nBkg("nBkg","Bkg signal", 0.0, 1000000.0),
     mass("mass","onia mass",kineCut->massLow,kineCut->massHigh,"GeV/c^{2}"),
-    pT("pT","momentum",kineCut->ptLow,kineCut->ptHigh,"GeV/c"),
-    y("y","rapidity",kineCut->yLow,kineCut->yHigh),
-    dataset("dataset","mass dataset",tree_, RooArgSet(mass,pT,y),kineCutStr.data()),
-    cball1(mass,"1"),
-    cball2(mass,"2"),
-    bkg(mass,"bkg"),
-    dcball("dcb","double crystal ball", RooArgList(*(cball1.getCB()),*(cball2.getCB()) ),RooArgList(fs) ),
-    dcballbkg("dcb_fit","double crystal ball + Bkg", RooArgList(dcball,*(bkg.getChev()) ),RooArgList(nSig,nBkg) )
+    pT("pT","momentum quarkonia",kineCut->ptLow,kineCut->ptHigh,"GeV/c"),
+    y("y","rapidity quarkonia",kineCut->yLow,kineCut->yHigh),
+    pT_mi("pT_mi","momentum minus muon",kineCut->ptLow,kineCut->ptHigh,"GeV/c"),
+    pT_pl("pT_pl","momentum plus muon",kineCut->ptLow,kineCut->ptHigh,"GeV/c"),
+    eta_mi("eta_mi","Eta minus muon",kineCut->singleMuEtaHigh),
+    eta_pl("eta_pl","Eta plus muon",kineCut->singleMuEtaHigh),
+
+    dataset("dataset","mass dataset",tree_, RooArgSet(mass,pT,y,pT_mi,pT_pl,eta_mi,eta_pl),kineCutStr.data()),
+    dcball(mass,"1","2"),
+    bkg(mass,"bkg")
 {
 
 }
 
 string OniaMassFitter::kineCutExp(const kineCutParam* kineCut)
 {
-    string str(Form("pT < %.3f && pT > %.3f",kineCut->ptHigh,kineCut->ptLow));
-    str.append(Form("&& y < %.3f && y > %.3f",kineCut->yHigh,kineCut->yLow));
+    string str(Form("(pT < %.3f) && (pT > %.3f)",kineCut->ptHigh,kineCut->ptLow));
+    str.append(Form("&& (abs(y) < %.3f) && (abs(y) > %.3f)",kineCut->yHigh,kineCut->yLow));
+    str.append(Form("&& (pT_mi  > %.3f) && (abs(eta_mi) < %.3f)",kineCut->singleMuPtLow,kineCut->singleMuEtaHigh));
+    str.append(Form("&& (pT_pl  > %.3f) && (abs(eta_pl) < %.3f)",kineCut->singleMuPtLow,kineCut->singleMuEtaHigh));
     return str;
 }
 
-RooAbsReal* OniaMassFitter::fit()
+RooAbsReal* OniaMassFitter::fit(bool bkgOn)
 {
-    results=dcballbkg.fitTo(dataset,RooFit::Save(),RooFit::Range(kineCut->massLow,kineCut->massHigh), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
-    return &dcballbkg;
+    if (bkgOn)
+    {
+        RooAddPdf* dcballbkg = new RooAddPdf("dcb_fit","double crystal ball + Bkg", RooArgList(*(dcball.getDCB()),*(bkg.getChev()) ),RooArgList(nSig,nBkg) );
+        output.reset(dcballbkg);
+    }
+    else
+    {
+        RooExtendPdf* signal = new RooExtendPdf("dcb_fit","extended signal",*dcball.getDCB(),nSig);
+        output.reset(signal);
+    }
+    results=output->fitTo(dataset,RooFit::Save(),RooFit::Range(kineCut->massLow,kineCut->massHigh), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
+    return output.get();
+    
 }
 
 RooDataSet* OniaMassFitter::getDataset()
@@ -72,8 +86,8 @@ RooCBShape* CrystalBall::getCB()
 //Chevychev2
 
 Chevychev2::Chevychev2(RooRealVar& var,const char* name):
-    ch4_k1("ch4_k1","ch4_k1",0.2,-12,12),
-    ch4_k2("ch4_k2","ch4_k1",-0.1,-12,12),
+    ch4_k1("ch4_k1","ch4_k1",0.2,-4,4),
+    ch4_k2("ch4_k2","ch4_k1",-0.1,-4,4),
     chev(name,"Background",var,RooArgSet(ch4_k1,ch4_k2))
 {
 
@@ -82,4 +96,24 @@ Chevychev2::Chevychev2(RooRealVar& var,const char* name):
 RooChebychev* Chevychev2::getChev()
 {
     return &chev;
+}
+
+//Double CrystalBall
+
+DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var, const char* name1, const char* name2):
+    CrystalBall(var,name1),
+    mean_2(   Form("mean_%s",name2),"1.0*@0",RooArgList(mean)),
+    sigma_2(  Form("sigma_%s",name2),"width of gaussian",S1SIGMAMASS*0.5, S1SIGMAMASS_MIN, S1SIGMAMASS_MAX),
+    alpha_2(  Form("alpha_%s",name2),"1.0*@0",RooArgList(alpha)),
+    n_2(      Form("n_%s",name2),"1.0*@0",RooArgList(n)),
+    fs("fs","Crystal ball ratio", 0.5, 0.0, 1.0),
+    cBall_2(  Form("cball_%s",name2),"crystalBall",var,mean_2,sigma_2,alpha_2,n_2),
+    dcball("dcb","double crystal ball", RooArgList(cBall,cBall_2),RooArgList(fs) )
+{
+
+}
+
+RooAbsPdf* DoubleCrystalBall::getDCB()
+{
+    return &dcball;
 }

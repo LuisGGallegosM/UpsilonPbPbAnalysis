@@ -10,8 +10,9 @@ OniaCutter::OniaCutter()
     maxDz = 20.0f;
     minVtxProb = 0.01f;
     sign = 0;
-    isMC = true;
+    isMC = false;
     trigSelect = HLT_HIL1DoubleMuOpen_v1;
+    checkSign=true;
 }
 
 bool OniaCutter::operator()(Onia_Input* input,Int_t index)
@@ -19,7 +20,7 @@ bool OniaCutter::operator()(Onia_Input* input,Int_t index)
     //check for triggers
     if ((input->trig[index] & trigSelect) != trigSelect) return false;
 
-    if (input->sign[index] != sign) return false;
+    if ((checkSign) && (input->sign[index] != sign)) return false;
 
     int mupl_idx = input->mupl_idx[index];//plus muon index
     int mumi_idx = input->mumi_idx[index];//minus muon index

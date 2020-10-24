@@ -17,7 +17,7 @@ void massfit(const char* filename, const char* outfilename, const kineCutParam* 
 
     TFile newfile(outfilename,"RECREATE");
 
-    RooAbsReal* fittedFunc = massFitter.fit();
+    RooAbsReal* fittedFunc = massFitter.fit(kineCut->bkgOn);
     
     newfile.cd();
     massFitter.getDataset()->Write();
