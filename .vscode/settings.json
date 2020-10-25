@@ -56,6 +56,8 @@
         "typeinfo": "cpp",
         "SkimTree.C": "cpp",
         "list": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "allocator": "cpp",
+        "cstring": "cpp"
     }
 }

@@ -19,21 +19,54 @@
 
 //Using in CrystalBall function
 
-#define S1MEANMASS_MAX  (9.56)
-#define S1MEANMASS      (9.46)
-#define S1MEANMASS_MIN  (9.36)
+#define S1_MEAN_MAX     (9.56f)
+#define S1_MEAN_MIN     (9.36f)
 
-#define S1SIGMAMASS_MAX     (0.4)
-#define S1SIGMAMASS         (0.1)
-#define S1SIGMAMASS_MIN     (0.01)
+#define S1_SIGMA_MAX    (0.40f)
+#define S1_SIGMA_MIN    (0.01f)
 
-#define S1ALPHAMASS_MAX (5.5)
-#define S1ALPHAMASS     (2.522)
-#define S1ALPHAMASS_MIN (0.5)
+#define S1_ALPHA_MAX    (5.50f)
+#define S1_ALPHA_MIN    (0.50f)
 
-#define S1NMASS_MAX     (5.5)
-#define S1NMASS         (1.705)
-#define S1NMASS_MIN     (0.5)
+#define S1_N_MAX        (25.50f)
+#define S1_N_MIN        (0.05f)
+
+#define S1_CH4_MAX      (4.0f)
+#define S1_CH4_MIN      (-4.0f)
+
+#define S1_NSIG_MAX     (10000000.0f)
+#define S1_NBKG_MAX     (1000000.0f)
+
+struct dcbParam
+{
+    float mean;
+    float alpha;
+    float n;
+    float sigma1;
+    float x;
+    float f;
+
+    dcbParam():
+    mean(9.46f),alpha(2.522f),n(1.705f),
+    sigma1(0.1f),x(0.5f),f(0.5f)
+    {
+    }
+};
+
+struct fitValues
+{
+    dcbParam dcb;
+    float nSig;
+    float nBkg;
+    float chk4_k1;
+    float chk4_k2;
+
+    fitValues():dcb(),
+    nSig(5000000.0f),
+    nBkg(500000.0f),chk4_k1(0.2f),chk4_k2(-0.1f)
+    {
+    }
+};
 
 struct kineCutParam
 {
@@ -56,7 +89,7 @@ class Chevychev2
     RooChebychev chev;
 
     public:
-    Chevychev2(RooRealVar& var,const char* name);
+    Chevychev2(RooRealVar& var,const char* name,float k1, float k2);
 
     RooChebychev* getChev();
 };
@@ -79,7 +112,7 @@ class CrystalBall
      * @param var observable variable in x axis.
      * @param name a unique name to identify this crystal ball and its variables.
      */
-    CrystalBall(RooRealVar& var, const char* name);
+    CrystalBall(RooRealVar& var, const char* name, const dcbParam* initial);
 
     /**
      * @brief Get the crystal ball function.
@@ -92,39 +125,34 @@ class CrystalBall
 class DoubleCrystalBall : protected CrystalBall
 {
     RooFormulaVar mean_2;
-    RooRealVar sigma_2;
+    RooRealVar x;
     RooFormulaVar alpha_2;
     RooFormulaVar n_2;
-    RooRealVar fs;
+    RooFormulaVar sigma_2;
+    RooRealVar f;
     RooCBShape cBall_2;
     RooAddPdf dcball;
 
     public:
-    DoubleCrystalBall(RooRealVar& var, const char* name1, const char* name2);
+    DoubleCrystalBall(RooRealVar& var, const dcbParam* initial);
     RooAbsPdf* getDCB();
 };
 
 class OniaMassFitter
 {
-    const kineCutParam* kineCut;
-    std::string kineCutStr;
+    kineCutParam kineCut;
+    fitValues initGuess;
     TTree* tree;
     RooRealVar mass;
-    RooRealVar pT;
-    RooRealVar y;
-    RooRealVar pT_mi;
-    RooRealVar eta_mi;
-    RooRealVar pT_pl;
-    RooRealVar eta_pl;
     RooRealVar nSig;
     RooRealVar nBkg;
     DoubleCrystalBall dcball;
     Chevychev2 bkg;
-    RooDataSet dataset;
-    RooFitResult* results;
+    std::unique_ptr<RooDataSet> dataset;
+    std::unique_ptr<RooFitResult> results;
     std::unique_ptr<RooAbsPdf> output;
 
-    std::string kineCutExp(const kineCutParam* kineCut);
+    std::string getKineCutExpr() const;
 
     public:
 
@@ -133,33 +161,38 @@ class OniaMassFitter
      * to fit a dataset using a double crystal ball function.
      * 
      * @param tree_ Tree from where to get a branch called "mass" to fit
-     * @param massLow_ Mass low boundary.
-     * @param massHigh_ Mass high boundary.
+     * @param kineCut Kinect cut for parameters
+     * @param initialGuess Initial value (first guess) for the fitting process
      */
-    OniaMassFitter(TTree* tree_,const kineCutParam* kineCut);
+    OniaMassFitter(TTree* tree_,const kineCutParam* kineCut,const fitValues* initialGuess);
 
     /**
-     * @brief Executes the fit using fitTo function.
+     * @brief Executes the fit using fitTo function and stores results.
      * 
-     * @return RooAbsReal* fit function for mass.
+     * @return RooAbsReal* fit function for mass. This result is owned by this object.
      */
-    RooAbsReal* fit(bool bkgOn=false);
+    RooAbsReal* fit();
 
     /**
-     * @brief Get the Dataset object
+     * @brief Get the cutted dataset object used for the last fit.
      * 
-     * @return RooDataSet* dataset saved from tree.
+     * @return RooDataSet* dataset saved from tree. This result is owned by this object.
      */
-    RooDataSet* getDataset();
+    RooDataSet* getDataset() const;
 
     /**
      * @brief Get the mass observable variable.
      * 
-     * @return RooRealVar* 
+     * @return RooRealVar*  This result is owned by this object.
      */
     RooRealVar* getVar();
 
-    RooFitResult* getResults();
+    /**
+     * @brief Get the RooFitResult object of last fit.
+     * 
+     * @return RooFitResult* This result is owned by this object. 
+     */
+    RooFitResult* getResults() const;
 };
 
 #endif

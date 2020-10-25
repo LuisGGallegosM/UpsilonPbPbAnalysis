@@ -21,7 +21,7 @@ void setPullStyle(RooPlot* pullPlot);
 TLegend* drawLegend(RooPlot* plot, const kineCutParam* kineCut);
 void setTDRStyle();
 
-void Drawing(const char* filename, const kineCutParam* kineCut)
+void Drawing(const char* filename,const char* drawfilename, const kineCutParam* kineCut)
 {
     TFile file(filename,"UPDATE");
 
@@ -52,7 +52,7 @@ void Drawing(const char* filename, const kineCutParam* kineCut)
 
     canvas->Update();
     canvas->Write(0,TObject::kOverwrite);
-    canvas->SaveAs("files/massfit.pdf");
+    canvas->SaveAs(drawfilename);
 
     return;
 }
@@ -157,7 +157,7 @@ void setPullStyle(RooPlot* pullPlot)
     pullPlot->GetYaxis()->SetTitle("Pull") ;
     pullPlot->GetYaxis()->SetTitleSize(0.10) ;
     pullPlot->GetYaxis()->SetLabelSize(0.09) ;
-    pullPlot->GetYaxis()->SetRangeUser(-7,7) ;
+    pullPlot->GetYaxis()->SetRangeUser(-12,12) ;
     pullPlot->GetYaxis()->CenterTitle();
     pullPlot->GetYaxis()->SetTickSize(0.02);
     pullPlot->GetYaxis()->SetNdivisions(505);
@@ -199,14 +199,14 @@ void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const kineCutParam* kineCu
     float mean_1 =params->getRealValue("mean_1");
     float n_1 = params->getRealValue("n_1");
     float sigma_1 = params->getRealValue("sigma_1");
-    float sigma_2 = params->getRealValue("sigma_2");
+    float x = params->getRealValue("x");
 
     tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
     tdrawer.drawText( Form("#alpha=%.3f",alpha_1));
     tdrawer.drawText( Form("m=%.3f",mean_1));
     tdrawer.drawText( Form("N=%.3f",n_1));
-    tdrawer.drawText( Form("#sigma_{1}=%.4f, #frac{#sigma_{2}}{#sigma_{1}}=%.4f",sigma_1,sigma_2/sigma_1));
-    tdrawer.drawText( Form("f_{s}=%.4f",fs));
+    tdrawer.drawText( Form("#sigma_{1}=%.4f, #frac{#sigma_{2}}{#sigma_{1}}=%.4f",sigma_1,x));
+    tdrawer.drawText( Form("f=%.4f",fs));
 
     TextDrawer tdrawer2(0.45,0.8);
     if (kineCut->ptLow == 0.0f)
@@ -240,7 +240,7 @@ void drawPullText(RooHist* hist,RooFitResult* fitResults)
     int nFitPar = fitResults->floatParsFinal().getSize();
     int ndf = nFullBins - nFitPar;
 
-    TLatex *tex = new TLatex(0.72,0.93,Form("#chi^{2}/ndf : %.1f / %d",chisq,ndf));
+    TLatex *tex = new TLatex(0.68,0.93,Form("#chi^{2}/ndf : %.1f / %d",chisq,ndf));
     tex->SetTextFont(43);
     tex->SetTextSize(12.0);
     tex->SetNDC();

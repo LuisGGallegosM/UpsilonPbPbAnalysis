@@ -12,12 +12,14 @@ void massfit(const char* filename, const char* outfilename, const kineCutParam* 
     TFile file(filename, "READ");
 
     TTree *tree_skimmed = (TTree *)file.Get(ONIATTREENAME);
+
+    fitValues initialGuess;
     
-    OniaMassFitter massFitter(tree_skimmed, kineCut);
+    OniaMassFitter massFitter(tree_skimmed, kineCut, &initialGuess);
 
     TFile newfile(outfilename,"RECREATE");
 
-    RooAbsReal* fittedFunc = massFitter.fit(kineCut->bkgOn);
+    RooAbsReal* fittedFunc = massFitter.fit();
     
     newfile.cd();
     massFitter.getDataset()->Write();

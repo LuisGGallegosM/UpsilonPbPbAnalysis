@@ -1,4 +1,4 @@
-*.root
+files/**
 *.out
 *.pdf
 .fuse*

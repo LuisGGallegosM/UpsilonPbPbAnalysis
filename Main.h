@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <vector>
+#include <iostream>
+#include "TSystem.h"
 #include "TTree.h"
 #include "TFile.h"
 #include "TString.h"
@@ -27,7 +29,7 @@ void Skim(const char* filename,const char* outputfilename);
 void massfit(const char* filename, const char* outfilename, const kineCutParam* kineCut);
 
 //drawing
-void Drawing(const char* filename, const kineCutParam* kineCut);
+void Drawing(const char* filename,const char* drawfilename, const kineCutParam* kineCut);
 
 #if defined(__CLING__)
 #include "Skimming/OniaSkimmer.cpp"
