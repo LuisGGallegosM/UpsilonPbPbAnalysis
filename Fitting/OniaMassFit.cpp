@@ -8,8 +8,8 @@ using namespace std;
 
 OniaMassFitter::OniaMassFitter(TTree* tree_,const kineCutParam* kineCut_,const fitValues* initialGuess):
     kineCut(*kineCut_),initGuess(*initialGuess),tree(tree_),
-    nSig("nSig","Upsilon Signal",initGuess.nSig, 0.0, S1_NSIG_MAX),
-    nBkg("nBkg","Bkg signal",initGuess.nBkg, 0.0, S1_NBKG_MAX),
+    nSig("nSig","Upsilon Signal",initGuess.nSig, 0.0f, S1_NSIG_MAX),
+    nBkg("nBkg","Bkg signal",initGuess.nBkg, 0.0f, S1_NBKG_MAX),
     mass("mass","onia mass",kineCut.massLow,kineCut.massHigh,"GeV/c^{2}"),
     dcball(mass,&(initGuess.dcb)),
     bkg(mass,"bkg",initGuess.chk4_k1,initGuess.chk4_k2)
@@ -28,12 +28,12 @@ string OniaMassFitter::getKineCutExpr() const
 
 RooAbsReal* OniaMassFitter::fit()
 {
-    RooRealVar pT("pT","momentum quarkonia",kineCut.ptLow,kineCut.ptHigh,"GeV/c");
-    RooRealVar y("y","rapidity quarkonia",kineCut.yLow,kineCut.yHigh);
-    RooRealVar pT_mi("pT_mi","momentum minus muon",kineCut.ptLow,kineCut.ptHigh,"GeV/c");
-    RooRealVar eta_mi("eta_mi","Eta minus muon",kineCut.singleMuEtaHigh);
-    RooRealVar pT_pl("pT_pl","momentum plus muon",kineCut.ptLow,kineCut.ptHigh,"GeV/c");
-    RooRealVar eta_pl("eta_pl","Eta plus muon",kineCut.singleMuEtaHigh);
+    RooRealVar pT("pT","momentum quarkonia",0,100,"GeV/c");
+    RooRealVar y("y","rapidity quarkonia",-5,5);
+    RooRealVar pT_mi("pT_mi","momentum minus muon",0,500,"GeV/c");
+    RooRealVar eta_mi("eta_mi","Eta minus muon",-4,4);
+    RooRealVar pT_pl("pT_pl","momentum plus muon",0,500,"GeV/c");
+    RooRealVar eta_pl("eta_pl","Eta plus muon",-4,4);
 
     std::string kineCutExpr = getKineCutExpr();
     
