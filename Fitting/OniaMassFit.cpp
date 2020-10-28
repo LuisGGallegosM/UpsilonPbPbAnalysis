@@ -37,7 +37,8 @@ RooAbsReal* OniaMassFitter::fit()
 
     std::string kineCutExpr = getKineCutExpr();
     
-    dataset = std::make_unique<RooDataSet>("dataset","mass dataset",tree, RooArgSet(mass,pT,y,pT_mi,pT_pl,eta_mi,eta_pl),kineCutExpr.data());
+    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, RooArgSet(mass,pT,y,pT_mi,pT_pl,eta_mi,eta_pl),kineCutExpr.data());
+    dataset.reset(datas);
     std::cout << "Reduced dataset:\n";
     dataset->Print();
     if (kineCut.bkgOn)

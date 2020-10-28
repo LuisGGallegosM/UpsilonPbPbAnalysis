@@ -22,7 +22,7 @@
 				"-lRooFit",
 				"-lRooFitCore",
 				"-lMinuit",
-				"-std=c++14"
+				"-std=c++11"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"

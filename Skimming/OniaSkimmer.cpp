@@ -37,7 +37,7 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName)
     addOutput("phi_mi",&dataOut.phi_mi);
     addOutput("phi_pl",&dataOut.phi_pl);
 
-    auxData = std::make_unique<Onia_Aux>();
+    auxData.reset(new Onia_Aux());
     auxData->events.reserve(200000);
 
     return;
