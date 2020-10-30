@@ -8,6 +8,7 @@
 #include <new>
 #include <functional>
 #include "TTree.h"
+#include <iostream>
 
 #define maxBranchSize (1000)
 #define MAXTREESIZE (10000000000)
@@ -56,14 +57,14 @@ class Skimmer
         int block =0;
         Long64_t entries= tree_input->GetEntries();
 
-        printf("Skimming of '%s' tree starting...\n",tree_input->GetName());
-        printf("%lld entries in tree\n", entries);
+        std::cout << "Skimming of " << tree_input->GetName() <<" tree starting...\n";
+        std::cout << entries <<"%lld entries in tree\n";
 
         for(Long64_t i=0;i<entries;++i)
         {
             if ((i % (entries/20)) ==0)
             {
-                printf("Processing: %i%%\n",block*5);
+                std::cout <<"Processing: " << block*5 << "% \n";
                 ++block;
             }
                 
@@ -79,8 +80,10 @@ class Skimmer
             }
 
         }
-        printf("Total readed entries %lld from '%s' tree\n", entries, tree_input->GetName());
-        printf("Total output entries %lld to '%s' tree\nDone.\n", tree_output->GetEntries(),tree_output->GetName());
+        std::cout << "Total readed entries " << entries;
+        std::cout << " from '" << tree_input->GetName() << "' tree\n";
+        std::cout << "Total output entries " << tree_output->GetEntries();
+        std::cout << " to '" << tree_output->GetName() << "' tree\nDone.\n";
         return tree_output;
     }
     TTree* GetTree()

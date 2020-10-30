@@ -45,8 +45,6 @@ struct cutParams
     float yHigh;
     float singleMuPtLow;
     float singleMuEtaHigh;
-    float massLow;
-    float massHigh;
 };
 
 struct fitConfig

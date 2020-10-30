@@ -22,13 +22,10 @@
 #define ONIATTREENAME ("onia_skimmed")
 #define JETTTREENAME ("jet_skimmed")
 
-//skimming
-void Skim(const char* filename,const char* outputfilename, const cutParams* kineCut);
+void Skimming(const char* filename,const char* outputfilename, const cutParams* kineCut);
 
-//fitting
-void massfit(const char* filename, const char* outfilename, const fitConfig* config);
+void Fitting(const char* filename, const char* outfilename, const fitConfig* config);
 
-//drawing
 void Drawing(const char* filename,const char* drawfilename, const drawConfig* config);
 
 #if defined(__CLING__)

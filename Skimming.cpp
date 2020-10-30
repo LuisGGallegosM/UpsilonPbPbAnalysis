@@ -7,13 +7,13 @@ void saveCutParams(const char* filename,const cutParams*);
 using std::ofstream;
 
 /**
- * @brief Execute Onia Upsilon 1S skimming and Jets.
+ * @brief Execute Upsilon 1S skimming: Onia and Jets.
  * 
  * @param filename Name of file where to find the tree to skim.
  * @param outputfilename Name of the root output file to save skimmed data.
  * @param cut Cut parameters
  */
-void Skim(const char* filename,const char* outputfilename, const cutParams* cut)
+void Skimming(const char* filename,const char* outputfilename, const cutParams* cut)
 {
     //input file
     TFile file(filename, "READ");
@@ -127,8 +127,6 @@ void saveCutParams(const char* filename,const cutParams* cut)
     serialize(file,"yHigh",cut->yHigh);
     serialize(file,"singleMuPtLow",cut->singleMuPtLow);
     serialize(file,"singleMuEtaHigh",cut->singleMuEtaHigh);
-    serialize(file,"massLow",cut->massLow);
-    serialize(file,"massHigh",cut->massHigh);
 
     file.close();
 }

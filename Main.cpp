@@ -4,7 +4,7 @@
 using namespace std;
 
 void SetCutParams(cutParams& cut);
-void SetFitConfig(fitConfig& fitConf, const cutParams* cut);
+void SetFitConfig(fitConfig& fitConf);
 void SetDrawConfig(drawConfig& drawConf, const cutParams* cut, const fitConfig* fitConf);
 
 void Main()
@@ -20,7 +20,7 @@ void Main()
     SetCutParams(cut);
 
     fitConfig fitConf;
-    SetFitConfig(fitConf,&cut);
+    SetFitConfig(fitConf);
 
     drawConfig drawConf;
     SetDrawConfig(drawConf,&cut,&fitConf);
@@ -28,10 +28,10 @@ void Main()
     gSystem->mkdir(folder_name.data());
 
     //Skimming function
-    //Skim(data_filename.data(),skimmed_filename.data(),&cut);
+    Skimming(data_filename.data(),skimmed_filename.data(),&cut);
 
     //Mass Fitting function
-    massfit(skimmed_filename.data(),fit_filename.data(),&fitConf);
+    Fitting(skimmed_filename.data(),fit_filename.data(),&fitConf);
 
     //Generate drawings
     //Drawing(fit_filename.data(),drawing_filename.data(),&drawConf);
@@ -54,8 +54,6 @@ void SetCutParams(cutParams& kineCut)
     kineCut.ptHigh=50.0f;
     kineCut.yLow=0.0f;
     kineCut.yHigh=2.4f;
-    kineCut.massLow =8.5f;
-    kineCut.massHigh =10.0f;
     kineCut.singleMuPtLow=3.5f;
     kineCut.singleMuEtaHigh=2.4f;
 
@@ -64,12 +62,12 @@ void SetCutParams(cutParams& kineCut)
     kineCut.minVtxProb = 0.01f;
 }
 
-void SetFitConfig(fitConfig& fitConf, const cutParams* cut)
+void SetFitConfig(fitConfig& fitConf)
 {
     //set background and fit range
     fitConf.bkgOn =false;
-    fitConf.massHigh = cut->massHigh;
-    fitConf.massLow = cut->massLow;
+    fitConf.massHigh = 10.0f;
+    fitConf.massLow = 8.5f;
 
     //set initial values for fitting parameters
     fitConf.initialValues.nSig = 5000000.0f;
@@ -87,7 +85,7 @@ void SetFitConfig(fitConfig& fitConf, const cutParams* cut)
 
 void SetDrawConfig(drawConfig& drawConf, const cutParams* cut, const fitConfig* fitConf)
 {
-    drawConf.nBins = (cut->massHigh- cut->massLow)*100;
+    drawConf.nBins = (fitConf->massHigh- fitConf->massLow)*100;
     drawConf.cut = cut;
     drawConf.fitConf = fitConf;
 }

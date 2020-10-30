@@ -10,7 +10,7 @@ void copyCutFile(const char* filename, const char* outfilename);
  * @param outfilename filename of root file where to store fit results
  * @param config fit configuration parameters
  */
-void massfit(const char* filename, const char* outfilename, const fitConfig* config)
+void Fitting(const char* filename, const char* outfilename, const fitConfig* config)
 {
     TFile file(filename, "READ");
 
