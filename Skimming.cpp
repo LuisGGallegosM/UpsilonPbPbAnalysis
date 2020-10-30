@@ -11,6 +11,7 @@ using std::ofstream;
  * 
  * @param filename Name of file where to find the tree to skim.
  * @param outputfilename Name of the root output file to save skimmed data.
+ * @param cut Cut parameters
  */
 void Skim(const char* filename,const char* outputfilename, const cutParams* cut)
 {
@@ -98,6 +99,12 @@ TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
     return wroteTree;
 }
 
+/**
+ * @brief Save cut parameters to a text file
+ * 
+ * @param filename filename of skimmed file
+ * @param cut cut parameters to write in file
+ */
 void saveCutParams(const char* filename,const cutParams* cut)
 {
     std::string filen= std::string(filename) + ".txt";
