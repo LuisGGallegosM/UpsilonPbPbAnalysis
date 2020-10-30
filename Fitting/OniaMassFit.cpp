@@ -6,42 +6,25 @@ using namespace std;
 
 //OniaMassFitter member functions.
 
-OniaMassFitter::OniaMassFitter(TTree* tree_,const kineCutParam* kineCut_,const fitValues* initialGuess):
-    kineCut(*kineCut_),initGuess(*initialGuess),tree(tree_),
-    nSig("nSig","Upsilon Signal",initGuess.nSig, 0.0f, S1_NSIG_MAX),
-    nBkg("nBkg","Bkg signal",initGuess.nBkg, 0.0f, S1_NBKG_MAX),
-    mass("mass","onia mass",kineCut.massLow,kineCut.massHigh,"GeV/c^{2}"),
-    dcball(mass,&(initGuess.dcb)),
-    bkg(mass,"bkg",initGuess.chk4_k1,initGuess.chk4_k2)
+OniaMassFitter::OniaMassFitter(TTree* tree_,const fitConfig* fitConf):
+    config(*fitConf),tree(tree_),
+    nSig("nSig","Upsilon Signal",config.initialValues.nSig, 0.0f, S1_NSIG_MAX),
+    nBkg("nBkg","Bkg signal",config.initialValues.nBkg, 0.0f, S1_NBKG_MAX),
+    mass("mass","onia mass",config.massLow,config.massHigh,"GeV/c^{2}"),
+    dcball(mass,&(config.initialValues.dcb)),
+    bkg(mass,"bkg",config.initialValues.chk4_k1,config.initialValues.chk4_k2)
 {
 
-}
-
-string OniaMassFitter::getKineCutExpr() const
-{
-    string str(Form("(pT < %.3f) && (pT > %.3f)",kineCut.ptHigh,kineCut.ptLow));
-    str.append(Form("&& (abs(y) < %.3f) && (abs(y) > %.3f)",kineCut.yHigh,kineCut.yLow));
-    str.append(Form("&& (pT_mi  > %.3f) && (abs(eta_mi) < %.3f)",kineCut.singleMuPtLow,kineCut.singleMuEtaHigh));
-    str.append(Form("&& (pT_pl  > %.3f) && (abs(eta_pl) < %.3f)",kineCut.singleMuPtLow,kineCut.singleMuEtaHigh));
-    return str;
 }
 
 RooAbsReal* OniaMassFitter::fit()
 {
-    RooRealVar pT("pT","momentum quarkonia",0,100,"GeV/c");
-    RooRealVar y("y","rapidity quarkonia",-5,5);
-    RooRealVar pT_mi("pT_mi","momentum minus muon",0,500,"GeV/c");
-    RooRealVar eta_mi("eta_mi","Eta minus muon",-4,4);
-    RooRealVar pT_pl("pT_pl","momentum plus muon",0,500,"GeV/c");
-    RooRealVar eta_pl("eta_pl","Eta plus muon",-4,4);
-
-    std::string kineCutExpr = getKineCutExpr();
     
-    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, RooArgSet(mass,pT,y,pT_mi,pT_pl,eta_mi,eta_pl),kineCutExpr.data());
+    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, RooArgSet(mass));
     dataset.reset(datas);
     std::cout << "Reduced dataset:\n";
     dataset->Print();
-    if (kineCut.bkgOn)
+    if (config.bkgOn)
     {
         RooAddPdf* dcballbkg = new RooAddPdf("dcb_fit","double crystal ball + Bkg", RooArgList(*(dcball.getDCB()),*(bkg.getChev()) ),RooArgList(nSig,nBkg) );
         output.reset(dcballbkg);
@@ -51,7 +34,7 @@ RooAbsReal* OniaMassFitter::fit()
         RooExtendPdf* signal = new RooExtendPdf("dcb_fit","extended signal",*dcball.getDCB(),nSig);
         output.reset(signal);
     }
-    RooFitResult* res=output->fitTo(*dataset,RooFit::Save(),RooFit::Range(kineCut.massLow,kineCut.massHigh), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
+    RooFitResult* res=output->fitTo(*dataset,RooFit::Save(),RooFit::Range(config.massLow,config.massHigh), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
     results.reset(res);
     return output.get();
     

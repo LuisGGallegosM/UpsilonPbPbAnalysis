@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <vector>
-#include <iostream>
 #include "TSystem.h"
 #include "TTree.h"
 #include "TFile.h"
@@ -18,18 +17,19 @@
 #include "Skimming/JetCutter.h"
 #include "Fitting/OniaMassFit.h"
 #include "Drawing/TextDrawer.h"
+#include "Params.h"
 
 #define ONIATTREENAME ("onia_skimmed")
 #define JETTTREENAME ("jet_skimmed")
 
 //skimming
-void Skim(const char* filename,const char* outputfilename);
+void Skim(const char* filename,const char* outputfilename, const cutParams* kineCut);
 
 //fitting
-void massfit(const char* filename, const char* outfilename, const kineCutParam* kineCut);
+void massfit(const char* filename, const char* outfilename, const fitConfig* config);
 
 //drawing
-void Drawing(const char* filename,const char* drawfilename, const kineCutParam* kineCut);
+void Drawing(const char* filename,const char* drawfilename, const drawConfig* config);
 
 #if defined(__CLING__)
 #include "Skimming/OniaSkimmer.cpp"
@@ -41,6 +41,7 @@ void Drawing(const char* filename,const char* drawfilename, const kineCutParam* 
 #include "Fitting.cpp"
 #include "Drawing/TextDrawer.cpp"
 #include "Drawing.cpp"
+#include "Params.cpp"
 #endif
 
 #endif

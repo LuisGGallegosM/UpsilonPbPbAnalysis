@@ -12,16 +12,16 @@
 using namespace std;
 using namespace RooFit;
 
-TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,RooFitResult* fitResults, const kineCutParam* kineCut);
-void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc, const kineCutParam* kineCut);
+TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,RooFitResult* fitResults, const drawConfig* config);
+void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc, const cutParams* cut);
 void drawPullText(RooHist* hist, RooFitResult* fitResults);
 
-void setGraphStyle(RooPlot* plot,const kineCutParam* kineCut);
+void setGraphStyle(RooPlot* plot,const drawConfig* config);
 void setPullStyle(RooPlot* pullPlot);
-TLegend* drawLegend(RooPlot* plot, const kineCutParam* kineCut);
+TLegend* drawLegend(RooPlot* plot, bool bkgOn);
 void setTDRStyle();
 
-void Drawing(const char* filename,const char* drawfilename, const kineCutParam* kineCut)
+void Drawing(const char* filename,const char* drawfilename, const drawConfig* config)
 {
     TFile file(filename,"UPDATE");
 
@@ -42,7 +42,7 @@ void Drawing(const char* filename,const char* drawfilename, const kineCutParam* 
         return;
     }
 
-    TCanvas* canvas = drawData(massVar,dataset,fittedFunc,fitResults,kineCut);
+    TCanvas* canvas = drawData(massVar,dataset,fittedFunc,fitResults,config);
 
     if (canvas==nullptr)
     {
@@ -65,7 +65,7 @@ void Drawing(const char* filename,const char* drawfilename, const kineCutParam* 
  * @param fittedFunc fitted curve to experimental/sim
  * @return Drawn canvas.
  */
-TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,RooFitResult* fitResults, const kineCutParam* kineCut)
+TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,RooFitResult* fitResults, const drawConfig* config)
 {
     TCanvas* canvas = new TCanvas("Fit_plot","mass fit",4,45,550,520);
     canvas->SetLeftMargin(2.6);
@@ -88,21 +88,21 @@ TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,R
 
     //draw fitted and dataset function
     graph->cd();
-    RooPlot* plot = var->frame(kineCut->nBins);
+    RooPlot* plot = var->frame(config->nBins);
     fittedFunc->plotOn(plot,Name(FITFUNCNAME),LineColor(kOrange+7),Normalization(1.0,RooAbsReal::RelativeExpected));
     fittedFunc->plotOn(plot,Name("dcb"),Components("dcb"),LineStyle(9),LineColor(13),Normalization(1.0,RooAbsReal::RelativeExpected));
     fittedFunc->plotOn(plot,Name("cb1"),Components("cball_1"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
     fittedFunc->plotOn(plot,Name("cb2"),Components("cball_2"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
-    if (kineCut->bkgOn)
+    if (config->fitConf->bkgOn)
       fittedFunc->plotOn(plot,Name("bkg"),Components("bkg"),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
     dataset->plotOn(plot,Name(DATASETNAME), MarkerSize(0.5), XErrorSize(0));
-    TLegend* legend= drawLegend(plot,kineCut);
+    TLegend* legend= drawLegend(plot,config->fitConf->bkgOn);
 
-    setGraphStyle(plot,kineCut);
+    setGraphStyle(plot,config);
     plot->Draw("same");
     legend->Draw("same");
 
-    drawTexts(var,fittedFunc,kineCut);
+    drawTexts(var,fittedFunc,config->cut);
     
     //draw pull
     pull->cd();
@@ -123,27 +123,29 @@ TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,R
     return canvas;
 }
 
-void setGraphStyle(RooPlot* plot,const kineCutParam* kineCut)
+void setGraphStyle(RooPlot* plot, const drawConfig* config)
 {
-    float div= (kineCut->massHigh - kineCut->massLow)/(kineCut->nBins);
+  float massHigh = config->fitConf->massHigh;
+  float massLow = config->fitConf->massLow;
+  float div= (massHigh - massLow)/(config->nBins);
 
-    plot->SetTitle("PbPb Nonprompt #varUpsilon(1S) MC ( 5.02 TeV)");
-    plot->SetFillStyle(4000);
-    plot->SetMarkerStyle(2);
-    plot->SetMarkerSize(0.02);
-    plot->SetAxisRange(kineCut->massLow,kineCut->massHigh);
+  plot->SetTitle("PbPb Nonprompt #varUpsilon(1S) MC ( 5.02 TeV)");
+  plot->SetFillStyle(4000);
+  plot->SetMarkerStyle(2);
+  plot->SetMarkerSize(0.02);
+  plot->SetAxisRange(massLow,massHigh);
 
-    plot->GetXaxis()->SetLabelSize(0);
-    plot->GetXaxis()->SetTitleSize(0);
-    plot->GetXaxis()->SetRangeUser(kineCut->massLow,kineCut->massHigh);
+  plot->GetXaxis()->SetLabelSize(0);
+  plot->GetXaxis()->SetTitleSize(0);
+  plot->GetXaxis()->SetRangeUser(massLow,massHigh);
 
-    plot->GetYaxis()->SetTitleOffset(1.0);
-    plot->GetYaxis()->CenterTitle();
-    plot->GetYaxis()->SetTitleSize(0.048);
-    plot->GetYaxis()->SetTitle( Form("Events / ( %.3f GeV/c^{2} )",div));
-    plot->GetYaxis()->SetRangeUser(10,10000000);
+  plot->GetYaxis()->SetTitleOffset(1.0);
+  plot->GetYaxis()->CenterTitle();
+  plot->GetYaxis()->SetTitleSize(0.048);
+  plot->GetYaxis()->SetTitle( Form("Events / ( %.3f GeV/c^{2} )",div));
+  plot->GetYaxis()->SetRangeUser(10,10000000);
 
-    return;
+  return;
 }
 
 void setPullStyle(RooPlot* pullPlot)
@@ -173,7 +175,7 @@ void setPullStyle(RooPlot* pullPlot)
     return;
 }
 
-TLegend* drawLegend(RooPlot* plot,const kineCutParam* kineCut)
+TLegend* drawLegend(RooPlot* plot,bool bkgOn)
 {
     TLegend* fitleg = new TLegend(0.70,0.65,0.85,0.85);
     fitleg->SetTextSize(12);
@@ -182,14 +184,14 @@ TLegend* drawLegend(RooPlot* plot,const kineCutParam* kineCut)
     fitleg->AddEntry(plot->findObject(DATASETNAME),"Data","pe");
     fitleg->AddEntry(plot->findObject(FITFUNCNAME),"Total fit","l");
     fitleg->AddEntry(plot->findObject("dcb"),"Signal","l");
-    if (kineCut->bkgOn)
+    if (bkgOn)
       fitleg->AddEntry(plot->findObject("bkg"),"Background","l");
     fitleg->AddEntry(plot->findObject("cb1"),"CBall 1","l");
     fitleg->AddEntry(plot->findObject("cb2"),"CBall 2","l");
     return fitleg;
 }
 
-void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const kineCutParam* kineCut)
+void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const cutParams* cut)
 {
     TextDrawer tdrawer(0.22,0.8);
     RooArgSet* params= fittedFunc->getParameters(*var);
@@ -209,17 +211,17 @@ void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const kineCutParam* kineCu
     tdrawer.drawText( Form("f=%.4f",fs));
 
     TextDrawer tdrawer2(0.45,0.8);
-    if (kineCut->ptLow == 0.0f)
-        tdrawer2.drawText(Form("p_{T}^{#mu#mu} < %.1f GeV/c", kineCut->ptHigh));
+    if (cut->ptLow == 0.0f)
+        tdrawer2.drawText(Form("p_{T}^{#mu#mu} < %.1f GeV/c", cut->ptHigh));
     else 
-        tdrawer2.drawText(Form("%.f < p_{T}^{#mu#mu} < %.1f GeV/c",kineCut->ptLow, kineCut->ptHigh));
+        tdrawer2.drawText(Form("%.f < p_{T}^{#mu#mu} < %.1f GeV/c",cut->ptLow, cut->ptHigh));
     
-    if (kineCut->yLow == 0.0f)
-        tdrawer2.drawText(Form("|y^{#mu#mu}| < %.2f", kineCut->yHigh));
+    if (cut->yLow == 0.0f)
+        tdrawer2.drawText(Form("|y^{#mu#mu}| < %.2f", cut->yHigh));
     else 
-        tdrawer2.drawText(Form("%.2f < |y^{#mu#mu}| < %.2f",kineCut->yLow, kineCut->yHigh));
-    tdrawer2.drawText(Form("p_{T}^{#mu} > %.1f GeV/c", kineCut->singleMuPtLow));
-    tdrawer2.drawText(Form("|#eta^{#mu}| < %.2f",kineCut->singleMuEtaHigh));
+        tdrawer2.drawText(Form("%.2f < |y^{#mu#mu}| < %.2f",cut->yLow, cut->yHigh));
+    tdrawer2.drawText(Form("p_{T}^{#mu} > %.1f GeV/c", cut->singleMuPtLow));
+    tdrawer2.drawText(Form("|#eta^{#mu}| < %.2f",cut->singleMuEtaHigh));
 }
 
 void drawPullText(RooHist* hist,RooFitResult* fitResults)

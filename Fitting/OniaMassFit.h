@@ -16,6 +16,7 @@
 #include "RooChebychev.h"
 #include "RooFormulaVar.h"
 #include "RooExtendPdf.h"
+#include "../Params.h"
 
 //Using in CrystalBall function
 
@@ -37,50 +38,6 @@
 #define S1_NSIG_MAX     (10000000.0f)
 #define S1_NBKG_MAX     (1000000.0f)
 
-struct dcbParam
-{
-    float mean;
-    float alpha;
-    float n;
-    float sigma1;
-    float x;
-    float f;
-
-    dcbParam():
-    mean(9.46f),alpha(2.522f),n(1.705f),
-    sigma1(0.1f),x(0.5f),f(0.5f)
-    {
-    }
-};
-
-struct fitValues
-{
-    dcbParam dcb;
-    float nSig;
-    float nBkg;
-    float chk4_k1;
-    float chk4_k2;
-
-    fitValues():dcb(),
-    nSig(5000000.0f),
-    nBkg(500000.0f),chk4_k1(0.2f),chk4_k2(-0.1f)
-    {
-    }
-};
-
-struct kineCutParam
-{
-    int nBins;
-    float ptLow;
-    float ptHigh;
-    float yLow;
-    float yHigh;
-    float singleMuPtLow;
-    float singleMuEtaHigh;
-    float massLow;
-    float massHigh;
-    bool bkgOn;
-};
 
 class Chevychev2
 {
@@ -140,8 +97,7 @@ class DoubleCrystalBall : protected CrystalBall
 
 class OniaMassFitter
 {
-    kineCutParam kineCut;
-    fitValues initGuess;
+    fitConfig config;
     TTree* tree;
     RooRealVar mass;
     RooRealVar nSig;
@@ -164,7 +120,7 @@ class OniaMassFitter
      * @param kineCut Kinect cut for parameters
      * @param initialGuess Initial value (first guess) for the fitting process
      */
-    OniaMassFitter(TTree* tree_,const kineCutParam* kineCut,const fitValues* initialGuess);
+    OniaMassFitter(TTree* tree_,const fitConfig* fitConfig);
 
     /**
      * @brief Executes the fit using fitTo function and stores results.
