@@ -25,13 +25,14 @@ void Main()
     drawConfig drawConf;
     SetDrawConfig(drawConf,&cut,&fitConf);
 
+    gSystem->mkdir("files");
     gSystem->mkdir(folder_name.data());
 
     //Skimming function
     Skimming(data_filename.data(),skimmed_filename.data(),&cut);
 
     //Mass Fitting function
-    Fitting(skimmed_filename.data(),fit_filename.data(),&fitConf);
+    //Fitting(skimmed_filename.data(),fit_filename.data(),&fitConf);
 
     //Generate drawings
     //Drawing(fit_filename.data(),drawing_filename.data(),&drawConf);

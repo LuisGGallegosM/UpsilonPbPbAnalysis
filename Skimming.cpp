@@ -21,7 +21,8 @@ void Skimming(const char* filename,const char* outputfilename, const cutParams* 
     //output file
     TFile outputfile(outputfilename, "RECREATE");
 
-    if (file.IsZombie()) //input file is found?
+    //input file is found? is output filename valid?
+    if (file.IsZombie() || outputfile.IsZombie()) 
     {
         std::cout << "file cannot readed\n";
         return;
