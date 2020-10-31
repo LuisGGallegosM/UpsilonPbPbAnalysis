@@ -7,9 +7,9 @@ void SetCutParams(cutParams& cut);
 void SetFitConfig(fitConfig& fitConf);
 void SetDrawConfig(drawConfig& drawConf, const cutParams* cut, const fitConfig* fitConf);
 
-void Main()
+void Main(const char* filename="../rootfiles/merged_HiForestAOD.root")
 {
-    string data_filename ="../rootfiles/merged_HiForestAOD.root";
+    string data_filename = filename;
     string skimmed_filename = "files/merged_HiForestAOD_skimmed.root";
     string folder_name   = "files/test";
 
@@ -96,7 +96,10 @@ void SetDrawConfig(drawConfig& drawConf, const cutParams* cut, const fitConfig* 
 
 int main(int argc, char **argv)
 {
-    Main();
+    if (argc > 1)
+        Main(argv[1]);
+    else
+        Main();
     return 0;
 }
 
