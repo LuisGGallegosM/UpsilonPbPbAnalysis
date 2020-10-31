@@ -7,10 +7,10 @@ void SetCutParams(cutParams& cut);
 void SetFitConfig(fitConfig& fitConf);
 void SetDrawConfig(drawConfig& drawConf, const cutParams* cut, const fitConfig* fitConf);
 
-void Main(const char* filename="../rootfiles/merged_HiForestAOD.root")
+void Main(const char* filename="../rootfiles/merged_HiForestAOD.root", const char*  outfilename = "files/merged_HiForestAOD_skimmed.root")
 {
     string data_filename = filename;
-    string skimmed_filename = "files/merged_HiForestAOD_skimmed.root";
+    string skimmed_filename = outfilename;
     string folder_name   = "files/test";
 
     string fit_filename = folder_name + "/oniafit.root";
@@ -25,7 +25,7 @@ void Main(const char* filename="../rootfiles/merged_HiForestAOD.root")
     drawConfig drawConf;
     SetDrawConfig(drawConf,&cut,&fitConf);
 
-    gSystem->mkdir("files");
+    //gSystem->mkdir("files");
     gSystem->mkdir(folder_name.data());
 
     //Skimming function
@@ -96,8 +96,8 @@ void SetDrawConfig(drawConfig& drawConf, const cutParams* cut, const fitConfig* 
 
 int main(int argc, char **argv)
 {
-    if (argc > 1)
-        Main(argv[1]);
+    if (argc > 2)
+        Main(argv[1],argv[2]);
     else
         Main();
     return 0;

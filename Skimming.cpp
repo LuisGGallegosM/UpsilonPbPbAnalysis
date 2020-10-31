@@ -22,7 +22,7 @@ void Skimming(const char* filename,const char* outputfilename, const cutParams* 
     TFile outputfile(outputfilename, "RECREATE");
 
     //input file is found? is output filename valid?
-    if (file->IsZombie() || outputfile.IsZombie()) 
+    if ((file==nullptr) || outputfile.IsZombie()) 
     {
         std::cout << "file cannot readed\n";
         return;
@@ -43,6 +43,7 @@ void Skimming(const char* filename,const char* outputfilename, const cutParams* 
 
     outputfile.Close();
     file->Close();
+    delete file;
     std::cout << "Success.\n TTrees wrote to '" << outputfilename<< "' root file\n";
     return;
 }
