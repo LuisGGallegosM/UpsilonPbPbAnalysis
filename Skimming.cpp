@@ -16,13 +16,13 @@ using std::ofstream;
 void Skimming(const char* filename,const char* outputfilename, const cutParams* cut)
 {
     //input file
-    TFile file(filename, "READ");
+    TFile* file = TFile::Open(filename, "READ");
 
     //output file
     TFile outputfile(outputfilename, "RECREATE");
 
     //input file is found? is output filename valid?
-    if (file.IsZombie() || outputfile.IsZombie()) 
+    if (file->IsZombie() || outputfile.IsZombie()) 
     {
         std::cout << "file cannot readed\n";
         return;
@@ -31,18 +31,18 @@ void Skimming(const char* filename,const char* outputfilename, const cutParams* 
     //tree to write skimmed data
     std::unique_ptr<Onia_Aux> auxData;
 
-    TTree* onia_skimmed =  oniaSkim(&file,ONIATTREENAME,&auxData,cut);
+    TTree* onia_skimmed =  oniaSkim(file,ONIATTREENAME,&auxData,cut);
     if (onia_skimmed==nullptr) return;
     onia_skimmed->Write(0,TObject::kOverwrite);
 
-    TTree* jet_skimmed = jetSkim(&file,JETTTREENAME,auxData.get());
+    TTree* jet_skimmed = jetSkim(file,JETTTREENAME,auxData.get());
     if (jet_skimmed==nullptr) return;
     jet_skimmed->Write(0,TObject::kOverwrite);
 
     saveCutParams(filename,cut);
 
     outputfile.Close();
-    file.Close();
+    file->Close();
     std::cout << "Success.\n TTrees wrote to '" << outputfilename<< "' root file\n";
     return;
 }
