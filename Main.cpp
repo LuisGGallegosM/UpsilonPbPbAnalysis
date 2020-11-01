@@ -25,8 +25,7 @@ void Main(const char* filename="../rootfiles/merged_HiForestAOD.root", const cha
     drawConfig drawConf;
     SetDrawConfig(drawConf,&cut,&fitConf);
 
-    //gSystem->mkdir("files");
-    gSystem->mkdir(folder_name.data());
+    gSystem->mkdir(folder_name.data(),true);
 
     //Skimming function
     Skimming(data_filename.data(),skimmed_filename.data(),&cut);
@@ -66,7 +65,7 @@ void SetCutParams(cutParams& kineCut)
 void SetFitConfig(fitConfig& fitConf)
 {
     //set background and fit range
-    fitConf.bkgOn =false;
+    fitConf.bkgOn =true;
     fitConf.massHigh = 10.0f;
     fitConf.massLow = 8.5f;
 
