@@ -11,7 +11,7 @@
 #include <iostream>
 
 #define maxBranchSize (1000)
-#define MAXTREESIZE (10000000000)
+#define MAXTREESIZE (25000000000)
 
 template <class T,class U>
 class Skimmer
@@ -52,7 +52,7 @@ class Skimmer
         tree_output->SetMaxTreeSize(MAXTREESIZE);
     }
 
-    TTree* Skim(std::function<bool(T*,Int_t)> cutter)
+    TTree* Skim(std::function<bool(T*,Int_t,Int_t)> cutter)
     {
         int block =0;
         Long64_t entries= tree_input->GetEntries();
@@ -72,7 +72,7 @@ class Skimmer
 
             for(Long64_t j=0;j<dataIn.getSize();++j)
             {
-                if (cutter(&dataIn,j))
+                if (cutter(&dataIn,j,i))
                 {
                     WriteData(j,i);
                     FillEntries();
@@ -101,6 +101,12 @@ class Skimmer
     void addInput(const char* varName,void* address)
     {
         TBranch* branch = tree_input->GetBranch(varName);
+        if (branch ==nullptr)
+        {
+            std::string error = std::string("Tried to read branch '")+varName+ "' does not exist.";
+            throw std::runtime_error(error);
+        }
+
         branch->SetAddress(address);
         input_branches.push_back(branch);
     }

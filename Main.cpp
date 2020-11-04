@@ -9,32 +9,40 @@ void SetDrawConfig(drawConfig& drawConf, const cutParams* cut, const fitConfig* 
 
 void Main(const char* filename="../rootfiles/merged_HiForestAOD.root", const char*  outfilename = "files/merged_HiForestAOD_skimmed.root")
 {
-    string data_filename = filename;
-    string skimmed_filename = outfilename;
-    string folder_name   = "files/test";
+    try
+    {
+        string data_filename = filename;
+        string skimmed_filename = outfilename;
+        string folder_name   = "files/test";
 
-    string fit_filename = folder_name + "/oniafit.root";
-    string drawing_filename = folder_name + "/oniafit.pdf";
-  
-    cutParams cut;
-    SetCutParams(cut);
+        string fit_filename = folder_name + "/oniafit.root";
+        string drawing_filename = folder_name + "/oniafit.pdf";
+    
+        cutParams cut;
+        SetCutParams(cut);
 
-    fitConfig fitConf;
-    SetFitConfig(fitConf);
+        fitConfig fitConf;
+        SetFitConfig(fitConf);
 
-    drawConfig drawConf;
-    SetDrawConfig(drawConf,&cut,&fitConf);
+        drawConfig drawConf;
+        SetDrawConfig(drawConf,&cut,&fitConf);
 
-    gSystem->mkdir(folder_name.data(),true);
+        gSystem->mkdir(folder_name.data(),true);
 
-    //Skimming function
-    Skimming(data_filename.data(),skimmed_filename.data(),&cut);
+        //Skimming function
+        Skimming(data_filename.data(),skimmed_filename.data(),&cut);
 
-    //Mass Fitting function
-    //Fitting(skimmed_filename.data(),fit_filename.data(),&fitConf);
+        //Mass Fitting function
+        //Fitting(skimmed_filename.data(),fit_filename.data(),&fitConf);
 
-    //Generate drawings
-    //Drawing(fit_filename.data(),drawing_filename.data(),&drawConf);
+        //Generate drawings
+        //Drawing(fit_filename.data(),drawing_filename.data(),&drawConf);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
 
     return;
 }

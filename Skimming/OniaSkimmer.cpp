@@ -21,7 +21,12 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName)
     addInput("Reco_QQ_VtxProb",dataIn.VtxProb);
     addInput("Reco_QQ_trig",dataIn.trig);
     addInput("Reco_QQ_sign",dataIn.sign);
-    addInput("Reco_mu_whichGen",dataIn.whichGen);
+
+    //optional branch, MC only
+    if(treeIn->GetBranch("Reco_mu_whichGen")!=nullptr)
+    {
+        addInput("Reco_mu_whichGen",dataIn.whichGen);
+    }
 
     //output branches
     addOutput("mass",&dataOut.mass);

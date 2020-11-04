@@ -12,7 +12,7 @@ class JetCutter
     Float_t maxPt;
 
     public:
-    bool operator()(Jet_Input* input, Int_t index);
+    bool operator()(Jet_Input* input, Int_t index, Int_t entry);
     JetCutter(Onia_Aux* auxDat);
 };
 

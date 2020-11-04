@@ -14,7 +14,7 @@ class OniaCutter
     bool isSoft(Onia_Input* input, Int_t index);
 
     public:
-    bool operator()(Onia_Input* input, Int_t index);
+    bool operator()(Onia_Input* input, Int_t index,Int_t entry);
     OniaCutter(const cutParams* cut);
 };
 

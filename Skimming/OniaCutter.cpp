@@ -6,7 +6,7 @@ kineCut(*cut)
 {
 }
 
-bool OniaCutter::operator()(Onia_Input* input,Int_t index)
+bool OniaCutter::operator()(Onia_Input* input,Int_t index,Int_t entry)
 {
     //check for triggers
     if ((input->trig[index] & kineCut.trigSelect) != kineCut.trigSelect) return false;
@@ -33,6 +33,12 @@ bool OniaCutter::operator()(Onia_Input* input,Int_t index)
     TLorentzVector* mom4= (TLorentzVector*) input->mom4_QQ->At(index);
     TLorentzVector* mom4_mumi = (TLorentzVector*) input->mom4_mu->At(input->mumi_idx[index]);
     TLorentzVector* mom4_mupl = (TLorentzVector*) input->mom4_mu->At(input->mupl_idx[index]);
+
+    if((mom4==nullptr) || (mom4_mumi==nullptr) || (mom4_mupl==nullptr))
+    {
+        std::cerr << "TLorentzVector reading error at entry:" << entry <<", muon index:"<< index << '\n';
+        return false;
+    }
 
     if ((mom4->Pt() < kineCut.ptLow) || (mom4->Pt() > kineCut.ptHigh)) return false;
     if (( fabs(mom4->Rapidity()) < kineCut.yLow) || (fabs(mom4->Rapidity()) >kineCut.yHigh)) return false;
