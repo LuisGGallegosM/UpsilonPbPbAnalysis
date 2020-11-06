@@ -5,11 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "g++ root build and debug",
+            "name": "g++ skim debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/a.out",
-            "args": [],
+            "program": "${workspaceFolder}/Skimming/skim",
+            "args": ["../rootfiles/merged_HiForestAOD.root", 
+                    "files/merged_HiForestAOD_skimmed.root",
+                    "../rootfiles/merged_HiForestAOD.txt"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -22,7 +24,28 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "C++: g++ root build",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "g++ fit debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Fitting/fit",
+            "args": ["files/merged_HiForestAOD_skimmed.root", 
+                "files/test/merged_HiForestAOD_skimmed.root",
+                "files/test/merged_HiForestAOD_fit.txt"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Habilitar la impresión con sangría para gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]

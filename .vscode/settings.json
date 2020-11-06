@@ -58,6 +58,18 @@
         "list": "cpp",
         "set": "cpp",
         "allocator": "cpp",
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "io": "cpp",
+        "utils": "cpp",
+        "vc": "cpp",
+        "iterators": "cpp",
+        "cassert": "cpp",
+        "cerrno": "cpp",
+        "cfloat": "cpp",
+        "climits": "cpp",
+        "ios": "cpp",
+        "locale": "cpp",
+        "queue": "cpp",
+        "stack": "cpp"
     }
 }

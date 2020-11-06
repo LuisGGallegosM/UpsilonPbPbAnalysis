@@ -3,3 +3,7 @@ files/**
 *.pdf
 .fuse*
 .vs
+remoteskim.sh
+draw
+fit
+skim

@@ -1,8 +1,10 @@
-#include "Main.h"
+#include "Skimming.h"
 
 TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData, const cutParams* kineCut);
 TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData);
 void saveCutParams(const char* filename,const cutParams*);
+void SetCutParams(cutParams* kineCut);
+void SetCutParams2(const char* filename,cutParams* kineCut);
 
 using std::ofstream;
 
@@ -13,33 +15,49 @@ using std::ofstream;
  * @param outputfilename Name of the root output file to save skimmed data.
  * @param cut Cut parameters
  */
-void Skimming(const char* filename,const char* outputfilename, const cutParams* cut)
+void Skimming(const char* filename,const char* outputfilename, const char* configname)
 {
     //input file
     TFile* file = TFile::Open(filename, "READ");
 
+    //input file is found? is output filename valid?
+    if (file==nullptr) 
+    {
+        std::cerr << "file "<< filename <<" cannot be read\n";
+        return;
+    }
+
     //output file
     TFile outputfile(outputfilename, "RECREATE");
 
-    //input file is found? is output filename valid?
-    if ((file==nullptr) || outputfile.IsZombie()) 
+    if (outputfile.IsZombie())
     {
-        std::cout << "file cannot readed\n";
+        std::cerr << "file "<< outputfilename <<" cannot be wrote\n";
+        return;
+    }
+
+    cutParams cut;
+    cut.deserialize(configname);
+
+    //copy cut config file
+    std::ofstream(std::string(outputfilename) + ".txt") << std::ifstream(configname).rdbuf();
+
+    if(!cut.isValid())
+    {
+        std::cerr << "Error: Invalid cut parameters.\n";
         return;
     }
 
     //tree to write skimmed data
     std::unique_ptr<Onia_Aux> auxData;
 
-    TTree* onia_skimmed =  oniaSkim(file,ONIATTREENAME,&auxData,cut);
+    TTree* onia_skimmed =  oniaSkim(file,ONIATTREENAME,&auxData,&cut);
     if (onia_skimmed==nullptr) return;
     onia_skimmed->Write(0,TObject::kOverwrite);
 
     TTree* jet_skimmed = jetSkim(file,JETTTREENAME,auxData.get());
     if (jet_skimmed==nullptr) return;
     jet_skimmed->Write(0,TObject::kOverwrite);
-
-    saveCutParams(filename,cut);
 
     outputfile.Close();
     file->Close();
@@ -109,26 +127,42 @@ TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
  */
 void saveCutParams(const char* filename,const cutParams* cut)
 {
-    std::string filen= std::string(filename) + ".txt";
-    ofstream file(filen.data());
-
-    serialize(file,"isMC",cut->isMC);
-    serialize(file,"checkSign",cut->checkSign);
-    serialize(file,"trigSelect",cut->trigSelect);
-    serialize(file,"sign",cut->sign);
-    serialize(file,"selectionBits",cut->selectionBits);
-    serialize(file,"minTracks",cut->minTracks);
-    serialize(file,"minPixels",cut->minPixels);
-    serialize(file,"maxDxy",cut->maxDxy);
-    serialize(file,"maxDz",cut->maxDz);
-    serialize(file,"minVtxProb",cut->minVtxProb);
-
-    serialize(file,"ptLow",cut->ptLow);
-    serialize(file,"ptHigh",cut->ptHigh);
-    serialize(file,"yLow",cut->yLow);
-    serialize(file,"yHigh",cut->yHigh);
-    serialize(file,"singleMuPtLow",cut->singleMuPtLow);
-    serialize(file,"singleMuEtaHigh",cut->singleMuEtaHigh);
-
-    file.close();
 }
+
+void SetCutParams(cutParams* kineCut)
+{
+    kineCut->isMC = false;
+    kineCut->trigSelect = HLT_HIL1DoubleMuOpen_v1;
+    kineCut->checkSign=true;
+
+    kineCut->sign = 0;
+    kineCut->selectionBits = ((1 <<1) | (1 << 3));
+    kineCut->minTracks =6;
+    kineCut->minPixels =1;
+
+    kineCut->ptLow=0.0f;
+    kineCut->ptHigh=50.0f;
+    kineCut->yLow=0.0f;
+    kineCut->yHigh=2.4f;
+    kineCut->singleMuPtLow=3.5f;
+    kineCut->singleMuEtaHigh=2.4f;
+
+    kineCut->maxDxy = 0.3f;
+    kineCut->maxDz = 20.0f;
+    kineCut->minVtxProb = 0.01f;
+}
+
+#if !defined(__CLING__)
+
+int main(int argc, char **argv)
+{
+    if (argc == 4)
+        Skimming(argv[1],argv[2],argv[3]);
+    else
+    {
+          std::cerr << "Incorrect number of parameters\n";  
+    }
+    return 0;
+}
+
+#endif

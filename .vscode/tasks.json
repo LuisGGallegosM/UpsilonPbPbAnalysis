@@ -4,51 +4,8 @@
 		{
 			"type": "shell",
 			"label": "C++: g++ root build",
-			"command": "/usr/bin/g++",
+			"command": "cd Skimming; ./skimcompile.sh; cd ..;",
 			"args": [
-				"-g",
-				"-I",
-				"`${ROOTSYS}/bin/root-config",
-				"--cflags`",
-				"-I",
-				"/usr/include/c++/9",
-				"\"${workspaceFolder}/\"*.cpp",
-				"\"${workspaceFolder}/Drawing/\"*.cpp",
-				"\"${workspaceFolder}/Fitting/\"*.cpp",
-				"\"${workspaceFolder}/Skimming/\"*.cpp",
-				"`${ROOTSYS}/bin/root-config",
-				"--ldflags",
-				"--glibs`",
-				"-lRooFit",
-				"-lRooFitCore",
-				"-lMinuit",
-				"-std=c++11"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": "build"
-		},
-		{
-			"type": "shell",
-			"label": "C++: g++ root build release",
-			"command": "/usr/bin/g++",
-			"args": [
-				"-I",
-				"`${ROOTSYS}/bin/root-config",
-				"--cflags`",
-				"-I",
-				"/usr/include/c++/9",
-				"${workspaceFolder}/*.cpp",
-				"`${ROOTSYS}/bin/root-config",
-				"--ldflags",
-				"--glibs`",
-				"-lRooFit",
-				"-lRooFitCore",
-				"-lMinuit"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -61,7 +18,7 @@
 		{
 			"type": "shell",
 			"label": "C++: g++ root build and run",
-			"command": "${workspaceFolder}/a.out",
+			"command": "run.h",
 			"problemMatcher": [],
 			"dependsOn": [
 				"C++: g++ root build"

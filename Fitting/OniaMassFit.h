@@ -3,16 +3,13 @@
 
 #include <string>
 
-#include "TH1.h"
 #include "TTree.h"
 
 #include "RooRealVar.h"
 #include "RooCBShape.h"
 #include "RooDataSet.h"
-#include "RooGlobalFunc.h"
 #include "RooFitResult.h"
 #include "RooAddPdf.h"
-#include "RooPlot.h"
 #include "RooChebychev.h"
 #include "RooFormulaVar.h"
 #include "RooExtendPdf.h"
