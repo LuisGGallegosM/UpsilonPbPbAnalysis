@@ -2,9 +2,19 @@
 cd Skimming
 ./skimcompile.sh
 cd ..
-INPUT=../rootfiles/merged_HiForestAOD.root
-OUTPUTDIR=files
-OUTPUT="${OUTPUTDIR}/merged_HiForestAOD_skimmed.root"
-CONFIG=../rootfiles/merged_HiForestAOD.txt
+
+#input file to skim
+INPUTFILE="merged_HiForestAOD.root"
+#how to name skim result file
+OUTPUTFILE="merged_HiForestAOD_skimmed.root"
+#cut configuration file
+CONFIG="merged_HiForestAOD.cutconf"
+
+#working directory
+WORKDIR="../rootfiles"
+#directory where to write output
+OUTPUTDIR="${WORKDIR}/testskim"
+
+#execute skim
 mkdir -p $OUTPUTDIR
-./Skimming/skim ${INPUT} ${OUTPUT} ${CONFIG}
+./Skimming/skim "${WORKDIR}/${INPUTFILE}" "${OUTPUTDIR}/${OUTPUTFILE}" "${WORKDIR}/${CONFIG}"

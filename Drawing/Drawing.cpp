@@ -12,7 +12,7 @@ void setPullStyle(RooPlot* pullPlot);
 TLegend* drawLegend(RooPlot* plot, bool bkgOn);
 void setTDRStyle();
 
-void Drawing(const char* filename,const char* drawfilename)
+void Drawing(const char* filename,const char* drawfilename, const char* cutfilename, const char* fitfilename)
 {
     TFile file(filename,"UPDATE");
 
@@ -22,6 +22,13 @@ void Drawing(const char* filename,const char* drawfilename)
         return;
     }
     drawConfig config;
+    config.deserialize(cutfilename,fitfilename);
+
+    if (!config.isValid())
+    {
+        std::cerr << "Error: Invalid arguments\n";
+        return;
+    }
 
     RooRealVar* massVar = (RooRealVar*) (file.Get("mass"));
     RooAbsReal* fittedFunc = (RooAbsReal*) (file.Get("dcb_fit"));
@@ -53,8 +60,8 @@ void Drawing(const char* filename,const char* drawfilename)
 
 int main(int argc, char **argv)
 {
-    if (argc ==3)
-        Drawing(argv[1],argv[2]);
+    if (argc ==5)
+        Drawing(argv[1],argv[2],argv[3],argv[4]);
     else
     {
         std::cerr << "Error: Incorrect number of parameters\n";  
@@ -108,16 +115,16 @@ TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,R
     fittedFunc->plotOn(plot,Name("dcb"),Components("dcb"),LineStyle(9),LineColor(13),Normalization(1.0,RooAbsReal::RelativeExpected));
     fittedFunc->plotOn(plot,Name("cb1"),Components("cball_1"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
     fittedFunc->plotOn(plot,Name("cb2"),Components("cball_2"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
-    if (config->fitConf->bkgOn)
+    if (config->fitConf.bkgOn)
       fittedFunc->plotOn(plot,Name("bkg"),Components("bkg"),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
     dataset->plotOn(plot,Name(DATASETNAME), MarkerSize(0.5), XErrorSize(0));
-    TLegend* legend= drawLegend(plot,config->fitConf->bkgOn);
+    TLegend* legend= drawLegend(plot,config->fitConf.bkgOn);
 
     setGraphStyle(plot,config);
     plot->Draw("same");
     legend->Draw("same");
 
-    drawTexts(var,fittedFunc,config->cut);
+    drawTexts(var,fittedFunc,&(config->cut));
     
     //draw pull
     pull->cd();
@@ -140,8 +147,8 @@ TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,R
 
 void setGraphStyle(RooPlot* plot, const drawConfig* config)
 {
-  float massHigh = config->fitConf->massHigh;
-  float massLow = config->fitConf->massLow;
+  float massHigh = config->fitConf.massHigh;
+  float massLow = config->fitConf.massLow;
   float div= (massHigh - massLow)/(config->nBins);
 
   plot->SetTitle("PbPb Nonprompt #varUpsilon(1S) MC ( 5.02 TeV)");
@@ -262,11 +269,4 @@ void drawPullText(RooHist* hist,RooFitResult* fitResults)
     tex->SetTextSize(12.0);
     tex->SetNDC();
     tex->Draw("same");
-}
-
-void SetDrawConfig(drawConfig& drawConf, const cutParams* cut, const fitConfig* fitConf)
-{
-    drawConf.nBins = (fitConf->massHigh- fitConf->massLow)*100;
-    drawConf.cut = cut;
-    drawConf.fitConf = fitConf;
 }

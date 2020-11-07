@@ -128,15 +128,22 @@ struct fitConfig
 struct drawConfig
 {
     int nBins;
-    const cutParams* cut;
-    const fitConfig* fitConf;
+    cutParams cut;
+    fitConfig fitConf;
 
     bool isValid() const
     {
-        return (nBins>0) && (cut!=nullptr) && (fitConf!=nullptr) && (cut->isValid()) && (fitConf->isValid());
+        return (nBins>0) && (cut.isValid()) && (fitConf.isValid());
     }
-    drawConfig(): nBins(0), cut(nullptr), fitConf(nullptr)
+    drawConfig(): nBins(0), cut(), fitConf()
     {
+    }
+
+    void deserialize(const char* cutfilename, const char* fitfilename)
+    {
+        cut.deserialize(cutfilename);
+        fitConf.deserialize(fitfilename);
+        nBins=(fitConf.massHigh- fitConf.massLow)*100;
     }
 };
 

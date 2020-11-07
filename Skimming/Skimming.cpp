@@ -2,9 +2,8 @@
 
 TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData, const cutParams* kineCut);
 TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData);
-void saveCutParams(const char* filename,const cutParams*);
 void SetCutParams(cutParams* kineCut);
-void SetCutParams2(const char* filename,cutParams* kineCut);
+std::string ReplaceExtension(const char* outfilename,const char* newextension);
 
 using std::ofstream;
 
@@ -39,14 +38,14 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     cutParams cut;
     cut.deserialize(configname);
 
-    //copy cut config file
-    std::ofstream(std::string(outputfilename) + ".txt") << std::ifstream(configname).rdbuf();
-
     if(!cut.isValid())
     {
         std::cerr << "Error: Invalid cut parameters.\n";
         return;
     }
+
+    //copy cut config file
+    std::ofstream(ReplaceExtension(outputfilename,".cutconf")) << std::ifstream(configname).rdbuf();
 
     //tree to write skimmed data
     std::unique_ptr<Onia_Aux> auxData;
@@ -64,6 +63,13 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     delete file;
     std::cout << "Success.\n TTrees wrote to '" << outputfilename<< "' root file\n";
     return;
+}
+
+std::string ReplaceExtension(const char* outfilename,const char* newextension)
+{
+    std::string outputfilenamestr=std::string(outfilename);
+    std::string newextname = outputfilenamestr.substr(0,outputfilenamestr.find_last_of('.'));
+    return newextname + newextension;
 }
 
 /**
@@ -117,16 +123,6 @@ TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
     TTree* wroteTree =skimmer.Skim(cutter);
 
     return wroteTree;
-}
-
-/**
- * @brief Save cut parameters to a text file
- * 
- * @param filename filename of skimmed file
- * @param cut cut parameters to write in file
- */
-void saveCutParams(const char* filename,const cutParams* cut)
-{
 }
 
 void SetCutParams(cutParams* kineCut)

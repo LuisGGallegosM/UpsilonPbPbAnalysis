@@ -3,6 +3,7 @@
 
 void copyCutFile(const char* filename, const char* outfilename);
 void SetFitConfig(fitConfig* fitConf);
+std::string ReplaceExtension(const char* outfilename,const char* newextension);
 
 /**
  * @brief Does a invariant mass fit, from a branch in a tree
@@ -32,14 +33,13 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     TFile newfile(outfilename,"RECREATE");
 
     //redirect cout
-    std::string logFilename(outfilename);
-    logFilename +=".log";
-    std::ofstream logFile((logFilename).data());
+    std::ofstream logFile(ReplaceExtension(outfilename,".log"));
     std::cout.rdbuf(logFile.rdbuf());
 
-    RooAbsReal* fittedFunc = massFitter.fit();
+    //copy fit config file, same filename as output root file but with .cutconf extension
+    std::ofstream( ReplaceExtension(outfilename,".fitconf")) << std::ifstream(configname).rdbuf();
 
-    //copyCutFile(filename,outfilename);
+    RooAbsReal* fittedFunc = massFitter.fit();
 
     massFitter.getResults()->Print();
 
@@ -50,25 +50,13 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     massFitter.getVar()->Write();
 }
 
-/**
- * @brief Copies the cut parameters text file to current directory
- * 
- * @param filename 
- * @param outfilename 
- */
-void copyCutFile(const char* filename, const char* outfilename)
+std::string ReplaceExtension(const char* outfilename,const char* newextension)
 {
-    //save cut file
-    std::string copyFilename(outfilename);
-    copyFilename +=".txt";
-    std::ofstream copyFile(copyFilename.data());
-
-    std::string cutFilename(filename);
-    cutFilename +=".txt";
-    std::ifstream cutFile(cutFilename.data());
-
-    copyFile << cutFile.rdbuf();
+    std::string outputfilenamestr=std::string(outfilename);
+    std::string newextname = outputfilenamestr.substr(0,outputfilenamestr.find_last_of('.'));
+    return newextname + newextension;
 }
+
 
 void SetFitConfig(fitConfig* fitConf)
 {
