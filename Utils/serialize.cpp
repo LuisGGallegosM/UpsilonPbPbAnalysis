@@ -1,8 +1,16 @@
 #include "serialize.h"
 
-serializer::serializer(const char* filename) : filename_(filename),changed(false)
+serializer::serializer(const char* filename, serializer::iotype iot) : filename_(filename)
 {
     std::ifstream file(filename_);
+    if(!file.is_open())
+    {
+        std::string error ="Error: file '";
+        error += filename;
+        error +="' not open/found.\n";
+        throw std::runtime_error(error);
+    }
+
     std::string str;
     char varName[42];
     char varValue[42];
@@ -20,7 +28,7 @@ serializer::serializer(const char* filename) : filename_(filename),changed(false
 
 serializer::~serializer()
 {
-    if (changed)
+    if (type== iotype::write)
     {
         std::ofstream file(filename_,std::ios_base::trunc);
         for (const auto &i : vars)
@@ -33,10 +41,12 @@ serializer::~serializer()
 template <typename T>
 void serializer::write(const char* var, T input)
 {
+    if (type==iotype::read)
+    throw std::runtime_error("Error: File not open for writing");
+
     std::stringstream str;
     str << input;
     vars[var] = str.str();
-    changed=true;
 }
 
 template <typename T>
@@ -55,11 +65,13 @@ void serializer::read(const char* var, T& output)
 
 void serializer::write(const char* var, bool input)
 {
+    if (type==iotype::read)
+        throw std::runtime_error("Error: File not open for writing");
+
     if (input)
         vars[var] = "true";
     else
         vars[var] = "false";
-    changed=true;
 }
 
 void serializer::read(const char* var, bool& output)

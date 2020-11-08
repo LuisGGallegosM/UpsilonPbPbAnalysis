@@ -26,6 +26,8 @@ void Drawing(const char* filename,const char* drawfilename);
 
 #if defined(__CLING__)
 #include "TextDrawer.cpp"
+#include "../Utils/utils.cpp"
+#include "../Utils/serialize.cpp"
 #endif
 
 #endif

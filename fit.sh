@@ -1,7 +1,14 @@
 #!/bin/bash
+
+AUTOCOMPILE="NO"
+CLING="YES"
+
+if [ $AUTOCOMPILE = "YES" ] && [ CLING != "YES" ]
+then
 cd Fitting
 ./fitcompile.sh
 cd ..
+fi
 
 #Root file to fit from
 INPUTFILE="merged_HiForestAOD_skimmed.root"
@@ -15,9 +22,17 @@ OUTPUTDIR="${WORKDIR}/${CONFIG%.*}"
 #name of generated file is like CONFIG but with .root extension
 OUTPUTFILE="${CONFIG%.*}.root"
 
-#execute fitting
 mkdir -p $OUTPUTDIR
+
+#execute fitting
+if [ $CLING = "YES" ]
+then
+cd Fitting
+root -q 'Fitting.cpp("'../${WORKDIR}/${INPUTFILE}'","'../${OUTPUTDIR}/${OUTPUTFILE}'","'../${WORKDIR}/${CONFIG}'")'
+cd ..
+else
 ./Fitting/fit "${WORKDIR}/${INPUTFILE}" "${OUTPUTDIR}/${OUTPUTFILE}" "${WORKDIR}/${CONFIG}"
+fi
 
 #also execute drawing
-./draw.sh "${OUTPUTDIR}/${OUTPUTFILE}"
+#./draw.sh "${OUTPUTDIR}/${OUTPUTFILE}"

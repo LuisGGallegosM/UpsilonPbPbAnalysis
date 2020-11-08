@@ -3,46 +3,24 @@
     "tasks": [
 		{
 			"type": "shell",
-			"label": "C++: g++ root build",
-			"command": "cd Skimming; ./skimcompile.sh; cd ..;",
-			"args": [
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
+			"label": "C++: skim",
+			"command": "./skim.sh;",
+			"problemMatcher": [],
 			"group": "build"
 		},
 		{
 			"type": "shell",
-			"label": "C++: g++ root build and run",
-			"command": "run.h",
+			"label": "C++: fit",
+			"command": "./fit.sh",
 			"problemMatcher": [],
-			"dependsOn": [
-				"C++: g++ root build"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
+			"group": "build"
 		},
 		{
 			"type": "shell",
-			"label": "C++: root Cling execute",
-			"command": "root",
-			"args": [
-				"-q",
-				"Main.cpp"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"problemMatcher": [
-				"$gcc"
-			]
+			"label": "C++: draw",
+			"command": "./draw.sh",
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }

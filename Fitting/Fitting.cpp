@@ -3,7 +3,6 @@
 
 void copyCutFile(const char* filename, const char* outfilename);
 void SetFitConfig(fitConfig* fitConf);
-std::string ReplaceExtension(const char* outfilename,const char* newextension);
 
 /**
  * @brief Does a invariant mass fit, from a branch in a tree
@@ -49,14 +48,6 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     fittedFunc->Write();
     massFitter.getVar()->Write();
 }
-
-std::string ReplaceExtension(const char* outfilename,const char* newextension)
-{
-    std::string outputfilenamestr=std::string(outfilename);
-    std::string newextname = outputfilenamestr.substr(0,outputfilenamestr.find_last_of('.'));
-    return newextname + newextension;
-}
-
 
 void SetFitConfig(fitConfig* fitConf)
 {

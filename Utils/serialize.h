@@ -8,13 +8,16 @@
 
 class serializer
 {
+    public:
+    enum class iotype { read, write, update};
+
     private:
-    bool changed;
     std::string filename_;
     std::map<std::string,std::string> vars;
-
+    iotype type;
+    
     public:
-    serializer(const char* filename);
+    serializer(const char* filename, serializer::iotype iot= serializer::iotype::read);
 
     ~serializer();
 

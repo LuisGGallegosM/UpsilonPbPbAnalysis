@@ -3,7 +3,6 @@
 TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData, const cutParams* kineCut);
 TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData);
 void SetCutParams(cutParams* kineCut);
-std::string ReplaceExtension(const char* outfilename,const char* newextension);
 
 using std::ofstream;
 
@@ -63,13 +62,6 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     delete file;
     std::cout << "Success.\n TTrees wrote to '" << outputfilename<< "' root file\n";
     return;
-}
-
-std::string ReplaceExtension(const char* outfilename,const char* newextension)
-{
-    std::string outputfilenamestr=std::string(outfilename);
-    std::string newextname = outputfilenamestr.substr(0,outputfilenamestr.find_last_of('.'));
-    return newextname + newextension;
 }
 
 /**
