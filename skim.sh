@@ -1,14 +1,6 @@
 #!/bin/bash
 
-AUTOCOMPILE="YES"
-CLING="YES"
-
-if [ $AUTOCOMPILE = "YES" ] && [ CLING != "YES" ]
-then
-cd Skimming
-./skimcompile.sh
-cd ..
-fi
+CLING="NO"
 
 #input file to skim
 INPUTFILE="merged_HiForestAOD.root"

@@ -25,11 +25,29 @@ struct fitParams
     float chk4_k2;
 };
 
+struct kinecutParams
+{
+    float ptLow;
+    float ptHigh;
+    float yLow;
+    float yHigh;
+
+    kinecutParams():
+    ptLow(-1.0f),ptHigh(-1.0f),yLow(-1.0f),yHigh(-1.0f)
+    {
+
+    }
+
+    bool isValid() const
+    {
+        return (ptLow>=0.0f) && (ptHigh>0.0f) && (yLow>=0.0f) && (yHigh>0.0f);
+    }
+};
+
 struct cutParams
 {
     bool isMC;
     bool checkSign;
-
     unsigned long long trigSelect;
     int sign;
 
@@ -57,7 +75,7 @@ struct cutParams
     bool isValid() const
     {
         return (minTracks>=0) && (minPixels>=0) && (ptLow>=0.0f) 
-        && (ptHigh>0.0f) && (singleMuPtLow>0.0f) && (maxDxy>0.0f)
+        && (ptHigh>0.0f) && (singleMuPtLow>=0.0f) && (maxDxy>0.0f)
         && (maxDz > 0.0f) && (minVtxProb >0.0f);
     }
 
@@ -72,17 +90,17 @@ struct cutParams
         ser.read("selectionBits",selectionBits);
         ser.read("minTracks",minTracks);
         ser.read("minPixels",minPixels);
-        ser.read("ptLow",ptLow);
 
+        ser.read("maxDxy",maxDxy);
+        ser.read("maxDz",maxDz);
+        ser.read("minVtxProb",minVtxProb);
+
+        ser.read("ptLow",ptLow);
         ser.read("ptHigh",ptHigh);
         ser.read("yLow",yLow);
         ser.read("yHigh",yHigh);
         ser.read("singleMuPtLow",singleMuPtLow);
-
         ser.read("singleMuEtaHigh",singleMuEtaHigh);
-        ser.read("maxDxy",maxDxy);
-        ser.read("maxDz",maxDz);
-        ser.read("minVtxProb",minVtxProb);
     }
 };
 
@@ -91,15 +109,17 @@ struct fitConfig
     bool bkgOn;
     float massLow;
     float massHigh;
+
+    kinecutParams cut;
     fitParams initialValues;
 
-    fitConfig(): bkgOn(false), massLow(-1.0f), massHigh(-1.0f), initialValues()
+    fitConfig(): bkgOn(false), massLow(-1.0f), massHigh(-1.0f), cut(), initialValues()
     {
     }
 
     bool isValid() const
     {
-        return (massLow>=0.0f) && (massHigh>0.0f);
+        return (massLow>=0.0f) && (massHigh>0.0f) && (cut.isValid());
     }
 
     void deserialize(const char* filename)
@@ -109,6 +129,12 @@ struct fitConfig
         ser.read("bkgOn",bkgOn);
         ser.read("massHigh",massHigh);
         ser.read("massLow",massLow);
+
+        //set kinetic cut selection parameters
+        ser.read("cut.ptLow",cut.ptLow);
+        ser.read("cut.ptHigh",cut.ptHigh);
+        ser.read("cut.yLow",cut.yLow);
+        ser.read("cut.yHigh",cut.yHigh);
 
          //set initial values for fitting parameters
         ser.read("initialValues.nSig",initialValues.nSig);
@@ -143,7 +169,7 @@ struct drawConfig
     {
         cut.deserialize(cutfilename);
         fitConf.deserialize(fitfilename);
-        nBins=(fitConf.massHigh- fitConf.massLow)*100;
+        nBins=(fitConf.massHigh- fitConf.massLow)*50;
     }
 };
 

@@ -89,6 +89,7 @@ class DoubleCrystalBall : protected CrystalBall
 
     public:
     DoubleCrystalBall(RooRealVar& var, const dcbParam* initial);
+
     RooAbsPdf* getDCB();
 };
 

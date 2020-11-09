@@ -1,19 +1,11 @@
 #!/bin/bash
 
-AUTOCOMPILE="NO"
-CLING="YES"
-
-if [ $AUTOCOMPILE = "YES" ] && [ CLING != "YES" ]
-then
-cd Fitting
-./fitcompile.sh
-cd ..
-fi
+CLING="NO"
 
 #Root file to fit from
 INPUTFILE="merged_HiForestAOD_skimmed.root"
 #Fit configuration file name
-CONFIG="merged_HiForestAOD_fit0.fitconf"
+CONFIG="${1:-merged_HiForestAOD_fit0.fitconf}"
 
 #working directory where all is saved
 WORKDIR="../rootfiles/testskim"
@@ -35,4 +27,4 @@ else
 fi
 
 #also execute drawing
-#./draw.sh "${OUTPUTDIR}/${OUTPUTFILE}"
+./draw.sh "${OUTPUTDIR}/${OUTPUTFILE}"

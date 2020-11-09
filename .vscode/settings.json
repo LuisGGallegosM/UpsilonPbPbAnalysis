@@ -88,6 +88,18 @@
                 "name": "FIT",
                 "color": "white",
                 "command": "./fit.sh", // This is executed in the terminal.
+            },
+            {
+                "cwd": "${workspaceFolder}",     // Terminal initial folder ${workspaceFolder} and os user home as defaults
+                "name": "DRAW",
+                "color": "white",
+                "command": "./draw.sh", // This is executed in the terminal.
+            },
+            {
+                "cwd": "${workspaceFolder}",     // Terminal initial folder ${workspaceFolder} and os user home as defaults
+                "name": "COMPILE ALL",
+                "color": "white",
+                "command": "./compileall.sh", // This is executed in the terminal.
             }
         ]
     }

@@ -4,7 +4,7 @@
 using namespace RooFit;
 
 TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,RooFitResult* fitResults, const drawConfig* config);
-void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc, const cutParams* cut);
+void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc, const drawConfig* cut);
 void drawPullText(RooHist* hist, RooFitResult* fitResults);
 
 void setGraphStyle(RooPlot* plot,const drawConfig* config);
@@ -95,13 +95,13 @@ TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,R
 
     //setTDRStyle();
 
-    TPad* graph = new TPad("graph_pad","mass fit", 0, 0.30, 0.98, 1.0);
+    TPad* graph = new TPad("graph_pad","mass fit", 0, 0.45, 0.98, 1.0);
     graph->SetTicks(1,1);
     graph->SetLeftMargin(0.15);
     graph->SetLogy();
     graph->Draw();
 
-    TPad* pull = new TPad("pull_pad","mass fit pull", 0, 0.00, 0.98, 0.35);
+    TPad* pull = new TPad("pull_pad","mass fit pull", 0.00, 0.00, 0.98, 0.5);
     pull->SetTopMargin(0); // Upper and lower plot are joined
     pull->SetBottomMargin(0.63); 
     pull->SetLeftMargin(0.15);
@@ -124,13 +124,13 @@ TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,R
     plot->Draw("same");
     legend->Draw("same");
 
-    drawTexts(var,fittedFunc,&(config->cut));
+    drawTexts(var,fittedFunc,config);
     
     //draw pull
     pull->cd();
     RooPlot* pullPlot = var->frame(Title("Pull Distribution"));
     RooHist* pullHist = plot->pullHist(DATASETNAME,FITFUNCNAME);
-    pullHist->SetMarkerSize(0.5f);
+    pullHist->SetMarkerSize(0.7f);
     
     pullPlot->addPlotable(pullHist,"PSAME");
     
@@ -151,7 +151,7 @@ void setGraphStyle(RooPlot* plot, const drawConfig* config)
   float massLow = config->fitConf.massLow;
   float div= (massHigh - massLow)/(config->nBins);
 
-  plot->SetTitle("PbPb Nonprompt #varUpsilon(1S) MC ( 5.02 TeV)");
+  plot->SetTitle("#varUpsilon(1S) MC ( 5.02 TeV)");
   plot->SetFillStyle(4000);
   plot->SetMarkerStyle(2);
   plot->SetMarkerSize(0.02);
@@ -165,7 +165,7 @@ void setGraphStyle(RooPlot* plot, const drawConfig* config)
   plot->GetYaxis()->CenterTitle();
   plot->GetYaxis()->SetTitleSize(0.048);
   plot->GetYaxis()->SetTitle( Form("Events / ( %.3f GeV/c^{2} )",div));
-  plot->GetYaxis()->SetRangeUser(10,10000000);
+  plot->GetYaxis()->SetRangeUser(100,10000000);
 
   return;
 }
@@ -174,13 +174,13 @@ void setPullStyle(RooPlot* pullPlot)
 {
     pullPlot->SetTitleSize(0);
     pullPlot->SetMarkerStyle(2);
-    pullPlot->SetMarkerSize(0.01);
+    pullPlot->SetMarkerSize(0.1);
     
     pullPlot->SetDrawOption("HIST");
     pullPlot->GetYaxis()->SetTitleOffset(0.31) ;
     pullPlot->GetYaxis()->SetTitle("Pull") ;
     pullPlot->GetYaxis()->SetTitleSize(0.10) ;
-    pullPlot->GetYaxis()->SetLabelSize(0.09) ;
+    pullPlot->GetYaxis()->SetLabelSize(0.05) ;
     pullPlot->GetYaxis()->SetRangeUser(-12,12) ;
     pullPlot->GetYaxis()->CenterTitle();
     pullPlot->GetYaxis()->SetTickSize(0.02);
@@ -213,37 +213,44 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn)
     return fitleg;
 }
 
-void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const cutParams* cut)
+void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const drawConfig* config)
 {
     TextDrawer tdrawer(0.22,0.8);
     RooArgSet* params= fittedFunc->getParameters(*var);
 
-    float alpha_1 = params->getRealValue("alpha_1");
-    float fs = params->getRealValue("fs");
-    float mean_1 =params->getRealValue("mean_1");
-    float n_1 = params->getRealValue("n_1");
-    float sigma_1 = params->getRealValue("sigma_1");
-    float x = params->getRealValue("x");
+    float alpha =   params->getRealValue("alpha_1");
+    float f =       params->getRealValue("f");
+    float mean =    params->getRealValue("mean_1");
+    float n =       params->getRealValue("n_1");
+    float sigma =   params->getRealValue("sigma_1");
+    float x =       params->getRealValue("x");
 
     tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
-    tdrawer.drawText( Form("#alpha=%.3f",alpha_1));
-    tdrawer.drawText( Form("m=%.3f",mean_1));
-    tdrawer.drawText( Form("N=%.3f",n_1));
-    tdrawer.drawText( Form("#sigma_{1}=%.4f, #frac{#sigma_{2}}{#sigma_{1}}=%.4f",sigma_1,x));
-    tdrawer.drawText( Form("f=%.4f",fs));
+    tdrawer.drawText( Form("#alpha=%.3f",alpha));
+    tdrawer.drawText( Form("m=%.3f",mean));
+    tdrawer.drawText( Form("N=%.3f",n));
+    tdrawer.drawText( Form("#sigma_{1}=%.4f, #frac{#sigma_{2}}{#sigma_{1}}=%.4f",sigma,x));
+    tdrawer.drawText( Form("f=%.4f",f));
+
+    float ptLow=config->fitConf.cut.ptLow;
+    float ptHigh=config->fitConf.cut.ptHigh;
+    float yLow=config->fitConf.cut.yLow;
+    float yHigh=config->fitConf.cut.yHigh;
+    float singleMuPtLow=config->cut.singleMuPtLow;
+    float singleMuEtaHigh=config->cut.singleMuEtaHigh;
 
     TextDrawer tdrawer2(0.45,0.8);
-    if (cut->ptLow == 0.0f)
-        tdrawer2.drawText(Form("p_{T}^{#mu#mu} < %.1f GeV/c", cut->ptHigh));
+    if (ptLow == 0.0f)
+        tdrawer2.drawText(Form("p_{T}^{#mu#mu} < %.1f GeV/c", ptHigh));
     else 
-        tdrawer2.drawText(Form("%.f < p_{T}^{#mu#mu} < %.1f GeV/c",cut->ptLow, cut->ptHigh));
+        tdrawer2.drawText(Form("%.f < p_{T}^{#mu#mu} < %.1f GeV/c",ptLow, ptHigh));
     
-    if (cut->yLow == 0.0f)
-        tdrawer2.drawText(Form("|y^{#mu#mu}| < %.2f", cut->yHigh));
+    if (yLow == 0.0f)
+        tdrawer2.drawText(Form("|y^{#mu#mu}| < %.2f", yHigh));
     else 
-        tdrawer2.drawText(Form("%.2f < |y^{#mu#mu}| < %.2f",cut->yLow, cut->yHigh));
-    tdrawer2.drawText(Form("p_{T}^{#mu} > %.1f GeV/c", cut->singleMuPtLow));
-    tdrawer2.drawText(Form("|#eta^{#mu}| < %.2f",cut->singleMuEtaHigh));
+        tdrawer2.drawText(Form("%.2f < |y^{#mu#mu}| < %.2f",yLow, yHigh));
+    tdrawer2.drawText(Form("p_{T}^{#mu} > %.1f GeV/c", singleMuPtLow));
+    tdrawer2.drawText(Form("|#eta^{#mu}| < %.2f",singleMuEtaHigh));
 }
 
 void drawPullText(RooHist* hist,RooFitResult* fitResults)

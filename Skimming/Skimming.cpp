@@ -44,7 +44,7 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     }
 
     //copy cut config file
-    std::ofstream(ReplaceExtension(outputfilename,".cutconf")) << std::ifstream(configname).rdbuf();
+    CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
 
     //tree to write skimmed data
     std::unique_ptr<Onia_Aux> auxData;

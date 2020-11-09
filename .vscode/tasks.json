@@ -21,6 +21,13 @@
 			"command": "./draw.sh",
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "C++: build all",
+			"command": "./compileall.sh",
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }

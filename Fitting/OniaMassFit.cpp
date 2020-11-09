@@ -17,10 +17,18 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const fitConfig* fitConf):
 
 }
 
+string OniaMassFitter::getKineCutExpr() const
+{
+    string str(Form("(pT < %.3f) && (pT > %.3f)",config.cut.ptHigh,config.cut.ptLow));
+    str.append(Form(" && (abs(y) < %.3f) && (abs(y) > %.3f)",config.cut.yHigh,config.cut.yLow));
+    return str;
+}
+
 RooAbsReal* OniaMassFitter::fit()
 {
-    
-    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, RooArgSet(mass));
+    RooRealVar pT("pT","momentum quarkonia",0,100,"GeV/c");
+    RooRealVar y("y","rapidity quarkonia",-5,5);
+    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, RooArgSet(mass,pT,y),getKineCutExpr().data());
     dataset.reset(datas);
     std::cout << "Reduced dataset:\n";
     dataset->Print();
@@ -96,7 +104,7 @@ DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var, const dcbParam* initial):
     sigma_2(  "sigma_2","@0*@1",RooArgList(x,sigma)),
     alpha_2(  "alpha_2","1.0*@0",RooArgList(alpha)),
     n_2(      "n_2",    "1.0*@0",RooArgList(n)),
-    f(       "fs",     "Crystal ball ratio", initial->f, 0.0f, 1.0f),
+    f(       "f",     "Crystal ball ratio", initial->f, 0.0f, 1.0f),
     cBall_2(  "cball_2","crystalBall",var,mean_2,sigma_2,alpha_2,n_2),
     dcball(   "dcb",    "double crystal ball", RooArgList(cBall,cBall_2),RooArgList(f) )
 {

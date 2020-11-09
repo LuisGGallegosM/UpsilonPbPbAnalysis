@@ -1,17 +1,9 @@
 #!/bin/bash
 
-AUTOCOMPILE="NO"
-CLING="YES"
-
-if [ $AUTOCOMPILE = "YES" ] && [ CLING != "YES" ]
-then
-cd Drawing
-./drawcompile.sh
-cd ..
-fi
+CLING="NO"
 
 #file path to root fit file for drawing
-INPUT=${1-"../rootfiles/testskim/merged_HiForestAOD_fit0/merged_HiForestAOD_fit0.root"}
+INPUT=${1:-"../rootfiles/testskim/merged_HiForestAOD_fit1/merged_HiForestAOD_fit1.root"}
 
 #graphics outputfile named same as input file but with .pdf extension
 OUTPUT="${INPUT%.*}.pdf"

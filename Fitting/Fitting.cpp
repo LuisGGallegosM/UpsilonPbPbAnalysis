@@ -36,7 +36,7 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     std::cout.rdbuf(logFile.rdbuf());
 
     //copy fit config file, same filename as output root file but with .cutconf extension
-    std::ofstream( ReplaceExtension(outfilename,".fitconf")) << std::ifstream(configname).rdbuf();
+    CopyFile(configname, ReplaceExtension(outfilename,".fitconf").data());
 
     RooAbsReal* fittedFunc = massFitter.fit();
 
