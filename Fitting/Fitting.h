@@ -5,7 +5,7 @@
 #include <fstream>
 
 #include "../Utils/utils.h"
-#include "../Params.h"
+#include "../Utils/Params.h"
 #include "OniaMassFit.h"
 
 #include "TTree.h"

@@ -3,7 +3,7 @@
 
 #include "HLT_triggers.h"
 #include "OniaSkimmer.h"
-#include "../Params.h"
+#include "../Utils/Params.h"
 
 class OniaCutter
 {

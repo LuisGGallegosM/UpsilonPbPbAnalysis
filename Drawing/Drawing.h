@@ -17,7 +17,7 @@
 #include "TH1.h"
 
 #include "TextDrawer.h"
-#include "../Params.h"
+#include "../Utils/Params.h"
 
 #define FITFUNCNAME "fitFunc"
 #define DATASETNAME "dataset"

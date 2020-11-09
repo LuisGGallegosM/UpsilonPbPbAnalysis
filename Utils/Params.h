@@ -1,7 +1,7 @@
 #ifndef PARAMS
 #define PARAMS
 
-#include "Utils/serialize.h"
+#include "serialize.h"
 
 #define ONIATTREENAME ("onia_skimmed")
 #define JETTTREENAME ("jet_skimmed")

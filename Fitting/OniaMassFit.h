@@ -13,7 +13,7 @@
 #include "RooChebychev.h"
 #include "RooFormulaVar.h"
 #include "RooExtendPdf.h"
-#include "../Params.h"
+#include "../Utils/Params.h"
 
 //Using in CrystalBall function
 
