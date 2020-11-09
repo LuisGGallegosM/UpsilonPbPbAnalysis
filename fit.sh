@@ -3,12 +3,12 @@
 CLING="NO"
 
 #Root file to fit from
-INPUTFILE="merged_HiForestAOD_skimmed.root"
+INPUTFILE="merged_HiForestAOD_MC_skimmed.root"
 #Fit configuration file name
 CONFIG="${1:-merged_HiForestAOD_fit0.fitconf}"
 
 #working directory where all is saved
-WORKDIR="../rootfiles/testskim"
+WORKDIR="../rootfiles/merged_HiForestAOD_MC_skimmed"
 #save in a directory with a name generated from config file
 OUTPUTDIR="${WORKDIR}/${CONFIG%.*}"
 #name of generated file is like CONFIG but with .root extension

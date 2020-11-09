@@ -15,6 +15,11 @@ using std::ofstream;
  */
 void Skimming(const char* filename,const char* outputfilename, const char* configname)
 {
+    std::cout << "\nSKIMMING\n";
+    std::cout << "Reading input file: " << filename <<'\n';
+    std::cout << "Writing to output file: " << outputfilename <<'\n';
+    std::cout << "Cut configuration file: " << configname <<'\n';
+
     //input file
     TFile* file = TFile::Open(filename, "READ");
 
@@ -26,11 +31,11 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     }
 
     //output file
-    TFile outputfile(outputfilename, "RECREATE");
+    TFile outputfile(outputfilename, "CREATE");
 
     if (outputfile.IsZombie())
     {
-        std::cerr << "file "<< outputfilename <<" cannot be wrote\n";
+        std::cerr << "file "<< outputfilename <<" cannot be wrote or already exists\n";
         return;
     }
 

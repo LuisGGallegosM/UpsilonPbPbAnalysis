@@ -14,6 +14,12 @@ void setTDRStyle();
 
 void Drawing(const char* filename,const char* drawfilename, const char* cutfilename, const char* fitfilename)
 {
+    std::cout << "\nDRAWING\n";
+    std::cout << "Reading input file: " << filename <<'\n';
+    std::cout << "Drawing output file: " << drawfilename <<'\n';
+    std::cout << "Reading cut configuration file: " << cutfilename <<'\n';
+    std::cout << "Reading fit configuration file: " << fitfilename <<'\n';
+
     TFile file(filename,"UPDATE");
 
     if (file.IsZombie())

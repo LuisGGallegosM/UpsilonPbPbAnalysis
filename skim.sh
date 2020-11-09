@@ -3,25 +3,20 @@
 CLING="NO"
 
 #input file to skim
-INPUTFILE="merged_HiForestAOD.root"
-#how to name skim result file
-OUTPUTFILE="merged_HiForestAOD_skimmed.root"
+INPUTFILE="../rootfiles/merged_HiForestAOD.root"
+#how to folder name skim result file
+OUTPUTFOLDER="../rootfiles/merged_HiForestAOD_MC_skimmed"
 #cut configuration file
-CONFIG="merged_HiForestAOD.cutconf"
+CONFIG="../rootfiles/merged_HiForestAOD.cutconf"
 
-#working directory
-WORKDIR="../rootfiles"
-#directory where to write output
-OUTPUTDIR="${WORKDIR}/testskim"
-
-mkdir -p $OUTPUTDIR
+mkdir -p $OUTPUTFOLDER
 
 #execute skim
 if [ $CLING = "YES" ]
 then
 cd Skimming
-root -q 'Skimming.cpp("'../${WORKDIR}/${INPUTFILE}'","'../${OUTPUTDIR}/${OUTPUTFILE}'","'../${WORKDIR}/${CONFIG}'")'
+root -q 'Skimming.cpp("'../${INPUTFILE}'","'../${OUTPUTFOLDER}/${OUTPUTFOLDER%/*}.root'","'../${CONFIG}'")'
 cd ..
 else
-./Skimming/skim "${WORKDIR}/${INPUTFILE}" "${OUTPUTDIR}/${OUTPUTFILE}" "${WORKDIR}/${CONFIG}"
+./Skimming/skim "${INPUTFILE}" "${OUTPUTFOLDER}/$(basename ${OUTPUTFOLDER}).root" "${CONFIG}"
 fi

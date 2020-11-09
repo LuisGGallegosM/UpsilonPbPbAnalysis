@@ -14,9 +14,26 @@ void SetFitConfig(fitConfig* fitConf);
  */
 void Fitting(const char* filename, const char* outfilename, const char* configname)
 {
+    std::cout << "\nFITTING\n";
+    std::cout << "Reading input file: " << filename <<'\n';
+    std::cout << "Writing output file: " << outfilename <<'\n';
+    std::cout << "Reading configuration file: " << configname <<'\n';
+
     TFile file(filename, "READ");
 
-    TTree *tree_skimmed = (TTree *)file.Get(ONIATTREENAME);
+    if (file.IsZombie()) 
+    {
+        std::cerr << "file "<< filename <<" cannot be read\n";
+        return;
+    }
+
+    TFile newfile(outfilename,"CREATE");
+
+    if (newfile.IsZombie()) 
+    {
+        std::cerr << "file "<< outfilename<<" cannot be wrote or already exists\n";
+        return;
+    }
 
     fitConfig config;
     config.deserialize(configname);
@@ -26,10 +43,10 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
         std::cerr << "Error: Invalid arguments\n";
         return;
     }
-    
-    OniaMassFitter massFitter(tree_skimmed, &config);
 
-    TFile newfile(outfilename,"RECREATE");
+    TTree *tree_skimmed = (TTree *)file.Get(ONIATTREENAME);
+
+    OniaMassFitter massFitter(tree_skimmed, &config);
 
     //redirect cout
     std::ofstream logFile(ReplaceExtension(outfilename,".log"));
@@ -37,6 +54,7 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
 
     //copy fit config file, same filename as output root file but with .cutconf extension
     CopyFile(configname, ReplaceExtension(outfilename,".fitconf").data());
+    CopyFile(ReplaceExtension(filename,".cutconf").data(),ReplaceExtension(outfilename,".cutconf").data() );
 
     RooAbsReal* fittedFunc = massFitter.fit();
 
