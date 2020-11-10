@@ -1,7 +1,10 @@
 #include "serialize.h"
 
-serializer::serializer(const char* filename, serializer::iotype iot) : filename_(filename)
+serializer::serializer(const char* filename, serializer::iotype iot) : filename_(filename), type(iot)
 {
+    if (!(iot==iotype::read) || (iot==iotype::update))
+        return;
+
     std::ifstream file(filename_);
     if(!file.is_open())
     {
@@ -28,7 +31,7 @@ serializer::serializer(const char* filename, serializer::iotype iot) : filename_
 
 serializer::~serializer()
 {
-    if (type== iotype::write)
+    if ((type== iotype::write) || (type==iotype::update))
     {
         std::ofstream file(filename_,std::ios_base::trunc);
         for (const auto &i : vars)
@@ -42,7 +45,7 @@ template <typename T>
 void serializer::write(const char* var, T input)
 {
     if (type==iotype::read)
-    throw std::runtime_error("Error: File not open for writing");
+        throw std::runtime_error("Error: File not open for writing");
 
     std::stringstream str;
     str << input;
@@ -97,3 +100,7 @@ void serializer::read(const char* var, bool& output)
 template void serializer::read(const char* var, int& output);
 template void serializer::read(const char* var, float& output);
 template void serializer::read(const char* var, unsigned long long& output);
+
+template void serializer::write(const char* var, int output);
+template void serializer::write(const char* var, float output);
+template void serializer::write(const char* var, unsigned long long output);

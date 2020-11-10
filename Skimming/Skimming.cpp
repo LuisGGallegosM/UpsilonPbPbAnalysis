@@ -58,9 +58,9 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     if (onia_skimmed==nullptr) return;
     onia_skimmed->Write(0,TObject::kOverwrite);
 
-    TTree* jet_skimmed = jetSkim(file,JETTTREENAME,auxData.get());
-    if (jet_skimmed==nullptr) return;
-    jet_skimmed->Write(0,TObject::kOverwrite);
+    //TTree* jet_skimmed = jetSkim(file,JETTTREENAME,auxData.get());
+    //if (jet_skimmed==nullptr) return;
+    //jet_skimmed->Write(0,TObject::kOverwrite);
 
     outputfile.Close();
     file->Close();
@@ -90,7 +90,7 @@ TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>
     OniaCutter cutter(cut);
 
     OniaSkimmer skimmer = OniaSkimmer(myTree,wroteTreeName);
-    TTree* wroteTree = skimmer.Skim(cutter);
+    TTree* wroteTree = skimmer.Skim(&cutter);
 
     (*auxData) = std::move(skimmer.auxData);
 
@@ -117,7 +117,7 @@ TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
     JetCutter cutter(auxData);
     
     JetSkimmer skimmer(myTree,wroteTreeName,auxData);
-    TTree* wroteTree =skimmer.Skim(cutter);
+    TTree* wroteTree =skimmer.Skim(&cutter);
 
     return wroteTree;
 }

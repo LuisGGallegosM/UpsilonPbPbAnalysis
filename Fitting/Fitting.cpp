@@ -1,9 +1,8 @@
 
 #include "Fitting.h"
 
-void copyCutFile(const char* filename, const char* outfilename);
 void SetFitConfig(fitConfig* fitConf);
-
+void getFitParams(fitParams& fParams, const RooRealVar* var, const RooAbsReal* fittedFunc, bool bkgOn);
 /**
  * @brief Does a invariant mass fit, from a branch in a tree
  * in a root file. Saves the plot in a tree and in pdf file format.
@@ -56,7 +55,11 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     CopyFile(configname, ReplaceExtension(outfilename,".fitconf").data());
     CopyFile(ReplaceExtension(filename,".cutconf").data(),ReplaceExtension(outfilename,".cutconf").data() );
 
+    fitParams fParams;
     RooAbsReal* fittedFunc = massFitter.fit();
+
+    getFitParams(fParams, massFitter.getVar(), fittedFunc,config.bkgOn);
+    fParams.serialize(ReplaceExtension(outfilename,".fit").data());
 
     massFitter.getResults()->Print();
 
@@ -86,6 +89,26 @@ void SetFitConfig(fitConfig* fitConf)
     fitConf->initialValues.dcb.sigma1 = 0.1f;
     fitConf->initialValues.dcb.x = 0.5f;
     fitConf->initialValues.dcb.f = 0.5f;
+}
+
+void getFitParams(fitParams& fParams, const RooRealVar* var, const RooAbsReal* fittedFunc, bool bkgOn)
+{
+    RooArgSet* params= fittedFunc->getParameters(*var);
+
+    fParams.dcb.alpha=   params->getRealValue("alpha_1");
+    fParams.dcb.f =       params->getRealValue("f");
+    fParams.dcb.mean =    params->getRealValue("mean_1");
+    fParams.dcb.n =       params->getRealValue("n_1");
+    fParams.dcb.sigma1 =   params->getRealValue("sigma_1");
+    fParams.dcb.x =       params->getRealValue("x");
+    fParams.nSig =      params->getRealValue("nSig");
+
+    if (bkgOn)
+    {
+        fParams.nBkg =      params->getRealValue("nBkg");
+        fParams.chk4_k1 =      params->getRealValue("chk4_k1");
+        fParams.chk4_k2 =      params->getRealValue("chk4_k1");
+    }
 }
 
 #if !defined(__CLING__)

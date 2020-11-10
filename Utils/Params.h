@@ -14,6 +14,10 @@ struct dcbParam
     float sigma1;
     float x;
     float f;
+
+    dcbParam(): mean(-1.0f),alpha(-1.0f),n(-1.0f),sigma1(-1.0f),x(-1.0f),f(-1.0f)
+    {
+    }
 };
 
 struct fitParams
@@ -23,6 +27,25 @@ struct fitParams
     float nBkg;
     float chk4_k1;
     float chk4_k2;
+
+    fitParams() : dcb(),nSig(-1.0f),nBkg(-1.0f),chk4_k1(-1.0f),chk4_k2(-1.0f)
+    {
+    }
+
+    void serialize(const char* filename)
+    {
+        serializer ser(filename,serializer::iotype::write);
+        ser.write("dcb.mean",dcb.mean);
+        ser.write("dcb.alpha",dcb.alpha);
+        ser.write("dcb.n",dcb.n);
+        ser.write("dcb.sigma",dcb.sigma1);
+        ser.write("dcb.x",dcb.x);
+        ser.write("dcb.f",dcb.f);
+        ser.write("nSig",nSig);
+        ser.write("nBkg",nBkg);
+        ser.write("chk4_k1",chk4_k1);
+        ser.write("chk4_k2",chk4_k2);
+    }
 };
 
 struct kinecutParams
@@ -50,6 +73,7 @@ struct cutParams
     bool checkSign;
     unsigned long long trigSelect;
     int sign;
+    int prescale;
 
     int selectionBits;
     int minTracks;
@@ -65,7 +89,7 @@ struct cutParams
     float singleMuPtLow;
     float singleMuEtaHigh;
 
-    cutParams() : isMC(false), checkSign(false), trigSelect(0LL),
+    cutParams() : isMC(false), checkSign(false), trigSelect(0LL), prescale(0),
     sign(0), selectionBits(0), minPixels(-1),minTracks(-1), maxDxy(-1.0f),maxDz(-1.0f),
     minVtxProb(-1.0f),ptHigh(-1.0f),ptLow(-1.0f),yLow(-1.0f),yHigh(-1.0f),
     singleMuPtLow(-1.0f), singleMuEtaHigh(-1.0f)
@@ -86,6 +110,7 @@ struct cutParams
         ser.read("trigSelect", trigSelect);
         ser.read("checkSign",checkSign );
         ser.read("sign",sign);
+        ser.read("prescale",prescale);
 
         ser.read("selectionBits",selectionBits);
         ser.read("minTracks",minTracks);

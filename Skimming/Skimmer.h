@@ -13,6 +13,15 @@
 #define maxBranchSize (1000)
 #define MAXTREESIZE (25000000000)
 
+template<class T>
+class Cutter
+{
+    public:
+
+    virtual bool cut(T* input, Int_t index,Int_t entry)=0;
+    virtual bool prescale(Int_t entry)=0;
+};
+
 template <class T,class U>
 class Skimmer
 {
@@ -52,7 +61,7 @@ class Skimmer
         tree_output->SetMaxTreeSize(MAXTREESIZE);
     }
 
-    TTree* Skim(std::function<bool(T*,Int_t,Int_t)> cutter)
+    TTree* Skim(Cutter<T>* cutter)
     {
         int block =0;
         Long64_t entries= tree_input->GetEntries();
@@ -67,12 +76,14 @@ class Skimmer
                 std::cout <<"Processing: " << block*5 << "% \n";
                 ++block;
             }
+
+            if (cutter->prescale(i)) continue;
                 
             GetEntries(i);
 
             for(Long64_t j=0;j<dataIn.getSize();++j)
             {
-                if (cutter(&dataIn,j,i))
+                if (cutter->cut(&dataIn,j,i))
                 {
                     WriteData(j,i);
                     FillEntries();

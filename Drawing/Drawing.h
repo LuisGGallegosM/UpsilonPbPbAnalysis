@@ -14,10 +14,11 @@
 #include "TLatex.h"
 #include "TLine.h"
 #include "TStyle.h"
-#include "TH1.h"
 
+#include "GraphStyle.h"
 #include "TextDrawer.h"
 #include "../Utils/Params.h"
+#include "../Utils/utils.h"
 
 #define FITFUNCNAME "fitFunc"
 #define DATASETNAME "dataset"

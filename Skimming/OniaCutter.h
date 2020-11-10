@@ -5,7 +5,7 @@
 #include "OniaSkimmer.h"
 #include "../Utils/Params.h"
 
-class OniaCutter
+class OniaCutter : public Cutter<Onia_Input>
 {
     private:
     
@@ -14,7 +14,8 @@ class OniaCutter
     bool isSoft(Onia_Input* input, Int_t index);
 
     public:
-    bool operator()(Onia_Input* input, Int_t index,Int_t entry);
+    bool cut(Onia_Input* input, Int_t index,Int_t entry) override;
+    bool prescale(Int_t entry) override;
     OniaCutter(const cutParams* cut);
 };
 

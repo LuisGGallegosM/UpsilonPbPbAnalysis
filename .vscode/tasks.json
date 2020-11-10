@@ -28,6 +28,27 @@
 			"command": "./compileall.sh",
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "C++: build skim",
+			"command": "./buildskim.sh",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "C++: build fit",
+			"command": "./buildfit.sh",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "C++: build draw",
+			"command": "./builddraw.sh",
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }

@@ -3,14 +3,14 @@
 
 using namespace RooFit;
 
-TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,RooFitResult* fitResults, const drawConfig* config);
-void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc, const drawConfig* cut);
+void drawGraphText(const fitParams* fParams,const drawConfig* config);
 void drawPullText(RooHist* hist, RooFitResult* fitResults);
+void getFitParams(fitParams& fParams, const RooRealVar* var, const RooAbsReal* fittedFunc, const drawConfig* config);
 
-void setGraphStyle(RooPlot* plot,const drawConfig* config);
-void setPullStyle(RooPlot* pullPlot);
 TLegend* drawLegend(RooPlot* plot, bool bkgOn);
-void setTDRStyle();
+
+RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,const drawConfig* config);
+RooHist*  drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults);
 
 void Drawing(const char* filename,const char* drawfilename, const char* cutfilename, const char* fitfilename)
 {
@@ -41,13 +41,29 @@ void Drawing(const char* filename,const char* drawfilename, const char* cutfilen
     RooDataSet* dataset = (RooDataSet*) (file.Get("dataset"));
     RooFitResult* fitResults = (RooFitResult*) (file.Get("fitresults"));
 
-    if ((massVar==nullptr) || (fittedFunc==nullptr) || (dataset==nullptr))
+    if ((massVar==nullptr) || (fittedFunc==nullptr) || (dataset==nullptr) || (fitResults==nullptr))
     {
         std::cerr << "Error: Needed data not found in file\n" ;
         return;
     }
 
-    TCanvas* canvas = drawData(massVar,dataset,fittedFunc,fitResults,&config);
+    fitParams fParams;
+    getFitParams(fParams, massVar, fittedFunc, &config );
+
+    //DRAWING START
+
+    TCanvas* canvas = getStyledCanvas();
+    canvas->cd();
+    TPad* graph = getStyledGraphPad();
+    TPad* pull = getStyledPullPad();
+
+    graph->cd();
+    RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
+    drawGraphText(&fParams,&config);
+
+    pull->cd();
+    RooHist* pullHist = drawPull(graphPlot,massVar,fitResults);
+    drawPullText(pullHist,fitResults);
 
     if (canvas==nullptr)
     {
@@ -78,44 +94,11 @@ int main(int argc, char **argv)
 #endif
 
 
+//DRAW GRAPH
 
-/**
- * @brief Draws the data in variable var of dataset and fittedFunc in same plot.
- * 
- * @param var variable to use in x axis.
- * @param dataset experimental/sim data points.
- * @param fittedFunc fitted curve to experimental/sim
- * @return Drawn canvas.
- */
-TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,RooFitResult* fitResults, const drawConfig* config)
+RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,const drawConfig* config)
 {
-    if (!config->isValid())
-    {
-        std::cerr << "Error: invalid draw configuration\n";
-        return nullptr;
-    }
-
-    TCanvas* canvas = new TCanvas("Fit_plot","mass fit",4,45,550,520);
-    canvas->SetLeftMargin(2.6);
-    canvas->cd();
-
-    //setTDRStyle();
-
-    TPad* graph = new TPad("graph_pad","mass fit", 0, 0.45, 0.98, 1.0);
-    graph->SetTicks(1,1);
-    graph->SetLeftMargin(0.15);
-    graph->SetLogy();
-    graph->Draw();
-
-    TPad* pull = new TPad("pull_pad","mass fit pull", 0.00, 0.00, 0.98, 0.5);
-    pull->SetTopMargin(0); // Upper and lower plot are joined
-    pull->SetBottomMargin(0.63); 
-    pull->SetLeftMargin(0.15);
-    pull->SetTicks(1,1);
-    pull->Draw();
-
-    //draw fitted and dataset function
-    graph->cd();
+        //draw fitted and dataset function
     RooPlot* plot = var->frame(config->nBins);
     fittedFunc->plotOn(plot,Name(FITFUNCNAME),LineColor(kOrange+7),Normalization(1.0,RooAbsReal::RelativeExpected));
     fittedFunc->plotOn(plot,Name("dcb"),Components("dcb"),LineStyle(9),LineColor(13),Normalization(1.0,RooAbsReal::RelativeExpected));
@@ -130,77 +113,7 @@ TCanvas* drawData(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,R
     plot->Draw("same");
     legend->Draw("same");
 
-    drawTexts(var,fittedFunc,config);
-    
-    //draw pull
-    pull->cd();
-    RooPlot* pullPlot = var->frame(Title("Pull Distribution"));
-    RooHist* pullHist = plot->pullHist(DATASETNAME,FITFUNCNAME);
-    pullHist->SetMarkerSize(0.7f);
-    
-    pullPlot->addPlotable(pullHist,"PSAME");
-    
-    setPullStyle(pullPlot);  
-    pullPlot->Draw("same");
-    TLine *l1 = new TLine(8.5,0,10.0,0.0);
-    l1->SetLineColor(4);
-    l1->Draw("same");
-
-    drawPullText(pullHist,fitResults);
-
-    return canvas;
-}
-
-void setGraphStyle(RooPlot* plot, const drawConfig* config)
-{
-  float massHigh = config->fitConf.massHigh;
-  float massLow = config->fitConf.massLow;
-  float div= (massHigh - massLow)/(config->nBins);
-
-  plot->SetTitle("#varUpsilon(1S) MC ( 5.02 TeV)");
-  plot->SetFillStyle(4000);
-  plot->SetMarkerStyle(2);
-  plot->SetMarkerSize(0.02);
-  plot->SetAxisRange(massLow,massHigh);
-
-  plot->GetXaxis()->SetLabelSize(0);
-  plot->GetXaxis()->SetTitleSize(0);
-  plot->GetXaxis()->SetRangeUser(massLow,massHigh);
-
-  plot->GetYaxis()->SetTitleOffset(1.0);
-  plot->GetYaxis()->CenterTitle();
-  plot->GetYaxis()->SetTitleSize(0.048);
-  plot->GetYaxis()->SetTitle( Form("Events / ( %.3f GeV/c^{2} )",div));
-  plot->GetYaxis()->SetRangeUser(100,10000000);
-
-  return;
-}
-
-void setPullStyle(RooPlot* pullPlot)
-{
-    pullPlot->SetTitleSize(0);
-    pullPlot->SetMarkerStyle(2);
-    pullPlot->SetMarkerSize(0.1);
-    
-    pullPlot->SetDrawOption("HIST");
-    pullPlot->GetYaxis()->SetTitleOffset(0.31) ;
-    pullPlot->GetYaxis()->SetTitle("Pull") ;
-    pullPlot->GetYaxis()->SetTitleSize(0.10) ;
-    pullPlot->GetYaxis()->SetLabelSize(0.05) ;
-    pullPlot->GetYaxis()->SetRangeUser(-12,12) ;
-    pullPlot->GetYaxis()->CenterTitle();
-    pullPlot->GetYaxis()->SetTickSize(0.02);
-    pullPlot->GetYaxis()->SetNdivisions(505);
-
-    pullPlot->GetXaxis()->SetTitle("m_{#mu^{+}#mu^{-}} (GeV/c^{2})");
-    pullPlot->GetXaxis()->SetTitleOffset(1.20) ;
-    pullPlot->GetXaxis()->SetLabelOffset(0.04) ;
-    pullPlot->GetXaxis()->SetLabelSize(0.10) ;
-    pullPlot->GetXaxis()->SetTitleSize(0.10) ;
-    pullPlot->GetXaxis()->CenterTitle();
-    pullPlot->GetXaxis()->SetRangeUser(8.5,10.0);
-    pullPlot->GetXaxis()->SetTickSize(0.03);
-    return;
+    return plot;
 }
 
 TLegend* drawLegend(RooPlot* plot,bool bkgOn)
@@ -219,24 +132,17 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn)
     return fitleg;
 }
 
-void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const drawConfig* config)
+void drawGraphText(const fitParams* fParams,const drawConfig* config)
 {
     TextDrawer tdrawer(0.22,0.8);
-    RooArgSet* params= fittedFunc->getParameters(*var);
-
-    float alpha =   params->getRealValue("alpha_1");
-    float f =       params->getRealValue("f");
-    float mean =    params->getRealValue("mean_1");
-    float n =       params->getRealValue("n_1");
-    float sigma =   params->getRealValue("sigma_1");
-    float x =       params->getRealValue("x");
-
+    
     tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
-    tdrawer.drawText( Form("#alpha=%.3f",alpha));
-    tdrawer.drawText( Form("m=%.3f",mean));
-    tdrawer.drawText( Form("N=%.3f",n));
-    tdrawer.drawText( Form("#sigma_{1}=%.4f, #frac{#sigma_{2}}{#sigma_{1}}=%.4f",sigma,x));
-    tdrawer.drawText( Form("f=%.4f",f));
+    tdrawer.drawText( Form("#alpha=%.3f",fParams->dcb.alpha));
+    tdrawer.drawText( Form("m=%.3f",fParams->dcb.mean));
+    tdrawer.drawText( Form("N=%.3f",fParams->dcb.n));
+    tdrawer.drawText( Form("#sigma_{1}=%.4f",fParams->dcb.sigma1));
+    tdrawer.drawText( Form("#frac{#sigma_{2}}{#sigma_{1}}=%.4f",fParams->dcb.x));
+    tdrawer.drawText( Form("f=%.4f",fParams->dcb.f));
 
     float ptLow=config->fitConf.cut.ptLow;
     float ptHigh=config->fitConf.cut.ptHigh;
@@ -249,7 +155,7 @@ void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const drawConfig* config)
     if (ptLow == 0.0f)
         tdrawer2.drawText(Form("p_{T}^{#mu#mu} < %.1f GeV/c", ptHigh));
     else 
-        tdrawer2.drawText(Form("%.f < p_{T}^{#mu#mu} < %.1f GeV/c",ptLow, ptHigh));
+        tdrawer2.drawText(Form("%.1f < p_{T}^{#mu#mu} < %.1f GeV/c",ptLow, ptHigh));
     
     if (yLow == 0.0f)
         tdrawer2.drawText(Form("|y^{#mu#mu}| < %.2f", yHigh));
@@ -257,6 +163,24 @@ void drawTexts(RooRealVar* var,RooAbsReal* fittedFunc,const drawConfig* config)
         tdrawer2.drawText(Form("%.2f < |y^{#mu#mu}| < %.2f",yLow, yHigh));
     tdrawer2.drawText(Form("p_{T}^{#mu} > %.1f GeV/c", singleMuPtLow));
     tdrawer2.drawText(Form("|#eta^{#mu}| < %.2f",singleMuEtaHigh));
+}
+//DRAW PULL
+
+RooHist* drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults)
+{
+    //draw pull
+    RooPlot* pullPlot = var->frame(Title("Pull Distribution"));
+    RooHist* pullHist = plot->pullHist(DATASETNAME,FITFUNCNAME);
+    pullHist->SetMarkerSize(0.7f);
+    
+    pullPlot->addPlotable(pullHist,"PSAME");
+    
+    setPullStyle(pullPlot);  
+    pullPlot->Draw("same");
+    TLine *l1 = new TLine(8.5,0,10.0,0.0);
+    l1->SetLineColor(4);
+    l1->Draw("same");
+    return pullHist;
 }
 
 void drawPullText(RooHist* hist,RooFitResult* fitResults)
@@ -282,4 +206,25 @@ void drawPullText(RooHist* hist,RooFitResult* fitResults)
     tex->SetTextSize(12.0);
     tex->SetNDC();
     tex->Draw("same");
+}
+
+
+void getFitParams(fitParams& fParams, const RooRealVar* var, const RooAbsReal* fittedFunc, const drawConfig* config)
+{
+    RooArgSet* params= fittedFunc->getParameters(*var);
+
+    fParams.dcb.alpha=   params->getRealValue("alpha_1");
+    fParams.dcb.f =       params->getRealValue("f");
+    fParams.dcb.mean =    params->getRealValue("mean_1");
+    fParams.dcb.n =       params->getRealValue("n_1");
+    fParams.dcb.sigma1 =   params->getRealValue("sigma_1");
+    fParams.dcb.x =       params->getRealValue("x");
+    fParams.nSig =      params->getRealValue("nSig");
+
+    if (config->fitConf.bkgOn)
+    {
+        fParams.nBkg =      params->getRealValue("nBkg");
+        fParams.chk4_k1 =      params->getRealValue("chk4_k1");
+        fParams.chk4_k2 =      params->getRealValue("chk4_k1");
+    }
 }

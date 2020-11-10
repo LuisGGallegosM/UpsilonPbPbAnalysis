@@ -6,7 +6,7 @@ kineCut(*cut)
 {
 }
 
-bool OniaCutter::operator()(Onia_Input* input,Int_t index,Int_t entry)
+bool OniaCutter::cut(Onia_Input* input,Int_t index,Int_t entry)
 {
     //check for triggers
     if ((input->trig[index] & kineCut.trigSelect) != kineCut.trigSelect) return false;
@@ -51,6 +51,11 @@ bool OniaCutter::operator()(Onia_Input* input,Int_t index,Int_t entry)
     if (input->VtxProb[index] < kineCut.minVtxProb) return false;
 
     return true;
+}
+
+bool OniaCutter::prescale(Int_t entry)
+{
+    return (kineCut.prescale>1) && ((entry % kineCut.prescale)!=0);
 }
 
 bool OniaCutter::isSoft(Onia_Input* input,Int_t index)

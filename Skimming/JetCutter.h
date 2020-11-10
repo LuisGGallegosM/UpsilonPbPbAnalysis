@@ -2,9 +2,8 @@
 #define JETCUTTER
 
 #include "JetSkimmer.h"
-#include "OniaSkimmer.h"
 
-class JetCutter
+class JetCutter : public Cutter<Jet_Input>
 {
     private:
     Onia_Aux* auxData;
@@ -12,7 +11,8 @@ class JetCutter
     Float_t maxPt;
 
     public:
-    bool operator()(Jet_Input* input, Int_t index, Int_t entry);
+    bool cut(Jet_Input* input, Int_t index, Int_t entry) override;
+    bool prescale(Int_t entry) override;
     JetCutter(Onia_Aux* auxDat);
 };
 
