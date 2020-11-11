@@ -32,6 +32,21 @@ struct fitParams
     {
     }
 
+    void deserialize(const char* filename)
+    {
+        serializer ser(filename);
+        ser.read("dcb.mean",dcb.mean);
+        ser.read("dcb.alpha",dcb.alpha);
+        ser.read("dcb.n",dcb.n);
+        ser.read("dcb.sigma",dcb.sigma1);
+        ser.read("dcb.x",dcb.x);
+        ser.read("dcb.f",dcb.f);
+        ser.read("nSig",nSig);
+        ser.read("nBkg",nBkg);
+        ser.read("chk4_k1",chk4_k1);
+        ser.read("chk4_k2",chk4_k2);
+    }
+
     void serialize(const char* filename)
     {
         serializer ser(filename,serializer::iotype::write);
@@ -100,7 +115,7 @@ struct cutParams
     {
         return (minTracks>=0) && (minPixels>=0) && (ptLow>=0.0f) 
         && (ptHigh>0.0f) && (singleMuPtLow>=0.0f) && (maxDxy>0.0f)
-        && (maxDz > 0.0f) && (minVtxProb >0.0f);
+        && (maxDz > 0.0f) && (minVtxProb >0.0f) && (prescale>0);
     }
 
     void deserialize(const char* filename)

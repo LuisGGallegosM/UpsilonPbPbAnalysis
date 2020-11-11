@@ -16,8 +16,8 @@ FITFILE="${INPUT%.*}.fitconf"
 if [ $CLING = "YES" ]
 then
 cd Drawing
-root -q 'Drawing.cpp("'../${INPUT}'","'../${OUTPUT}'","'../${CUTFILE}'","'../${FITFILE}'")'
+root -q 'Drawing.cpp("'../${INPUT}'","'../${OUTPUT}'","'../${CUTFILE}'","'../${FITFILE}'")' > "../${INPUT%.*}_Drawing.log" 2>&1 
 cd ..
 else
-./Drawing/draw "${INPUT}" "${OUTPUT}" "${CUTFILE}" "${FITFILE}"
+./Drawing/draw "${INPUT}" "${OUTPUT}" "${CUTFILE}" "${FITFILE}" > "${INPUT%.*}_Drawing.log" 2>&1 
 fi

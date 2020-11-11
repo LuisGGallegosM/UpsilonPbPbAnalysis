@@ -17,6 +17,13 @@
 		},
 		{
 			"type": "shell",
+			"label": "C++: multi fit",
+			"command": "./multifit.sh",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"type": "shell",
 			"label": "C++: draw",
 			"command": "./draw.sh",
 			"problemMatcher": [],

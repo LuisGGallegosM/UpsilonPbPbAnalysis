@@ -80,14 +80,38 @@ void Drawing(const char* filename,const char* drawfilename, const char* cutfilen
 
 #if !defined(__CLING__)
 
+const char* file="../rootfiles/merged_HiForestAOD_MC_skimmed/merged_HiForestAOD.pdf";
+const char* ss[]={"../rootfiles/merged_HiForestAOD_MC_skimmed/merged_HiForestAOD_fit0/merged_HiForestAOD_fit0.fit",
+                "../rootfiles/merged_HiForestAOD_MC_skimmed/merged_HiForestAOD_fit1/merged_HiForestAOD_fit1.fit" };
+
 int main(int argc, char **argv)
 {
-    if (argc ==5)
-        Drawing(argv[1],argv[2],argv[3],argv[4]);
+    std::string option(argv[1]);
+
+    if (option=="-m")
+    {
+        int numFiles=(argc -3) ;
+        const char* args[32];
+
+        if (numFiles<=0) return 0;
+        
+        for (int i=0;i<numFiles;i++) args[i]=argv[i+3];
+
+        DrawingCmp(argv[2],numFiles,args);
+    }
     else
     {
-        std::cerr << "Error: Incorrect number of parameters\n";  
+        if (argc ==5)
+            Drawing(argv[1],argv[2],argv[3],argv[4]);
+        else
+        {
+            std::cerr << "Error: Incorrect number of parameters\n";  
+        }
     }
+
+    
+    return 0;
+
     return 0;
 }
 

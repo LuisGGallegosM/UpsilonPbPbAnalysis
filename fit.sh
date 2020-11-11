@@ -3,16 +3,14 @@
 CLING="NO"
 
 #Root file to fit from
-INPUTFILE="merged_HiForestAOD_MC_skimmed.root"
+INPUTFILE="../rootfiles/merged_HiForestAOD_MC_skimmed/merged_HiForestAOD_MC_skimmed.root"
 #Fit configuration file name
-CONFIG="${1:-merged_HiForestAOD_fit0.fitconf}"
+CONFIG="${1:-../rootfiles/merged_HiForestAOD_MC_skimmed/merged_HiForestAOD_fit0.fitconf}"
 
-#working directory where all is saved
-WORKDIR="../rootfiles/merged_HiForestAOD_MC_skimmed"
 #save in a directory with a name generated from config file
-OUTPUTDIR="${WORKDIR}/${CONFIG%.*}"
+OUTPUTDIR="${CONFIG%.*}"
 #name of generated file is like CONFIG but with .root extension
-OUTPUTFILE="${CONFIG%.*}.root"
+OUTPUTFILE="${OUTPUTDIR}/$( basename $OUTPUTDIR ).root"
 
 mkdir -p $OUTPUTDIR
 
@@ -20,11 +18,11 @@ mkdir -p $OUTPUTDIR
 if [ $CLING = "YES" ]
 then
 cd Fitting
-root -q 'Fitting.cpp("'../${WORKDIR}/${INPUTFILE}'","'../${OUTPUTDIR}/${OUTPUTFILE}'","'../${WORKDIR}/${CONFIG}'")'
+root -q 'Fitting.cpp("'../${INPUTFILE}'","'../${OUTPUTFILE}'","'../${CONFIG}'")' > "../${OUTPUTFILE%.*}_Fitting.log" 2>&1
 cd ..
 else
-./Fitting/fit "${WORKDIR}/${INPUTFILE}" "${OUTPUTDIR}/${OUTPUTFILE}" "${WORKDIR}/${CONFIG}"
+./Fitting/fit "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}" > "${OUTPUTFILE%.*}_Fitting.log" 2>&1
 fi
 
 #also execute drawing
-./draw.sh "${OUTPUTDIR}/${OUTPUTFILE}"
+./draw.sh "${OUTPUTFILE}"

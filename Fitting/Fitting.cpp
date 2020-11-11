@@ -47,10 +47,6 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
 
     OniaMassFitter massFitter(tree_skimmed, &config);
 
-    //redirect cout
-    std::ofstream logFile(ReplaceExtension(outfilename,".log"));
-    std::cout.rdbuf(logFile.rdbuf());
-
     //copy fit config file, same filename as output root file but with .cutconf extension
     CopyFile(configname, ReplaceExtension(outfilename,".fitconf").data());
     CopyFile(ReplaceExtension(filename,".cutconf").data(),ReplaceExtension(outfilename,".cutconf").data() );

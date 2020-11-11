@@ -9,6 +9,8 @@ OUTPUTFOLDER="../rootfiles/merged_HiForestAOD_MC_skimmed"
 #cut configuration file
 CONFIG="../rootfiles/merged_HiForestAOD.cutconf"
 
+OUTPUTFILE="${OUTPUTFOLDER}/$(basename ${OUTPUTFOLDER}).root"
+
 mkdir -p $OUTPUTFOLDER
 
 #execute skim
@@ -18,5 +20,5 @@ cd Skimming
 root -q 'Skimming.cpp("'../${INPUTFILE}'","'../${OUTPUTFOLDER}/${OUTPUTFOLDER%/*}.root'","'../${CONFIG}'")'
 cd ..
 else
-./Skimming/skim "${INPUTFILE}" "${OUTPUTFOLDER}/$(basename ${OUTPUTFOLDER}).root" "${CONFIG}"
+./Skimming/skim "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}" > "${OUTPUTFILE%.*}_Skimming.log" 2>&1
 fi

@@ -85,4 +85,3 @@ TPad* getStyledPullPad()
     pull->Draw();
     return pull;
 }
-

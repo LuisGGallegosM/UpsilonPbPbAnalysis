@@ -19,6 +19,7 @@
 #include "TextDrawer.h"
 #include "../Utils/Params.h"
 #include "../Utils/utils.h"
+#include "DrawingCmp.h"
 
 #define FITFUNCNAME "fitFunc"
 #define DATASETNAME "dataset"
