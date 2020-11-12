@@ -103,7 +103,7 @@ void getFitParams(fitParams& fParams, const RooRealVar* var, const RooAbsReal* f
     {
         fParams.nBkg =      params->getRealValue("nBkg");
         fParams.chk4_k1 =      params->getRealValue("chk4_k1");
-        fParams.chk4_k2 =      params->getRealValue("chk4_k1");
+        fParams.chk4_k2 =      params->getRealValue("chk4_k2");
     }
 }
 

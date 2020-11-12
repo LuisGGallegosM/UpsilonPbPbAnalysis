@@ -96,10 +96,13 @@ std::vector<double> generateBins(std::vector<FitElement>& configs)
 
 void drawCompGraph(float (*func) (const FitElement&), std::vector<FitElement>& fits,TH1F* graph)
 {
+    int i=0;
     for ( const auto& fit : fits)
     {
         float pt =0.5f*(fit.configs.cut.ptHigh + fit.configs.cut.ptLow);
         graph->Fill(pt,func(fit));
+        graph->SetBinError(i+1,0.1);
+        i++;
     }
 
     return;

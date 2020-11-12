@@ -83,8 +83,8 @@ RooCBShape* CrystalBall::getCB()
 //Chevychev2
 
 Chevychev2::Chevychev2(RooRealVar& var,const char* name,float k1,float k2):
-    ch4_k1("ch4_k1","ch4_k1",k1,S1_CH4_MIN,S1_CH4_MAX),
-    ch4_k2("ch4_k2","ch4_k2",k2,S1_CH4_MIN,S1_CH4_MAX),
+    ch4_k1("chk4_k1","chk4_k1",k1,S1_CH4_MIN,S1_CH4_MAX),
+    ch4_k2("chk4_k2","chk4_k2",k2,S1_CH4_MIN,S1_CH4_MAX),
     chev(name,"Background",var,RooArgSet(ch4_k1,ch4_k2))
 {
 
