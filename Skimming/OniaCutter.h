@@ -19,4 +19,8 @@ class OniaCutter : public Cutter<Onia_Input>
     OniaCutter(const cutParams* cut);
 };
 
+#if defined(__CLING__)
+#include "OniaCutter.cpp"
+#endif
+
 #endif

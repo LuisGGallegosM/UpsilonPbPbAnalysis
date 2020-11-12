@@ -32,4 +32,9 @@ class serializer
     void read(const char* var, bool& output);
 };
 
+
+#if defined(__CLING__)
+#include "../Utils/serialize.cpp"
+#endif
+
 #endif

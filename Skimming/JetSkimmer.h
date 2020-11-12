@@ -46,4 +46,8 @@ class JetSkimmer : public Skimmer<Jet_Input,Jet_Output>
     JetSkimmer(TTree* treeIn,const char* treeOutName, Onia_Aux* auxData);
 };
 
+#if defined(__CLING__)
+#include "JetSkimmer.cpp"
+#endif
+
 #endif

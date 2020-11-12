@@ -11,13 +11,15 @@ OUTPUT="${INPUT%.*}.pdf"
 CUTFILE="${INPUT%.*}.cutconf"
 #path to fit configuration file, it has same name as input but with .fitconf extension
 FITFILE="${INPUT%.*}.fitconf"
+#path of file where to save log
+LOGFILE="${INPUT%.*}_Drawing.log"
 
 #execute fit
 if [ $CLING = "YES" ]
 then
 cd Drawing
-root -q 'Drawing.cpp("'../${INPUT}'","'../${OUTPUT}'","'../${CUTFILE}'","'../${FITFILE}'")' > "../${INPUT%.*}_Drawing.log" 2>&1 
+root -q 'Drawing.cpp("'../${INPUT}'","'../${OUTPUT}'","'../${CUTFILE}'","'../${FITFILE}'")' > "../${LOGFILE}" 2>&1 
 cd ..
 else
-./Drawing/draw "${INPUT}" "${OUTPUT}" "${CUTFILE}" "${FITFILE}" > "${INPUT%.*}_Drawing.log" 2>&1 
+./Drawing/draw "${INPUT}" "${OUTPUT}" "${CUTFILE}" "${FITFILE}" > "${LOGFILE}" 2>&1 
 fi

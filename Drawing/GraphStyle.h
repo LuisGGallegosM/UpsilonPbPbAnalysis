@@ -12,4 +12,9 @@ void setPullStyle(RooPlot* pullPlot);
 TPad* getStyledGraphPad();
 TCanvas* getStyledCanvas();
 TPad* getStyledPullPad();
+
+#if defined(__CLING__)
+#include "GraphStyle.cpp"
+#endif
+
 #endif

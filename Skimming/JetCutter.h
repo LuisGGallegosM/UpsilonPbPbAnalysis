@@ -16,4 +16,8 @@ class JetCutter : public Cutter<Jet_Input>
     JetCutter(Onia_Aux* auxDat);
 };
 
+#if defined(__CLING__)
+#include "JetCutter.cpp"
+#endif
+
 #endif

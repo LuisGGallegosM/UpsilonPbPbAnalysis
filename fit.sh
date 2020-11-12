@@ -11,6 +11,8 @@ CONFIG="${1:-../rootfiles/merged_HiForestAOD_MC_skimmed/merged_HiForestAOD_fit0.
 OUTPUTDIR="${CONFIG%.*}"
 #name of generated file is like CONFIG but with .root extension
 OUTPUTFILE="${OUTPUTDIR}/$( basename $OUTPUTDIR ).root"
+#path of file where to save log
+LOGFILE="${OUTPUTFILE%.*}_Fitting.log"
 
 mkdir -p $OUTPUTDIR
 
@@ -18,10 +20,10 @@ mkdir -p $OUTPUTDIR
 if [ $CLING = "YES" ]
 then
 cd Fitting
-root -q 'Fitting.cpp("'../${INPUTFILE}'","'../${OUTPUTFILE}'","'../${CONFIG}'")' > "../${OUTPUTFILE%.*}_Fitting.log" 2>&1
+root -q 'Fitting.cpp("'../${INPUTFILE}'","'../${OUTPUTFILE}'","'../${CONFIG}'")' > "../${LOGFILE}" 2>&1
 cd ..
 else
-./Fitting/fit "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}" > "${OUTPUTFILE%.*}_Fitting.log" 2>&1
+./Fitting/fit "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}" > "${LOGFILE}" 2>&1
 fi
 
 #also execute drawing

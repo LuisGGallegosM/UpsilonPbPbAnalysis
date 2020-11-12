@@ -63,4 +63,8 @@ class OniaSkimmer : public Skimmer<Onia_Input,Onia_Output>
     std::unique_ptr<Onia_Aux> auxData;
 };
 
+#if defined(__CLING__)
+#include "OniaSkimmer.cpp"
+#endif
+
 #endif

@@ -13,10 +13,4 @@
 
 void Fitting(const char* filename, const char* outfilename);
 
-#if defined(__CLING__)
-#include "OniaMassFit.cpp"
-#include "../Utils/serialize.cpp"
-#include "../Utils/utils.cpp"
-#endif
-
 #endif

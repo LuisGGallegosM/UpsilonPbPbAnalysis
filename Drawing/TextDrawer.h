@@ -23,4 +23,8 @@ class TextDrawer
     void drawText(const char *text);
 };
 
+#if defined(__CLING__)
+#include "TextDrawer.cpp"
+#endif
+
 #endif
