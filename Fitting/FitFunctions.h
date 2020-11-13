@@ -29,6 +29,10 @@
 #define S1_NSIG_MAX     (10000000.0f)
 #define S1_NBKG_MAX     (1000000.0f)
 
+
+#define RATIO_Y2S (10.023/9.460)
+#define RATIO_Y3S (10.355/9.460)
+
 class Chevychev2
 {
     RooRealVar ch4_k1;
@@ -50,6 +54,8 @@ class CrystalBall
     RooRealVar n;
     RooCBShape cBall;
 
+    friend class CrystalBallSlave;
+
     public:
 
     /**
@@ -69,7 +75,35 @@ class CrystalBall
     RooCBShape* getCB();
 };
 
-class DoubleCrystalBall : protected CrystalBall
+class CrystalBallSlave
+{
+    protected:
+    RooFormulaVar mean;
+    RooFormulaVar sigma;
+    RooFormulaVar alpha;
+    RooFormulaVar n;
+    RooCBShape cBall;
+
+    public:
+
+    /**
+     * @brief Construct a new Crystal Ball object. This represents a crystal ball
+     * function including all needed variables.
+     * 
+     * @param var observable variable in x axis.
+     * @param name a unique name to identify this crystal ball and its variables.
+     */
+    CrystalBallSlave(RooRealVar& var, CrystalBall& cball, const char* name, float ratio);
+
+    /**
+     * @brief Get the crystal ball function.
+     * 
+     * @return RooCBShape* The interally saved crystal ball function.
+     */
+    RooCBShape* getCB();
+};
+
+class DoubleCrystalBall : public CrystalBall
 {
     RooFormulaVar mean_2;
     RooRealVar x;
@@ -81,7 +115,26 @@ class DoubleCrystalBall : protected CrystalBall
     RooAddPdf dcball;
 
     public:
-    DoubleCrystalBall(RooRealVar& var, const dcbParam* initial);
+    DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial);
+
+    RooAbsPdf* getDCB();
+
+    friend class DoubleCrystalBallSlave;
+};
+
+class DoubleCrystalBallSlave : protected CrystalBallSlave
+{
+    RooFormulaVar mean_2;
+    RooFormulaVar x;
+    RooFormulaVar alpha_2;
+    RooFormulaVar n_2;
+    RooFormulaVar sigma_2;
+    RooFormulaVar f;
+    RooCBShape cBall_2;
+    RooAddPdf dcball;
+
+    public:
+    DoubleCrystalBallSlave(RooRealVar& var,const char* name,DoubleCrystalBall& doublecb,float ratio);
 
     RooAbsPdf* getDCB();
 };

@@ -7,7 +7,7 @@
 #include "../Utils/Params.h"
 
 void setGraphStyle(RooPlot* plot,const drawConfig* config);
-void setPullStyle(RooPlot* pullPlot);
+void setPullStyle(RooPlot* pullPlot, const drawConfig* config);
 
 TPad* getStyledGraphPad();
 TCanvas* getStyledCanvas();

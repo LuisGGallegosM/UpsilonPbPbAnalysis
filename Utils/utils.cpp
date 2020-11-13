@@ -16,3 +16,23 @@ void CopyFile(const char* inputpath, const char* outputpath)
     outputfile << inputfile.rdbuf();
     return;
 }
+
+void getFitParams(fitParams& fParams, const RooRealVar* var, const RooAbsReal* fittedFunc, bool bkgOn)
+{
+    RooArgSet* params= fittedFunc->getParameters(*var);
+
+    fParams.dcb.alpha=   params->getRealValue("alpha_Y1S_1");
+    fParams.dcb.f =       params->getRealValue("f_Y1S");
+    fParams.dcb.mean =    params->getRealValue("mean_Y1S_1");
+    fParams.dcb.n =       params->getRealValue("n_Y1S_1");
+    fParams.dcb.sigma1 =   params->getRealValue("sigma_Y1S_1");
+    fParams.dcb.x =       params->getRealValue("x_Y1S");
+    fParams.nSig =      params->getRealValue("nSig_Y1S");
+
+    if (bkgOn)
+    {
+        fParams.nBkg =      params->getRealValue("nBkg");
+        fParams.chk4_k1 =      params->getRealValue("chk4_k1");
+        fParams.chk4_k2 =      params->getRealValue("chk4_k2");
+    }
+}

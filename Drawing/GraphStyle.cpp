@@ -15,7 +15,7 @@ void setGraphStyle(RooPlot* plot, const drawConfig* config)
         plot->SetTitle("#varUpsilon(1S) ( 5.02 TeV)");
     plot->SetFillStyle(4000);
     plot->SetMarkerStyle(2);
-    plot->SetMarkerSize(0.02);
+    plot->SetMarkerSize(0.01);
     plot->SetAxisRange(massLow,massHigh);
 
     plot->GetXaxis()->SetLabelSize(0);
@@ -26,12 +26,12 @@ void setGraphStyle(RooPlot* plot, const drawConfig* config)
     plot->GetYaxis()->CenterTitle();
     plot->GetYaxis()->SetTitleSize(0.048);
     plot->GetYaxis()->SetTitle( Form("Events / ( %.3f GeV/c^{2} )",div));
-    plot->GetYaxis()->SetRangeUser(100,10000000);
+    plot->GetYaxis()->SetRangeUser(config->minBinY,config->maxBinY);
 
   return;
 }
 
-void setPullStyle(RooPlot* pullPlot)
+void setPullStyle(RooPlot* pullPlot, const drawConfig* config)
 {
     pullPlot->SetTitleSize(0);
     pullPlot->SetMarkerStyle(2);
@@ -53,7 +53,7 @@ void setPullStyle(RooPlot* pullPlot)
     pullPlot->GetXaxis()->SetLabelSize(0.06) ;
     pullPlot->GetXaxis()->SetTitleSize(0.06) ;
     pullPlot->GetXaxis()->CenterTitle();
-    pullPlot->GetXaxis()->SetRangeUser(8.5,10.0);
+    pullPlot->GetXaxis()->SetRangeUser(config->fitConf.massLow,config->fitConf.massHigh);
     pullPlot->GetXaxis()->SetTickSize(0.03);
     return;
 }

@@ -13,10 +13,10 @@ using namespace std;
 
 OniaMassFitter::OniaMassFitter(TTree* tree_,const fitConfig* fitConf):
     config(*fitConf),tree(tree_),
-    nSig("nSig","Upsilon Signal",config.initialValues.nSig, 0.0f, S1_NSIG_MAX),
+    nSig_Y1S("nSig_Y1S","Upsilon Signal",config.initialValues.nSig, 0.0f, S1_NSIG_MAX),
     nBkg("nBkg","Bkg signal",config.initialValues.nBkg, 0.0f, S1_NBKG_MAX),
     mass("mass","onia mass",config.massLow,config.massHigh,"GeV/c^{2}"),
-    dcball(mass,&(config.initialValues.dcb)),
+    dcball1(mass,"Y1S",&(config.initialValues.dcb)),
     bkg(mass,"bkg",config.initialValues.chk4_k1,config.initialValues.chk4_k2)
 {
 
@@ -29,6 +29,20 @@ string OniaMassFitter::getKineCutExpr() const
     return str;
 }
 
+void OniaMassFitter::combinePdf()
+{
+    if (config.bkgOn)
+    {
+        RooAddPdf* dcballbkg = new RooAddPdf("dcb_fit","double crystal ball + Bkg", RooArgList(*(dcball1.getDCB()),*(bkg.getChev()) ),RooArgList(nSig_Y1S,nBkg) );
+        output.reset(dcballbkg);
+    }
+    else
+    {
+        RooExtendPdf* signal = new RooExtendPdf("dcb_fit","extended signal",*dcball1.getDCB(),nSig_Y1S);
+        output.reset(signal);
+    }
+}
+
 RooAbsReal* OniaMassFitter::fit()
 {
     RooRealVar pT("pT","momentum quarkonia",0,100,"GeV/c");
@@ -37,16 +51,9 @@ RooAbsReal* OniaMassFitter::fit()
     dataset.reset(datas);
     std::cout << "Reduced dataset:\n";
     dataset->Print();
-    if (config.bkgOn)
-    {
-        RooAddPdf* dcballbkg = new RooAddPdf("dcb_fit","double crystal ball + Bkg", RooArgList(*(dcball.getDCB()),*(bkg.getChev()) ),RooArgList(nSig,nBkg) );
-        output.reset(dcballbkg);
-    }
-    else
-    {
-        RooExtendPdf* signal = new RooExtendPdf("dcb_fit","extended signal",*dcball.getDCB(),nSig);
-        output.reset(signal);
-    }
+
+    combinePdf();
+
     RooFitResult* res=output->fitTo(*dataset,RooFit::Save(),RooFit::Range(config.massLow,config.massHigh), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
     results.reset(res);
     return output.get();
@@ -66,4 +73,36 @@ RooRealVar* OniaMassFitter::getVar()
 RooFitResult* OniaMassFitter::getResults() const
 {
     return results.get();
+}
+
+
+OniaMassFitter2::OniaMassFitter2(TTree* tree_,const fitConfig* fitConf):
+    OniaMassFitter(tree_,fitConf),
+    nSig_Y2S("nSig_Y2S","Upsilon Signal Y2S",config.initialValues.nSig, 0.0f, S1_NSIG_MAX),
+    nSig_Y3S("nSig_Y3S","Upsilon Signal Y3S",config.initialValues.nSig, 0.0f, S1_NSIG_MAX),
+    dcball2(mass,"Y2S",dcball1,RATIO_Y2S),
+    dcball3(mass,"Y3S",dcball1,RATIO_Y3S)
+{
+}
+
+void OniaMassFitter2::combinePdf()
+{
+
+    
+    if (config.bkgOn)
+    {
+        RooAddPdf* dcballbkg = 
+            new RooAddPdf("dcb_fit","3 double crystal ball + Bkg", 
+                    RooArgList(*dcball1.getDCB(),*dcball2.getDCB(),*dcball3.getDCB(),*(bkg.getChev()) ),
+                    RooArgList(nSig_Y1S,nSig_Y2S,nSig_Y3S,nBkg) );
+        output.reset(dcballbkg);
+    }
+    else
+    {
+        RooAddPdf* dcball = 
+            new RooAddPdf("dcb_fit","3 double crystal ball + Bkg", 
+                    RooArgList(*dcball1.getDCB(),*dcball2.getDCB(),*dcball3.getDCB()),
+                    RooArgList(nSig_Y1S,nSig_Y2S,nSig_Y3S) );
+        output.reset(dcball);
+    }
 }

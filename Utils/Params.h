@@ -194,22 +194,31 @@ struct fitConfig
 struct drawConfig
 {
     int nBins;
+    float minBinY;
+    float maxBinY;
+    bool moreUpsilon;
     cutParams cut;
     fitConfig fitConf;
 
     bool isValid() const
     {
-        return (nBins>0) && (cut.isValid()) && (fitConf.isValid());
+        return (nBins>0) && (minBinY>0) && (maxBinY>0) && (cut.isValid()) && (fitConf.isValid());
     }
-    drawConfig(): nBins(0), cut(), fitConf()
+    drawConfig(): nBins(-1),minBinY(-1),maxBinY(-1), moreUpsilon(false), cut(), fitConf()
     {
     }
 
-    void deserialize(const char* cutfilename, const char* fitfilename)
+    void deserialize(const char* configfilename,const char* cutfilename, const char* fitfilename)
     {
         cut.deserialize(cutfilename);
         fitConf.deserialize(fitfilename);
-        nBins=(fitConf.massHigh- fitConf.massLow)*50;
+
+        serializer ser(configfilename);
+
+        ser.read("nBins",nBins);
+        ser.read("minBinY",minBinY);
+        ser.read("maxBinY",maxBinY);
+        ser.read("moreUpsilon",moreUpsilon);
     }
 };
 

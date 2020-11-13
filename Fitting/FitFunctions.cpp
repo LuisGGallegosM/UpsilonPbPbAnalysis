@@ -19,6 +19,65 @@ RooCBShape* CrystalBall::getCB()
     return &cBall;
 }
 
+//Double CrystalBall
+
+DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial):
+    CrystalBall(var,Form("%s_1",name),initial),
+    mean_2(   Form("mean_%s_2",name), "1.0*@0",RooArgList(mean)),
+    x(        Form("x_%s",name),"sigma ratio",initial->x,0.0f,1.0f),
+    sigma_2(  Form("sigma_%s_2",name),"@0*@1",RooArgList(x,sigma)),
+    alpha_2(  Form("alpha_%s_2",name),"1.0*@0",RooArgList(alpha)),
+    n_2(      Form("n_%s_2",name),    "1.0*@0",RooArgList(n)),
+    f(        Form("f_%s",name),     "Crystal ball ratio", initial->f, 0.0f, 1.0f),
+    cBall_2(  Form("cball_%s_2",name),"crystalBall",var,mean_2,sigma_2,alpha_2,n_2),
+    dcball(   Form("dcb_%s",name),    "double crystal ball", RooArgList(cBall,cBall_2),RooArgList(f) )
+{
+
+}
+
+RooAbsPdf* DoubleCrystalBall::getDCB()
+{
+    return &dcball;
+}
+
+//Slave Crystal ball
+
+CrystalBallSlave::CrystalBallSlave(RooRealVar& var, CrystalBall& cball, const char* name,float ratio):
+    mean(   Form("mean_%s",name), Form( "%f *@0",ratio),RooArgList(cball.mean)),
+    sigma(  Form("sigma_%s",name),Form( "%f *@0",ratio),RooArgList(cball.sigma)),
+    alpha(  Form("alpha_%s",name),      "1.0*@0", RooArgList(cball.alpha)),
+    n(      Form("n_%s",name),          "1.0*@0", RooArgList(cball.n)),
+    cBall(  Form("cball_%s",name),      "crystalBall",var,mean,sigma,alpha,n)
+{
+
+}
+
+RooCBShape* CrystalBallSlave::getCB()
+{
+    return &cBall;
+}
+
+//Double CrystalBall Slave
+
+DoubleCrystalBallSlave::DoubleCrystalBallSlave(RooRealVar& var,const char* name,DoubleCrystalBall& doublecb,float ratio):
+    CrystalBallSlave(var,doublecb,name,ratio),
+    mean_2(   Form("mean_%s_2",name),   "1.0*@0",RooArgList(mean)),
+    x(        Form("x_%s",name),        "1.0*@0",RooArgList(doublecb.x)),
+    sigma_2(  Form("sigma_%s_2",name),  "@0*@1", RooArgList(doublecb.x,sigma)),
+    alpha_2(  Form("alpha_%s_2",name),  "1.0*@0",RooArgList(alpha)),
+    n_2(      Form("n_%s_2",name),      "1.0*@0",RooArgList(n)),
+    f(        Form("f_%s",name),        "1.0*@0",RooArgList(doublecb.f)),
+    cBall_2(  Form("cball_%s_2",name),  "crystalBall",var,mean_2,sigma_2,alpha_2,n_2),
+    dcball(   Form("dcb_%s",name),      "double crystal ball", RooArgList(cBall,cBall_2),RooArgList(f) )
+{
+
+}
+
+RooAbsPdf* DoubleCrystalBallSlave::getDCB()
+{
+    return &dcball;
+}
+
 //Chevychev2
 
 Chevychev2::Chevychev2(RooRealVar& var,const char* name,float k1,float k2):
@@ -32,25 +91,4 @@ Chevychev2::Chevychev2(RooRealVar& var,const char* name,float k1,float k2):
 RooChebychev* Chevychev2::getChev()
 {
     return &chev;
-}
-
-//Double CrystalBall
-
-DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var, const dcbParam* initial):
-    CrystalBall(var,"1",initial),
-    mean_2(   "mean_2", "1.0*@0",RooArgList(mean)),
-    x(        "x","sigma ratio",initial->x,0.0f,1.0f),
-    sigma_2(  "sigma_2","@0*@1",RooArgList(x,sigma)),
-    alpha_2(  "alpha_2","1.0*@0",RooArgList(alpha)),
-    n_2(      "n_2",    "1.0*@0",RooArgList(n)),
-    f(       "f",     "Crystal ball ratio", initial->f, 0.0f, 1.0f),
-    cBall_2(  "cball_2","crystalBall",var,mean_2,sigma_2,alpha_2,n_2),
-    dcball(   "dcb",    "double crystal ball", RooArgList(cBall,cBall_2),RooArgList(f) )
-{
-
-}
-
-RooAbsPdf* DoubleCrystalBall::getDCB()
-{
-    return &dcball;
 }

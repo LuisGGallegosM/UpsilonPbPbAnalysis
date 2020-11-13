@@ -5,18 +5,18 @@ using namespace RooFit;
 
 void drawGraphText(const fitParams* fParams,const drawConfig* config);
 void drawPullText(RooHist* hist, RooFitResult* fitResults);
-void getFitParams(fitParams& fParams, const RooRealVar* var, const RooAbsReal* fittedFunc, const drawConfig* config);
 
-TLegend* drawLegend(RooPlot* plot, bool bkgOn);
+TLegend* drawLegend(RooPlot* plot, bool bkgOn,bool moreUpsilon);
 
 RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,const drawConfig* config);
-RooHist*  drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults);
+RooHist*  drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults,const drawConfig* config);
 
-void Drawing(const char* filename,const char* drawfilename, const char* cutfilename, const char* fitfilename)
+void Drawing(const char* filename,const char* drawfilename, const char* configfilename, const char* cutfilename, const char* fitfilename)
 {
     std::cout << "\nDRAWING\n";
     std::cout << "Reading input file: " << filename <<'\n';
     std::cout << "Drawing output file: " << drawfilename <<'\n';
+    std::cout << "Reading draw configuration file: " << configfilename <<'\n';
     std::cout << "Reading cut configuration file: " << cutfilename <<'\n';
     std::cout << "Reading fit configuration file: " << fitfilename <<'\n';
 
@@ -28,13 +28,15 @@ void Drawing(const char* filename,const char* drawfilename, const char* cutfilen
         return;
     }
     drawConfig config;
-    config.deserialize(cutfilename,fitfilename);
+    config.deserialize(configfilename,cutfilename,fitfilename);
 
     if (!config.isValid())
     {
         std::cerr << "Error: Invalid arguments\n";
         return;
     }
+
+    CopyFile(configfilename, ReplaceExtension(drawfilename,".drawconf").data());
 
     RooRealVar* massVar = (RooRealVar*) (file.Get("mass"));
     RooAbsReal* fittedFunc = (RooAbsReal*) (file.Get("dcb_fit"));
@@ -62,7 +64,7 @@ void Drawing(const char* filename,const char* drawfilename, const char* cutfilen
     drawGraphText(&fParams,&config);
 
     pull->cd();
-    RooHist* pullHist = drawPull(graphPlot,massVar,fitResults);
+    RooHist* pullHist = drawPull(graphPlot,massVar,fitResults,&config);
     drawPullText(pullHist,fitResults);
 
     if (canvas==nullptr)
@@ -101,8 +103,8 @@ int main(int argc, char **argv)
     }
     else
     {
-        if (argc ==5)
-            Drawing(argv[1],argv[2],argv[3],argv[4]);
+        if (argc ==6)
+            Drawing(argv[1],argv[2],argv[3],argv[4],argv[5]);
         else
         {
             std::cerr << "Error: Incorrect number of parameters\n";  
@@ -125,13 +127,25 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc
         //draw fitted and dataset function
     RooPlot* plot = var->frame(config->nBins);
     fittedFunc->plotOn(plot,Name(FITFUNCNAME),LineColor(kOrange+7),Normalization(1.0,RooAbsReal::RelativeExpected));
-    fittedFunc->plotOn(plot,Name("dcb"),Components("dcb"),LineStyle(9),LineColor(13),Normalization(1.0,RooAbsReal::RelativeExpected));
-    fittedFunc->plotOn(plot,Name("cb1"),Components("cball_1"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
-    fittedFunc->plotOn(plot,Name("cb2"),Components("cball_2"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
+
+    if (config->moreUpsilon)
+    {
+        fittedFunc->plotOn(plot,Name("dcb1"),Components("dcb_Y1S,bkg"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
+        fittedFunc->plotOn(plot,Name("dcb2"),Components("dcb_Y2S,bkg"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
+        fittedFunc->plotOn(plot,Name("dcb3"),Components("dcb_Y3S,bkg"),LineStyle(7),LineColor(kMagenta+2),Normalization(1.0,RooAbsReal::RelativeExpected));
+    }
+    else
+    {
+        fittedFunc->plotOn(plot,Name("dcb"),Components("dcb_Y1S"),LineStyle(9),LineColor(13),Normalization(1.0,RooAbsReal::RelativeExpected));
+        fittedFunc->plotOn(plot,Name("cb1"),Components("cball_Y1S_1"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
+        fittedFunc->plotOn(plot,Name("cb2"),Components("cball_Y1S_2"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
+    }
+    
+    
     if (config->fitConf.bkgOn)
       fittedFunc->plotOn(plot,Name("bkg"),Components("bkg"),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
-    dataset->plotOn(plot,Name(DATASETNAME), MarkerSize(0.5), XErrorSize(0));
-    TLegend* legend= drawLegend(plot,config->fitConf.bkgOn);
+    dataset->plotOn(plot,Name(DATASETNAME), MarkerSize(0.4), XErrorSize(0));
+    TLegend* legend= drawLegend(plot,config->fitConf.bkgOn,config->moreUpsilon);
 
     setGraphStyle(plot,config);
     plot->Draw("same");
@@ -140,7 +154,7 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc
     return plot;
 }
 
-TLegend* drawLegend(RooPlot* plot,bool bkgOn)
+TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
 {
     TLegend* fitleg = new TLegend(0.70,0.65,0.85,0.85);
     fitleg->SetTextSize(12);
@@ -148,11 +162,23 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn)
     fitleg->SetBorderSize(0);
     fitleg->AddEntry(plot->findObject(DATASETNAME),"Data","pe");
     fitleg->AddEntry(plot->findObject(FITFUNCNAME),"Total fit","l");
-    fitleg->AddEntry(plot->findObject("dcb"),"Signal","l");
+    if(moreUpsilon)
+    {
+        fitleg->AddEntry(plot->findObject("dcb1"),"Signal Y1S","l");
+        fitleg->AddEntry(plot->findObject("dcb2"),"Signal Y2S","l");
+        fitleg->AddEntry(plot->findObject("dcb3"),"Signal Y3S","l");
+    }
+    else
+    {
+        fitleg->AddEntry(plot->findObject("dcb"),"Signal","l");
+        fitleg->AddEntry(plot->findObject("cb1"),"CBall 1","l");
+        fitleg->AddEntry(plot->findObject("cb2"),"CBall 2","l");
+    }
+    
+
     if (bkgOn)
       fitleg->AddEntry(plot->findObject("bkg"),"Background","l");
-    fitleg->AddEntry(plot->findObject("cb1"),"CBall 1","l");
-    fitleg->AddEntry(plot->findObject("cb2"),"CBall 2","l");
+
     return fitleg;
 }
 
@@ -190,7 +216,7 @@ void drawGraphText(const fitParams* fParams,const drawConfig* config)
 }
 //DRAW PULL
 
-RooHist* drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults)
+RooHist* drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults,const drawConfig* config)
 {
     //draw pull
     RooPlot* pullPlot = var->frame(Title("Pull Distribution"));
@@ -199,7 +225,7 @@ RooHist* drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults)
     
     pullPlot->addPlotable(pullHist,"PSAME");
     
-    setPullStyle(pullPlot);  
+    setPullStyle(pullPlot,config);  
     pullPlot->Draw("same");
     TLine *l1 = new TLine(8.5,0,10.0,0.0);
     l1->SetLineColor(4);
@@ -230,25 +256,4 @@ void drawPullText(RooHist* hist,RooFitResult* fitResults)
     tex->SetTextSize(12.0);
     tex->SetNDC();
     tex->Draw("same");
-}
-
-
-void getFitParams(fitParams& fParams, const RooRealVar* var, const RooAbsReal* fittedFunc, const drawConfig* config)
-{
-    RooArgSet* params= fittedFunc->getParameters(*var);
-
-    fParams.dcb.alpha=   params->getRealValue("alpha_1");
-    fParams.dcb.f =       params->getRealValue("f");
-    fParams.dcb.mean =    params->getRealValue("mean_1");
-    fParams.dcb.n =       params->getRealValue("n_1");
-    fParams.dcb.sigma1 =   params->getRealValue("sigma_1");
-    fParams.dcb.x =       params->getRealValue("x");
-    fParams.nSig =      params->getRealValue("nSig");
-
-    if (config->fitConf.bkgOn)
-    {
-        fParams.nBkg =      params->getRealValue("nBkg");
-        fParams.chk4_k1 =      params->getRealValue("chk4_k1");
-        fParams.chk4_k2 =      params->getRealValue("chk4_k2");
-    }
 }

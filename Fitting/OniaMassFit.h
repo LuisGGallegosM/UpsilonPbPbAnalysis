@@ -14,18 +14,21 @@
 
 class OniaMassFitter
 {
+    protected:
     fitConfig config;
     TTree* tree;
     RooRealVar mass;
-    RooRealVar nSig;
+    RooRealVar nSig_Y1S;
     RooRealVar nBkg;
-    DoubleCrystalBall dcball;
+    DoubleCrystalBall dcball1;
     Chevychev2 bkg;
     std::unique_ptr<RooDataSet> dataset;
     std::unique_ptr<RooFitResult> results;
     std::unique_ptr<RooAbsPdf> output;
 
     std::string getKineCutExpr() const;
+
+    virtual void combinePdf();
 
     public:
 
@@ -66,6 +69,20 @@ class OniaMassFitter
      * @return RooFitResult* This result is owned by this object. 
      */
     RooFitResult* getResults() const;
+};
+
+class OniaMassFitter2 : public OniaMassFitter
+{
+    private:
+    RooRealVar nSig_Y2S;
+    RooRealVar nSig_Y3S;
+    DoubleCrystalBallSlave dcball2;
+    DoubleCrystalBallSlave dcball3;
+
+    void combinePdf() override;
+
+    public:
+    OniaMassFitter2(TTree* tree_,const fitConfig* fitConf);
 };
 
 #if defined(__CLING__)
