@@ -42,6 +42,8 @@ class OniaMassFitter
      */
     OniaMassFitter(TTree* tree_,const fitConfig* fitConfig);
 
+    virtual ~OniaMassFitter();
+
     /**
      * @brief Executes the fit using fitTo function and stores results.
      * 

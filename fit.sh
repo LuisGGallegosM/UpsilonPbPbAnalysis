@@ -3,9 +3,9 @@
 CLING="NO"
 
 #Root file to fit from
-INPUTFILE="../rootfiles/merged_HiForestAOD_skimmed/merged_HiForestAOD_skimmed.root"
+INPUTFILE="${1:-../rootfiles/merged_HiForestAOD_skimmed/merged_HiForestAOD_skimmed.root}"
 #Fit configuration file name
-CONFIG="${1:-../rootfiles/merged_HiForestAOD_skimmed/merged_HiForestAOD_fit0.fitconf}"
+CONFIG="${2:-../rootfiles/merged_HiForestAOD_skimmed/merged_HiForestAOD_fit0.fitconf}"
 #Draw configuration file name
 DRAWCONFIG="${INPUTFILE%.*}.drawconf"
 
@@ -29,4 +29,4 @@ else
 fi
 
 #also execute drawing
-./draw.sh "${OUTPUTFILE}" 
+./draw.sh "${OUTPUTFILE}" "${DRAWCONFIG}"

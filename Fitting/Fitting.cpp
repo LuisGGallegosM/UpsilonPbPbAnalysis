@@ -45,25 +45,35 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
 
     TTree *tree_skimmed = (TTree *)file.Get(ONIATTREENAME);
 
-    OniaMassFitter2 massFitter(tree_skimmed, &config);
+    std::unique_ptr<OniaMassFitter> massFitter;
+
+    //fit with first three Upsilon or only the first
+    if (config.moreUpsilon)
+    {
+        massFitter.reset(new OniaMassFitter2(tree_skimmed, &config));
+    }
+    else
+    {
+        massFitter.reset(new OniaMassFitter(tree_skimmed, &config));
+    }
 
     //copy fit config file, same filename as output root file but with .cutconf extension
     CopyFile(configname, ReplaceExtension(outfilename,".fitconf").data());
     CopyFile(ReplaceExtension(filename,".cutconf").data(),ReplaceExtension(outfilename,".cutconf").data() );
 
     fitParams fParams;
-    RooAbsReal* fittedFunc = massFitter.fit();
+    RooAbsReal* fittedFunc = massFitter->fit();
 
-    getFitParams(fParams, massFitter.getVar(), fittedFunc,config.bkgOn);
+    getFitParams(fParams, massFitter->getVar(), fittedFunc,config.bkgOn);
     fParams.serialize(ReplaceExtension(outfilename,".fit").data());
 
-    massFitter.getResults()->Print();
+    massFitter->getResults()->Print();
 
     newfile.cd();
-    massFitter.getDataset()->Write();
-    massFitter.getResults()->Write("fitresults");
+    massFitter->getDataset()->Write();
+    massFitter->getResults()->Write("fitresults");
     fittedFunc->Write();
-    massFitter.getVar()->Write();
+    massFitter->getVar()->Write();
 }
 
 void SetFitConfig(fitConfig* fitConf)
@@ -74,7 +84,7 @@ void SetFitConfig(fitConfig* fitConf)
     fitConf->massLow = 8.5f;
 
     //set initial values for fitting parameters
-    fitConf->initialValues.nSig = 5000000.0f;
+    fitConf->initialValues.nSigY1S = 5000000.0f;
     fitConf->initialValues.nBkg = 500000.0f;
     fitConf->initialValues.chk4_k1=0.2f;
     fitConf->initialValues.chk4_k2=-0.1f;

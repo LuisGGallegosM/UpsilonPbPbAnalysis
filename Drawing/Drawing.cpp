@@ -128,7 +128,7 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc
     RooPlot* plot = var->frame(config->nBins);
     fittedFunc->plotOn(plot,Name(FITFUNCNAME),LineColor(kOrange+7),Normalization(1.0,RooAbsReal::RelativeExpected));
 
-    if (config->moreUpsilon)
+    if (config->fitConf.moreUpsilon)
     {
         fittedFunc->plotOn(plot,Name("dcb1"),Components("dcb_Y1S,bkg"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
         fittedFunc->plotOn(plot,Name("dcb2"),Components("dcb_Y2S,bkg"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
@@ -145,7 +145,7 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc
     if (config->fitConf.bkgOn)
       fittedFunc->plotOn(plot,Name("bkg"),Components("bkg"),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
     dataset->plotOn(plot,Name(DATASETNAME), MarkerSize(0.4), XErrorSize(0));
-    TLegend* legend= drawLegend(plot,config->fitConf.bkgOn,config->moreUpsilon);
+    TLegend* legend= drawLegend(plot,config->fitConf.bkgOn,config->fitConf.moreUpsilon);
 
     setGraphStyle(plot,config);
     plot->Draw("same");

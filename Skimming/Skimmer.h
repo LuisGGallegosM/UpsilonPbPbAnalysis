@@ -20,6 +20,8 @@ class Cutter
 
     virtual bool cut(T* input, Int_t index,Int_t entry)=0;
     virtual bool prescale(Int_t entry)=0;
+
+    virtual ~Cutter() {};
 };
 
 template <class T,class U>
@@ -60,6 +62,8 @@ class Skimmer
         tree_output= new TTree(treeOutName, "Skimmed tree");
         tree_output->SetMaxTreeSize(MAXTREESIZE);
     }
+
+    virtual ~Skimmer() {}
 
     TTree* Skim(Cutter<T>* cutter)
     {

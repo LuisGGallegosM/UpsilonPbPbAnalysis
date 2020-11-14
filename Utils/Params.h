@@ -23,12 +23,15 @@ struct dcbParam
 struct fitParams
 {
     dcbParam dcb;
-    float nSig;
+    float nSigY1S;
+    float nSigY2S;
+    float nSigY3S;
     float nBkg;
     float chk4_k1;
     float chk4_k2;
 
-    fitParams() : dcb(),nSig(-1.0f),nBkg(-1.0f),chk4_k1(-1.0f),chk4_k2(-1.0f)
+    fitParams() : dcb(),nSigY1S(-1.0f),nSigY2S(-1.0f),nSigY3S(-1.0f),
+    nBkg(-1.0f),chk4_k1(-1.0f),chk4_k2(-1.0f)
     {
     }
 
@@ -41,7 +44,9 @@ struct fitParams
         ser.read("dcb.sigma",dcb.sigma1);
         ser.read("dcb.x",dcb.x);
         ser.read("dcb.f",dcb.f);
-        ser.read("nSig",nSig);
+        ser.read("nSigY1S",nSigY1S);
+        ser.read("nSigY2S",nSigY2S);
+        ser.read("nSigY3S",nSigY3S);
         ser.read("nBkg",nBkg);
         ser.read("chk4_k1",chk4_k1);
         ser.read("chk4_k2",chk4_k2);
@@ -56,7 +61,9 @@ struct fitParams
         ser.write("dcb.sigma",dcb.sigma1);
         ser.write("dcb.x",dcb.x);
         ser.write("dcb.f",dcb.f);
-        ser.write("nSig",nSig);
+        ser.write("nSigY1S",nSigY1S);
+        ser.write("nSigY2S",nSigY2S);
+        ser.write("nSigY3S",nSigY3S);
         ser.write("nBkg",nBkg);
         ser.write("chk4_k1",chk4_k1);
         ser.write("chk4_k2",chk4_k2);
@@ -147,13 +154,14 @@ struct cutParams
 struct fitConfig
 {
     bool bkgOn;
+    bool moreUpsilon;
     float massLow;
     float massHigh;
 
     kinecutParams cut;
     fitParams initialValues;
 
-    fitConfig(): bkgOn(false), massLow(-1.0f), massHigh(-1.0f), cut(), initialValues()
+    fitConfig(): bkgOn(false),moreUpsilon(false), massLow(-1.0f), massHigh(-1.0f), cut(), initialValues()
     {
     }
 
@@ -167,6 +175,7 @@ struct fitConfig
         serializer ser(filename);
         //set background and fit range
         ser.read("bkgOn",bkgOn);
+        ser.read("moreUpsilon",moreUpsilon);
         ser.read("massHigh",massHigh);
         ser.read("massLow",massLow);
 
@@ -177,7 +186,9 @@ struct fitConfig
         ser.read("cut.yHigh",cut.yHigh);
 
          //set initial values for fitting parameters
-        ser.read("initialValues.nSig",initialValues.nSig);
+        ser.read("initialValues.nSigY1S",initialValues.nSigY1S);
+        ser.read("initialValues.nSigY2S",initialValues.nSigY2S);
+        ser.read("initialValues.nSigY3S",initialValues.nSigY3S);
         ser.read("initialValues.nBkg",initialValues.nBkg);
         ser.read("initialValues.chk4_k1",initialValues.chk4_k1);
         ser.read("initialValues.chk4_k2",initialValues.chk4_k2);
@@ -196,7 +207,6 @@ struct drawConfig
     int nBins;
     float minBinY;
     float maxBinY;
-    bool moreUpsilon;
     cutParams cut;
     fitConfig fitConf;
 
@@ -204,7 +214,7 @@ struct drawConfig
     {
         return (nBins>0) && (minBinY>0) && (maxBinY>0) && (cut.isValid()) && (fitConf.isValid());
     }
-    drawConfig(): nBins(-1),minBinY(-1),maxBinY(-1), moreUpsilon(false), cut(), fitConf()
+    drawConfig(): nBins(-1),minBinY(-1),maxBinY(-1), cut(), fitConf()
     {
     }
 
@@ -218,7 +228,6 @@ struct drawConfig
         ser.read("nBins",nBins);
         ser.read("minBinY",minBinY);
         ser.read("maxBinY",maxBinY);
-        ser.read("moreUpsilon",moreUpsilon);
     }
 };
 

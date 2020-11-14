@@ -27,7 +27,9 @@ void getFitParams(fitParams& fParams, const RooRealVar* var, const RooAbsReal* f
     fParams.dcb.n =       params->getRealValue("n_Y1S_1");
     fParams.dcb.sigma1 =   params->getRealValue("sigma_Y1S_1");
     fParams.dcb.x =       params->getRealValue("x_Y1S");
-    fParams.nSig =      params->getRealValue("nSig_Y1S");
+    fParams.nSigY1S =      params->getRealValue("nSig_Y1S");
+    fParams.nSigY2S =      params->getRealValue("nSig_Y2S");
+    fParams.nSigY3S =      params->getRealValue("nSig_Y3S");
 
     if (bkgOn)
     {
