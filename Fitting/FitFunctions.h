@@ -20,14 +20,14 @@
 #define S1_ALPHA_MAX    (5.50f)
 #define S1_ALPHA_MIN    (0.50f)
 
-#define S1_N_MAX        (35.50f)
+#define S1_N_MAX        (12.00f)
 #define S1_N_MIN        (0.05f)
 
 #define S1_CH4_MAX      (4.0f)
 #define S1_CH4_MIN      (-4.0f)
 
-#define S1_NSIG_MAX     (10000000.0f)
-#define S1_NBKG_MAX     (1000000.0f)
+#define S1_NSIG_MAX     (2000000.0f)
+#define S1_NBKG_MAX     (200000.0f)
 
 
 #define RATIO_Y2S (10.023/9.460)

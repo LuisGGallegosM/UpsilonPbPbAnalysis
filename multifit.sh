@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WORKDIR="../rootfiles/merged_HiForestAOD_MC_skimmed/"
+WORKDIR="../rootfiles/merged_HiForestAOD_skimmed/"
 
 CONFIGFILES=( \
  "merged_HiForestAOD_fit0.fitconf"\
@@ -12,7 +12,7 @@ CONFIGFILES=( \
 
 FILENAMES="${CONFIGFILES[@]/#/${WORKDIR}}"
 
-SKIMFILE="../rootfiles/merged_HiForestAOD_MC_skimmed/merged_HiForestAOD_MC_skimmed.root"
+SKIMFILE="../rootfiles/merged_HiForestAOD_skimmed/merged_HiForestAOD_skimmed.root"
 
 echo ${FILENAMES[@]}
 

@@ -42,7 +42,7 @@ void setPullStyle(RooPlot* pullPlot, const drawConfig* config)
     pullPlot->GetYaxis()->SetTitle("Pull") ;
     pullPlot->GetYaxis()->SetTitleSize(0.07) ;
     pullPlot->GetYaxis()->SetLabelSize(0.05) ;
-    pullPlot->GetYaxis()->SetRangeUser(-12,12) ;
+    pullPlot->GetYaxis()->SetRangeUser(-8,8) ;
     pullPlot->GetYaxis()->CenterTitle();
     pullPlot->GetYaxis()->SetTickSize(0.02);
     pullPlot->GetYaxis()->SetNdivisions(505);

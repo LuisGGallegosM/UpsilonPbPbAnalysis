@@ -15,7 +15,7 @@ struct FitElement
 };
 
 void drawCompGraph(float (*func) (const FitElement&), std::vector<FitElement>& fits,TH1F* graph);
-std::vector<double> generateBins(std::vector<FitElement>& configs);
+std::vector<double> generateBinBoundaries(std::vector<FitElement>& configs);
 void fillVariables(  std::vector<const char*>& names,std::vector<float (*) (const FitElement&)>& functors);
 
 void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
@@ -39,7 +39,7 @@ void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
     }
     std::sort(fits.begin(),fits.end(),[](FitElement& l,FitElement& r) {return l.configs.cut.ptLow < r.configs.cut.ptLow;});
 
-    std::vector<double> xbins = generateBins(fits);
+    std::vector<double> xbins = generateBinBoundaries(fits);
     std::vector<const char*> names;
     std::vector<float (*) (const FitElement&)> functors;
 
@@ -55,6 +55,8 @@ void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
         pad.Draw();
         pad.cd();
         TH1F compGraph(names[i],names[i],fits.size(),xbins.data());
+        compGraph.GetXaxis()->SetTitle("p_{T} ( GeV/c )");
+        compGraph.GetYaxis()->SetTitle(names[i]);
         drawCompGraph(functors[i],fits,&compGraph);
         compGraph.Draw();
         std::string outfilename = (ReplaceExtension(outputfilename,"_")+names[i]+".pdf");
@@ -81,9 +83,27 @@ void fillVariables(  std::vector<const char*>& names,std::vector<float (*) (cons
 
     names.push_back("x");
     functors.push_back([](const FitElement& param) { return param.fits.dcb.x;  });
+
+    names.push_back("nSigY1S");
+    functors.push_back([](const FitElement& param) { return param.fits.nSigY1S;  });
+
+    names.push_back("nSigY2S");
+    functors.push_back([](const FitElement& param) { return param.fits.nSigY2S;  });
+
+    names.push_back("nSigY3S");
+    functors.push_back([](const FitElement& param) { return param.fits.nSigY3S;  });
+
+    names.push_back("nBkg");
+    functors.push_back([](const FitElement& param) { return param.fits.nBkg;  });
+
+    names.push_back("chk4_k1");
+    functors.push_back([](const FitElement& param) { return param.fits.chk4_k1;  });
+
+    names.push_back("chk4_k2");
+    functors.push_back([](const FitElement& param) { return param.fits.chk4_k2;  });
 }
 
-std::vector<double> generateBins(std::vector<FitElement>& configs)
+std::vector<double> generateBinBoundaries(std::vector<FitElement>& configs)
 {
     std::vector<double> xbins;
     xbins.push_back(configs[0].configs.cut.ptLow);
@@ -97,7 +117,7 @@ std::vector<double> generateBins(std::vector<FitElement>& configs)
 void drawCompGraph(float (*func) (const FitElement&), std::vector<FitElement>& fits,TH1F* graph)
 {
     int i=0;
-    for ( const auto& fit : fits)
+    for (const auto& fit : fits)
     {
         float pt =0.5f*(fit.configs.cut.ptHigh + fit.configs.cut.ptLow);
         graph->Fill(pt,func(fit));

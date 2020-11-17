@@ -56,6 +56,13 @@
 			"command": "./builddraw.sh",
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "C++: fitconf Generation",
+			"command": "./fitconfGen.sh",
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }

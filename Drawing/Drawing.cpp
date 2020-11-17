@@ -227,7 +227,7 @@ RooHist* drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults,const
     
     setPullStyle(pullPlot,config);  
     pullPlot->Draw("same");
-    TLine *l1 = new TLine(8.5,0,10.0,0.0);
+    TLine *l1 = new TLine(config->fitConf.massLow,0,config->fitConf.massHigh,0.0);
     l1->SetLineColor(4);
     l1->Draw("same");
     return pullHist;
