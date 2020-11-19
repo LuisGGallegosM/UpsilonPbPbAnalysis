@@ -1,6 +1,6 @@
 #include "serialize.h"
 
-serializer::serializer(const char* filename, serializer::iotype iot) : filename_(filename), type(iot)
+serializer::serializer(const std::string& filename, serializer::iotype iot) : filename_(filename), type(iot)
 {
     if (!(iot==iotype::read) || (iot==iotype::update))
         return;
@@ -8,9 +8,7 @@ serializer::serializer(const char* filename, serializer::iotype iot) : filename_
     std::ifstream file(filename_);
     if(!file.is_open())
     {
-        std::string error ="Error: file '";
-        error += filename;
-        error +="' not open/found.\n";
+        std::string error ="Error: file '"+filename+"' not open/found.\n";
         throw std::runtime_error(error);
     }
 
@@ -41,9 +39,24 @@ serializer::~serializer()
     }
 }
 
-template <typename T>
-void serializer::write(const char* var, T input)
+void serializer::addPrefix(const std::string& prefix)
 {
+    prefixes.push_back(prefix);
+    currentPrefix.clear();
+    for(const auto& str : prefixes) currentPrefix.append(str+'.');
+}
+
+void serializer::removePrefix()
+{
+    prefixes.pop_back();
+    currentPrefix.clear();
+    for(const auto& str : prefixes) currentPrefix.append(str+'.');
+}
+
+template <typename T>
+void serializer::write(const std::string& varname, T input)
+{
+    std::string var = currentPrefix + varname;
     if (type==iotype::read)
         throw std::runtime_error("Error: File not open for writing");
 
@@ -53,21 +66,21 @@ void serializer::write(const char* var, T input)
 }
 
 template <typename T>
-void serializer::read(const char* var, T& output)
+void serializer::read(const std::string& varname, T& output)
 {
+    std::string var = currentPrefix + varname;
     if (vars.find(var) != vars.end())
         std::stringstream(vars[var]) >> output;
     else
     {
-        std::string error ="Error: Variable '";
-        error += var;
-        error +="' not found in configuration file.\n";
+        std::string error ="Error: Variable '"+var+"' not found in configuration file.\n";
         throw std::invalid_argument(error);
     }     
 }
 
-void serializer::write(const char* var, bool input)
+void serializer::write(const std::string& varname, bool input)
 {
+    std::string var = currentPrefix + varname;
     if (type==iotype::read)
         throw std::runtime_error("Error: File not open for writing");
 
@@ -77,8 +90,9 @@ void serializer::write(const char* var, bool input)
         vars[var] = "false";
 }
 
-void serializer::read(const char* var, bool& output)
+void serializer::read(const std::string& varname, bool& output)
 {
+    std::string var = currentPrefix + varname;
     if (vars.find(var) != vars.end())
     {
         if(vars[var] == "true")
@@ -90,17 +104,15 @@ void serializer::read(const char* var, bool& output)
     }
     else
     {
-        std::string error ="Error: Variable '";
-        error += var;
-        error +="' not found in configuration file.\n";
+        std::string error ="Error: Variable '" +var+"' not found in configuration file.\n";
         throw std::invalid_argument(error);
     }  
 }
 
-template void serializer::read(const char* var, int& output);
-template void serializer::read(const char* var, float& output);
-template void serializer::read(const char* var, unsigned long long& output);
+template void serializer::read(const std::string& var, int& output);
+template void serializer::read(const std::string& var, float& output);
+template void serializer::read(const std::string& var, unsigned long long& output);
 
-template void serializer::write(const char* var, int output);
-template void serializer::write(const char* var, float output);
-template void serializer::write(const char* var, unsigned long long output);
+template void serializer::write(const std::string& var, int output);
+template void serializer::write(const std::string& var, float output);
+template void serializer::write(const std::string& var, unsigned long long output);

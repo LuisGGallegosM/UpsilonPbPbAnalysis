@@ -25,10 +25,13 @@ class OniaMassFitter
     std::unique_ptr<RooDataSet> dataset;
     std::unique_ptr<RooFitResult> results;
     std::unique_ptr<RooAbsPdf> output;
+    fitParams resultParams;
 
     std::string getKineCutExpr() const;
 
     virtual void combinePdf();
+
+    virtual void extractResults();
 
     public:
 
@@ -56,21 +59,23 @@ class OniaMassFitter
      * 
      * @return RooDataSet* dataset saved from tree. This result is owned by this object.
      */
-    RooDataSet* getDataset() const;
+    RooDataSet* getDataset() const {return dataset.get();}
 
     /**
      * @brief Get the mass observable variable.
      * 
      * @return RooRealVar*  This result is owned by this object.
      */
-    RooRealVar* getVar();
+    RooRealVar* getVar() {return &mass;}
 
     /**
      * @brief Get the RooFitResult object of last fit.
      * 
      * @return RooFitResult* This result is owned by this object. 
      */
-    RooFitResult* getResults() const;
+    RooFitResult* getResults() const { return results.get();}
+
+    const fitParams* getFitParamsResult() const { return &resultParams;}
 };
 
 class OniaMassFitter2 : public OniaMassFitter
@@ -82,6 +87,8 @@ class OniaMassFitter2 : public OniaMassFitter
     DoubleCrystalBallSlave dcball3;
 
     void combinePdf() override;
+
+    void extractResults() override;
 
     public:
     OniaMassFitter2(TTree* tree_,const fitConfig* fitConf);

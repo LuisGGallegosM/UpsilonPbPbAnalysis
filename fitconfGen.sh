@@ -17,7 +17,7 @@ OUTPUT+="initialValues.chk4_k2 = -0.2\n"
 OUTPUT+="initialValues.dcb.mean = 9.46\n"
 OUTPUT+="initialValues.dcb.alpha = 1.6\n"
 OUTPUT+="initialValues.dcb.n = 2.0\n"
-OUTPUT+="initialValues.dcb.sigma1 = 0.13\n"
+OUTPUT+="initialValues.dcb.sigma = 0.13\n"
 OUTPUT+="initialValues.dcb.x = 0.5\n"
 OUTPUT+="initialValues.dcb.f = 0.5\n"
 

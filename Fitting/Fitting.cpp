@@ -63,7 +63,7 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
 
     fitParams fParams;
     RooAbsReal* fittedFunc = massFitter->fit();
-
+    
     getFitParams(fParams, massFitter->getVar(), fittedFunc,config.bkgOn);
     fParams.serialize(ReplaceExtension(outfilename,".fit").data());
 
@@ -74,27 +74,6 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     massFitter->getResults()->Write("fitresults");
     fittedFunc->Write();
     massFitter->getVar()->Write();
-}
-
-void SetFitConfig(fitConfig* fitConf)
-{
-    //set background and fit range
-    fitConf->bkgOn =false;
-    fitConf->massHigh = 10.0f;
-    fitConf->massLow = 8.5f;
-
-    //set initial values for fitting parameters
-    fitConf->initialValues.nSigY1S = 5000000.0f;
-    fitConf->initialValues.nBkg = 500000.0f;
-    fitConf->initialValues.chk4_k1=0.2f;
-    fitConf->initialValues.chk4_k2=-0.1f;
-
-    fitConf->initialValues.dcb.mean=9.46f;
-    fitConf->initialValues.dcb.alpha = 2.522f;
-    fitConf->initialValues.dcb.n =1.705f;
-    fitConf->initialValues.dcb.sigma1 = 0.1f;
-    fitConf->initialValues.dcb.x = 0.5f;
-    fitConf->initialValues.dcb.f = 0.5f;
 }
 
 #if !defined(__CLING__)

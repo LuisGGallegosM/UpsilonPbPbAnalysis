@@ -42,7 +42,9 @@ class Chevychev2
     public:
     Chevychev2(RooRealVar& var,const char* name,float k1, float k2);
 
-    RooChebychev* getChev();
+    RooChebychev* getChev() {return &chev;}
+    RooRealVar* getCh4_k1() {return &ch4_k1;}
+    RooRealVar* getCh4_k2() {return &ch4_k2;}
 };
 
 class CrystalBall
@@ -117,7 +119,10 @@ class DoubleCrystalBall : public CrystalBall
     public:
     DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial);
 
-    RooAbsPdf* getDCB();
+    RooAbsPdf* getDCB() {return &dcball;}
+
+    void fillFitParams(dcbParam* params);
+    void fillFitErrors(dcbParam* params);
 
     friend class DoubleCrystalBallSlave;
 };

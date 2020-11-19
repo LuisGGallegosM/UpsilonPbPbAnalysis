@@ -13,11 +13,11 @@ using namespace std;
 
 OniaMassFitter::OniaMassFitter(TTree* tree_,const fitConfig* fitConf):
     config(*fitConf),tree(tree_),
-    nSig_Y1S("nSig_Y1S","Upsilon Signal",config.initialValues.nSigY1S, 0.0f, S1_NSIG_MAX),
-    nBkg("nBkg","Bkg signal",config.initialValues.nBkg, 0.0f, S1_NBKG_MAX),
+    nSig_Y1S("nSig_Y1S","Upsilon Signal",config.initialValues.getNSigY1S(), 0.0f, S1_NSIG_MAX),
+    nBkg("nBkg","Bkg signal",config.initialValues.getNBkg(), 0.0f, S1_NBKG_MAX),
     mass("mass","onia mass",config.massLow,config.massHigh,"GeV/c^{2}"),
-    dcball1(mass,"Y1S",&(config.initialValues.dcb)),
-    bkg(mass,"bkg",config.initialValues.chk4_k1,config.initialValues.chk4_k2)
+    dcball1(mass,"Y1S",config.initialValues.getDCBParams()),
+    bkg(mass,"bkg",config.initialValues.getChk4_k1(),config.initialValues.getChk4_k2())
 {
 
 }
@@ -26,8 +26,8 @@ OniaMassFitter::~OniaMassFitter() { }
 
 string OniaMassFitter::getKineCutExpr() const
 {
-    string str(Form("(pT < %.3f) && (pT > %.3f)",config.cut.ptHigh,config.cut.ptLow));
-    str.append(Form(" && (abs(y) < %.3f) && (abs(y) > %.3f)",config.cut.yHigh,config.cut.yLow));
+    string str(Form("(pT < %.3f) && (pT > %.3f)",config.cut.getPtHigh(),config.cut.getPtLow()));
+    str.append(Form(" && (abs(y) < %.3f) && (abs(y) > %.3f)",config.cut.getYHigh(),config.cut.getYLow()));
     return str;
 }
 
@@ -58,39 +58,41 @@ RooAbsReal* OniaMassFitter::fit()
 
     RooFitResult* res=output->fitTo(*dataset,RooFit::Save(),RooFit::Range(config.massLow,config.massHigh), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
     results.reset(res);
+
+    extractResults();
+
     return output.get();
     
 }
 
-RooDataSet* OniaMassFitter::getDataset() const
+void OniaMassFitter::extractResults()
 {
-    return dataset.get();
+    resultParams.setNSig(nSig_Y1S.getVal(),0.0f,0.0f);
+    resultParams.setNBkg(nBkg.getVal());
+    resultParams.setChk4(bkg.getCh4_k1()->getVal(),bkg.getCh4_k2()->getVal());
+
+    dcball1.fillFitParams(resultParams.getDCBParams());
 }
 
-RooRealVar* OniaMassFitter::getVar()
-{
-    return &mass;
-}
-
-RooFitResult* OniaMassFitter::getResults() const
-{
-    return results.get();
-}
+//OniaMassFitter2
 
 
 OniaMassFitter2::OniaMassFitter2(TTree* tree_,const fitConfig* fitConf):
     OniaMassFitter(tree_,fitConf),
-    nSig_Y2S("nSig_Y2S","Upsilon Signal Y2S",config.initialValues.nSigY2S, 0.0f, S1_NSIG_MAX),
-    nSig_Y3S("nSig_Y3S","Upsilon Signal Y3S",config.initialValues.nSigY3S, 0.0f, S1_NSIG_MAX),
+    nSig_Y2S("nSig_Y2S","Upsilon Signal Y2S",config.initialValues.getNSigY2S(), 0.0f, S1_NSIG_MAX),
+    nSig_Y3S("nSig_Y3S","Upsilon Signal Y3S",config.initialValues.getNSigY3S(), 0.0f, S1_NSIG_MAX),
     dcball2(mass,"Y2S",dcball1,RATIO_Y2S),
     dcball3(mass,"Y3S",dcball1,RATIO_Y3S)
 {
 }
 
+void OniaMassFitter2::extractResults()
+{
+    OniaMassFitter::extractResults();
+}
+
 void OniaMassFitter2::combinePdf()
 {
-
-    
     if (config.bkgOn)
     {
         RooAddPdf* dcballbkg = 

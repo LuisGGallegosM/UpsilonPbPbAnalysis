@@ -6,23 +6,36 @@
 #define ONIATTREENAME ("onia_skimmed")
 #define JETTTREENAME ("jet_skimmed")
 
-struct dcbParam
+class dcbParam
 {
     float mean;
     float alpha;
     float n;
-    float sigma1;
+    float sigma;
     float x;
     float f;
 
-    dcbParam(): mean(-1.0f),alpha(-1.0f),n(-1.0f),sigma1(-1.0f),x(-1.0f),f(-1.0f)
+    public:
+
+    dcbParam(): mean(-1.0f),alpha(-1.0f),n(-1.0f),sigma(-1.0f),x(-1.0f),f(-1.0f)
     {
     }
+
+    void setParams(float mean_,float alpha_,float n_,float sigma_, float x_, float f_);
+
+    float getMean()  const {return mean;}
+    float getAlpha() const {return alpha;}
+    float getN()     const {return n;}
+    float getSigma() const { return sigma;}
+    float getX()     const {return x;}
+    float getF()     const {return f;}
+
+    void deserialize(serializer& ser);
+    void serialize(serializer& ser) const;
 };
 
-struct fitParams
+class externParams
 {
-    dcbParam dcb;
     float nSigY1S;
     float nSigY2S;
     float nSigY3S;
@@ -30,63 +43,84 @@ struct fitParams
     float chk4_k1;
     float chk4_k2;
 
-    fitParams() : dcb(),nSigY1S(-1.0f),nSigY2S(-1.0f),nSigY3S(-1.0f),
-    nBkg(-1.0f),chk4_k1(-1.0f),chk4_k2(-1.0f)
+    public:
+    externParams():nSigY1S(-1.0f),nSigY2S(-1.0f),nSigY3S(-1.0f),
+                    nBkg(-1.0f),chk4_k1(-1.0f),chk4_k2(-1.0f) 
     {
     }
 
-    void deserialize(const char* filename)
-    {
-        serializer ser(filename);
-        ser.read("dcb.mean",dcb.mean);
-        ser.read("dcb.alpha",dcb.alpha);
-        ser.read("dcb.n",dcb.n);
-        ser.read("dcb.sigma",dcb.sigma1);
-        ser.read("dcb.x",dcb.x);
-        ser.read("dcb.f",dcb.f);
-        ser.read("nSigY1S",nSigY1S);
-        ser.read("nSigY2S",nSigY2S);
-        ser.read("nSigY3S",nSigY3S);
-        ser.read("nBkg",nBkg);
-        ser.read("chk4_k1",chk4_k1);
-        ser.read("chk4_k2",chk4_k2);
-    }
+    float getNSigY1S() const {return nSigY1S;}
+    float getNSigY2S() const {return nSigY2S;}
+    float getNSigY3S() const {return nSigY3S;}
+    float getNBkg()    const {return nBkg;}
+    float getChk4_k1() const {return chk4_k1;}
+    float getChk4_k2() const {return chk4_k2;}
 
-    void serialize(const char* filename)
-    {
-        serializer ser(filename,serializer::iotype::write);
-        ser.write("dcb.mean",dcb.mean);
-        ser.write("dcb.alpha",dcb.alpha);
-        ser.write("dcb.n",dcb.n);
-        ser.write("dcb.sigma",dcb.sigma1);
-        ser.write("dcb.x",dcb.x);
-        ser.write("dcb.f",dcb.f);
-        ser.write("nSigY1S",nSigY1S);
-        ser.write("nSigY2S",nSigY2S);
-        ser.write("nSigY3S",nSigY3S);
-        ser.write("nBkg",nBkg);
-        ser.write("chk4_k1",chk4_k1);
-        ser.write("chk4_k2",chk4_k2);
-    }
+    void setNSig(float Y1S,float Y2S, float Y3S) {nSigY1S=Y1S; nSigY2S=Y2S; nSigY3S=Y3S;}
+    void setNBkg(float value) {nBkg=value;}
+    void setChk4(float k1,float k2) { chk4_k1=k1; chk4_k2=k2;  }
+
+    void deserialize(serializer& ser);
+
+    void serialize(serializer& ser) const;
+
+
 };
 
-struct kinecutParams
+class fitParams
+{
+    dcbParam dcb;
+    externParams extParam;
+
+    public:
+    fitParams() : dcb(),extParam()
+    {
+    }
+
+    void setNSig(float Y1S,float Y2S, float Y3S) { extParam.setNSig(Y1S,Y2S,Y3S);}
+    void setNBkg(float value) {extParam.setNBkg(value);}
+    void setChk4(float k1,float k2) { extParam.setChk4(k1,k2);}
+
+    float getNSigY1S() const {return extParam.getNSigY1S();}
+    float getNSigY2S() const {return extParam.getNSigY2S();}
+    float getNSigY3S() const {return extParam.getNSigY3S();}
+    float getNBkg()    const {return extParam.getNBkg();}
+    float getChk4_k1() const {return extParam.getChk4_k1();}
+    float getChk4_k2() const {return extParam.getChk4_k2();}
+
+    const dcbParam* getDCBParams() const {return &dcb;}
+    dcbParam* getDCBParams() {return &dcb;}
+
+    void deserialize(serializer& ser);
+
+    void deserialize(const std::string& filename);
+
+    void serialize(const std::string& filename) const;
+};
+
+class kinecutParams
 {
     float ptLow;
     float ptHigh;
     float yLow;
     float yHigh;
 
-    kinecutParams():
-    ptLow(-1.0f),ptHigh(-1.0f),yLow(-1.0f),yHigh(-1.0f)
+    public:
+    kinecutParams():ptLow(-1.0f),ptHigh(-1.0f),yLow(-1.0f),yHigh(-1.0f)
     {
-
     }
+
+    float getPtLow() const {return ptLow;}
+    float getPtHigh() const {return ptHigh;}
+    float getYLow() const {return yLow;}
+    float getYHigh() const {return yHigh;}
 
     bool isValid() const
     {
         return (ptLow>=0.0f) && (ptHigh>0.0f) && (yLow>=0.0f) && (yHigh>0.0f);
     }
+
+    void deserialize(serializer& ser);
 };
 
 struct cutParams
@@ -125,30 +159,7 @@ struct cutParams
         && (maxDz > 0.0f) && (minVtxProb >0.0f) && (prescale>0);
     }
 
-    void deserialize(const char* filename)
-    {
-        serializer ser(filename);
-        ser.read("isMC",isMC);
-        ser.read("trigSelect", trigSelect);
-        ser.read("checkSign",checkSign );
-        ser.read("sign",sign);
-        ser.read("prescale",prescale);
-
-        ser.read("selectionBits",selectionBits);
-        ser.read("minTracks",minTracks);
-        ser.read("minPixels",minPixels);
-
-        ser.read("maxDxy",maxDxy);
-        ser.read("maxDz",maxDz);
-        ser.read("minVtxProb",minVtxProb);
-
-        ser.read("ptLow",ptLow);
-        ser.read("ptHigh",ptHigh);
-        ser.read("yLow",yLow);
-        ser.read("yHigh",yHigh);
-        ser.read("singleMuPtLow",singleMuPtLow);
-        ser.read("singleMuEtaHigh",singleMuEtaHigh);
-    }
+    void deserialize(const std::string& filename);
 };
 
 struct fitConfig
@@ -170,36 +181,7 @@ struct fitConfig
         return (massLow>=0.0f) && (massHigh>0.0f) && (cut.isValid());
     }
 
-    void deserialize(const char* filename)
-    {
-        serializer ser(filename);
-        //set background and fit range
-        ser.read("bkgOn",bkgOn);
-        ser.read("moreUpsilon",moreUpsilon);
-        ser.read("massHigh",massHigh);
-        ser.read("massLow",massLow);
-
-        //set kinetic cut selection parameters
-        ser.read("cut.ptLow",cut.ptLow);
-        ser.read("cut.ptHigh",cut.ptHigh);
-        ser.read("cut.yLow",cut.yLow);
-        ser.read("cut.yHigh",cut.yHigh);
-
-         //set initial values for fitting parameters
-        ser.read("initialValues.nSigY1S",initialValues.nSigY1S);
-        ser.read("initialValues.nSigY2S",initialValues.nSigY2S);
-        ser.read("initialValues.nSigY3S",initialValues.nSigY3S);
-        ser.read("initialValues.nBkg",initialValues.nBkg);
-        ser.read("initialValues.chk4_k1",initialValues.chk4_k1);
-        ser.read("initialValues.chk4_k2",initialValues.chk4_k2);
-
-        ser.read("initialValues.dcb.mean",initialValues.dcb.mean);
-        ser.read("initialValues.dcb.alpha",initialValues.dcb.alpha);
-        ser.read("initialValues.dcb.n",initialValues.dcb.n);
-        ser.read("initialValues.dcb.sigma1",initialValues.dcb.sigma1);
-        ser.read("initialValues.dcb.x",initialValues.dcb.x);
-        ser.read("initialValues.dcb.f",initialValues.dcb.f );
-    }
+    void deserialize(const std::string& filename);
 };
 
 struct drawConfig
@@ -218,17 +200,7 @@ struct drawConfig
     {
     }
 
-    void deserialize(const char* configfilename,const char* cutfilename, const char* fitfilename)
-    {
-        cut.deserialize(cutfilename);
-        fitConf.deserialize(fitfilename);
-
-        serializer ser(configfilename);
-
-        ser.read("nBins",nBins);
-        ser.read("minBinY",minBinY);
-        ser.read("maxBinY",maxBinY);
-    }
+    void deserialize(const std::string& configfilename,const std::string& cutfilename, const std::string& fitfilename);
 };
 
 #endif

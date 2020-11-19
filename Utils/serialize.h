@@ -2,6 +2,7 @@
 #define SERIALIZE
 
 #include <iostream>
+#include <vector>
 #include <fstream>
 #include <sstream>
 #include <map>
@@ -14,22 +15,27 @@ class serializer
     private:
     std::string filename_;
     std::map<std::string,std::string> vars;
+    std::vector<std::string> prefixes;
     iotype type;
+    std::string currentPrefix;
     
     public:
-    serializer(const char* filename, serializer::iotype iot= serializer::iotype::read);
+    serializer(const std::string& filename, serializer::iotype iot= serializer::iotype::read);
 
     ~serializer();
 
-    template <typename T>
-    void write(const char* var, T input);
+    void addPrefix(const std::string& prefix);
+    void removePrefix();
 
     template <typename T>
-    void read(const char* var, T& output);
+    void write(const std::string& varname, T input);
 
-    void write(const char* var, bool input);
+    template <typename T>
+    void read(const std::string& varname, T& output);
 
-    void read(const char* var, bool& output);
+    void write(const std::string& varname, bool input);
+
+    void read(const std::string& varname, bool& output);
 };
 
 

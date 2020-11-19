@@ -111,9 +111,6 @@ int main(int argc, char **argv)
         }
     }
 
-    
-    return 0;
-
     return 0;
 }
 
@@ -187,17 +184,17 @@ void drawGraphText(const fitParams* fParams,const drawConfig* config)
     TextDrawer tdrawer(0.22,0.8);
     
     tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
-    tdrawer.drawText( Form("#alpha=%.3f",fParams->dcb.alpha));
-    tdrawer.drawText( Form("m=%.3f",fParams->dcb.mean));
-    tdrawer.drawText( Form("N=%.3f",fParams->dcb.n));
-    tdrawer.drawText( Form("#sigma_{1}=%.4f",fParams->dcb.sigma1));
-    tdrawer.drawText( Form("#frac{#sigma_{2}}{#sigma_{1}}=%.4f",fParams->dcb.x));
-    tdrawer.drawText( Form("f=%.4f",fParams->dcb.f));
+    tdrawer.drawText( Form("#alpha=%.3f",fParams->getDCBParams()->getAlpha()));
+    tdrawer.drawText( Form("m=%.3f",fParams->getDCBParams()->getMean()));
+    tdrawer.drawText( Form("N=%.3f",fParams->getDCBParams()->getN()));
+    tdrawer.drawText( Form("#sigma_{1}=%.4f",fParams->getDCBParams()->getSigma()));
+    tdrawer.drawText( Form("#frac{#sigma_{2}}{#sigma_{1}}=%.4f",fParams->getDCBParams()->getX()));
+    tdrawer.drawText( Form("f=%.4f",fParams->getDCBParams()->getF()));
 
-    float ptLow=config->fitConf.cut.ptLow;
-    float ptHigh=config->fitConf.cut.ptHigh;
-    float yLow=config->fitConf.cut.yLow;
-    float yHigh=config->fitConf.cut.yHigh;
+    float ptLow=config->fitConf.cut.getPtLow();
+    float ptHigh=config->fitConf.cut.getPtHigh();
+    float yLow=config->fitConf.cut.getYLow();
+    float yHigh=config->fitConf.cut.getYHigh();
     float singleMuPtLow=config->cut.singleMuPtLow;
     float singleMuEtaHigh=config->cut.singleMuEtaHigh;
 
