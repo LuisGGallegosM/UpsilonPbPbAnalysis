@@ -58,7 +58,7 @@ class OniaSkimmer : public Skimmer<Onia_Input,Onia_Output>
     private:
     void WriteData(Int_t index, Long64_t entry);
     public:
-    OniaSkimmer(TTree* treeIn,const char* treeOutName);
+    OniaSkimmer(TTree* treeIn,const char* treeOutName, Cutter<Onia_Input>* cut);
 
     std::unique_ptr<Onia_Aux> auxData;
 };

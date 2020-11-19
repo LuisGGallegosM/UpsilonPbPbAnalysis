@@ -5,6 +5,7 @@ JetCutter::JetCutter(Onia_Aux* auxDat) : auxData(auxDat)
 {
     minPt = 10.0f;
     maxPt = 50.0f;
+    MC = false;
 }
 
 bool JetCutter::cut(Jet_Input* input,Int_t index,Int_t entry)

@@ -1,7 +1,7 @@
 #include "JetSkimmer.h"
 
-JetSkimmer::JetSkimmer(TTree* treeIn,const char* treeOutName,Onia_Aux* oniaAuxData)
-: Skimmer(treeIn,treeOutName) , oniaData(oniaAuxData)
+JetSkimmer::JetSkimmer(TTree* treeIn,const char* treeOutName,Onia_Aux* oniaAuxData, Cutter<Jet_Input>* cut)
+: Skimmer(treeIn,treeOutName,cut) , oniaData(oniaAuxData)
 {
     TBranch* branch;
 

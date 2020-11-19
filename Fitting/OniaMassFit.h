@@ -25,13 +25,15 @@ class OniaMassFitter
     std::unique_ptr<RooDataSet> dataset;
     std::unique_ptr<RooFitResult> results;
     std::unique_ptr<RooAbsPdf> output;
-    fitParams resultParams;
 
     std::string getKineCutExpr() const;
 
+    /**
+     * @brief this function makes the total fitting function by combining correctly its components
+     * including bkg if bkgOn is enabled.
+     * 
+     */
     virtual void combinePdf();
-
-    virtual void extractResults();
 
     public:
 
@@ -75,7 +77,13 @@ class OniaMassFitter
      */
     RooFitResult* getResults() const { return results.get();}
 
-    const fitParams* getFitParamsResult() const { return &resultParams;}
+
+    /**
+     * @brief Get the Fit Params by writing it to paramOut.
+     * 
+     * @param paramOut fitParams where to fill the got values
+     */
+    virtual void getFitParams(fitParams* paramOut);
 };
 
 class OniaMassFitter2 : public OniaMassFitter
@@ -86,9 +94,11 @@ class OniaMassFitter2 : public OniaMassFitter
     DoubleCrystalBallSlave dcball2;
     DoubleCrystalBallSlave dcball3;
 
+    /**
+     * @brief Same as base method, this method includes Y2S and Y3S fields
+     * 
+     */
     void combinePdf() override;
-
-    void extractResults() override;
 
     public:
     OniaMassFitter2(TTree* tree_,const fitConfig* fitConf);

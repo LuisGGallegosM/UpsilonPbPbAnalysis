@@ -89,8 +89,8 @@ TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>
     //execute skim
     OniaCutter cutter(cut);
 
-    OniaSkimmer skimmer = OniaSkimmer(myTree,wroteTreeName);
-    TTree* wroteTree = skimmer.Skim(&cutter);
+    OniaSkimmer skimmer = OniaSkimmer(myTree,wroteTreeName,&cutter);
+    TTree* wroteTree = skimmer.Skim();
 
     (*auxData) = std::move(skimmer.auxData);
 
@@ -116,33 +116,10 @@ TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
 
     JetCutter cutter(auxData);
     
-    JetSkimmer skimmer(myTree,wroteTreeName,auxData);
-    TTree* wroteTree =skimmer.Skim(&cutter);
+    JetSkimmer skimmer(myTree,wroteTreeName,auxData,&cutter);
+    TTree* wroteTree =skimmer.Skim();
 
     return wroteTree;
-}
-
-void SetCutParams(cutParams* kineCut)
-{
-    kineCut->isMC = false;
-    kineCut->trigSelect = HLT_HIL1DoubleMuOpen_v1;
-    kineCut->checkSign=true;
-
-    kineCut->sign = 0;
-    kineCut->selectionBits = ((1 <<1) | (1 << 3));
-    kineCut->minTracks =6;
-    kineCut->minPixels =1;
-
-    kineCut->ptLow=0.0f;
-    kineCut->ptHigh=50.0f;
-    kineCut->yLow=0.0f;
-    kineCut->yHigh=2.4f;
-    kineCut->singleMuPtLow=3.5f;
-    kineCut->singleMuEtaHigh=2.4f;
-
-    kineCut->maxDxy = 0.3f;
-    kineCut->maxDz = 20.0f;
-    kineCut->minVtxProb = 0.01f;
 }
 
 #if !defined(__CLING__)

@@ -2,8 +2,8 @@
 
 #include "OniaSkimmer.h"
 
-OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName) 
-: Skimmer(treeIn,treeOutName)
+OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, Cutter<Onia_Input>* cut) 
+: Skimmer(treeIn,treeOutName,cut)
 {
     TBranch* branch;
 
@@ -22,8 +22,13 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName)
     addInput("Reco_QQ_trig",dataIn.trig);
     addInput("Reco_QQ_sign",dataIn.sign);
 
-    //optional branch, MC only
-    if(treeIn->GetBranch("Reco_mu_whichGen")!=nullptr)
+    //MC only branch check
+    if((treeIn->GetBranch("Reco_mu_whichGen")!=nullptr) && (!cut->isMC()))
+    {
+        std::cout << "\nWARNING: isMC = false and this root file looks like MC (contains 'Reco_mu_whichGen' branch)\n";
+    }
+
+    if(cut->isMC())
     {
         addInput("Reco_mu_whichGen",dataIn.whichGen);
     }

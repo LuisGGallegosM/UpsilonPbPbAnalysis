@@ -20,6 +20,7 @@ class Cutter
 
     virtual bool cut(T* input, Int_t index,Int_t entry)=0;
     virtual bool prescale(Int_t entry)=0;
+    virtual bool isMC()=0;
 
     virtual ~Cutter() {};
 };
@@ -32,6 +33,7 @@ class Skimmer
     std::vector<TBranch*> output_branches;
     TTree* tree_input;
     TTree* tree_output;
+    Cutter<T>* cutter;
 
     void GetEntries(Long64_t index)
     {
@@ -55,8 +57,8 @@ class Skimmer
     virtual void WriteData(Int_t index, Long64_t entry) = 0;
 
     public:
-    Skimmer(TTree* treeIn, const char* treeOutName) 
-    :tree_input(treeIn) ,input_branches(), output_branches()
+    Skimmer(TTree* treeIn, const char* treeOutName, Cutter<T>* cut) 
+    :tree_input(treeIn) ,input_branches(), output_branches(), cutter(cut)
     {
         TString name(tree_input->GetName());
         tree_output= new TTree(treeOutName, "Skimmed tree");
@@ -65,7 +67,7 @@ class Skimmer
 
     virtual ~Skimmer() {}
 
-    TTree* Skim(Cutter<T>* cutter)
+    TTree* Skim()
     {
         int block =0;
         Long64_t entries= tree_input->GetEntries();

@@ -43,7 +43,7 @@ class JetSkimmer : public Skimmer<Jet_Input,Jet_Output>
 
     void WriteData(Int_t index, Long64_t entry);
     public:
-    JetSkimmer(TTree* treeIn,const char* treeOutName, Onia_Aux* auxData);
+    JetSkimmer(TTree* treeIn,const char* treeOutName, Onia_Aux* auxData, Cutter<Jet_Input>* cut);
 };
 
 #if defined(__CLING__)

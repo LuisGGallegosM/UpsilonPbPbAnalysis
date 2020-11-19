@@ -16,6 +16,7 @@ class OniaCutter : public Cutter<Onia_Input>
     public:
     bool cut(Onia_Input* input, Int_t index,Int_t entry) override;
     bool prescale(Int_t entry) override;
+    bool isMC() override { return kineCut.isMC; }
     OniaCutter(const cutParams* cut);
 };
 

@@ -64,7 +64,6 @@ class externParams
 
     void serialize(serializer& ser) const;
 
-
 };
 
 class fitParams
@@ -202,5 +201,9 @@ struct drawConfig
 
     void deserialize(const std::string& configfilename,const std::string& cutfilename, const std::string& fitfilename);
 };
+
+#if defined(__CLING__)
+#include "Params.cpp"
+#endif
 
 #endif

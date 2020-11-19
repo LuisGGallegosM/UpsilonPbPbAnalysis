@@ -35,12 +35,12 @@ DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var,const char* name, const dcb
 
 }
 
-void DoubleCrystalBall::fillFitParams(dcbParam* params)
+void DoubleCrystalBall::getFitParams(dcbParam* params)
 {
     params->setParams(mean.getVal(),alpha.getVal(),n.getVal(),sigma.getVal(),x.getVal(),f.getVal());
 }
 
-void DoubleCrystalBall::fillFitErrors(dcbParam* params)
+void DoubleCrystalBall::getFitParamsErrors(dcbParam* params)
 {
     params->setParams(mean.getError(),alpha.getError(),n.getError(),sigma.getError(),x.getError(),f.getError());
 }

@@ -59,19 +59,18 @@ RooAbsReal* OniaMassFitter::fit()
     RooFitResult* res=output->fitTo(*dataset,RooFit::Save(),RooFit::Range(config.massLow,config.massHigh), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
     results.reset(res);
 
-    extractResults();
-
     return output.get();
     
 }
 
-void OniaMassFitter::extractResults()
+void OniaMassFitter::getFitParams(fitParams* resultParams)
 {
-    resultParams.setNSig(nSig_Y1S.getVal(),0.0f,0.0f);
-    resultParams.setNBkg(nBkg.getVal());
-    resultParams.setChk4(bkg.getCh4_k1()->getVal(),bkg.getCh4_k2()->getVal());
+    resultParams->setNSig(nSig_Y1S.getVal(),0.0f,0.0f);
+    resultParams->setNBkg(nBkg.getVal());
+    resultParams->setChk4(bkg.getCh4_k1()->getVal(),bkg.getCh4_k2()->getVal());
 
-    dcball1.fillFitParams(resultParams.getDCBParams());
+    dcbParam* dcb=resultParams->getDCBParams();
+    dcball1.getFitParams(dcb);
 }
 
 //OniaMassFitter2
@@ -84,11 +83,6 @@ OniaMassFitter2::OniaMassFitter2(TTree* tree_,const fitConfig* fitConf):
     dcball2(mass,"Y2S",dcball1,RATIO_Y2S),
     dcball3(mass,"Y3S",dcball1,RATIO_Y3S)
 {
-}
-
-void OniaMassFitter2::extractResults()
-{
-    OniaMassFitter::extractResults();
 }
 
 void OniaMassFitter2::combinePdf()
