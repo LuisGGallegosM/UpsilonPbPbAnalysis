@@ -43,7 +43,7 @@ class Chevychev2
     Chevychev2(RooRealVar& var,const char* name,float k1, float k2);
 
     //getters
-    RooChebychev* getChev() {return &chev;}
+    RooAbsReal* getFunc() {return &chev;}
     RooRealVar* getCh4_k1() {return &ch4_k1;}
     RooRealVar* getCh4_k2() {return &ch4_k2;}
 };

@@ -190,12 +190,13 @@ struct drawConfig
     float maxBinY;
     cutParams cut;
     fitConfig fitConf;
+    bool isLog;
 
     bool isValid() const
     {
         return (nBins>0) && (minBinY>0) && (maxBinY>0) && (cut.isValid()) && (fitConf.isValid());
     }
-    drawConfig(): nBins(-1),minBinY(-1),maxBinY(-1), cut(), fitConf()
+    drawConfig(): nBins(-1),minBinY(-1),maxBinY(-1), cut(), fitConf(), isLog(false)
     {
     }
 

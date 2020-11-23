@@ -35,7 +35,7 @@ void OniaMassFitter::combinePdf()
 {
     if (config.bkgOn)
     {
-        RooAddPdf* dcballbkg = new RooAddPdf("dcb_fit","double crystal ball + Bkg", RooArgList(*(dcball1.getDCB()),*(bkg.getChev()) ),RooArgList(nSig_Y1S,nBkg) );
+        RooAddPdf* dcballbkg = new RooAddPdf("dcb_fit","double crystal ball + Bkg", RooArgList(*(dcball1.getDCB()),*(bkg.getFunc()) ),RooArgList(nSig_Y1S,nBkg) );
         output.reset(dcballbkg);
     }
     else
@@ -91,7 +91,7 @@ void OniaMassFitter2::combinePdf()
     {
         RooAddPdf* dcballbkg = 
             new RooAddPdf("dcb_fit","3 double crystal ball + Bkg", 
-                    RooArgList(*dcball1.getDCB(),*dcball2.getDCB(),*dcball3.getDCB(),*(bkg.getChev()) ),
+                    RooArgList(*dcball1.getDCB(),*dcball2.getDCB(),*dcball3.getDCB(),*(bkg.getFunc()) ),
                     RooArgList(nSig_Y1S,nSig_Y2S,nSig_Y3S,nBkg) );
         output.reset(dcballbkg);
     }

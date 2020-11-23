@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WORKDIR="../rootfiles/merged_HiForestAOD_skimmed/"
+WORKDIR="../rootfiles/merged_HiForestAOD_MC_skimmed2/"
 
 CONFIGFILES=( \
  "merged_HiForestAOD_fit0.fitconf"\
@@ -10,11 +10,11 @@ CONFIGFILES=( \
  "merged_HiForestAOD_fit4.fitconf"\
  "merged_HiForestAOD_fit5.fitconf")
 
+INTEGRATEDCFILE="merged_HiForestAOD_fit_integrated.fitconf"
+
 FILENAMES="${CONFIGFILES[@]/#/${WORKDIR}}"
 
-SKIMFILE="../rootfiles/merged_HiForestAOD_skimmed/merged_HiForestAOD_skimmed.root"
-
-echo ${FILENAMES[@]}
+SKIMFILE="../rootfiles/merged_HiForestAOD_MC_skimmed2/merged_HiForestAOD_MC_skimmed2.root"
 
 if [ 1 = 1 ]
 then
@@ -32,6 +32,8 @@ then
     wait $JOB
     done
 
+    ./fit.sh "$SKIMFILE" "${WORKDIR}${INTEGRATEDCFILE}"
+
 fi
 
 NAME="${WORKDIR}/merged_HiForestAOD_fit.pdf"
@@ -44,6 +46,6 @@ OUTPUTFILE="${OUTPUTDIR}/$( basename $OUTPUTDIR ).fit"
 FITFILENAMES=( ${FITFILENAMES[@]} $OUTPUTFILE)
 done
 
-./Drawing/draw -m $NAME "${FITFILENAMES[@]}" #> "${NAME%.*}_Drawing.log" 2>&1 
+./Drawing/draw -m $NAME "${FITFILENAMES[@]}" > "${NAME%.*}_Drawing.log" 2>&1 
 
 echo "all done"

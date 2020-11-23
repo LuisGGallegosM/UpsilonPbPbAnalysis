@@ -9,7 +9,7 @@
 void setGraphStyle(RooPlot* plot,const drawConfig* config);
 void setPullStyle(RooPlot* pullPlot, const drawConfig* config);
 
-TPad* getStyledGraphPad();
+TPad* getStyledGraphPad(bool isLog);
 TCanvas* getStyledCanvas();
 TPad* getStyledPullPad();
 

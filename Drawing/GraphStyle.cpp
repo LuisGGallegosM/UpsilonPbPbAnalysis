@@ -58,12 +58,13 @@ void setPullStyle(RooPlot* pullPlot, const drawConfig* config)
     return;
 }
 
-TPad* getStyledGraphPad()
+TPad* getStyledGraphPad(bool isLog)
 {
     TPad* graph = new TPad("graph_pad","mass fit", 0, 0.45, 0.98, 1.0);
     graph->SetTicks(1,1);
     graph->SetLeftMargin(0.15);
-    graph->SetLogy();
+    if (isLog)
+        graph->SetLogy();
     graph->Draw();
     return graph;
 }

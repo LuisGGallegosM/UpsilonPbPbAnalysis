@@ -56,7 +56,7 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
 
     TCanvas* canvas = getStyledCanvas();
     canvas->cd();
-    TPad* graph = getStyledGraphPad();
+    TPad* graph = getStyledGraphPad(config.isLog);
     TPad* pull = getStyledPullPad();
 
     graph->cd();
