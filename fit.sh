@@ -5,7 +5,7 @@ CLING="NO"
 #Root file to fit from
 INPUTFILE="${1:-../rootfiles/merged_HiForestAOD_MC_skimmed2/merged_HiForestAOD_MC_skimmed2.root}"
 #Fit configuration file name
-CONFIG="${2:-../rootfiles/merged_HiForestAOD_MC_skimmed2/merged_HiForestAOD_fit_integrated.fitconf}"
+CONFIG="${2:-../rootfiles/merged_HiForestAOD_MC_skimmed2/merged_HiForestAOD_fit0.fitconf}"
 #Draw configuration file name
 DRAWCONFIG="${INPUTFILE%.*}.drawconf"
 

@@ -64,7 +64,8 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     fitParams fParams;
     RooAbsReal* fittedFunc = massFitter->fit();
     
-    getFitParams(fParams, massFitter->getVar(), fittedFunc,config.bkgOn);
+    massFitter->getFitParams(&fParams);
+
     fParams.serialize(ReplaceExtension(outfilename,".fit").data());
 
     massFitter->getResults()->Print();

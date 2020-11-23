@@ -85,6 +85,12 @@ OniaMassFitter2::OniaMassFitter2(TTree* tree_,const fitConfig* fitConf):
 {
 }
 
+void OniaMassFitter2::getFitParams(fitParams* resultParams)
+{
+    OniaMassFitter::getFitParams(resultParams);
+    resultParams->setNSig(nSig_Y1S.getVal(),nSig_Y2S.getVal(),nSig_Y3S.getVal());
+}
+
 void OniaMassFitter2::combinePdf()
 {
     if (config.bkgOn)

@@ -102,6 +102,8 @@ class OniaMassFitter2 : public OniaMassFitter
 
     public:
     OniaMassFitter2(TTree* tree_,const fitConfig* fitConf);
+
+    void getFitParams(fitParams* paramOut) override;
 };
 
 #if defined(__CLING__)
