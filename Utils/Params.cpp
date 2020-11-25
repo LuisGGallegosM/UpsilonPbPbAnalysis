@@ -107,17 +107,26 @@
 
     void externParams::deserialize(serializer& ser)
     {
+        ser.read("moreUpsilon",moreUpsilon);
         ser.read("nSigY1S",nSigY1S);
-        ser.read("nSigY2S",nSigY2S);
-        ser.read("nSigY3S",nSigY3S);
+        if (moreUpsilon)
+        {
+            ser.read("nSigY2S",nSigY2S);
+            ser.read("nSigY3S",nSigY3S);
+        }
+
         ser.read("nBkg",nBkg);
     }
 
     void externParams::serialize(serializer& ser) const
     {
+        ser.write("moreUpsilon",moreUpsilon);
         ser.write("nSigY1S",nSigY1S);
-        ser.write("nSigY2S",nSigY2S);
-        ser.write("nSigY3S",nSigY3S);
+        if (moreUpsilon)
+        {
+            ser.write("nSigY2S",nSigY2S);
+            ser.write("nSigY3S",nSigY3S);
+        }
         ser.write("nBkg",nBkg);
     }
 
@@ -198,7 +207,6 @@
     {
         serializer ser(filename);
         //set background and fit range
-        ser.read("moreUpsilon",moreUpsilon);
         ser.read("massHigh",massHigh);
         ser.read("massLow",massLow);
 

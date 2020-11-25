@@ -36,7 +36,7 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const fitConfig* fitConf):
         case BkgParams::BkgType::none:
         b = nullptr;
         break;
-        
+
         default:
         throw invalid_argument("\nError: bkgType argument not valid\n");
     }
@@ -57,7 +57,12 @@ void OniaMassFitter::combinePdf()
 {
     if (config.isBkgOn())
     {
-        RooAddPdf* dcballbkg = new RooAddPdf("dcb_fit","double crystal ball + Bkg", RooArgList(*(dcball1.getDCB()),*(bkg->getFunc()) ),RooArgList(nSig_Y1S,nBkg) );
+        RooAddPdf* dcballbkg = 
+            new RooAddPdf(  "dcb_fit",
+                            "double crystal ball + Bkg", 
+                            RooArgList(*(dcball1.getDCB()),
+                            *(bkg->getFunc()) ),
+                            RooArgList(nSig_Y1S,nBkg) );
         output.reset(dcballbkg);
     }
     else
@@ -78,7 +83,13 @@ RooAbsReal* OniaMassFitter::fit()
 
     combinePdf();
 
-    RooFitResult* res=output->fitTo(*dataset,RooFit::Save(),RooFit::Range(config.getMassLow(),config.getMassHigh()), RooFit::Hesse(),RooFit::Timer(),RooFit::Extended());
+    RooFitResult* res=
+        output->fitTo(  *dataset,RooFit::Save(),
+                        RooFit::Range(config.getMassLow(),
+                        config.getMassHigh()), 
+                        RooFit::Hesse(),
+                        RooFit::Timer(),
+                        RooFit::Extended());
     results.reset(res);
 
     return output.get();
@@ -87,7 +98,7 @@ RooAbsReal* OniaMassFitter::fit()
 
 void OniaMassFitter::getFitParams(fitParams* resultParams)
 {
-    resultParams->setNSig(nSig_Y1S.getVal(),0.0f,0.0f);
+    resultParams->setNSig(nSig_Y1S.getVal());
     resultParams->setNBkg(nBkg.getVal());
     Chevychev2* chev= dynamic_cast<Chevychev2*>(bkg.get());
     if (chev!=nullptr)

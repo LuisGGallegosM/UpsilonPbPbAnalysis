@@ -6,17 +6,24 @@ BASENAME="merged_HiForestAOD_fit"
 pt=( 0.0 2.0 4.0 6.0 9.0 12.0 30.0 )
 
 BKGTYPE="special"
+MOREUPSILON="false"
 
-OUTPUT+="moreUpsilon = false\n"
+#
+
 OUTPUT+="massHigh = 10.0\n"
 OUTPUT+="massLow = 8.0\n"
 OUTPUT+="cut.ptLow = %s\n"
 OUTPUT+="cut.ptHigh = %s\n"
 OUTPUT+="cut.yLow = 0.0\n"
 OUTPUT+="cut.yHigh = 2.4\n"
+OUTPUT+="initialValues.moreUpsilon = ${MOREUPSILON}\n"
 OUTPUT+="initialValues.nSigY1S = 50000.0\n"
+
+if [ MOREUPSILON = "true" ]
+then
 OUTPUT+="initialValues.nSigY2S = 16000.0\n"
 OUTPUT+="initialValues.nSigY3S = 8000.0\n"
+fi
 OUTPUT+="initialValues.nBkg = 120000.0\n"
 OUTPUT+="initialValues.bkg.bkgType = ${BKGTYPE}\n"
 

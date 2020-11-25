@@ -21,6 +21,11 @@ class dcbParam
     {
     }
 
+    bool isValid() const
+    {
+        return (mean>0.0f) && (alpha>0.0f) && (n>0.0f) && (sigma>0.0f) && (x>0.0f) && (f>0.0f);
+    }
+
     void setParams(float mean_,float alpha_,float n_,float sigma_, float x_, float f_);
 
     float getMean()  const {return mean;}
@@ -76,17 +81,20 @@ class externParams
     float nSigY2S;
     float nSigY3S;
     float nBkg;
+    bool moreUpsilon;
 
     public:
-    externParams():nSigY1S(-1.0f),nSigY2S(-1.0f),nSigY3S(-1.0f),nBkg(-1.0f)
+    externParams():nSigY1S(-1.0f),nSigY2S(-1.0f),nSigY3S(-1.0f),nBkg(-1.0f), moreUpsilon(false)
     {
     }
-
+    
+    bool isMoreUpsilon() const {return moreUpsilon;}
     float getNSigY1S() const {return nSigY1S;}
     float getNSigY2S() const {return nSigY2S;}
     float getNSigY3S() const {return nSigY3S;}
     float getNBkg()    const {return nBkg;}
 
+    void setNSig(float Y1S) {nSigY1S=Y1S;}
     void setNSig(float Y1S,float Y2S, float Y3S) {nSigY1S=Y1S; nSigY2S=Y2S; nSigY3S=Y3S;}
     void setNBkg(float value) {nBkg=value;}
 
@@ -103,12 +111,13 @@ class fitParams
     BkgParams bkg;
 
     public:
-    fitParams() : dcb(),extParam()
+    fitParams() : dcb(),extParam(), bkg()
     {
     }
 
-    bool isValid() const { return bkg.isValid();}
+    bool isValid() const { return bkg.isValid() && dcb.isValid();}
 
+    void setNSig(float Y1S) {extParam.setNSig(Y1S);}
     void setNSig(float Y1S,float Y2S, float Y3S) { extParam.setNSig(Y1S,Y2S,Y3S);}
     void setNBkg(float value) {extParam.setNBkg(value);}
     void setChk4(float k1,float k2) { bkg.setChk4(k1,k2);}
@@ -118,6 +127,7 @@ class fitParams
     float getNSigY2S() const {return extParam.getNSigY2S();}
     float getNSigY3S() const {return extParam.getNSigY3S();}
     float getNBkg()    const {return extParam.getNBkg();}
+    bool isMoreUpsilon() const {return extParam.isMoreUpsilon();}
 
     BkgParams::BkgType getBkgType() const {return bkg.getBkgType();}
     float getChk4_k1() const {return bkg.getChk4_k1();}
@@ -202,7 +212,6 @@ struct cutParams
 
 class fitConfig
 {
-    bool moreUpsilon;
     float massLow;
     float massHigh;
 
@@ -211,12 +220,12 @@ class fitConfig
 
     public:
 
-    fitConfig(): moreUpsilon(false), massLow(-1.0f), massHigh(-1.0f), cut(), initialValues()
+    fitConfig(): massLow(-1.0f), massHigh(-1.0f), cut(), initialValues()
     {
     }
 
     bool isBkgOn() const { return initialValues.getBkgType() != BkgParams::BkgType::none;}
-    bool isMoreUpsilon() const {return moreUpsilon;}
+    bool isMoreUpsilon() const {return initialValues.isMoreUpsilon();}
     float getMassLow() const {return massLow;}
     float getMassHigh() const {return massHigh;}
     const kinecutParams* getCut() const {return &cut;}
