@@ -16,7 +16,7 @@ struct FitElement
 
 void drawCompGraph(float (*func) (const FitElement&), std::vector<FitElement>& fits,TH1F* graph);
 std::vector<double> generateBinBoundaries(std::vector<FitElement>& configs);
-void fillVariables(  std::vector<const char*>& names,std::vector<float (*) (const FitElement&)>& functors);
+void fillVariables(  std::vector<const char*>& names,std::vector<float (*) (const FitElement&)>& functors, const fitConfig* fit);
 
 void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
 {
@@ -37,13 +37,14 @@ void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
         fit.configs.deserialize( ReplaceExtension(fitfilenames[i], ".fitconf").data()  );
         fits.push_back(fit);
     }
-    std::sort(fits.begin(),fits.end(),[](FitElement& l,FitElement& r) {return l.configs.cut.getPtLow() < r.configs.cut.getPtHigh();});
+    std::sort(fits.begin(),fits.end(),
+            [](FitElement& l,FitElement& r) {return l.configs.getCut()->getPtLow() < r.configs.getCut()->getPtHigh();});
 
     std::vector<double> xbins = generateBinBoundaries(fits);
     std::vector<const char*> names;
     std::vector<float (*) (const FitElement&)> functors;
 
-    fillVariables(names,functors);
+    fillVariables(names,functors,&(fits[0].configs));
 
     for(int i=0;i< names.size();i++)
     {
@@ -67,7 +68,7 @@ void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
     return;
 }
 
-void fillVariables(  std::vector<const char*>& names,std::vector<float (*) (const FitElement&)>& functors)
+void fillVariables(  std::vector<const char*>& names,std::vector<float (*) (const FitElement&)>& functors, const fitConfig* fit)
 {
     names.push_back("alpha");
     functors.push_back([](const FitElement& param) { return param.fits.getDCBParams()->getAlpha();  });
@@ -87,29 +88,53 @@ void fillVariables(  std::vector<const char*>& names,std::vector<float (*) (cons
     names.push_back("nSigY1S");
     functors.push_back([](const FitElement& param) { return param.fits.getNSigY1S();  });
 
-    names.push_back("nSigY2S");
-    functors.push_back([](const FitElement& param) { return param.fits.getNSigY2S();  });
+    if (fit->isMoreUpsilon())
+    {
+        names.push_back("nSigY2S");
+        functors.push_back([](const FitElement& param) { return param.fits.getNSigY2S();  });
 
-    names.push_back("nSigY3S");
-    functors.push_back([](const FitElement& param) { return param.fits.getNSigY3S();  });
+        names.push_back("nSigY3S");
+        functors.push_back([](const FitElement& param) { return param.fits.getNSigY3S();  });
+    }
 
-    names.push_back("nBkg");
-    functors.push_back([](const FitElement& param) { return param.fits.getNBkg();  });
+    if (fit->isBkgOn())
+    {
+        names.push_back("nBkg");
+        functors.push_back([](const FitElement& param) { return param.fits.getNBkg();  });
+    }
 
-    names.push_back("chk4_k1");
-    functors.push_back([](const FitElement& param) { return param.fits.getChk4_k1();  });
+    switch (fit->getBkgType())
+    {
+        case BkgParams::BkgType::chev:
 
-    names.push_back("chk4_k2");
-    functors.push_back([](const FitElement& param) { return param.fits.getChk4_k2();  });
+        names.push_back("chk4_k1");
+        functors.push_back([](const FitElement& param) { return param.fits.getChk4_k1();  });
+
+        names.push_back("chk4_k2");
+        functors.push_back([](const FitElement& param) { return param.fits.getChk4_k2();  });
+        break;
+        
+        case BkgParams::BkgType::special:
+
+        names.push_back("lambda_bkg");
+        functors.push_back([](const FitElement& param) { return param.fits.getLambda();  });
+
+        names.push_back("sigma_bkg");
+        functors.push_back([](const FitElement& param) { return param.fits.getSigma();  });
+        
+        names.push_back("mu_bkg");
+        functors.push_back([](const FitElement& param) { return param.fits.getMu();  });
+        break;
+    }
 }
 
 std::vector<double> generateBinBoundaries(std::vector<FitElement>& configs)
 {
     std::vector<double> xbins;
-    xbins.push_back(configs[0].configs.cut.getPtLow());
+    xbins.push_back(configs[0].configs.getCut()->getPtLow());
     for(int i=0;i< configs.size();i++)
     {
-        xbins.push_back(configs[i].configs.cut.getPtHigh());
+        xbins.push_back(configs[i].configs.getCut()->getPtHigh());
     }
     return xbins;
 }
@@ -119,7 +144,7 @@ void drawCompGraph(float (*func) (const FitElement&), std::vector<FitElement>& f
     int i=0;
     for (const auto& fit : fits)
     {
-        float pt =0.5f*(fit.configs.cut.getPtHigh() + fit.configs.cut.getPtLow());
+        float pt =0.5f*(fit.configs.getCut()->getPtHigh() + fit.configs.getCut()->getPtLow());
         graph->Fill(pt,func(fit));
         graph->SetBinError(i+1,0.1);
         i++;

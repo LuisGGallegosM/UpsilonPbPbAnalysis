@@ -48,7 +48,7 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     std::unique_ptr<OniaMassFitter> massFitter;
 
     //fit with first three Upsilon or only the first
-    if (config.moreUpsilon)
+    if (config.isMoreUpsilon())
     {
         massFitter.reset(new OniaMassFitter2(tree_skimmed, &config));
     }

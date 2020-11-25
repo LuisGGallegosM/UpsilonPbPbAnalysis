@@ -123,7 +123,7 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc
     RooPlot* plot = var->frame(config->nBins);
     fittedFunc->plotOn(plot,Name(FITFUNCNAME),LineColor(kOrange+7),Normalization(1.0,RooAbsReal::RelativeExpected));
 
-    if (config->fitConf.moreUpsilon)
+    if (config->fitConf.isMoreUpsilon())
     {
         fittedFunc->plotOn(plot,Name("dcb1"),Components("dcb_Y1S,bkg"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
         fittedFunc->plotOn(plot,Name("dcb2"),Components("dcb_Y2S,bkg"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
@@ -137,10 +137,10 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc
     }
     
     
-    if (config->fitConf.bkgOn)
+    if (config->fitConf.isBkgOn())
       fittedFunc->plotOn(plot,Name("bkg"),Components("bkg"),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
     dataset->plotOn(plot,Name(DATASETNAME), MarkerSize(0.4), XErrorSize(0));
-    TLegend* legend= drawLegend(plot,config->fitConf.bkgOn,config->fitConf.moreUpsilon);
+    TLegend* legend= drawLegend(plot,config->fitConf.isBkgOn(),config->fitConf.isMoreUpsilon());
 
     setGraphStyle(plot,config);
     plot->Draw("same");
@@ -189,10 +189,10 @@ void drawGraphText(const fitParams* fParams,const drawConfig* config)
     tdrawer.drawText( Form("#frac{#sigma_{2}}{#sigma_{1}}=%.4f",fParams->getDCBParams()->getX()));
     tdrawer.drawText( Form("f=%.4f",fParams->getDCBParams()->getF()));
 
-    float ptLow=config->fitConf.cut.getPtLow();
-    float ptHigh=config->fitConf.cut.getPtHigh();
-    float yLow=config->fitConf.cut.getYLow();
-    float yHigh=config->fitConf.cut.getYHigh();
+    float ptLow=config->fitConf.getCut()->getPtLow();
+    float ptHigh=config->fitConf.getCut()->getPtHigh();
+    float yLow=config->fitConf.getCut()->getYLow();
+    float yHigh=config->fitConf.getCut()->getYHigh();
     float singleMuPtLow=config->cut.singleMuPtLow;
     float singleMuEtaHigh=config->cut.singleMuEtaHigh;
 
@@ -222,7 +222,7 @@ RooHist* drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults,const
     
     setPullStyle(pullPlot,config);  
     pullPlot->Draw("same");
-    TLine *l1 = new TLine(config->fitConf.massLow,0,config->fitConf.massHigh,0.0);
+    TLine *l1 = new TLine(config->fitConf.getMassLow(),0,config->fitConf.getMassHigh(),0.0);
     l1->SetLineColor(4);
     l1->Draw("same");
     return pullHist;

@@ -112,7 +112,9 @@ void serializer::read(const std::string& varname, bool& output)
 template void serializer::read(const std::string& var, int& output);
 template void serializer::read(const std::string& var, float& output);
 template void serializer::read(const std::string& var, unsigned long long& output);
+template void serializer::read(const std::string& var, std::string& output);
 
 template void serializer::write(const std::string& var, int output);
 template void serializer::write(const std::string& var, float output);
 template void serializer::write(const std::string& var, unsigned long long output);
+template void serializer::write(const std::string& var, const std::string output);

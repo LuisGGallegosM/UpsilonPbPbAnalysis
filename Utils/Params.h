@@ -34,18 +34,51 @@ class dcbParam
     void serialize(serializer& ser) const;
 };
 
+class BkgParams
+{
+    public:
+    enum class BkgType {error, none, chev, special };
+
+    private:
+    float chk4_k1;
+    float chk4_k2;
+    float mu;
+    float sigma;
+    float lambda;
+    BkgType bkgType;
+
+    public:
+    BkgParams():chk4_k1(-1.0f),chk4_k2(-1.0f) ,mu(-1.0f),sigma(-1.0f),lambda(-1.0f),bkgType(BkgType::error)
+    {}
+
+    bool isValid() const { return bkgType!= BkgType::error;}
+
+    void setChk4(float k1,float k2) { chk4_k1=k1; chk4_k2=k2;bkgType= BkgType::chev;}
+    void setSpBkg(float mu_, float sigma_, float lambda_) {mu=mu_;sigma=sigma_;lambda=lambda_; bkgType=BkgType::special;}
+
+    float getChk4_k1() const {return chk4_k1;}
+    float getChk4_k2() const {return chk4_k2;}
+    float getMu() const {return mu;}
+    float getSigma() const {return sigma;}
+    float getLambda() const {return lambda;}
+    BkgType getBkgType() const {return bkgType;}
+
+    void deserialize(serializer& ser);
+    void serialize(serializer& ser) const;
+
+    static std::string toStr(BkgType type);
+    static BkgType fromStr(const std::string& str);
+};
+
 class externParams
 {
     float nSigY1S;
     float nSigY2S;
     float nSigY3S;
     float nBkg;
-    float chk4_k1;
-    float chk4_k2;
 
     public:
-    externParams():nSigY1S(-1.0f),nSigY2S(-1.0f),nSigY3S(-1.0f),
-                    nBkg(-1.0f),chk4_k1(-1.0f),chk4_k2(-1.0f) 
+    externParams():nSigY1S(-1.0f),nSigY2S(-1.0f),nSigY3S(-1.0f),nBkg(-1.0f)
     {
     }
 
@@ -53,12 +86,9 @@ class externParams
     float getNSigY2S() const {return nSigY2S;}
     float getNSigY3S() const {return nSigY3S;}
     float getNBkg()    const {return nBkg;}
-    float getChk4_k1() const {return chk4_k1;}
-    float getChk4_k2() const {return chk4_k2;}
 
     void setNSig(float Y1S,float Y2S, float Y3S) {nSigY1S=Y1S; nSigY2S=Y2S; nSigY3S=Y3S;}
     void setNBkg(float value) {nBkg=value;}
-    void setChk4(float k1,float k2) { chk4_k1=k1; chk4_k2=k2;  }
 
     void deserialize(serializer& ser);
 
@@ -70,22 +100,31 @@ class fitParams
 {
     dcbParam dcb;
     externParams extParam;
+    BkgParams bkg;
 
     public:
     fitParams() : dcb(),extParam()
     {
     }
 
+    bool isValid() const { return bkg.isValid();}
+
     void setNSig(float Y1S,float Y2S, float Y3S) { extParam.setNSig(Y1S,Y2S,Y3S);}
     void setNBkg(float value) {extParam.setNBkg(value);}
-    void setChk4(float k1,float k2) { extParam.setChk4(k1,k2);}
+    void setChk4(float k1,float k2) { bkg.setChk4(k1,k2);}
+    void setSpBkg(float mu,float sigma, float lambda) { bkg.setSpBkg(mu,sigma,lambda); }
 
     float getNSigY1S() const {return extParam.getNSigY1S();}
     float getNSigY2S() const {return extParam.getNSigY2S();}
     float getNSigY3S() const {return extParam.getNSigY3S();}
     float getNBkg()    const {return extParam.getNBkg();}
-    float getChk4_k1() const {return extParam.getChk4_k1();}
-    float getChk4_k2() const {return extParam.getChk4_k2();}
+
+    BkgParams::BkgType getBkgType() const {return bkg.getBkgType();}
+    float getChk4_k1() const {return bkg.getChk4_k1();}
+    float getChk4_k2() const {return bkg.getChk4_k2();}
+    float getMu() const {return bkg.getMu();}
+    float getSigma() const {return bkg.getSigma();}
+    float getLambda() const {return bkg.getLambda();}
 
     const dcbParam* getDCBParams() const {return &dcb;}
     dcbParam* getDCBParams() {return &dcb;}
@@ -161,9 +200,8 @@ struct cutParams
     void deserialize(const std::string& filename);
 };
 
-struct fitConfig
+class fitConfig
 {
-    bool bkgOn;
     bool moreUpsilon;
     float massLow;
     float massHigh;
@@ -171,13 +209,23 @@ struct fitConfig
     kinecutParams cut;
     fitParams initialValues;
 
-    fitConfig(): bkgOn(false),moreUpsilon(false), massLow(-1.0f), massHigh(-1.0f), cut(), initialValues()
+    public:
+
+    fitConfig(): moreUpsilon(false), massLow(-1.0f), massHigh(-1.0f), cut(), initialValues()
     {
     }
 
+    bool isBkgOn() const { return initialValues.getBkgType() != BkgParams::BkgType::none;}
+    bool isMoreUpsilon() const {return moreUpsilon;}
+    float getMassLow() const {return massLow;}
+    float getMassHigh() const {return massHigh;}
+    const kinecutParams* getCut() const {return &cut;}
+    const fitParams* getInitValues() const {return &initialValues;}
+    BkgParams::BkgType getBkgType() const {return initialValues.getBkgType();}
+
     bool isValid() const
     {
-        return (massLow>=0.0f) && (massHigh>0.0f) && (cut.isValid());
+        return (massLow>=0.0f) && (massHigh>0.0f) && (cut.isValid()) && (initialValues.isValid());
     }
 
     void deserialize(const std::string& filename);

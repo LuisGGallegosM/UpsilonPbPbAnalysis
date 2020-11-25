@@ -33,6 +33,76 @@
         f=f_;
     }
 
+//BkgParams
+
+    void BkgParams::deserialize(serializer& ser)
+    {
+        std::string str;
+        ser.read("bkgType",str);
+        bkgType= fromStr(str);
+        switch (bkgType)
+        {
+            case BkgType::chev:
+                ser.read("chk4_k1",chk4_k1);
+                ser.read("chk4_k2",chk4_k2);
+            break;
+            case BkgType::special:
+                ser.read("lambda",lambda);
+                ser.read("mu",mu);
+                ser.read("sigma",sigma);
+            break;
+        }
+    }
+
+    void BkgParams::serialize(serializer& ser) const
+    {
+        ser.write("bkgType", toStr(bkgType));
+        if (bkgType == BkgType::chev)
+        {
+            ser.write("chk4_k1",chk4_k1);
+            ser.write("chk4_k2",chk4_k2);
+        }
+        else
+        {
+            ser.write("lambda",lambda);
+            ser.write("mu",mu);
+            ser.write("sigma",sigma);
+        }
+    }
+
+    std::string BkgParams::toStr(BkgType type)
+    {
+        std::string out;
+        switch(type)
+        {
+            case BkgType::none : out="none";break;
+            case BkgType::chev : out="chev";break;
+            case BkgType::special: out="special";break;
+            default:
+            throw std::invalid_argument("Error: argument BkgType not set correctly");
+        }
+        return out;
+    }
+    BkgParams::BkgType BkgParams::fromStr(const std::string& str)
+    {
+        if (str=="chev")
+        {
+            return BkgType::chev;
+        }
+        else if (str=="special")
+        {
+            return BkgType::special;
+        }
+        else if (str=="none")
+        {
+            return BkgType::none;
+        }
+        else
+        {
+            throw std::invalid_argument(std::string("Error: argument for BkgType '")+str+"' not valid");
+        }
+    }
+
 //externParams
 
     void externParams::deserialize(serializer& ser)
@@ -41,8 +111,6 @@
         ser.read("nSigY2S",nSigY2S);
         ser.read("nSigY3S",nSigY3S);
         ser.read("nBkg",nBkg);
-        ser.read("chk4_k1",chk4_k1);
-        ser.read("chk4_k2",chk4_k2);
     }
 
     void externParams::serialize(serializer& ser) const
@@ -51,8 +119,6 @@
         ser.write("nSigY2S",nSigY2S);
         ser.write("nSigY3S",nSigY3S);
         ser.write("nBkg",nBkg);
-        ser.write("chk4_k1",chk4_k1);
-        ser.write("chk4_k2",chk4_k2);
     }
 
 //fitParams
@@ -62,6 +128,10 @@
         extParam.deserialize(ser);
         ser.addPrefix("dcb");
         dcb.deserialize(ser);
+        ser.removePrefix();
+
+        ser.addPrefix("bkg");
+        bkg.deserialize(ser);
         ser.removePrefix();
     }
 
@@ -78,6 +148,10 @@
 
         ser.addPrefix("dcb");
         dcb.serialize(ser);
+        ser.removePrefix();
+
+        ser.addPrefix("bkg");
+        bkg.serialize(ser);
         ser.removePrefix();
     }
 
@@ -124,7 +198,6 @@
     {
         serializer ser(filename);
         //set background and fit range
-        ser.read("bkgOn",bkgOn);
         ser.read("moreUpsilon",moreUpsilon);
         ser.read("massHigh",massHigh);
         ser.read("massLow",massLow);

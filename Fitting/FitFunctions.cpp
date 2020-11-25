@@ -92,3 +92,19 @@ Chevychev2::Chevychev2(RooRealVar& var,const char* name,float k1,float k2):
 {
 
 }
+
+//SpecialBkg
+
+SpecialBkg::SpecialBkg(RooRealVar& var,const char* name,float mu_,float sigma_, float lambda_):
+    mu(Form("mu_%s",name),"err_mu",mu_,  0, 35),
+    sigma(Form("sigma_%s",name),"err_sigma", sigma_, 0,35),
+    lambda(Form("lambda_%s",name),"m_lambda",  lambda_, 0,35),
+    bkgPdf()
+{
+    RooGenericPdf* pdf=
+        new RooGenericPdf(name,"Background","TMath::Exp(-@0/@1)*(TMath::Erf((@0-@2)/(TMath::Sqrt(2)*@3))+1)*0.5",
+                           RooArgList(var, lambda, mu, sigma));
+    bkgPdf.reset(pdf);
+}
+
+    

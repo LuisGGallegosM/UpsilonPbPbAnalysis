@@ -32,7 +32,7 @@ then
     wait $JOB
     done
 
-    ./fit.sh "$SKIMFILE" "${WORKDIR}${INTEGRATEDCFILE}"
+    #./fit.sh "$SKIMFILE" "${WORKDIR}${INTEGRATEDCFILE}"
 
 fi
 

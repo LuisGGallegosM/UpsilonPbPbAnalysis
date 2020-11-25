@@ -8,6 +8,7 @@
 #include "RooAddPdf.h"
 #include "RooChebychev.h"
 #include "RooFormulaVar.h"
+#include "RooGenericPdf.h"
 
 //Using in CrystalBall function
 
@@ -33,7 +34,13 @@
 #define RATIO_Y2S (10.023/9.460)
 #define RATIO_Y3S (10.355/9.460)
 
-class Chevychev2
+class BkgFunc
+{
+    public:
+    virtual RooAbsReal* getFunc() =0;
+};
+
+class Chevychev2 : public BkgFunc
 {
     RooRealVar ch4_k1;
     RooRealVar ch4_k2;
@@ -43,9 +50,25 @@ class Chevychev2
     Chevychev2(RooRealVar& var,const char* name,float k1, float k2);
 
     //getters
-    RooAbsReal* getFunc() {return &chev;}
+    RooAbsReal* getFunc() override {return &chev;}
     RooRealVar* getCh4_k1() {return &ch4_k1;}
     RooRealVar* getCh4_k2() {return &ch4_k2;}
+};
+
+class SpecialBkg : public BkgFunc
+{
+    RooRealVar mu;
+    RooRealVar sigma;
+    RooRealVar lambda;
+    std::unique_ptr<RooGenericPdf> bkgPdf;
+    public:
+    SpecialBkg(RooRealVar& var,const char* name,float mu,float sigma, float lambda);
+
+    //getters
+    RooAbsReal* getFunc() override {return bkgPdf.get();}
+    RooRealVar* getMu()  {return &mu;}
+    RooRealVar* getSigma() {return &sigma;}
+    RooRealVar* getLambda() {return &lambda;}
 };
 
 class CrystalBall

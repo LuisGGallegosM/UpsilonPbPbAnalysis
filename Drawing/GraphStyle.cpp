@@ -5,8 +5,8 @@
 
 void setGraphStyle(RooPlot* plot, const drawConfig* config)
 {
-    float massHigh = config->fitConf.massHigh;
-    float massLow = config->fitConf.massLow;
+    float massHigh = config->fitConf.getMassHigh();
+    float massLow = config->fitConf.getMassLow();
     float div= (massHigh - massLow)/(config->nBins);
 
     if (config->cut.isMC)
@@ -53,7 +53,7 @@ void setPullStyle(RooPlot* pullPlot, const drawConfig* config)
     pullPlot->GetXaxis()->SetLabelSize(0.06) ;
     pullPlot->GetXaxis()->SetTitleSize(0.06) ;
     pullPlot->GetXaxis()->CenterTitle();
-    pullPlot->GetXaxis()->SetRangeUser(config->fitConf.massLow,config->fitConf.massHigh);
+    pullPlot->GetXaxis()->SetRangeUser(config->fitConf.getMassLow(),config->fitConf.getMassHigh());
     pullPlot->GetXaxis()->SetTickSize(0.03);
     return;
 }
