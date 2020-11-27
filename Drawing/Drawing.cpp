@@ -53,29 +53,36 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
     fParams.deserialize(ReplaceExtension(fitfilename,".fit"));
 
     //DRAWING START
-
-    TCanvas* canvas = getStyledCanvas();
-    canvas->cd();
-    TPad* graph = getStyledGraphPad(config.isLog);
-    TPad* pull = getStyledPullPad();
-
-    graph->cd();
-    RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
-    drawGraphText(&fParams,&config);
-
-    pull->cd();
-    RooHist* pullHist = drawPull(graphPlot,massVar,fitResults,&config);
-    drawPullText(pullHist,fitResults);
-
-    if (canvas==nullptr)
+    for (bool isLog : { false,true })
     {
-        std::cerr << "Error: Canvas not generated\n";
-        return;
-    }
+        TCanvas* canvas = getStyledCanvas();
+        if (canvas==nullptr)
+        {
+            std::cerr << "Error: Canvas not generated\n";
+            return;
+        }
 
-    canvas->Update();
-    canvas->Write(0,TObject::kOverwrite);
-    canvas->SaveAs(drawfilename);
+        canvas->cd();
+        TPad* graph = getStyledGraphPad(isLog);
+        TPad* pull = getStyledPullPad();
+
+        graph->cd();
+        RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
+        setGraphStyle(graphPlot,&config,fParams.getNSigY1S(),isLog);
+        drawLegend(graphPlot,config.fitConf.isBkgOn(),config.fitConf.isMoreUpsilon());
+        drawGraphText(&fParams,&config);
+
+        pull->cd();
+        RooHist* pullHist = drawPull(graphPlot,massVar,fitResults,&config);
+        drawPullText(pullHist,fitResults);
+
+        canvas->Update();
+        canvas->Write(0,TObject::kOverwrite);
+        if (isLog)
+            canvas->SaveAs(ReplaceExtension(drawfilename,"_log.pdf").data());
+        else
+            canvas->SaveAs(drawfilename);
+    }
 
     return;
 }
@@ -136,15 +143,10 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc
         fittedFunc->plotOn(plot,Name("cb2"),Components("cball_Y1S_2"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
     }
     
-    
     if (config->fitConf.isBkgOn())
       fittedFunc->plotOn(plot,Name("bkg"),Components("bkg"),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
     dataset->plotOn(plot,Name(DATASETNAME), MarkerSize(0.4), XErrorSize(0));
-    TLegend* legend= drawLegend(plot,config->fitConf.isBkgOn(),config->fitConf.isMoreUpsilon());
-
-    setGraphStyle(plot,config);
     plot->Draw("same");
-    legend->Draw("same");
 
     return plot;
 }
@@ -169,10 +171,11 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
         fitleg->AddEntry(plot->findObject("cb1"),"CBall 1","l");
         fitleg->AddEntry(plot->findObject("cb2"),"CBall 2","l");
     }
-    
 
     if (bkgOn)
       fitleg->AddEntry(plot->findObject("bkg"),"Background","l");
+
+    fitleg->Draw("same");
 
     return fitleg;
 }

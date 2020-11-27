@@ -229,7 +229,4 @@
         serializer ser(configfilename);
 
         ser.read("nBins",nBins);
-        ser.read("minBinY",minBinY);
-        ser.read("maxBinY",maxBinY);
-        ser.read("isLog",isLog);
     }

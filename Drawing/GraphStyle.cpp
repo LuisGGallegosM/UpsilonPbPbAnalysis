@@ -3,11 +3,25 @@
 #include "GraphStyle.h"
 #include "TH1.h"
 
-void setGraphStyle(RooPlot* plot, const drawConfig* config)
+void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue  , bool isLog)
 {
     float massHigh = config->fitConf.getMassHigh();
     float massLow = config->fitConf.getMassLow();
     float div= (massHigh - massLow)/(config->nBins);
+    float maxValue = topValue;
+    float minValue = 0.0f;
+
+    //round to 
+    maxValue = ceil(maxValue/10000.0f)*10000.0;
+    if (isLog)
+    {
+        minValue = 10.0f;
+        maxValue *= 100;
+    }
+    else
+    {
+        maxValue *=0.15f;
+    }
 
     if (config->cut.isMC)
         plot->SetTitle("#varUpsilon(1S) MC ( 5.02 TeV)");
@@ -26,7 +40,7 @@ void setGraphStyle(RooPlot* plot, const drawConfig* config)
     plot->GetYaxis()->CenterTitle();
     plot->GetYaxis()->SetTitleSize(0.048);
     plot->GetYaxis()->SetTitle( Form("Events / ( %.3f GeV/c^{2} )",div));
-    plot->GetYaxis()->SetRangeUser(config->minBinY,config->maxBinY);
+    plot->GetYaxis()->SetRangeUser(minValue,maxValue);
 
   return;
 }
