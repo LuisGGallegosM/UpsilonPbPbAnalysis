@@ -7,8 +7,6 @@
 #include "RooFormulaVar.h"
 #include "RooExtendPdf.h"
 
-using namespace std;
-
 //OniaMassFitter member functions.
 
 OniaMassFitter::OniaMassFitter(TTree* tree_,const fitConfig* fitConf):
@@ -19,36 +17,15 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const fitConfig* fitConf):
     dcball1(mass,"Y1S",config.getInitValues()->getDCBParams()),
     bkg()
 {
-    BkgFunc* b =nullptr;
-    BkgParams::BkgType bkgType=config.getInitValues()->getBkgType();
-
-    switch (bkgType)
-    {
-        case BkgParams::BkgType::chev:
-        b = new Chevychev2(mass,"bkg",config.getInitValues()->getChk4_k1(),config.getInitValues()->getChk4_k2());
-        break;
-
-        case BkgParams::BkgType::special:
-        b = new SpecialBkg(mass,"bkg",config.getInitValues()->getMu(),
-                        config.getInitValues()->getSigma(),config.getInitValues()->getLambda());
-        break;
-
-        case BkgParams::BkgType::none:
-        b = nullptr;
-        break;
-
-        default:
-        throw invalid_argument("\nError: bkgType argument not valid\n");
-    }
-    if (b!=nullptr)
-        bkg.reset(b);
+    BkgFunc* b =BkgFactory(mass,config);
+    bkg.reset(b);
 }
 
 OniaMassFitter::~OniaMassFitter() { }
 
-string OniaMassFitter::getKineCutExpr() const
+std::string OniaMassFitter::getKineCutExpr() const
 {
-    string str(Form("(pT < %.3f) && (pT > %.3f)",config.getCut()->getPtHigh(),config.getCut()->getPtLow()));
+    std::string str(Form("(pT < %.3f) && (pT > %.3f)",config.getCut()->getPtHigh(),config.getCut()->getPtLow()));
     str.append(Form(" && (abs(y) < %.3f) && (abs(y) > %.3f)",config.getCut()->getYHigh(),config.getCut()->getYLow()));
     return str;
 }
@@ -100,14 +77,9 @@ void OniaMassFitter::getFitParams(fitParams* resultParams)
 {
     resultParams->setNSig(nSig_Y1S.getVal());
     resultParams->setNBkg(nBkg.getVal());
-    Chevychev2* chev= dynamic_cast<Chevychev2*>(bkg.get());
-    if (chev!=nullptr)
-        resultParams->setChk4(chev->getCh4_k1()->getVal(),chev->getCh4_k2()->getVal());
-        else
-        {
-            SpecialBkg* spBkg= dynamic_cast<SpecialBkg*>(bkg.get());
-            resultParams->setSpBkg(spBkg->getMu()->getVal(),spBkg->getSigma()->getVal(),spBkg->getLambda()->getVal());
-        }
+    
+    BkgParams* bkgParams=resultParams->getBkgParams();
+    bkg->getBkgParams(bkgParams);
 
     dcbParam* dcb=resultParams->getDCBParams();
     dcball1.getFitParams(dcb);

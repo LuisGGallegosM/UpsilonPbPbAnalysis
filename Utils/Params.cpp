@@ -51,56 +51,72 @@
                 ser.read("mu",mu);
                 ser.read("sigma",sigma);
             break;
+            case BkgType::exponential:
+                ser.read("lambda",lambda);
+            break;
         }
     }
 
     void BkgParams::serialize(serializer& ser) const
     {
         ser.write("bkgType", toStr(bkgType));
-        if (bkgType == BkgType::chev)
+        switch(bkgType)
         {
-            ser.write("chk4_k1",chk4_k1);
-            ser.write("chk4_k2",chk4_k2);
-        }
-        else
-        {
-            ser.write("lambda",lambda);
-            ser.write("mu",mu);
-            ser.write("sigma",sigma);
+            case BkgType::chev:
+                ser.write("chk4_k1",chk4_k1);
+                ser.write("chk4_k2",chk4_k2);
+            break;
+            case BkgType::special:
+                ser.write("lambda",lambda);
+                ser.write("mu",mu);
+                ser.write("sigma",sigma);
+            break;
+            case BkgType::exponential:
+                ser.write("lambda",lambda);
+            break;
         }
     }
 
+    const std::vector<BkgParams::bkgPair> BkgParams::bkgNames
+    {
+        {"none",BkgParams::BkgType::none},
+        {"chev",BkgParams::BkgType::chev},
+        {"special",BkgParams::BkgType::special},
+        {"exponential",BkgParams::BkgType::exponential}
+    };
+
     std::string BkgParams::toStr(BkgType type)
     {
-        std::string out;
-        switch(type)
+        std::string str;
+        bool found=false;
+        for(const auto& var : bkgNames)
         {
-            case BkgType::none : out="none";break;
-            case BkgType::chev : out="chev";break;
-            case BkgType::special: out="special";break;
-            default:
-            throw std::invalid_argument("Error: argument BkgType not set correctly");
+            if(var.type == type)
+            {
+                str= var.name;
+                found=true;
+                break;
+            }
         }
-        return out;
+        if (!found) throw std::runtime_error("Error: type does not exist");
+        return str;
     }
     BkgParams::BkgType BkgParams::fromStr(const std::string& str)
     {
-        if (str=="chev")
+        BkgParams::BkgType type;
+        bool found=false;
+        for(const auto& var : bkgNames)
         {
-            return BkgType::chev;
+            if(var.name == str)
+            {
+                type=var.type;
+                found=true;
+                break;
+            }
         }
-        else if (str=="special")
-        {
-            return BkgType::special;
-        }
-        else if (str=="none")
-        {
-            return BkgType::none;
-        }
-        else
-        {
-            throw std::invalid_argument(std::string("Error: argument for BkgType '")+str+"' not valid");
-        }
+
+        if (!found) throw std::invalid_argument(std::string("Error: argument for BkgType '")+str+"' not valid");
+        return type;
     }
 
 //externParams

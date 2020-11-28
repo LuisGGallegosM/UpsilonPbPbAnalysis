@@ -42,7 +42,7 @@ class dcbParam
 class BkgParams
 {
     public:
-    enum class BkgType {error, none, chev, special };
+    enum class BkgType {error, none, chev, special,exponential };
 
     private:
     float chk4_k1;
@@ -52,14 +52,24 @@ class BkgParams
     float lambda;
     BkgType bkgType;
 
+    struct bkgPair
+    {
+        std::string name;
+        BkgType type;
+    };
+
+    const static std::vector<bkgPair> bkgNames;
+
     public:
     BkgParams():chk4_k1(-1.0f),chk4_k2(-1.0f) ,mu(-1.0f),sigma(-1.0f),lambda(-1.0f),bkgType(BkgType::error)
     {}
 
     bool isValid() const { return bkgType!= BkgType::error;}
 
-    void setChk4(float k1,float k2) { chk4_k1=k1; chk4_k2=k2;bkgType= BkgType::chev;}
-    void setSpBkg(float mu_, float sigma_, float lambda_) {mu=mu_;sigma=sigma_;lambda=lambda_; bkgType=BkgType::special;}
+    void setChk4(float k1,float k2) { chk4_k1=k1; chk4_k2=k2;}
+    void setSpBkg(float mu_, float sigma_, float lambda_) {mu=mu_;sigma=sigma_;lambda=lambda_;}
+    void setLambda(float lambda_) { lambda=lambda_;}
+    void setBkgType(BkgType type) {bkgType = type;}
 
     float getChk4_k1() const {return chk4_k1;}
     float getChk4_k2() const {return chk4_k2;}
@@ -117,18 +127,19 @@ class fitParams
 
     bool isValid() const { return bkg.isValid() && dcb.isValid();}
 
+    //setters
     void setNSig(float Y1S) {extParam.setNSig(Y1S);}
     void setNSig(float Y1S,float Y2S, float Y3S) { extParam.setNSig(Y1S,Y2S,Y3S);}
     void setNBkg(float value) {extParam.setNBkg(value);}
-    void setChk4(float k1,float k2) { bkg.setChk4(k1,k2);}
-    void setSpBkg(float mu,float sigma, float lambda) { bkg.setSpBkg(mu,sigma,lambda); }
 
+    //getters
     float getNSigY1S() const {return extParam.getNSigY1S();}
     float getNSigY2S() const {return extParam.getNSigY2S();}
     float getNSigY3S() const {return extParam.getNSigY3S();}
     float getNBkg()    const {return extParam.getNBkg();}
     bool isMoreUpsilon() const {return extParam.isMoreUpsilon();}
 
+    BkgParams* getBkgParams() {return &bkg;}
     BkgParams::BkgType getBkgType() const {return bkg.getBkgType();}
     float getChk4_k1() const {return bkg.getChk4_k1();}
     float getChk4_k2() const {return bkg.getChk4_k2();}

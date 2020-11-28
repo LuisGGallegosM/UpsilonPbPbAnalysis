@@ -1,6 +1,9 @@
 #!/bin/bash
 
-WORKDIR="../rootfiles/merged_HiForestAOD_MC_skimmed2/"
+echo "multiple fitting"
+
+WORKDIR="../rootfiles/merged_HiForestAOD_MC_skimmed2"
+OUTDIR="output"
 
 CONFIGFILES=( \
  "merged_HiForestAOD_fit0.fitconf"\
@@ -12,8 +15,6 @@ CONFIGFILES=( \
 
 INTEGRATEDCFILE="merged_HiForestAOD_fit_integrated.fitconf"
 
-FILENAMES="${CONFIGFILES[@]/#/${WORKDIR}}"
-
 SKIMFILE="../rootfiles/merged_HiForestAOD_MC_skimmed2/merged_HiForestAOD_MC_skimmed2.root"
 
 if [ 1 = 1 ]
@@ -21,9 +22,11 @@ then
 
     JOBS=()
 
-    for CONFIG in ${FILENAMES[@]}
+    for CONFIG in ${CONFIGFILES[@]}
     do
-    ./fit.sh "$SKIMFILE" "$CONFIG" &
+    FITFILE="${WORKDIR}/${CONFIG}"
+    echo "reading fit file '${FITFILE}'"
+    ./fit.sh "$SKIMFILE" "$FITFILE" "${WORKDIR}/${OUTDIR}/${CONFIG%.*}" &
     JOBS=( "${JOBS[@]}" "$!" )
     done
 
@@ -31,18 +34,19 @@ then
     do
     wait $JOB
     done
-
     #./fit.sh "$SKIMFILE" "${WORKDIR}${INTEGRATEDCFILE}"
-
+    echo "all fits done"
 fi
 
-NAME="${WORKDIR}/merged_HiForestAOD_fit.pdf"
+echo "multiple drawing"
+#do fit comparison drawings
+NAME="${WORKDIR}/${OUTDIR}/merged_HiForestAOD_fit.pdf"
 
 FITFILENAMES=()
-for FILENAME in ${FILENAMES[@]}
+for CONFIG in ${CONFIGFILES[@]}
 do
-OUTPUTDIR="${FILENAME%.*}"
-OUTPUTFILE="${OUTPUTDIR}/$( basename $OUTPUTDIR ).fit"
+OUTPUTFILE="${WORKDIR}/${OUTDIR}/${CONFIG%.*}/${CONFIG%.*}.fit"
+echo "reading fit result file '${OUTPUTFILE}'"
 FITFILENAMES=( ${FITFILENAMES[@]} $OUTPUTFILE)
 done
 

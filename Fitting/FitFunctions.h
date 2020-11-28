@@ -9,6 +9,7 @@
 #include "RooChebychev.h"
 #include "RooFormulaVar.h"
 #include "RooGenericPdf.h"
+#include "RooExponential.h"
 
 //Using in CrystalBall function
 
@@ -30,6 +31,10 @@
 #define S1_NSIG_MAX     (2000000.0f)
 #define S1_NBKG_MAX     (200000.0f)
 
+#define BKG_LAMBDA_MAX (35.0f)
+#define BKG_SIGMA_MAX  (35.0f)
+#define BKG_MU_MAX     (35.0f)
+
 
 #define RATIO_Y2S (10.023/9.460)
 #define RATIO_Y3S (10.355/9.460)
@@ -37,7 +42,8 @@
 class BkgFunc
 {
     public:
-    virtual RooAbsReal* getFunc() =0;
+    virtual RooAbsReal* getFunc() { throw std::runtime_error("Error: accesing no bkg funcion"); }
+    virtual void getBkgParams(BkgParams* output) { output->setBkgType(BkgParams::BkgType::none); }
 };
 
 class Chevychev2 : public BkgFunc
@@ -53,6 +59,7 @@ class Chevychev2 : public BkgFunc
     RooAbsReal* getFunc() override {return &chev;}
     RooRealVar* getCh4_k1() {return &ch4_k1;}
     RooRealVar* getCh4_k2() {return &ch4_k2;}
+    void getBkgParams(BkgParams* output) override;
 };
 
 class SpecialBkg : public BkgFunc
@@ -69,6 +76,19 @@ class SpecialBkg : public BkgFunc
     RooRealVar* getMu()  {return &mu;}
     RooRealVar* getSigma() {return &sigma;}
     RooRealVar* getLambda() {return &lambda;}
+    void getBkgParams(BkgParams* output) override;
+};
+
+class ExponentialBkg : public BkgFunc
+{
+    RooRealVar lambda;
+    std::unique_ptr<RooGenericPdf> bkgPdf;
+    public:
+    ExponentialBkg(RooRealVar& var,const char* name,float lambda);
+
+    RooAbsReal* getFunc() override {return bkgPdf.get();}
+    RooRealVar* getLambda() {return &lambda;}
+    void getBkgParams(BkgParams* output) override;
 };
 
 class CrystalBall
@@ -168,6 +188,8 @@ class DoubleCrystalBallSlave : protected CrystalBallSlave
     //getter
     RooAbsPdf* getDCB();
 };
+
+BkgFunc* BkgFactory(RooRealVar& var, const fitConfig& config);
 
 #if defined(__CLING__)
 #include "FitFunctions.cpp"

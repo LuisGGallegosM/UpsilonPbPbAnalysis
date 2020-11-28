@@ -2,15 +2,15 @@
 
 CLING="NO"
 
-#Root file to fit from
+#root file to fit from
 INPUTFILE="${1:-../rootfiles/merged_HiForestAOD_MC_skimmed2/merged_HiForestAOD_MC_skimmed2.root}"
-#Fit configuration file name
+#fit configuration file name
 CONFIG="${2:-../rootfiles/merged_HiForestAOD_MC_skimmed2/merged_HiForestAOD_fit0.fitconf}"
-#Draw configuration file name
-DRAWCONFIG="${INPUTFILE%.*}.drawconf"
+#directory where to save all files
+OUTPUTDIR="${3:-../rootfiles/merged_HiForestAOD_MC_skimmed2/merged_HiForestAOD_fit0}"
 
-#save in a directory with a name generated from config file
-OUTPUTDIR="${CONFIG%.*}"
+#draw configuration file name, must have same name as INPUTFILE but with drawconf extension
+DRAWCONFIG="${INPUTFILE%.*}.drawconf"
 #name of generated file is like CONFIG but with .root extension
 OUTPUTFILE="${OUTPUTDIR}/$( basename $OUTPUTDIR ).root"
 #path of file where to save log

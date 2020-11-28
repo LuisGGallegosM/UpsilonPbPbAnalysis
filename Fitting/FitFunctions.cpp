@@ -93,12 +93,18 @@ Chevychev2::Chevychev2(RooRealVar& var,const char* name,float k1,float k2):
 
 }
 
+void Chevychev2::getBkgParams(BkgParams* output)
+{
+    output->setChk4(ch4_k1.getVal(),ch4_k2.getVal());
+    output->setBkgType(BkgParams::BkgType::chev);
+}
+
 //SpecialBkg
 
 SpecialBkg::SpecialBkg(RooRealVar& var,const char* name,float mu_,float sigma_, float lambda_):
-    mu(Form("mu_%s",name),"err_mu",mu_,  0, 35),
-    sigma(Form("sigma_%s",name),"err_sigma", sigma_, 0,35),
-    lambda(Form("lambda_%s",name),"m_lambda",  lambda_, 0,35),
+    mu(Form("mu_%s",name),"err_mu",mu_,  0.0f, BKG_MU_MAX),
+    sigma(Form("sigma_%s",name),"err_sigma", sigma_, 0.0f,BKG_SIGMA_MAX),
+    lambda(Form("lambda_%s",name),"m_lambda",  lambda_, 0.0f,BKG_LAMBDA_MAX),
     bkgPdf()
 {
     RooGenericPdf* pdf=
@@ -107,4 +113,57 @@ SpecialBkg::SpecialBkg(RooRealVar& var,const char* name,float mu_,float sigma_, 
     bkgPdf.reset(pdf);
 }
 
-    
+void SpecialBkg::getBkgParams(BkgParams* output)
+{
+    output->setSpBkg(mu.getVal(),sigma.getVal(),lambda.getVal());
+    output->setBkgType(BkgParams::BkgType::special);
+}
+
+//ExponentialBkg
+
+ExponentialBkg::ExponentialBkg(RooRealVar& var,const char* name,float lambda_):
+lambda(Form("lambda_%s",name),"m_lambda",  lambda_, 0.0f,BKG_LAMBDA_MAX),
+bkgPdf()
+{
+    RooGenericPdf* pdf=
+        new RooGenericPdf(name,"Background","TMath::Exp(-@0/@1)",
+                           RooArgList(var, lambda));
+    bkgPdf.reset(pdf);
+}
+
+void ExponentialBkg::getBkgParams(BkgParams* output)
+{
+    output->setLambda(lambda.getVal());
+    output->setBkgType(BkgParams::BkgType::exponential);
+}
+
+
+BkgFunc* BkgFactory(RooRealVar& var, const fitConfig& config)
+{
+    BkgFunc* b= nullptr;
+    BkgParams::BkgType bkgType = config.getBkgType();
+    switch (bkgType)
+    {
+        case BkgParams::BkgType::chev:
+        b = new Chevychev2(var,"bkg",config.getInitValues()->getChk4_k1(),config.getInitValues()->getChk4_k2());
+        break;
+
+        case BkgParams::BkgType::special:
+        b = new SpecialBkg(var,"bkg",config.getInitValues()->getMu(),
+                        config.getInitValues()->getSigma(),config.getInitValues()->getLambda());
+        break;
+
+        case BkgParams::BkgType::exponential:
+        b = new ExponentialBkg(var,"bkg",config.getInitValues()->getLambda());
+
+        break;
+
+        case BkgParams::BkgType::none:
+        b = new BkgFunc();
+        break;
+
+        default:
+        throw std::invalid_argument("\nError: bkgType argument not valid\n");
+    }
+    return b;
+}
