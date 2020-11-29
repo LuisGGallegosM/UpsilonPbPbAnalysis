@@ -73,16 +73,19 @@ RooAbsReal* OniaMassFitter::fit()
     
 }
 
-void OniaMassFitter::getFitParams(fitParams* resultParams)
+fitParams OniaMassFitter::getFitParams()
 {
-    resultParams->setNSig(nSig_Y1S.getVal());
-    resultParams->setNBkg(nBkg.getVal());
+    fitParams output;
+    output.setNSig(nSig_Y1S.getVal());
+    output.setMoreUpsilon(false);
+    output.setNBkg(nBkg.getVal());
     
-    BkgParams* bkgParams=resultParams->getBkgParams();
-    bkg->getBkgParams(bkgParams);
+    BkgParams bkgParams=bkg->getBkgParams();
+    output.setBkgParams(bkgParams);
 
-    dcbParam* dcb=resultParams->getDCBParams();
-    dcball1.getFitParams(dcb);
+    dcbParam dcb = dcball1.getFitParams();
+    output.setDCBParams(dcb);
+    return output;
 }
 
 //OniaMassFitter2
@@ -97,10 +100,12 @@ OniaMassFitter2::OniaMassFitter2(TTree* tree_,const fitConfig* fitConf):
 {
 }
 
-void OniaMassFitter2::getFitParams(fitParams* resultParams)
+fitParams OniaMassFitter2::getFitParams()
 {
-    OniaMassFitter::getFitParams(resultParams);
-    resultParams->setNSig(nSig_Y1S.getVal(),nSig_Y2S.getVal(),nSig_Y3S.getVal());
+    fitParams output = OniaMassFitter::getFitParams();
+    output.setNSig(nSig_Y1S.getVal(),nSig_Y2S.getVal(),nSig_Y3S.getVal());
+    output.setMoreUpsilon(true);
+    return output;
 }
 
 void OniaMassFitter2::combinePdf()

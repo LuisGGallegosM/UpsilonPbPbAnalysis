@@ -61,10 +61,10 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     CopyFile(configname, ReplaceExtension(outfilename,".fitconf").data());
     CopyFile(ReplaceExtension(filename,".cutconf").data(),ReplaceExtension(outfilename,".cutconf").data() );
 
-    fitParams fParams;
+    
     RooAbsReal* fittedFunc = massFitter->fit();
     
-    massFitter->getFitParams(&fParams);
+    fitParams fParams = massFitter->getFitParams();
 
     fParams.serialize(ReplaceExtension(outfilename,".fit").data());
 

@@ -107,6 +107,7 @@ class externParams
     void setNSig(float Y1S) {nSigY1S=Y1S;}
     void setNSig(float Y1S,float Y2S, float Y3S) {nSigY1S=Y1S; nSigY2S=Y2S; nSigY3S=Y3S;}
     void setNBkg(float value) {nBkg=value;}
+    void setMoreUpsilon(bool more) { moreUpsilon=more; }
 
     void deserialize(serializer& ser);
 
@@ -131,6 +132,9 @@ class fitParams
     void setNSig(float Y1S) {extParam.setNSig(Y1S);}
     void setNSig(float Y1S,float Y2S, float Y3S) { extParam.setNSig(Y1S,Y2S,Y3S);}
     void setNBkg(float value) {extParam.setNBkg(value);}
+    void setDCBParams(const dcbParam& params) {dcb = params;}
+    void setBkgParams(const BkgParams& params) {bkg = params;}
+    void setMoreUpsilon(bool more) { extParam.setMoreUpsilon(more); }
 
     //getters
     float getNSigY1S() const {return extParam.getNSigY1S();}
@@ -138,8 +142,7 @@ class fitParams
     float getNSigY3S() const {return extParam.getNSigY3S();}
     float getNBkg()    const {return extParam.getNBkg();}
     bool isMoreUpsilon() const {return extParam.isMoreUpsilon();}
-
-    BkgParams* getBkgParams() {return &bkg;}
+    
     BkgParams::BkgType getBkgType() const {return bkg.getBkgType();}
     float getChk4_k1() const {return bkg.getChk4_k1();}
     float getChk4_k2() const {return bkg.getChk4_k2();}
@@ -148,7 +151,6 @@ class fitParams
     float getLambda() const {return bkg.getLambda();}
 
     const dcbParam* getDCBParams() const {return &dcb;}
-    dcbParam* getDCBParams() {return &dcb;}
 
     void deserialize(serializer& ser);
 

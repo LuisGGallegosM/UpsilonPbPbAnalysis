@@ -43,7 +43,7 @@ class BkgFunc
 {
     public:
     virtual RooAbsReal* getFunc() { throw std::runtime_error("Error: accesing no bkg funcion"); }
-    virtual void getBkgParams(BkgParams* output) { output->setBkgType(BkgParams::BkgType::none); }
+    virtual BkgParams getBkgParams();
 };
 
 class Chevychev2 : public BkgFunc
@@ -59,7 +59,7 @@ class Chevychev2 : public BkgFunc
     RooAbsReal* getFunc() override {return &chev;}
     RooRealVar* getCh4_k1() {return &ch4_k1;}
     RooRealVar* getCh4_k2() {return &ch4_k2;}
-    void getBkgParams(BkgParams* output) override;
+    BkgParams getBkgParams() override;
 };
 
 class SpecialBkg : public BkgFunc
@@ -76,7 +76,7 @@ class SpecialBkg : public BkgFunc
     RooRealVar* getMu()  {return &mu;}
     RooRealVar* getSigma() {return &sigma;}
     RooRealVar* getLambda() {return &lambda;}
-    void getBkgParams(BkgParams* output) override;
+    BkgParams getBkgParams() override;
 };
 
 class ExponentialBkg : public BkgFunc
@@ -88,7 +88,7 @@ class ExponentialBkg : public BkgFunc
 
     RooAbsReal* getFunc() override {return bkgPdf.get();}
     RooRealVar* getLambda() {return &lambda;}
-    void getBkgParams(BkgParams* output) override;
+    BkgParams getBkgParams() override;
 };
 
 class CrystalBall
@@ -165,7 +165,7 @@ class DoubleCrystalBall : public CrystalBall
 
     //getters
     RooAbsPdf* getDCB() {return &dcball;}
-    void getFitParams(dcbParam* params);
+    dcbParam getFitParams() const;
     void getFitParamsErrors(dcbParam* params);
 
     friend class DoubleCrystalBallSlave;

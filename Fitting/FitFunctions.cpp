@@ -35,9 +35,11 @@ DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var,const char* name, const dcb
 
 }
 
-void DoubleCrystalBall::getFitParams(dcbParam* params)
+dcbParam DoubleCrystalBall::getFitParams() const
 {
-    params->setParams(mean.getVal(),alpha.getVal(),n.getVal(),sigma.getVal(),x.getVal(),f.getVal());
+    dcbParam p;
+    p.setParams(mean.getVal(),alpha.getVal(),n.getVal(),sigma.getVal(),x.getVal(),f.getVal());
+    return p;
 }
 
 void DoubleCrystalBall::getFitParamsErrors(dcbParam* params)
@@ -83,6 +85,15 @@ RooAbsPdf* DoubleCrystalBallSlave::getDCB()
     return &dcball;
 }
 
+//BkgFunc
+
+BkgParams BkgFunc::getBkgParams()
+{
+    BkgParams p;
+    p.setBkgType(BkgParams::BkgType::none);
+    return p;
+}
+
 //Chevychev2
 
 Chevychev2::Chevychev2(RooRealVar& var,const char* name,float k1,float k2):
@@ -93,10 +104,12 @@ Chevychev2::Chevychev2(RooRealVar& var,const char* name,float k1,float k2):
 
 }
 
-void Chevychev2::getBkgParams(BkgParams* output)
+BkgParams Chevychev2::getBkgParams()
 {
-    output->setChk4(ch4_k1.getVal(),ch4_k2.getVal());
-    output->setBkgType(BkgParams::BkgType::chev);
+    BkgParams p;
+    p.setChk4(ch4_k1.getVal(),ch4_k2.getVal());
+    p.setBkgType(BkgParams::BkgType::chev);
+    return p;
 }
 
 //SpecialBkg
@@ -113,10 +126,12 @@ SpecialBkg::SpecialBkg(RooRealVar& var,const char* name,float mu_,float sigma_, 
     bkgPdf.reset(pdf);
 }
 
-void SpecialBkg::getBkgParams(BkgParams* output)
+BkgParams SpecialBkg::getBkgParams()
 {
-    output->setSpBkg(mu.getVal(),sigma.getVal(),lambda.getVal());
-    output->setBkgType(BkgParams::BkgType::special);
+    BkgParams p;
+    p.setSpBkg(mu.getVal(),sigma.getVal(),lambda.getVal());
+    p.setBkgType(BkgParams::BkgType::special);
+    return p;
 }
 
 //ExponentialBkg
@@ -131,10 +146,12 @@ bkgPdf()
     bkgPdf.reset(pdf);
 }
 
-void ExponentialBkg::getBkgParams(BkgParams* output)
+BkgParams ExponentialBkg::getBkgParams()
 {
-    output->setLambda(lambda.getVal());
-    output->setBkgType(BkgParams::BkgType::exponential);
+    BkgParams p;
+    p.setLambda(lambda.getVal());
+    p.setBkgType(BkgParams::BkgType::exponential);
+    return p;
 }
 
 
