@@ -1,18 +1,19 @@
 #!/bin/bash
 
-OUTDIR="../rootfiles/merged_HiForestAOD_MC_skimmed2"
+OUTDIR="../rootfiles/merged_HiForestAOD_skimmed2"
 BASENAME="merged_HiForestAOD_fit"
 
 pt=( 0.0 2.0 4.0 6.0 9.0 12.0 30.0 )
 BKGTYPE=( "special" "special" "special" "special" "exponential" "exponential")
-MOREUPSILON="false"
+MOREUPSILON="true"
 
+echo "generating fit configuration files in directory ${OUTDIR}:"
 #
 num=$((${#pt[@]} -2 ))
  
 for i in $(seq 0 $num )
 do
-    OUTPUT="massHigh = 10.0\n"
+    OUTPUT="massHigh = 14.0\n"
     OUTPUT+="massLow = 8.0\n"
     OUTPUT+="cut.ptLow = ${pt[$i]}\n"
     OUTPUT+="cut.ptHigh = ${pt[ $(($i+1)) ]}\n"
@@ -21,7 +22,7 @@ do
     OUTPUT+="initialValues.moreUpsilon = ${MOREUPSILON}\n"
     OUTPUT+="initialValues.nSigY1S = 50000.0\n"
 
-    if [ MOREUPSILON = "true" ]
+    if [ $MOREUPSILON = "true" ]
     then
     OUTPUT+="initialValues.nSigY2S = 16000.0\n"
     OUTPUT+="initialValues.nSigY3S = 8000.0\n"
@@ -56,7 +57,10 @@ do
     OUTPUT+="initialValues.dcb.x = 0.5\n"
     OUTPUT+="initialValues.dcb.f = 0.5\n"
 
-    printf "$OUTPUT" > "${OUTDIR}/${BASENAME}${i}.fitconf"
+    FILENAME="${OUTDIR}/${BASENAME}${i}.fitconf"
+
+    printf "$OUTPUT" > $FILENAME
+    echo "generated fit configuration file : ${FILENAME}"
 done
 
 #printf "$OUTPUT" "${pt[0]}" "${pt[ $(($num+1)) ]}" > "${OUTDIR}/${BASENAME}_integrated.fitconf"
