@@ -146,6 +146,16 @@
         ser.write("nBkg",nBkg);
     }
 
+    bool externParams::isValid() const
+    {
+        if (nSigY1S <0) return false;
+        if(moreUpsilon)
+        {
+           return ((nSigY2S >= 0.0f) && (nSigY3S >= 0.0f));
+        }
+        return true;
+    }
+
 //fitParams
 
     void fitParams::deserialize(serializer& ser)

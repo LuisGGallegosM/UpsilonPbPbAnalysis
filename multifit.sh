@@ -53,7 +53,7 @@ done
 
 echo "fitting..."
 #do the fits
-if [ 0 = 1 ]
+if [ 1 = 0 ]
 then
     JOBS=()
 
@@ -68,29 +68,37 @@ then
     do
         wait $JOB
     done
-    #./fit.sh "$SKIMFILE" "${WORKDIR}${INTEGRATEDCFILE}"
-    echo "all fits done"
 fi
 
-echo "multiple drawing"
-#do fit comparison drawings
-NAME="${WORKDIR}/${OUTDIR}/merged_HiForestAOD_fit.pdf"
+if [ 1 = 1 ]
+then
+    ./fit.sh "$SKIMFILE" "${WORKDIR}/${INTEGRATEDCFILE}" "${WORKDIR}/${OUTDIR}/${INTEGRATEDCFILE%.*}"
+fi
 
-FITFILENAMES=()
-for CONFIG in ${CONFIGFILES[@]}
-do
-    OUTPUTFILE="${WORKDIR}/${OUTDIR}/${CONFIG%.*}/${CONFIG%.*}.fit"
-    echo "reading fit result file '${OUTPUTFILE}'"
+echo "all fits done"
 
-    if [ ! -f ${OUTPUTFILE} ]
-    then
-        echo "Error: ${OUTPUTFILE} does not exists!"
-        exit 1
-    fi
+if [ 1 = 0]
+then
+    echo "multiple drawing"
+    #do fit comparison drawings
+    NAME="${WORKDIR}/${OUTDIR}/merged_HiForestAOD_fit.pdf"
 
-    FITFILENAMES=( ${FITFILENAMES[@]} $OUTPUTFILE)
-done
+    FITFILENAMES=()
+    for CONFIG in ${CONFIGFILES[@]}
+    do
+        OUTPUTFILE="${WORKDIR}/${OUTDIR}/${CONFIG%.*}/${CONFIG%.*}.fit"
+        echo "reading fit result file '${OUTPUTFILE}'"
 
-./Drawing/draw -m $NAME "${FITFILENAMES[@]}" > "${NAME%.*}_Drawing.log" 2>&1 
+        if [ ! -f ${OUTPUTFILE} ]
+        then
+            echo "Error: ${OUTPUTFILE} does not exists!"
+            exit 1
+        fi
+
+        FITFILENAMES=( ${FITFILENAMES[@]} $OUTPUTFILE)
+    done
+
+    ./Drawing/draw -m $NAME "${FITFILENAMES[@]}" > "${NAME%.*}_Drawing.log" 2>&1 
+fi
 
 echo "all done"

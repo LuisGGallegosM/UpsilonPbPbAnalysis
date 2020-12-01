@@ -13,7 +13,7 @@ num=$((${#pt[@]} -2 ))
  
 for i in $(seq 0 $num )
 do
-    OUTPUT="massHigh = 14.0\n"
+    OUTPUT="massHigh = 11.0\n"
     OUTPUT+="massLow = 8.0\n"
     OUTPUT+="cut.ptLow = ${pt[$i]}\n"
     OUTPUT+="cut.ptHigh = ${pt[ $(($i+1)) ]}\n"

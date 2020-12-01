@@ -97,6 +97,8 @@ class externParams
     externParams():nSigY1S(-1.0f),nSigY2S(-1.0f),nSigY3S(-1.0f),nBkg(-1.0f), moreUpsilon(false)
     {
     }
+
+    bool isValid() const;
     
     bool isMoreUpsilon() const {return moreUpsilon;}
     float getNSigY1S() const {return nSigY1S;}
@@ -126,7 +128,7 @@ class fitParams
     {
     }
 
-    bool isValid() const { return bkg.isValid() && dcb.isValid();}
+    bool isValid() const { return bkg.isValid() && dcb.isValid() && extParam.isValid();}
 
     //setters
     void setNSig(float Y1S) {extParam.setNSig(Y1S);}

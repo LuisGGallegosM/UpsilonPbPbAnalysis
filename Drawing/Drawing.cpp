@@ -13,26 +13,39 @@ RooHist*  drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults,cons
 
 void Drawing(const char* filename,const char* drawfilename, const char* configfilename, const char* cutfilename, const char* fitfilename)
 {
+    const std::string fitresultfilename = ReplaceExtension(fitfilename,".fit");
+
     std::cout << "\nDRAWING\n";
     std::cout << "Reading input file: " << filename <<'\n';
     std::cout << "Drawing output file: " << drawfilename <<'\n';
     std::cout << "Reading draw configuration file: " << configfilename <<'\n';
     std::cout << "Reading cut configuration file: " << cutfilename <<'\n';
     std::cout << "Reading fit configuration file: " << fitfilename <<'\n';
+    std::cout << "Reading fit result file:" << fitresultfilename  << '\n';
 
-    TFile file(filename,"UPDATE");
-
-    if (file.IsZombie())
-    {
-        std::cerr << "Error: File " << filename << " not found.\n";
-        return;
-    }
     drawConfig config;
     config.deserialize(configfilename,cutfilename,fitfilename);
 
     if (!config.isValid())
     {
         std::cerr << "Error: Invalid arguments\n";
+        return;
+    }
+
+    fitParams fParams;
+    fParams.deserialize(fitresultfilename);
+
+    if (!fParams.isValid())
+    {
+        std::cerr << "Error: incorrect fit result file\n" ;
+        return;
+    }
+
+    TFile file(filename,"UPDATE");
+
+    if (file.IsZombie())
+    {
+        std::cerr << "Error: File " << filename << " not found.\n";
         return;
     }
 
@@ -48,9 +61,6 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
         std::cerr << "Error: Needed data not found in file\n" ;
         return;
     }
-
-    fitParams fParams;
-    fParams.deserialize(ReplaceExtension(fitfilename,".fit"));
 
     //DRAWING START
     for (bool isLog : { false,true })
