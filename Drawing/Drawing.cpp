@@ -3,7 +3,7 @@
 
 using namespace RooFit;
 
-void drawGraphText(const fitParams* fParams,const drawConfig* config);
+void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config);
 void drawPullText(RooHist* hist, RooFitResult* fitResults);
 
 TLegend* drawLegend(RooPlot* plot, bool bkgOn,bool moreUpsilon);
@@ -32,7 +32,7 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
         return;
     }
 
-    fitParams fParams;
+    fitParamsWithErrors fParams;
     fParams.deserialize(fitresultfilename);
 
     if (!fParams.isValid())
@@ -190,17 +190,17 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
     return fitleg;
 }
 
-void drawGraphText(const fitParams* fParams,const drawConfig* config)
+void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
 {
     TextDrawer tdrawer(0.22,0.8);
     
     tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
-    tdrawer.drawText( Form("#alpha=%.3f",fParams->getDCBParams()->getAlpha()));
-    tdrawer.drawText( Form("m=%.3f",fParams->getDCBParams()->getMean()));
-    tdrawer.drawText( Form("N=%.3f",fParams->getDCBParams()->getN()));
-    tdrawer.drawText( Form("#sigma_{1}=%.4f",fParams->getDCBParams()->getSigma()));
-    tdrawer.drawText( Form("#frac{#sigma_{2}}{#sigma_{1}}=%.4f",fParams->getDCBParams()->getX()));
-    tdrawer.drawText( Form("f=%.4f",fParams->getDCBParams()->getF()));
+    tdrawer.drawText( Form("#alpha=%.3f #pm %.3f",fParams->getAlpha(),fParams->getErrors().getAlpha()));
+    tdrawer.drawText( Form("m=%.3f #pm %.3f",fParams->getMean(),fParams->getErrors().getMean()));
+    tdrawer.drawText( Form("N=%.3f #pm %.3f",fParams->getN(),fParams->getErrors().getN()));
+    tdrawer.drawText( Form("#sigma_{1}=%.4f #pm %.4f",fParams->getSigma(),fParams->getErrors().getSigma()));
+    tdrawer.drawText( Form("#frac{#sigma_{2}}{#sigma_{1}}=%.4f #pm %.4f",fParams->getX(),fParams->getErrors().getX()));
+    tdrawer.drawText( Form("f=%.4f #pm %.4f",fParams->getF(),fParams->getErrors().getF()));
 
     float ptLow=config->fitConf.getCut()->getPtLow();
     float ptHigh=config->fitConf.getCut()->getPtHigh();

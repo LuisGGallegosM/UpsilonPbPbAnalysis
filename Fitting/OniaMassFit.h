@@ -83,7 +83,7 @@ class OniaMassFitter
      * 
      * @param paramOut fitParams where to fill the got values
      */
-    virtual fitParams getFitParams();
+    virtual fitParamsWithErrors getFitParams();
 };
 
 class OniaMassFitter2 : public OniaMassFitter
@@ -103,7 +103,7 @@ class OniaMassFitter2 : public OniaMassFitter
     public:
     OniaMassFitter2(TTree* tree_,const fitConfig* fitConf);
 
-    fitParams getFitParams() override;
+    fitParamsWithErrors getFitParams() override;
 };
 
 #if defined(__CLING__)

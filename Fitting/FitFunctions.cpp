@@ -42,6 +42,13 @@ dcbParam DoubleCrystalBall::getFitParams() const
     return p;
 }
 
+dcbParam DoubleCrystalBall::getFitParamsErrors() const
+{
+    dcbParam p;
+    p.setParams(mean.getError(),alpha.getError(),n.getError(),sigma.getError(),x.getError(),f.getError());
+    return p;
+}
+
 void DoubleCrystalBall::getFitParamsErrors(dcbParam* params)
 {
     params->setParams(mean.getError(),alpha.getError(),n.getError(),sigma.getError(),x.getError(),f.getError());
@@ -94,6 +101,13 @@ BkgParams BkgFunc::getBkgParams()
     return p;
 }
 
+BkgParams BkgFunc::getBkgParamsErrors()
+{
+    BkgParams p;
+    p.setBkgType(BkgParams::BkgType::none);
+    return p;
+}
+
 //Chevychev2
 
 Chevychev2::Chevychev2(RooRealVar& var,const char* name,float k1,float k2):
@@ -108,6 +122,14 @@ BkgParams Chevychev2::getBkgParams()
 {
     BkgParams p;
     p.setChk4(ch4_k1.getVal(),ch4_k2.getVal());
+    p.setBkgType(BkgParams::BkgType::chev);
+    return p;
+}
+
+BkgParams Chevychev2::getBkgParamsErrors()
+{
+    BkgParams p;
+    p.setChk4(ch4_k1.getError(),ch4_k2.getError());
     p.setBkgType(BkgParams::BkgType::chev);
     return p;
 }
@@ -134,6 +156,14 @@ BkgParams SpecialBkg::getBkgParams()
     return p;
 }
 
+BkgParams SpecialBkg::getBkgParamsErrors()
+{
+    BkgParams p;
+    p.setSpBkg(mu.getError(),sigma.getError(),lambda.getError());
+    p.setBkgType(BkgParams::BkgType::special);
+    return p;
+}
+
 //ExponentialBkg
 
 ExponentialBkg::ExponentialBkg(RooRealVar& var,const char* name,float lambda_):
@@ -154,6 +184,14 @@ BkgParams ExponentialBkg::getBkgParams()
     return p;
 }
 
+BkgParams ExponentialBkg::getBkgParamsErrors()
+{
+    BkgParams p;
+    p.setLambda(lambda.getError());
+    p.setBkgType(BkgParams::BkgType::exponential);
+    return p;
+}
+
 
 BkgFunc* BkgFactory(RooRealVar& var, const fitConfig& config)
 {
@@ -167,7 +205,7 @@ BkgFunc* BkgFactory(RooRealVar& var, const fitConfig& config)
 
         case BkgParams::BkgType::special:
         b = new SpecialBkg(var,"bkg",config.getInitValues()->getMu(),
-                        config.getInitValues()->getSigma(),config.getInitValues()->getLambda());
+                        config.getInitValues()->getSigmaBkg(),config.getInitValues()->getLambda());
         break;
 
         case BkgParams::BkgType::exponential:

@@ -179,6 +179,11 @@
     void fitParams::serialize(const std::string& filename) const
     {
         serializer ser(filename,serializer::iotype::write);
+        serialize(ser);
+    }
+
+    void fitParams::serialize(serializer& ser) const
+    {
         extParam.serialize(ser);
 
         ser.addPrefix("dcb");
@@ -189,6 +194,32 @@
         bkg.serialize(ser);
         ser.removePrefix();
     }
+
+//fitParamsWithErrors
+    void fitParamsWithErrors::deserialize(serializer& ser)
+    {
+        fitParams::deserialize(ser);
+        ser.addPrefix("error");
+        errors.deserialize(ser);
+        ser.removePrefix();
+    }
+
+    void fitParamsWithErrors::deserialize(const std::string& filename)
+    {
+        serializer ser(filename);
+        deserialize(ser);
+    }
+
+    void fitParamsWithErrors::serialize(const std::string& filename) const
+    {
+        serializer ser(filename,serializer::iotype::write);
+        fitParams::serialize(ser);
+
+        ser.addPrefix("error");
+        errors.serialize(ser);
+        ser.removePrefix();
+    }
+
 
 //kinecutParams
 

@@ -39,22 +39,23 @@ CONFIGFILES=( \
 
 INTEGRATEDCFILE="merged_HiForestAOD_fit_integrated.fitconf"
 
-#check if all fitconfig files exists
-for CONFIG in ${CONFIGFILES[@]}
-do
-    FITFILE="${WORKDIR}/${CONFIG}"
-    echo "reading fit file '${FITFILE}'"
-    if [ ! -f "$FITFILE" ]
-    then
-        echo "Error: ${FITFILE} file does not exists!"
-        exit 1
-    fi
-done
-
 echo "fitting..."
 #do the fits
-if [ 1 = 0 ]
+if [ 1 = 1 ]
 then
+    #check if all fitconfig files exists
+    for CONFIG in ${CONFIGFILES[@]}
+    do
+        FITFILE="${WORKDIR}/${CONFIG}"
+        echo "reading fit file '${FITFILE}'"
+        if [ ! -f "$FITFILE" ]
+        then
+            echo "Error: ${FITFILE} file does not exists!"
+            exit 1
+        fi
+    done
+
+    #do the fitting jobs
     JOBS=()
 
     for CONFIG in ${CONFIGFILES[@]}
@@ -64,6 +65,7 @@ then
         JOBS=( "${JOBS[@]}" "$!" )
     done
 
+    #wait for all jobs to complete
     for JOB in ${JOBS[@]}
     do
         wait $JOB
@@ -77,7 +79,7 @@ fi
 
 echo "all fits done"
 
-if [ 1 = 0]
+if [ 1 = 1 ]
 then
     echo "multiple drawing"
     #do fit comparison drawings

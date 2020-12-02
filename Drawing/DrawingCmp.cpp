@@ -10,13 +10,28 @@
 
 struct FitElement
 {
-    fitParams fits;
+    fitParamsWithErrors fits;
     fitConfig configs;
 };
 
-void drawCompGraph(float (*func) (const FitElement&), std::vector<FitElement>& fits,TH1F* graph);
-std::vector<double> generateBinBoundaries(std::vector<FitElement>& configs);
-void fillVariables(  std::vector<const char*>& names,std::vector<float (*) (const FitElement&)>& functors, const fitConfig* fit);
+struct fitVal
+{
+    float value;
+    float error;
+};
+
+typedef float (fitParams::*fitGetter)() const;
+
+struct toGet
+{
+    std::string name;
+    fitGetter getter;
+    toGet(const char* name_,fitGetter getter_): name(name_), getter(getter_) {}
+};
+
+void drawCompGraph(fitGetter func, const std::vector<FitElement>& fits,TH1F* graph);
+std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs);
+std::vector<toGet> fillVariables(const fitConfig* fit);
 
 void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
 {
@@ -32,22 +47,23 @@ void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
 
     for(int i=0;i<size;i++)
     {
-        FitElement fit;
+        fits.emplace_back();
+        FitElement& fit = fits.back();
         fit.fits.deserialize(fitfilenames[i]);
         fit.configs.deserialize( ReplaceExtension(fitfilenames[i], ".fitconf").data()  );
-        fits.push_back(fit);
+        assert(fit.fits.isValid());
+        assert(fit.configs.isValid());
     }
+
     std::sort(fits.begin(),fits.end(),
             [](FitElement& l,FitElement& r) {return l.configs.getCut()->getPtLow() < r.configs.getCut()->getPtHigh();});
 
-    std::vector<double> xbins = generateBinBoundaries(fits);
-    std::vector<const char*> names;
-    std::vector<float (*) (const FitElement&)> functors;
+    const std::vector<double> xbins = generateBinBoundaries(fits);
+    const std::vector<toGet> getters = fillVariables(&(fits[0].configs));
 
-    fillVariables(names,functors,&(fits[0].configs));
-
-    for(int i=0;i< names.size();i++)
+    for(const auto& getter : getters)
     {
+        const char* name= getter.name.data();
         TCanvas canvas("Fit_plot","fit",4,45,550,520);
         canvas.cd();
 
@@ -55,12 +71,12 @@ void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
         
         pad.Draw();
         pad.cd();
-        TH1F compGraph(names[i],names[i],fits.size(),xbins.data());
+        TH1F compGraph(name,name,fits.size(),xbins.data());
         compGraph.GetXaxis()->SetTitle("p_{T} ( GeV/c )");
-        compGraph.GetYaxis()->SetTitle(names[i]);
-        drawCompGraph(functors[i],fits,&compGraph);
+        compGraph.GetYaxis()->SetTitle(name);
+        drawCompGraph(getter.getter,fits,&compGraph);
         compGraph.Draw();
-        std::string outfilename = (ReplaceExtension(outputfilename,"_")+names[i]+".pdf");
+        std::string outfilename = (ReplaceExtension(outputfilename,"_")+name+".pdf");
         canvas.SaveAs(outfilename.data());
         std::cout << "output file: "<< outfilename << "\n";
     }
@@ -68,85 +84,67 @@ void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
     return;
 }
 
-void fillVariables(  std::vector<const char*>& names,std::vector<float (*) (const FitElement&)>& functors, const fitConfig* fit)
+std::vector<toGet> fillVariables(const fitConfig* fit)
 {
-    names.push_back("alpha");
-    functors.push_back([](const FitElement& param) { return param.fits.getDCBParams()->getAlpha();  });
-
-    names.push_back("n");
-    functors.push_back([](const FitElement& param) { return param.fits.getDCBParams()->getN();  });
-
-    names.push_back("f");
-    functors.push_back([](const FitElement& param) { return param.fits.getDCBParams()->getF();  });
-
-    names.push_back("sigma");
-    functors.push_back([](const FitElement& param) { return param.fits.getDCBParams()->getSigma();  });
-
-    names.push_back("x");
-    functors.push_back([](const FitElement& param) { return param.fits.getDCBParams()->getX();  });
-
-    names.push_back("nSigY1S");
-    functors.push_back([](const FitElement& param) { return param.fits.getNSigY1S();  });
+    std::vector<toGet> getters;
+    getters.push_back(toGet{"alpha", &fitParams::getAlpha});
+    getters.push_back(toGet{"n",&fitParams::getN});
+    getters.push_back(toGet{"f",&fitParams::getF});
+    getters.push_back(toGet{"sigma",&fitParams::getSigma});
+    getters.push_back(toGet{"x",&fitParams::getX});
+    getters.push_back(toGet{"nSigY1S",&fitParams::getNSigY1S});
+    getters.push_back(toGet{"mass",&fitParams::getMean});
 
     if (fit->isMoreUpsilon())
     {
-        names.push_back("nSigY2S");
-        functors.push_back([](const FitElement& param) { return param.fits.getNSigY2S();  });
-
-        names.push_back("nSigY3S");
-        functors.push_back([](const FitElement& param) { return param.fits.getNSigY3S();  });
+        getters.push_back(toGet{"nSigY2S",&fitParams::getNSigY2S});
+        getters.push_back(toGet{"nSigY3S",&fitParams::getNSigY3S});
     }
 
     if (fit->isBkgOn())
     {
-        names.push_back("nBkg");
-        functors.push_back([](const FitElement& param) { return param.fits.getNBkg();  });
+        getters.push_back(toGet{"nBkg",&fitParams::getNBkg});
     }
 
     switch (fit->getBkgType())
     {
         case BkgParams::BkgType::chev:
-
-        names.push_back("chk4_k1");
-        functors.push_back([](const FitElement& param) { return param.fits.getChk4_k1();  });
-
-        names.push_back("chk4_k2");
-        functors.push_back([](const FitElement& param) { return param.fits.getChk4_k2();  });
+        getters.push_back(toGet{"chk4_k1",&fitParams::getChk4_k1});
+        getters.push_back(toGet{"chk4_k2",&fitParams::getChk4_k2});
         break;
         
         case BkgParams::BkgType::special:
+        getters.push_back(toGet{"lambda_bkg",&fitParams::getLambda});
+        getters.push_back(toGet{"sigma_bkg",&fitParams::getSigmaBkg});
+        getters.push_back(toGet{"mu_bkg",&fitParams::getMu});
+        break;
 
-        names.push_back("lambda_bkg");
-        functors.push_back([](const FitElement& param) { return param.fits.getLambda();  });
-
-        names.push_back("sigma_bkg");
-        functors.push_back([](const FitElement& param) { return param.fits.getSigma();  });
-        
-        names.push_back("mu_bkg");
-        functors.push_back([](const FitElement& param) { return param.fits.getMu();  });
+        case BkgParams::BkgType::exponential:
+        getters.push_back(toGet{"lambda_bkg",&fitParams::getLambda});
         break;
     }
+    return getters;
 }
 
-std::vector<double> generateBinBoundaries(std::vector<FitElement>& configs)
+std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs)
 {
     std::vector<double> xbins;
     xbins.push_back(configs[0].configs.getCut()->getPtLow());
-    for(int i=0;i< configs.size();i++)
+    for(const auto& config : configs)
     {
-        xbins.push_back(configs[i].configs.getCut()->getPtHigh());
+        xbins.push_back(config.configs.getCut()->getPtHigh());
     }
     return xbins;
 }
 
-void drawCompGraph(float (*func) (const FitElement&), std::vector<FitElement>& fits,TH1F* graph)
+void drawCompGraph(fitGetter func, const std::vector<FitElement>& fits,TH1F* graph)
 {
     int i=0;
     for (const auto& fit : fits)
     {
         float pt =0.5f*(fit.configs.getCut()->getPtHigh() + fit.configs.getCut()->getPtLow());
-        graph->Fill(pt,func(fit));
-        graph->SetBinError(i+1,0.1);
+        graph->Fill(pt,(fit.fits.*func)());
+        graph->SetBinError(i+1,(fit.fits.getErrors().*func)());
         i++;
     }
 

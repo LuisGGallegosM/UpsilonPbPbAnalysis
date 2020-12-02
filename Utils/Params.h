@@ -149,10 +149,42 @@ class fitParams
     float getChk4_k1() const {return bkg.getChk4_k1();}
     float getChk4_k2() const {return bkg.getChk4_k2();}
     float getMu() const {return bkg.getMu();}
-    float getSigma() const {return bkg.getSigma();}
+    float getSigmaBkg() const {return bkg.getSigma();}
     float getLambda() const {return bkg.getLambda();}
 
     const dcbParam* getDCBParams() const {return &dcb;}
+    float getAlpha() const {return dcb.getAlpha();}
+    float getN() const {return dcb.getN();}
+    float getF() const {return dcb.getF();}
+    float getSigma() const {return dcb.getSigma();}
+    float getX() const {return dcb.getX();}
+    float getMean() const {return dcb.getMean();}
+    
+
+    void deserialize(serializer& ser);
+
+    void deserialize(const std::string& filename);
+
+    void serialize(const std::string& filename) const;
+
+    void serialize(serializer& ser) const;
+};
+
+class fitParamsWithErrors : public fitParams
+{
+    fitParams errors;
+
+    public:
+    fitParamsWithErrors() : fitParams(),errors()
+    {
+    }
+
+    bool isValid() const { return fitParams::isValid() && errors.isValid();}
+
+    void setMoreUpsilon(bool more) { fitParams::setMoreUpsilon(more); errors.setMoreUpsilon(more); }
+
+    fitParams& getErrors() {return errors;}
+    const fitParams& getErrors() const {return errors;}
 
     void deserialize(serializer& ser);
 

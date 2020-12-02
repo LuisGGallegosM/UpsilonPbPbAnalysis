@@ -73,18 +73,27 @@ RooAbsReal* OniaMassFitter::fit()
     
 }
 
-fitParams OniaMassFitter::getFitParams()
+fitParamsWithErrors OniaMassFitter::getFitParams()
 {
-    fitParams output;
-    output.setNSig(nSig_Y1S.getVal());
+    fitParamsWithErrors output;
     output.setMoreUpsilon(false);
+    output.setNSig(nSig_Y1S.getVal());
     output.setNBkg(nBkg.getVal());
+    output.getErrors().setNSig(nSig_Y1S.getError());
+    output.getErrors().setNBkg(nBkg.getError());
     
     BkgParams bkgParams=bkg->getBkgParams();
     output.setBkgParams(bkgParams);
 
+    BkgParams bkgParamsError= bkg->getBkgParamsErrors();
+    output.getErrors().setBkgParams(bkgParamsError);
+
     dcbParam dcb = dcball1.getFitParams();
     output.setDCBParams(dcb);
+
+    dcbParam dcbErrors = dcball1.getFitParamsErrors();
+    output.getErrors().setDCBParams(dcbErrors);
+
     return output;
 }
 
@@ -100,11 +109,12 @@ OniaMassFitter2::OniaMassFitter2(TTree* tree_,const fitConfig* fitConf):
 {
 }
 
-fitParams OniaMassFitter2::getFitParams()
+fitParamsWithErrors OniaMassFitter2::getFitParams()
 {
-    fitParams output = OniaMassFitter::getFitParams();
-    output.setNSig(nSig_Y1S.getVal(),nSig_Y2S.getVal(),nSig_Y3S.getVal());
+    fitParamsWithErrors output = OniaMassFitter::getFitParams();
     output.setMoreUpsilon(true);
+    output.setNSig(nSig_Y1S.getVal(),nSig_Y2S.getVal(),nSig_Y3S.getVal());
+    output.getErrors().setNSig(nSig_Y1S.getError(),nSig_Y2S.getError(),nSig_Y3S.getError());
     return output;
 }
 
