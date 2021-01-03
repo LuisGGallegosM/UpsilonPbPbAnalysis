@@ -8,7 +8,7 @@ void drawPullText(RooHist* hist, RooFitResult* fitResults);
 
 TLegend* drawLegend(RooPlot* plot, bool bkgOn,bool moreUpsilon);
 
-RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,const drawConfig* config);
+RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const drawConfig* config);
 RooHist*  drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults,const drawConfig* config);
 
 void Drawing(const char* filename,const char* drawfilename, const char* configfilename, const char* cutfilename, const char* fitfilename)
@@ -52,7 +52,7 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
     CopyFile(configfilename, ReplaceExtension(drawfilename,".drawconf").data());
 
     RooRealVar* massVar = (RooRealVar*) (file.Get("mass"));
-    RooAbsReal* fittedFunc = (RooAbsReal*) (file.Get("dcb_fit"));
+    RooAbsPdf* fittedFunc = (RooAbsPdf*) (file.Get("dcb_fit"));
     RooDataSet* dataset = (RooDataSet*) (file.Get("dataset"));
     RooFitResult* fitResults = (RooFitResult*) (file.Get("fitresults"));
 
@@ -78,7 +78,12 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
 
         graph->cd();
         RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
-        setGraphStyle(graphPlot,&config,fParams.getNSigY1S(),isLog);
+        massVar->setVal(fParams.getMean());
+        int expected=fittedFunc->expectedEvents(*massVar);
+        float maxVal=expected*fittedFunc->getVal(*massVar);
+        massVar->setVal(config.fitConf.getMassHigh());
+        float minVal=expected*fittedFunc->getVal(*massVar);
+        setGraphStyle(graphPlot,&config,maxVal,minVal,isLog);
         drawLegend(graphPlot,config.fitConf.isBkgOn(),config.fitConf.isMoreUpsilon());
         drawGraphText(&fParams,&config);
 
@@ -134,7 +139,7 @@ int main(int argc, char **argv)
 
 //DRAW GRAPH
 
-RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsReal* fittedFunc,const drawConfig* config)
+RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const drawConfig* config)
 {
         //draw fitted and dataset function
     RooPlot* plot = var->frame(config->nBins);

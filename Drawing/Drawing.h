@@ -9,6 +9,7 @@
 #include "RooDataSet.h"
 #include "RooFitResult.h"
 #include "RooPlot.h"
+#include "RooAbsPdf.h"
 
 #include "TLegend.h"
 #include "TLatex.h"

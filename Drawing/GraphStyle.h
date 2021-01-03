@@ -6,7 +6,7 @@
 #include "RooPlot.h"
 #include "../Utils/Params.h"
 
-void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue  , bool isLog);
+void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue ,float bottomValue , bool isLog);
 void setPullStyle(RooPlot* pullPlot, const drawConfig* config);
 
 TPad* getStyledGraphPad(bool isLog);

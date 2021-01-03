@@ -3,24 +3,26 @@
 #include "GraphStyle.h"
 #include "TH1.h"
 
-void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue  , bool isLog)
+void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue, float bottomValue, bool isLog)
 {
     float massHigh = config->fitConf.getMassHigh();
     float massLow = config->fitConf.getMassLow();
     float div= (massHigh - massLow)/(config->nBins);
-    float maxValue = topValue;
-    float minValue = 0.0f;
+    float maxValue = topValue*div;
+    float minValue = bottomValue*div;
 
     //round to 
-    maxValue = ceil(maxValue/10000.0f)*10000.0;
+    maxValue = ceil(maxValue/1000.0f)*1000.0;
+    minValue = ceil(minValue);
     if (isLog)
     {
-        minValue = 10.0f;
-        maxValue *= 100;
+        minValue *= 0.05f;
+        maxValue *= 50.0f;
     }
     else
     {
-        maxValue *=0.15f;
+        minValue = 0.0f;
+        maxValue *=1.50f;
     }
 
     if (config->cut.isMC)
