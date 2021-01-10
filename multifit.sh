@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #directory where files are located
-WORKDIR="../rootfiles/merged_HiForestAOD_skimmed2"
+WORKDIR="../rootfiles/merged_HiForestAOD_skimmed3"
 #directory where to save multifit results, inside WORKDIR
 OUTDIR="output"
 
@@ -27,80 +27,52 @@ do
 done
 
 echo "saving files in '${OUTDIR}' directory"
+mkdir "${WORKDIR}/${OUTDIR}"
 
 #fitconf files to read
-CONFIGFILES=( \
- "merged_HiForestAOD_fit0.fitconf"\
- "merged_HiForestAOD_fit1.fitconf"\
- "merged_HiForestAOD_fit2.fitconf"\
- "merged_HiForestAOD_fit3.fitconf"\
- "merged_HiForestAOD_fit4.fitconf"\
- "merged_HiForestAOD_fit5.fitconf")
-
-INTEGRATEDCFILE="merged_HiForestAOD_fit_integrated.fitconf"
+CONFIGFILES=()
+ALLFITFILES=$(find ${WORKDIR} -name "*.fitconf")
+for i in $ALLFITFILES
+do
+    echo "reading fitconf file '${i}'"
+    CONFIGFILES=( ${CONFIGFILES[@]} $(basename $i) )
+done
 
 echo "fitting..."
 #do the fits
-if [ 1 = 1 ]
+if [ 0 = 1 ]
 then
-    #check if all fitconfig files exists
+    #do the fitting jobs
+    MAXJOBS=6
     for CONFIG in ${CONFIGFILES[@]}
     do
         FITFILE="${WORKDIR}/${CONFIG}"
-        echo "reading fit file '${FITFILE}'"
-        if [ ! -f "$FITFILE" ]
+        echo "fitting file: $CONFIG"
+        ./fit.sh "$SKIMFILE" "$FITFILE" "${WORKDIR}/${OUTDIR}/${CONFIG%.*}" &
+        JOBS=( $(jobs -p) )
+        JOBNUM="${#JOBS[@]}"
+        if [ $MAXJOBS = $JOBNUM ]
         then
-            echo "Error: ${FITFILE} file does not exists!"
-            exit 1
+            wait -n
         fi
     done
-
-    #do the fitting jobs
-    JOBS=()
-
-    for CONFIG in ${CONFIGFILES[@]}
-    do
-        FITFILE="${WORKDIR}/${CONFIG}"
-        ./fit.sh "$SKIMFILE" "$FITFILE" "${WORKDIR}/${OUTDIR}/${CONFIG%.*}" &
-        JOBS=( "${JOBS[@]}" "$!" )
-    done
-
-    #wait for all jobs to complete
-    for JOB in ${JOBS[@]}
-    do
-        wait $JOB
-    done
-fi
-
-if [ 1 = 1 ]
-then
-    ./fit.sh "$SKIMFILE" "${WORKDIR}/${INTEGRATEDCFILE}" "${WORKDIR}/${OUTDIR}/${INTEGRATEDCFILE%.*}"
+    wait
 fi
 
 echo "all fits done"
 
+#do comparation drawing
 if [ 1 = 1 ]
 then
-    echo "multiple drawing"
-    #do fit comparison drawings
-    NAME="${WORKDIR}/${OUTDIR}/merged_HiForestAOD_fit.pdf"
-
-    FITFILENAMES=()
-    for CONFIG in ${CONFIGFILES[@]}
+    echo "starting comparative drawings"
+    COMPCONFFILES=$(find ${WORKDIR} -name "*.drawcomp")
+    for COMP in $COMPCONFFILES
     do
-        OUTPUTFILE="${WORKDIR}/${OUTDIR}/${CONFIG%.*}/${CONFIG%.*}.fit"
-        echo "reading fit result file '${OUTPUTFILE}'"
-
-        if [ ! -f ${OUTPUTFILE} ]
-        then
-            echo "Error: ${OUTPUTFILE} does not exists!"
-            exit 1
-        fi
-
-        FITFILENAMES=( ${FITFILENAMES[@]} $OUTPUTFILE)
+        COMPFILES=$( cat ${COMP} )
+        COMPNAME=$( basename ${COMP} )
+        echo "reading file: $COMPNAME"
+        ./multidraw.sh "${WORKDIR}/${OUTDIR}" "${WORKDIR}/${OUTDIR}/${COMPNAME%.*}" "${COMPFILES[@]}"
     done
-
-    ./Drawing/draw -m $NAME "${FITFILENAMES[@]}" > "${NAME%.*}_Drawing.log" 2>&1 
 fi
 
 echo "all done"

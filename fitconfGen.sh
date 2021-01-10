@@ -1,22 +1,25 @@
 #!/bin/bash
 
-OUTDIR="../rootfiles/merged_HiForestAOD_skimmed2"
+OUTDIR="../rootfiles/merged_HiForestAOD_skimmed3"
 BASENAME="merged_HiForestAOD_fit"
 
-pt=( 0.0 2.0 4.0 6.0 9.0 12.0 30.0 )
-BKGTYPE=( "special" "special" "special" "special" "exponential" "exponential")
+ptLow=(   0.0 0.0 2.0 4.0 6.0  9.0 12.0 0.0 4.0  9.0 0.0  6.0)
+ptHigh=( 30.0 2.0 4.0 6.0 9.0 12.0 30.0 4.0 9.0 30.0 6.0 30.0)
+BKGTYPE=( "special" "special" "special" "special" "special"\
+ "exponential" "exponential" "special" "special" "exponential"\
+ "special" "exponential" )
 MOREUPSILON="true"
 
 echo "generating fit configuration files in directory ${OUTDIR}:"
 #
-num=$((${#pt[@]} -2 ))
+num=$((${#ptLow[@]} -1 ))
  
 for i in $(seq 0 $num )
 do
     OUTPUT="massHigh = 11.0\n"
     OUTPUT+="massLow = 8.0\n"
-    OUTPUT+="cut.ptLow = ${pt[$i]}\n"
-    OUTPUT+="cut.ptHigh = ${pt[ $(($i+1)) ]}\n"
+    OUTPUT+="cut.ptLow = ${ptLow[$i]}\n"
+    OUTPUT+="cut.ptHigh = ${ptHigh[$i]}\n"
     OUTPUT+="cut.yLow = 0.0\n"
     OUTPUT+="cut.yHigh = 2.4\n"
     OUTPUT+="initialValues.moreUpsilon = ${MOREUPSILON}\n"
