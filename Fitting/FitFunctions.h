@@ -16,25 +16,24 @@
 #define S1_MEAN_MAX     (9.56f)
 #define S1_MEAN_MIN     (9.36f)
 
-#define S1_SIGMA_MAX    (0.40f)
+#define S1_SIGMA_MAX    (0.60f)
 #define S1_SIGMA_MIN    (0.01f)
 
 #define S1_ALPHA_MAX    (5.50f)
 #define S1_ALPHA_MIN    (0.50f)
 
-#define S1_N_MAX        (12.00f)
+#define S1_N_MAX        (10.00f)
 #define S1_N_MIN        (0.05f)
 
 #define S1_CH4_MAX      (4.0f)
 #define S1_CH4_MIN      (-4.0f)
 
-#define S1_NSIG_MAX     (2000000.0f)
-#define S1_NBKG_MAX     (200000.0f)
+#define S1_NSIG_MAX     (10000000.0f)
+#define S1_NBKG_MAX     (1000000.0f)
 
-#define BKG_LAMBDA_MAX (35.0f)
-#define BKG_SIGMA_MAX  (35.0f)
-#define BKG_MU_MAX     (35.0f)
-
+#define BKG_LAMBDA_MAX (30.0f)
+#define BKG_SIGMA_MAX  (4.0f)
+#define BKG_MU_MAX     (20.0f)
 
 #define RATIO_Y2S (10.023/9.460)
 #define RATIO_Y3S (10.355/9.460)

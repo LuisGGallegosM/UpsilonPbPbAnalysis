@@ -27,6 +27,3 @@ cd ..
 else
 ./Fitting/fit "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}" > "${LOGFILE}" 2>&1
 fi
-
-#also execute drawing
-./draw.sh "${OUTPUTFILE}" "${DRAWCONFIG}"

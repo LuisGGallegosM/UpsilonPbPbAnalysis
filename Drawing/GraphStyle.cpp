@@ -12,17 +12,17 @@ void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue, floa
     float minValue = bottomValue*div;
 
     //round to 
-    maxValue = ceil(maxValue/1000.0f)*1000.0;
+    maxValue = ceil(maxValue/1000.0f)*1000.0+1000.0f;
     minValue = ceil(minValue);
     if (isLog)
     {
-        minValue *= 0.05f;
+        minValue *= 0.7f;
         maxValue *= 50.0f;
     }
     else
     {
         minValue = 0.0f;
-        maxValue *=1.50f;
+        maxValue *=2.00f;
     }
 
     if (config->cut.isMC)

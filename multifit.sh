@@ -31,17 +31,17 @@ mkdir "${WORKDIR}/${OUTDIR}"
 
 #fitconf files to read
 CONFIGFILES=()
-ALLFITFILES=$(find ${WORKDIR} -name "*.fitconf")
+ALLFITFILES=$(find ${WORKDIR} -maxdepth 1 -name "*.fitconf")
 for i in $ALLFITFILES
 do
     echo "reading fitconf file '${i}'"
     CONFIGFILES=( ${CONFIGFILES[@]} $(basename $i) )
 done
 
-echo "fitting..."
 #do the fits
-if [ 0 = 1 ]
+if [ 1 = 1 ]
 then
+    echo "fitting..."
     #do the fitting jobs
     MAXJOBS=6
     for CONFIG in ${CONFIGFILES[@]}
@@ -57,14 +57,28 @@ then
         fi
     done
     wait
+    echo "all fits done"
 fi
 
-echo "all fits done"
+#draw graphs
+if [ 1 = 1 ]
+then
+    #execute drawing
+    echo "generating drawings"
+    echo "reading drawing configuration file: ${DRAWCONFIG}"
+    for CONFIG in ${CONFIGFILES[@]}
+    do
+    NAME=${CONFIG%.*}
+    ROOTFILEDRAW="${WORKDIR}/${OUTDIR}/${NAME}/${NAME}.root"
+    echo "drawing ${ROOTFILEDRAW}"
+    ./draw.sh "${ROOTFILEDRAW}" "${DRAWCONFIG}"
+    done
+fi
 
 #do comparation drawing
 if [ 1 = 1 ]
 then
-    echo "starting comparative drawings"
+    echo "starting comparative drawings..."
     COMPCONFFILES=$(find ${WORKDIR} -name "*.drawcomp")
     for COMP in $COMPCONFFILES
     do

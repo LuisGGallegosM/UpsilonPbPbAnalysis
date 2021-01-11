@@ -78,11 +78,8 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
 
         graph->cd();
         RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
-        massVar->setVal(fParams.getMean());
-        int expected=fittedFunc->expectedEvents(*massVar);
-        float maxVal=expected*fittedFunc->getVal(*massVar);
-        massVar->setVal(config.fitConf.getMassHigh());
-        float minVal=expected*fittedFunc->getVal(*massVar);
+        float maxVal=fParams.getNSigY1S()/( fParams.getSigma() * 1.4142*1.7724 );
+        float minVal=fParams.getNBkg()/( config.fitConf.getMassHigh() - config.fitConf.getMassLow() );
         setGraphStyle(graphPlot,&config,maxVal,minVal,isLog);
         drawLegend(graphPlot,config.fitConf.isBkgOn(),config.fitConf.isMoreUpsilon());
         drawGraphText(&fParams,&config);

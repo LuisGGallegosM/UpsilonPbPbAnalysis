@@ -2,13 +2,14 @@
 
 CLING="NO"
 
+WORKDIR="merged_HiForestAOD_skimmed3"
 #file path to root fit file for drawing
-INPUT=${1:-"../rootfiles/merged_HiForestAOD_MC_skimmed2/merged_HiForestAOD_fit0/merged_HiForestAOD_fit0.root"}
+INPUT=${1:-"../rootfiles/${WORKDIR}/output/merged_HiForestAOD_fit0/merged_HiForestAOD_fit0.root"}
 
 #graphics outputfile named same as input file but with .pdf extension
 OUTPUT="${INPUT%.*}.pdf"
 #path to draw configuration file
-DRAWFILE=${2:-"../rootfiles/merged_HiForestAOD_MC_skimmed2/merged_HiForestAOD_MC_skimmed2.drawconf"}
+DRAWFILE=${2:-"../rootfiles/${WORKDIR}/${WORKDIR}.drawconf"}
 #path to cut file, one folder up from INPUT file location
 CUTFILE="${INPUT%.*}.cutconf"
 #path to fit configuration file, it has same name as input but with .fitconf extension
