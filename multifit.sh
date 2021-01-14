@@ -17,6 +17,9 @@ echo "reading skim file '${SKIMFILE}'"
 echo "reading draw configuration file '${DRAWCONFIG}'"
 echo "reading cut file '${CUTCONFIG}'"
 
+echo "generating fitconf files..."
+./fitconfGen.sh
+
 for F in "$SKIMFILE" "$DRAWCONFIG" "$CUTCONFIG"
 do
     if [ ! -f "$F" ]
@@ -37,6 +40,10 @@ do
     echo "reading fitconf file '${i}'"
     CONFIGFILES=( ${CONFIGFILES[@]} $(basename $i) )
 done
+
+echo "write a comment:"
+read
+printf "$REPLY" > "${WORKDIR}/${OUTDIR}/readme.txt"
 
 #do the fits
 if [ 1 = 1 ]

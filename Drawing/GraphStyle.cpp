@@ -26,9 +26,9 @@ void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue, floa
     }
 
     if (config->cut.isMC)
-        plot->SetTitle("#varUpsilon(1S) MC ( 5.02 TeV)");
+        plot->SetTitle(" ");
     else
-        plot->SetTitle("#varUpsilon(1S) ( 5.02 TeV)");
+        plot->SetTitle(" ");
     plot->SetFillStyle(4000);
     plot->SetMarkerStyle(2);
     plot->SetMarkerSize(0.01);
