@@ -2,12 +2,13 @@
 
 CLING="NO"
 DEFAULTNAME="merged_HiForestAOD_skimmed3"
+DEFAULTFITFILE="merged_HiForestAOD_fit1"
 #root file to fit from
 INPUTFILE="${1:-../rootfiles/${DEFAULTNAME}/${DEFAULTNAME}.root}"
 #fit configuration file name
-CONFIG="${2:-../rootfiles/${DEFAULTNAME}/merged_HiForestAOD_fit0.fitconf}"
+CONFIG="${2:-../rootfiles/${DEFAULTNAME}/${DEFAULTFITFILE}.fitconf}"
 #directory where to save all files
-OUTPUTDIR="${3:-../rootfiles/${DEFAULTNAME}/merged_HiForestAOD_fit0}"
+OUTPUTDIR="${3:-../rootfiles/${DEFAULTNAME}/${DEFAULTFITFILE}}"
 
 #draw configuration file name, must have same name as INPUTFILE but with drawconf extension
 DRAWCONFIG="${INPUTFILE%.*}.drawconf"

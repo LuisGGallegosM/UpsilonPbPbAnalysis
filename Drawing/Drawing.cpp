@@ -144,9 +144,9 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,
 
     if (config->fitConf.isMoreUpsilon())
     {
-        fittedFunc->plotOn(plot,Name("dcb1"),Components("dcb_Y1S,bkg"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
-        fittedFunc->plotOn(plot,Name("dcb2"),Components("dcb_Y2S,bkg"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
-        fittedFunc->plotOn(plot,Name("dcb3"),Components("dcb_Y3S,bkg"),LineStyle(7),LineColor(kMagenta+2),Normalization(1.0,RooAbsReal::RelativeExpected));
+        fittedFunc->plotOn(plot,Name("dcb1"),Components("dcb_Y1S"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
+        fittedFunc->plotOn(plot,Name("dcb2"),Components("dcb_Y2S"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
+        fittedFunc->plotOn(plot,Name("dcb3"),Components("dcb_Y3S"),LineStyle(7),LineColor(kMagenta+2),Normalization(1.0,RooAbsReal::RelativeExpected));
     }
     else
     {

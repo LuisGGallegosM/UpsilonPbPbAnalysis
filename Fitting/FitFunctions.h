@@ -22,7 +22,7 @@
 #define S1_ALPHA_MAX    (5.50f)
 #define S1_ALPHA_MIN    (0.50f)
 
-#define S1_N_MAX        (10.00f)
+#define S1_N_MAX        (15.00f)
 #define S1_N_MIN        (0.05f)
 
 #define S1_CH4_MAX      (4.0f)

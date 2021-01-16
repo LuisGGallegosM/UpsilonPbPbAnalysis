@@ -143,7 +143,7 @@ void drawCompGraph(fitGetter func, const std::vector<FitElement>& fits,TH1F* gra
     for (const auto& fit : fits)
     {
         float value = (fit.fits.*func)();
-        if (value < 0.0f) continue;
+        if (value == -1.0f) continue;
         float pt =0.5f*(fit.configs.getCut()->getPtHigh() + fit.configs.getCut()->getPtLow());
         graph->Fill(pt,value);
         graph->SetBinError(i+1,(fit.fits.getErrors().*func)());
