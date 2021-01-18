@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #directory where files are located
-WORKDIR="../rootfiles/merged_HiForestAOD_skimmed3"
+WORKDIR="../rootfiles/merged_HiForestAOD_skimmed4"
 #directory where to save multifit results, inside WORKDIR
 OUTDIR="output"
 
@@ -18,7 +18,7 @@ echo "reading draw configuration file '${DRAWCONFIG}'"
 echo "reading cut file '${CUTCONFIG}'"
 
 echo "generating fitconf files..."
-./fitconfGen.sh
+./fitconfGen.sh "$WORKDIR"
 
 for F in "$SKIMFILE" "$DRAWCONFIG" "$CUTCONFIG"
 do

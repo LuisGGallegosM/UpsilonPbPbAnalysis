@@ -4,14 +4,17 @@
 
 //Crystal ball member functions.
 
-CrystalBall::CrystalBall(RooRealVar& var, const char* name, const dcbParam* initial):
+CrystalBall::CrystalBall(RooRealVar& var, const char* name, const dcbParam* initial,bool fixAlpha, bool fixN):
     mean(   Form("mean_%s",name),"mean of gaussian PDF",initial->getMean(),S1_MEAN_MIN,S1_MEAN_MAX),
     sigma(  Form("sigma_%s",name),"width of gaussian",initial->getSigma(), S1_SIGMA_MIN, S1_SIGMA_MAX),
     alpha(  Form("alpha_%s",name),"tail shift", initial->getAlpha(),S1_ALPHA_MIN,S1_ALPHA_MAX),
     n(      Form("n_%s",name),"power order",initial->getN(), S1_N_MIN, S1_N_MAX),
     cBall(  Form("cball_%s",name),"crystalBall",var,mean,sigma,alpha,n)
 {
-
+    if (fixAlpha)
+        alpha.setConstant(kTRUE);
+    if (fixN)
+        n.setConstant(kTRUE);
 }
 
 RooCBShape* CrystalBall::getCB()
@@ -21,8 +24,8 @@ RooCBShape* CrystalBall::getCB()
 
 //Double CrystalBall
 
-DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial):
-    CrystalBall(var,Form("%s_1",name),initial),
+DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial,bool fixAlpha, bool fixN):
+    CrystalBall(var,Form("%s_1",name),initial,fixAlpha,fixN),
     mean_2(   Form("mean_%s_2",name), "1.0*@0",RooArgList(mean)),
     x(        Form("x_%s",name),"sigma ratio",initial->getX(),0.0f,1.0f),
     sigma_2(  Form("sigma_%s_2",name),"@0*@1",RooArgList(x,sigma)),

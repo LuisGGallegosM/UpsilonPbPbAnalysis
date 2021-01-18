@@ -23,7 +23,7 @@ class dcbParam
 
     bool isValid() const
     {
-        return (mean>0.0f) && (alpha>0.0f) && (n>0.0f) && (sigma>0.0f) && (x>0.0f) && (f>0.0f);
+        return (mean>=0.0f) && (alpha>=0.0f) && (n>=0.0f) && (sigma>=0.0f) && (x>=0.0f) && (f>=0.0f);
     }
 
     void setParams(float mean_,float alpha_,float n_,float sigma_, float x_, float f_);
@@ -265,9 +265,12 @@ class fitConfig
     kinecutParams cut;
     fitParams initialValues;
 
+    bool fixAlpha;
+    bool fixN;
+
     public:
 
-    fitConfig(): massLow(-1.0f), massHigh(-1.0f), cut(), initialValues()
+    fitConfig(): massLow(-1.0f), massHigh(-1.0f), cut(), initialValues(), fixAlpha(false),fixN(false)
     {
     }
 
@@ -275,6 +278,8 @@ class fitConfig
     bool isMoreUpsilon() const {return initialValues.isMoreUpsilon();}
     float getMassLow() const {return massLow;}
     float getMassHigh() const {return massHigh;}
+    bool getFixAlpha() const {return fixAlpha;}
+    bool getFixN() const {return fixN;}
     const kinecutParams* getCut() const {return &cut;}
     const fitParams* getInitValues() const {return &initialValues;}
     BkgParams::BkgType getBkgType() const {return initialValues.getBkgType();}

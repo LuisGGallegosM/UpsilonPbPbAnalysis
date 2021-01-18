@@ -274,6 +274,11 @@
         ser.addPrefix("initialValues");
         initialValues.deserialize(ser);
         ser.removePrefix();
+
+        ser.addPrefix("fix.dcb");
+        ser.read("alpha",fixAlpha);
+        ser.read("n",fixN);
+        ser.removePrefix();
     }
 
 //drawConfig

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-OUTDIR="../rootfiles/merged_HiForestAOD_skimmed3"
+OUTDIR=${1:-"../rootfiles/merged_HiForestAOD_MC_skimmed4"}
 BASENAME="merged_HiForestAOD_fit"
 
-MULTIFITFILE=$( find $OUTDIR -name "*.multifit")
+MULTIFITFILE=$( find $OUTDIR -name "*.multifit" )
 
 ptLow=()
 ptHigh=()
@@ -25,15 +25,17 @@ NSIG1S=${CONF[26]}
 NSIG2S=${CONF[29]}
 NSIG3S=${CONF[32]}
 NBKG=${CONF[35]}
+FIXALPHA=${CONF[38]}
+FIXN=${CONF[41]}
 
-for i in $( seq 42 6 $((${#CONF[@]} - 1 )))
+for i in $( seq 48 6 $((${#CONF[@]} - 1 )))
 do
     ptLow=( ${ptLow[@]} ${CONF[$i]} )
     ptHigh=( ${ptHigh[@]} ${CONF[$(($i + 1 ))]} )
     BKGTYPE=( ${BKGTYPE[@]} ${CONF[$(($i + 2 ))]} )
     initialN=( ${initialN[@]} ${CONF[$(($i + 3 ))]} )
     initialAlpha=( ${initialAlpha[@]} ${CONF[$(($i + 4 ))]} )
-    initialSigma=( ${initialSigma[@]} ${CONF[$(($i + 5 ))]})
+    initialSigma=( ${initialSigma[@]} ${CONF[$(($i + 5 ))]} )
 done
 
 echo "generating fit configuration files in directory ${OUTDIR}:"
@@ -74,8 +76,9 @@ do
             OUTPUT+="initialValues.bkg.lambda = ${LAMBDA_BKG}\n"
         ;;
         *)
-            echo "incorrect bkgType"
-            exit 1
+            echo "incorrect bkgType in ${OUTDIR}/${BASENAME}${i}.fitconf"
+            echo "bkgType= ${BKGTYPE[$i]}"
+            exit
         ;;
     esac
 
@@ -85,6 +88,8 @@ do
     OUTPUT+="initialValues.dcb.sigma = ${initialSigma[$i]}\n"
     OUTPUT+="initialValues.dcb.x = 0.5\n"
     OUTPUT+="initialValues.dcb.f = 0.5\n"
+    OUTPUT+="fix.dcb.alpha = ${FIXALPHA}\n"
+    OUTPUT+="fix.dcb.n = ${FIXN}\n"
 
     FILENAME="${OUTDIR}/${BASENAME}${i}.fitconf"
 

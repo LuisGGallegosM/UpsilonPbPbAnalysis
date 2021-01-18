@@ -14,7 +14,7 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const fitConfig* fitConf):
     nSig_Y1S("nSig_Y1S","Upsilon Signal",config.getInitValues()->getNSigY1S(), 0.0f, S1_NSIG_MAX),
     nBkg("nBkg","Bkg signal",config.getInitValues()->getNBkg(), 0.0f, S1_NBKG_MAX),
     mass("mass","onia mass",config.getMassLow(),config.getMassHigh(),"GeV/c^{2}"),
-    dcball1(mass,"Y1S",config.getInitValues()->getDCBParams()),
+    dcball1(mass,"Y1S",config.getInitValues()->getDCBParams(),fitConf->getFixAlpha(),fitConf->getFixN()),
     bkg()
 {
     BkgFunc* b =BkgFactory(mass,config);

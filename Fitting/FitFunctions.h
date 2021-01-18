@@ -114,7 +114,7 @@ class CrystalBall
      * @param var observable variable in x axis.
      * @param name a unique name to identify this crystal ball and its variables.
      */
-    CrystalBall(RooRealVar& var, const char* name, const dcbParam* initial);
+    CrystalBall(RooRealVar& var, const char* name, const dcbParam* initial,bool fixAlpha, bool fixN);
 
     /**
      * @brief Get the crystal ball function.
@@ -164,7 +164,7 @@ class DoubleCrystalBall : public CrystalBall
     RooAddPdf dcball;
 
     public:
-    DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial);
+    DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial,bool fixAlpha, bool fixN);
 
     //getters
     RooAbsPdf* getDCB() {return &dcball;}

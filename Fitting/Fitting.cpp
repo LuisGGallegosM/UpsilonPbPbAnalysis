@@ -65,9 +65,10 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     RooAbsReal* fittedFunc = massFitter->fit();
     
     fitParamsWithErrors fParams = massFitter->getFitParams();
-    assert(fParams.isValid());
 
     fParams.serialize(ReplaceExtension(outfilename,".fit").data());
+
+     assert(fParams.isValid());
 
     massFitter->getResults()->Print();
 
