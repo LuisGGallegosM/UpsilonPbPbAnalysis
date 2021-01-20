@@ -2,8 +2,8 @@
 
 CLING="NO"
 
-WORKDIR="merged_HiForestAOD_skimmed3"
-DEFAULTFILE="merged_HiForestAOD_fit1"
+WORKDIR="merged_HiForestAOD_skimmed4"
+DEFAULTFILE="merged_HiForestAOD_fit6"
 #file path to root fit file for drawing
 INPUT=${1:-"../rootfiles/${WORKDIR}/${DEFAULTFILE}/${DEFAULTFILE}.root"}
 #path to draw configuration file

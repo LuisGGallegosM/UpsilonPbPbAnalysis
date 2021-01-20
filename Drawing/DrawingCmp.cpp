@@ -20,7 +20,7 @@ struct fitVal
     float error;
 };
 
-typedef float (fitParams::*fitGetter)() const;
+typedef float (fitParamsNoLimits::*fitGetter)() const;
 
 struct toGet
 {

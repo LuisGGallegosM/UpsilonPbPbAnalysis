@@ -156,69 +156,99 @@
         return true;
     }
 
+//fitParamsNoLimits
+
+void fitParamsNoLimits::deserialize(serializer& ser)
+{
+    extParam.deserialize(ser);
+
+    ser.addPrefix("dcb");
+    dcb.deserialize(ser);
+    ser.removePrefix();
+
+    ser.addPrefix("bkg");
+    bkg.deserialize(ser);
+    ser.removePrefix();
+}
+
+void fitParamsNoLimits::serialize(serializer& ser) const
+{
+    extParam.serialize(ser);
+
+    ser.addPrefix("dcb");
+    dcb.serialize(ser);
+    ser.removePrefix();
+
+    ser.addPrefix("bkg");
+    bkg.serialize(ser);
+    ser.removePrefix();
+}
+
 //fitParams
 
-    void fitParams::deserialize(serializer& ser)
-    {
-        extParam.deserialize(ser);
-        ser.addPrefix("dcb");
-        dcb.deserialize(ser);
-        ser.removePrefix();
+void fitParams::deserialize(serializer& ser)
+{
+    fitParamsNoLimits::deserialize(ser);
 
-        ser.addPrefix("bkg");
-        bkg.deserialize(ser);
-        ser.removePrefix();
-    }
+    ser.addPrefix("limits.high");
+    high.deserialize(ser);
+    ser.removePrefix();
 
-    void fitParams::deserialize(const std::string& filename)
-    {
-        serializer ser(filename);
-        deserialize(ser);
-    }
+    ser.addPrefix("limits.low");
+    low.deserialize(ser);
+    ser.removePrefix();
+}
 
-    void fitParams::serialize(const std::string& filename) const
-    {
-        serializer ser(filename,serializer::iotype::write);
-        serialize(ser);
-    }
+void fitParams::deserialize(const std::string& filename)
+{
+    serializer ser(filename);
+    deserialize(ser);
+}
 
-    void fitParams::serialize(serializer& ser) const
-    {
-        extParam.serialize(ser);
+void fitParams::serialize(const std::string& filename) const
+{
+    serializer ser(filename,serializer::iotype::write);
+    serialize(ser);
+}
 
-        ser.addPrefix("dcb");
-        dcb.serialize(ser);
-        ser.removePrefix();
+void fitParams::serialize(serializer& ser) const
+{
+    fitParamsNoLimits::serialize(ser);
 
-        ser.addPrefix("bkg");
-        bkg.serialize(ser);
-        ser.removePrefix();
-    }
+    ser.addPrefix("limits.high");
+    high.serialize(ser);
+    ser.removePrefix();
+
+    ser.addPrefix("limits.low");
+    low.serialize(ser);
+    ser.removePrefix();
+}
 
 //fitParamsWithErrors
-    void fitParamsWithErrors::deserialize(serializer& ser)
-    {
-        fitParams::deserialize(ser);
-        ser.addPrefix("error");
-        errors.deserialize(ser);
-        ser.removePrefix();
-    }
+void fitParamsWithErrors::deserialize(serializer& ser)
+{
+    fitParams::deserialize(ser);
 
-    void fitParamsWithErrors::deserialize(const std::string& filename)
-    {
-        serializer ser(filename);
-        deserialize(ser);
-    }
+    ser.addPrefix("error");
+    errors.deserialize(ser);
+    ser.removePrefix();
+}
 
-    void fitParamsWithErrors::serialize(const std::string& filename) const
-    {
-        serializer ser(filename,serializer::iotype::write);
-        fitParams::serialize(ser);
+void fitParamsWithErrors::deserialize(const std::string& filename)
+{
+    serializer ser(filename);
+    deserialize(ser);
+}
 
-        ser.addPrefix("error");
-        errors.serialize(ser);
-        ser.removePrefix();
-    }
+void fitParamsWithErrors::serialize(const std::string& filename) const
+{
+    serializer ser(filename,serializer::iotype::write);
+    fitParams::serialize(ser);
+
+    ser.addPrefix("error");
+    errors.serialize(ser);
+    ser.removePrefix();
+}
 
 
 //kinecutParams

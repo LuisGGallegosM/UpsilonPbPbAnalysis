@@ -1,8 +1,8 @@
 #!/bin/bash
 
 CLING="NO"
-DEFAULTNAME="merged_HiForestAOD_skimmed3"
-DEFAULTFITFILE="merged_HiForestAOD_fit1"
+DEFAULTNAME="merged_HiForestAOD_skimmed4"
+DEFAULTFITFILE="merged_HiForestAOD_fit6"
 #root file to fit from
 INPUTFILE="${1:-../rootfiles/${DEFAULTNAME}/${DEFAULTNAME}.root}"
 #fit configuration file name

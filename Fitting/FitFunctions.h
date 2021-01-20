@@ -44,6 +44,8 @@ class BkgFunc
     virtual RooAbsReal* getFunc() { throw std::runtime_error("Error: accesing no bkg funcion"); }
     virtual BkgParams getBkgParams();
     virtual BkgParams getBkgParamsErrors();
+    virtual BkgParams getBkgParamsHigh();
+    virtual BkgParams getBkgParamsLow();
 };
 
 class Chevychev2 : public BkgFunc
@@ -53,7 +55,7 @@ class Chevychev2 : public BkgFunc
     RooChebychev chev;
 
     public:
-    Chevychev2(RooRealVar& var,const char* name,float k1, float k2);
+    Chevychev2(RooRealVar& var,const char* name,float* k, float* low, float* high);
 
     //getters
     RooAbsReal* getFunc() override {return &chev;}
@@ -61,6 +63,8 @@ class Chevychev2 : public BkgFunc
     RooRealVar* getCh4_k2() {return &ch4_k2;}
     BkgParams getBkgParams() override;
     BkgParams getBkgParamsErrors() override;
+    BkgParams getBkgParamsHigh() override;
+    BkgParams getBkgParamsLow() override;
 };
 
 class SpecialBkg : public BkgFunc
@@ -70,7 +74,7 @@ class SpecialBkg : public BkgFunc
     RooRealVar lambda;
     std::unique_ptr<RooGenericPdf> bkgPdf;
     public:
-    SpecialBkg(RooRealVar& var,const char* name,float mu,float sigma, float lambda);
+    SpecialBkg(RooRealVar& var,const char* name,float* initial,float* low, float* high);
 
     //getters
     RooAbsReal* getFunc() override {return bkgPdf.get();}
@@ -79,6 +83,8 @@ class SpecialBkg : public BkgFunc
     RooRealVar* getLambda() {return &lambda;}
     BkgParams getBkgParams() override;
     BkgParams getBkgParamsErrors() override;
+    BkgParams getBkgParamsHigh() override;
+    BkgParams getBkgParamsLow() override;
 };
 
 class ExponentialBkg : public BkgFunc
@@ -86,12 +92,14 @@ class ExponentialBkg : public BkgFunc
     RooRealVar lambda;
     std::unique_ptr<RooGenericPdf> bkgPdf;
     public:
-    ExponentialBkg(RooRealVar& var,const char* name,float lambda);
+    ExponentialBkg(RooRealVar& var,const char* name,float* initial,float* low, float* high);
 
     RooAbsReal* getFunc() override {return bkgPdf.get();}
     RooRealVar* getLambda() {return &lambda;}
     BkgParams getBkgParams() override;
     BkgParams getBkgParamsErrors() override;
+    BkgParams getBkgParamsHigh() override;
+    BkgParams getBkgParamsLow() override;
 };
 
 class CrystalBall
@@ -114,7 +122,7 @@ class CrystalBall
      * @param var observable variable in x axis.
      * @param name a unique name to identify this crystal ball and its variables.
      */
-    CrystalBall(RooRealVar& var, const char* name, const dcbParam* initial,bool fixAlpha, bool fixN);
+    CrystalBall(RooRealVar& var, const char* name, const dcbParam* initial, const dcbParam* low, const dcbParam* high,bool fixAlpha, bool fixN);
 
     /**
      * @brief Get the crystal ball function.
@@ -164,12 +172,14 @@ class DoubleCrystalBall : public CrystalBall
     RooAddPdf dcball;
 
     public:
-    DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial,bool fixAlpha, bool fixN);
+    DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial, const dcbParam* low, const dcbParam* high,bool fixAlpha, bool fixN);
 
     //getters
     RooAbsPdf* getDCB() {return &dcball;}
     dcbParam getFitParams() const;
     dcbParam getFitParamsErrors() const;
+    dcbParam getFitParamsHigh() const;
+    dcbParam getFitParamsLow() const;
     void getFitParamsErrors(dcbParam* params);
 
     friend class DoubleCrystalBallSlave;

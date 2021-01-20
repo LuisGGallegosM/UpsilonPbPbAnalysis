@@ -117,16 +117,14 @@ class externParams
 
 };
 
-class fitParams
+class fitParamsNoLimits
 {
     dcbParam dcb;
     externParams extParam;
     BkgParams bkg;
 
     public:
-    fitParams() : dcb(),extParam(), bkg()
-    {
-    }
+    fitParamsNoLimits() : dcb(),extParam(), bkg() {}
 
     bool isValid() const { return bkg.isValid() && dcb.isValid() && extParam.isValid();}
 
@@ -159,20 +157,40 @@ class fitParams
     float getSigma() const {return dcb.getSigma();}
     float getX() const {return dcb.getX();}
     float getMean() const {return dcb.getMean();}
-    
 
     void deserialize(serializer& ser);
 
+    void serialize(serializer& ser) const;
+};
+
+class fitParams : public fitParamsNoLimits
+{
+    fitParamsNoLimits low;
+    fitParamsNoLimits high;
+
+    public:
+    fitParams() : fitParamsNoLimits(), low(), high()
+    {
+    }
+
+    bool isValid() const { return fitParamsNoLimits::isValid() && low.isValid() && high.isValid();}
+    
+    const fitParamsNoLimits& getHighLimit() const {return high;}
+    const fitParamsNoLimits& getLowLimit() const {return low;}
+
+    fitParamsNoLimits& getHighLimit() {return high;}
+    fitParamsNoLimits& getLowLimit() {return low;}
+
+    void deserialize(serializer& ser);
     void deserialize(const std::string& filename);
 
     void serialize(const std::string& filename) const;
-
     void serialize(serializer& ser) const;
 };
 
 class fitParamsWithErrors : public fitParams
 {
-    fitParams errors;
+    fitParamsNoLimits errors;
 
     public:
     fitParamsWithErrors() : fitParams(),errors()
@@ -183,11 +201,10 @@ class fitParamsWithErrors : public fitParams
 
     void setMoreUpsilon(bool more) { fitParams::setMoreUpsilon(more); errors.setMoreUpsilon(more); }
 
-    fitParams& getErrors() {return errors;}
-    const fitParams& getErrors() const {return errors;}
+    fitParamsNoLimits& getErrors() {return errors;}
+    const fitParamsNoLimits& getErrors() const {return errors;}
 
     void deserialize(serializer& ser);
-
     void deserialize(const std::string& filename);
 
     void serialize(const std::string& filename) const;
