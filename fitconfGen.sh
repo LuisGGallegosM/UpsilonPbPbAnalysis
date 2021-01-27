@@ -91,7 +91,7 @@ do
         "special")
             OUTPUT+="initialValues.bkg.mu = ${MU_BKG}\n"
             OUTPUT+="initialValues.limits.low.bkg.mu = 0.0\n"
-            OUTPUT+="initialValues.limits.high.bkg.mu = 20.0\n"
+            OUTPUT+="initialValues.limits.high.bkg.mu = 30.0\n"
 
             OUTPUT+="initialValues.bkg.sigma = ${SIGMA_BKG}\n"
             OUTPUT+="initialValues.limits.low.bkg.sigma = 0.0\n"

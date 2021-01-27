@@ -35,9 +35,6 @@
 #define BKG_SIGMA_MAX  (4.0f)
 #define BKG_MU_MAX     (20.0f)
 
-#define RATIO_Y2S (10.023/9.460)
-#define RATIO_Y3S (10.355/9.460)
-
 class BkgFunc
 {
     public:

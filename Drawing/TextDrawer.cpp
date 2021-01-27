@@ -2,7 +2,7 @@
 
 TextDrawer::TextDrawer(float pos_x,float pox_y, float fontSize) :
     pos_text_x(pos_x), pos_text_y(pox_y),
-    pos_y_diff(0.07), text_size(fontSize),
+    pos_y_diff(0.055), text_size(fontSize),
     text_color(1),lines(0)
 {
 

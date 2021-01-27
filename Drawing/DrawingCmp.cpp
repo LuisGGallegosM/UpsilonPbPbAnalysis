@@ -74,6 +74,8 @@ void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
         TH1F compGraph(name,name,fits.size(),xbins.data());
         compGraph.GetXaxis()->SetTitle("p_{T} ( GeV/c )");
         compGraph.GetYaxis()->SetTitle(name);
+        compGraph.GetXaxis()->SetLabelSize(0.03f);
+        compGraph.GetYaxis()->SetLabelSize(0.03f);
         drawCompGraph(getter.getter,fits,&compGraph);
         compGraph.Draw();
         std::string outfilename = (ReplaceExtension(outputfilename,"_")+name+".pdf");
@@ -90,17 +92,24 @@ std::vector<toGet> fillVariables(const fitConfig* fit)
     getters.push_back(toGet{"alpha", &fitParams::getAlpha});
     getters.push_back(toGet{"n",&fitParams::getN});
     getters.push_back(toGet{"f",&fitParams::getF});
-    getters.push_back(toGet{"sigma",&fitParams::getSigma});
+    getters.push_back(toGet{"sigma_Y1S",&fitParams::getSigmaY1S});
     getters.push_back(toGet{"x",&fitParams::getX});
     getters.push_back(toGet{"nSigY1S",&fitParams::getNSigY1S});
-    getters.push_back(toGet{"mass",&fitParams::getMean});
+    getters.push_back(toGet{"mass_Y1S",&fitParams::getMeanY1S});
+
 
     if (fit->isMoreUpsilon())
     {
         getters.push_back(toGet{"nSigY2S",&fitParams::getNSigY2S});
         getters.push_back(toGet{"nSigY3S",&fitParams::getNSigY3S});
-    }
 
+        getters.push_back(toGet{"mass_Y2S",&fitParams::getMeanY2S});
+        getters.push_back(toGet{"mass_Y3S",&fitParams::getMeanY3S});
+
+        getters.push_back(toGet{"sigma_Y2S",&fitParams::getSigmaY2S});
+        getters.push_back(toGet{"sigma_Y3S",&fitParams::getSigmaY3S});
+    }
+ 
     if (fit->isBkgOn())
     {
         getters.push_back(toGet{"nBkg",&fitParams::getNBkg});

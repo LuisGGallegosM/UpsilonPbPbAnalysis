@@ -78,7 +78,7 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
 
         graph->cd();
         RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
-        float maxVal=fParams.getNSigY1S()/( fParams.getSigma() * 1.4142*1.7724 );
+        float maxVal=fParams.getNSigY1S()/( fParams.getSigmaY1S() * 1.4142*1.7724 );
         float minVal=fParams.getNBkg()/( config.fitConf.getMassHigh() - config.fitConf.getMassLow() );
         setGraphStyle(graphPlot,&config,maxVal,minVal,isLog);
         drawLegend(graphPlot,config.fitConf.isBkgOn(),config.fitConf.isMoreUpsilon());
@@ -194,13 +194,17 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
 
 void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
 {
-    TextDrawer tdrawer(0.22,0.8);
+    TextDrawer tdrawer(0.22f,0.8f,9.0f);
     
     tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
     tdrawer.drawText( Form("#alpha=%.3f #pm %.3f",fParams->getAlpha(),fParams->getErrors().getAlpha()));
-    tdrawer.drawText( Form("m=%.3f #pm %.3f",fParams->getMean(),fParams->getErrors().getMean()));
-    tdrawer.drawText( Form("N=%.3f #pm %.3f",fParams->getN(),fParams->getErrors().getN()));
-    tdrawer.drawText( Form("#sigma_{1}=%.4f #pm %.4f",fParams->getSigma(),fParams->getErrors().getSigma()));
+    tdrawer.drawText( Form("m_{Y1S}=%.3f #pm %.3f",fParams->getMeanY1S(),fParams->getErrors().getMeanY1S()));
+    tdrawer.drawText( Form("m_{Y2S}=%.3f #pm %.3f",fParams->getMeanY2S(),fParams->getErrors().getMeanY2S()));
+    tdrawer.drawText( Form("m_{Y3S}=%.3f #pm %.3f",fParams->getMeanY3S(),fParams->getErrors().getMeanY3S()));
+    tdrawer.drawText( Form("n=%.3f #pm %.3f",fParams->getN(),fParams->getErrors().getN()));
+    tdrawer.drawText( Form("#sigma_{1}^{Y1S}=%.4f #pm %.4f",fParams->getSigmaY1S(),fParams->getErrors().getSigmaY1S()));
+    tdrawer.drawText( Form("#sigma_{1}^{Y2S}=%.4f #pm %.4f",fParams->getSigmaY2S(),fParams->getErrors().getSigmaY2S()));
+    tdrawer.drawText( Form("#sigma_{1}^{Y3S}=%.4f #pm %.4f",fParams->getSigmaY3S(),fParams->getErrors().getSigmaY3S()));
     tdrawer.drawText( Form("#frac{#sigma_{2}}{#sigma_{1}}=%.4f #pm %.4f",fParams->getX(),fParams->getErrors().getX()));
     tdrawer.drawText( Form("f=%.4f #pm %.4f",fParams->getF(),fParams->getErrors().getF()));
 

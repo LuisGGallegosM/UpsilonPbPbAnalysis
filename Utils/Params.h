@@ -3,6 +3,9 @@
 
 #include "serialize.h"
 
+#define RATIO_Y2S (10.023/9.460)
+#define RATIO_Y3S (10.355/9.460)
+
 #define ONIATTREENAME ("onia_skimmed")
 #define JETTTREENAME ("jet_skimmed")
 
@@ -154,9 +157,13 @@ class fitParamsNoLimits
     float getAlpha() const {return dcb.getAlpha();}
     float getN() const {return dcb.getN();}
     float getF() const {return dcb.getF();}
-    float getSigma() const {return dcb.getSigma();}
+    float getSigmaY1S() const {return dcb.getSigma();}
+    float getSigmaY2S() const {return dcb.getSigma()*RATIO_Y2S;}
+    float getSigmaY3S() const {return dcb.getSigma()*RATIO_Y3S;}
     float getX() const {return dcb.getX();}
-    float getMean() const {return dcb.getMean();}
+    float getMeanY1S() const {return dcb.getMean();}
+    float getMeanY2S() const {return dcb.getMean()*RATIO_Y2S;}
+    float getMeanY3S() const {return dcb.getMean()*RATIO_Y3S;}
 
     void deserialize(serializer& ser);
 

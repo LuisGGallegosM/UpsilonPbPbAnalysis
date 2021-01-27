@@ -41,12 +41,8 @@ do
     CONFIGFILES=( ${CONFIGFILES[@]} $(basename $i) )
 done
 
-echo "write a comment:"
-read
-printf "$REPLY" > "${WORKDIR}/${OUTDIR}/readme.txt"
-
 #do the fits
-if [ 1 = 1 ]
+if [ 1 = 0 ]
 then
     echo "fitting..."
     #do the fitting jobs
