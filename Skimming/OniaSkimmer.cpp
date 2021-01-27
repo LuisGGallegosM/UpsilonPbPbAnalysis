@@ -25,12 +25,14 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, Cutter<Onia_Inpu
     //MC only branch check
     if((treeIn->GetBranch("Reco_mu_whichGen")!=nullptr) && (!cut->isMC()))
     {
-        std::cout << "\nWARNING: isMC = false and this root file looks like MC (contains 'Reco_mu_whichGen' branch)\n";
+        std::cerr << "\nWARNING: isMC = false and this root file looks like MC (contains 'Reco_mu_whichGen' branch)\n";
     }
 
     if(cut->isMC())
     {
-        addInput("Reco_mu_whichGen",dataIn.whichGen);
+        addInput("Reco_mu_whichGen",dataIn.RecoMuWhichGen);
+        addInput("Reco_QQ_whichGen",dataIn.RecoQQWhichGen);
+        addInput("Gen_QQ_momId",dataIn.GenQQid);
     }
 
     //output branches
@@ -97,7 +99,9 @@ Onia_Input::Onia_Input()
     dz = new Float_t[maxBranchSize]; 
     VtxProb = new Float_t[maxBranchSize];
     trig = new ULong64_t[maxBranchSize];
-    whichGen = new Int_t[maxBranchSize];
+    RecoMuWhichGen = new Int_t[maxBranchSize];
+    RecoQQWhichGen = new Int_t[maxBranchSize];
+    GenQQid = new Int_t[maxBranchSize];
     sign = new Int_t[maxBranchSize];
 }
 
@@ -114,6 +118,8 @@ Onia_Input::~Onia_Input()
     delete[] dz;
     delete[] VtxProb;
     delete[] trig;
-    delete[] whichGen;
+    delete[] RecoMuWhichGen;
+    delete[] RecoQQWhichGen;
+    delete[] GenQQid;
     delete[] sign;
 }

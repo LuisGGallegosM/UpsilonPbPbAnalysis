@@ -21,8 +21,13 @@ bool OniaCutter::cut(Onia_Input* input,Int_t index,Int_t entry)
 
     if(kineCut.isMC)
     {
-        if(input->whichGen[mupl_idx] == -1) return false;
-        if(input->whichGen[mumi_idx] == -1) return false;
+        if(input->RecoMuWhichGen[mupl_idx] < 0) return false;
+        if(input->RecoMuWhichGen[mumi_idx] < 0) return false;
+
+        int genQQindex=input->RecoQQWhichGen[index];
+        if (genQQindex < 0) return false;
+        int pdgId=input->GenQQid[genQQindex];
+        if ((pdgId != UPSILON_Y1S_PDGID ) && ( pdgId != -UPSILON_Y1S_PDGID)) return false;
     }
 
     //check if plus and minus muons are soft

@@ -23,7 +23,9 @@ struct Onia_Input
     UInt_t runNb;
     UInt_t eventNb;
     UInt_t lumi;
-    Int_t* whichGen;
+    Int_t* RecoMuWhichGen;
+    Int_t* RecoQQWhichGen;
+    Int_t* GenQQid;
     Int_t* sign;
 
     Int_t getSize();
