@@ -50,7 +50,6 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, Cutter<Onia_Inpu
     addOutput("eta_pl",&dataOut.eta_pl);
     addOutput("phi_mi",&dataOut.phi_mi);
     addOutput("phi_pl",&dataOut.phi_pl);
-    addOutput("dR",&dataOut.dR);
 
     auxData.reset(new Onia_Aux());
     auxData->events.reserve(200000);
@@ -77,11 +76,6 @@ void OniaSkimmer::WriteData(Int_t index, Long64_t entry)
     dataOut.pT_pl = mom4vec_mupl->Pt();
     dataOut.eta_pl = mom4vec_mupl->Eta();
     dataOut.phi_pl = mom4vec_mupl->Phi();
-
-    float dPhi= dataOut.phi_mi - dataOut.phi_pl;
-    float dEta= dataOut.eta_mi -dataOut.eta_pl;
-
-    dataOut.dR = sqrt(dPhi*dPhi+dEta*dEta);
 
     auxData->events.insert({entry,dataOut});
 }

@@ -50,7 +50,6 @@ struct Onia_Output
     Float_t pT_pl;
     Float_t eta_pl;
     Float_t phi_pl;
-    Float_t dR;
 };
 
 struct Onia_Aux

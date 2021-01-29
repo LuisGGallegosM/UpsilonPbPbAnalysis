@@ -27,13 +27,6 @@ bool OniaCutter::cut(Onia_Input* input,Int_t index,Int_t entry)
         //check if both muons are matched to generated muons
         if(genMuonPl < 0) return false;
         if(genMuonMi < 0) return false;
-        //find the dimuon in the generated array that has both generated muons
-        Int_t genQQindex= findMatchGenQQ(genMuonPl,genMuonMi,input->genQQ_mupl_idx,input->genQQ_mumi_idx,input->genQQsize);
-
-        //matching not found
-        //if (genQQindex < 0) return false;
-        //int pdgId=input->GenQQid[genQQindex];
-        //if ((pdgId != UPSILON_Y1S_PDGID ) && ( pdgId != -UPSILON_Y1S_PDGID)) return false;
     }
 
     //check if plus and minus muons are soft
