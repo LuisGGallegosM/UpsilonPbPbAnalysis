@@ -31,7 +31,9 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, Cutter<Onia_Inpu
     if(cut->isMC())
     {
         addInput("Reco_mu_whichGen",dataIn.RecoMuWhichGen);
-        addInput("Reco_QQ_whichGen",dataIn.RecoQQWhichGen);
+        addInput("Gen_QQ_size",&dataIn.genQQsize);
+        addInput("Gen_QQ_mupl_idx",dataIn.genQQ_mupl_idx);
+        addInput("Gen_QQ_mumi_idx",dataIn.genQQ_mumi_idx);
         addInput("Gen_QQ_momId",dataIn.GenQQid);
     }
 
@@ -48,6 +50,7 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, Cutter<Onia_Inpu
     addOutput("eta_pl",&dataOut.eta_pl);
     addOutput("phi_mi",&dataOut.phi_mi);
     addOutput("phi_pl",&dataOut.phi_pl);
+    addOutput("dR",&dataOut.dR);
 
     auxData.reset(new Onia_Aux());
     auxData->events.reserve(200000);
@@ -75,6 +78,11 @@ void OniaSkimmer::WriteData(Int_t index, Long64_t entry)
     dataOut.eta_pl = mom4vec_mupl->Eta();
     dataOut.phi_pl = mom4vec_mupl->Phi();
 
+    float dPhi= dataOut.phi_mi - dataOut.phi_pl;
+    float dEta= dataOut.eta_mi -dataOut.eta_pl;
+
+    dataOut.dR = sqrt(dPhi*dPhi+dEta*dEta);
+
     auxData->events.insert({entry,dataOut});
 }
 
@@ -100,7 +108,8 @@ Onia_Input::Onia_Input()
     VtxProb = new Float_t[maxBranchSize];
     trig = new ULong64_t[maxBranchSize];
     RecoMuWhichGen = new Int_t[maxBranchSize];
-    RecoQQWhichGen = new Int_t[maxBranchSize];
+    genQQ_mupl_idx = new Int_t[maxBranchSize];
+    genQQ_mumi_idx = new Int_t[maxBranchSize];
     GenQQid = new Int_t[maxBranchSize];
     sign = new Int_t[maxBranchSize];
 }
@@ -119,7 +128,8 @@ Onia_Input::~Onia_Input()
     delete[] VtxProb;
     delete[] trig;
     delete[] RecoMuWhichGen;
-    delete[] RecoQQWhichGen;
+    delete[] genQQ_mupl_idx;
+    delete[] genQQ_mumi_idx;
     delete[] GenQQid;
     delete[] sign;
 }

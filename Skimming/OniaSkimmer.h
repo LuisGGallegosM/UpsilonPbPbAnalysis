@@ -24,7 +24,9 @@ struct Onia_Input
     UInt_t eventNb;
     UInt_t lumi;
     Int_t* RecoMuWhichGen;
-    Int_t* RecoQQWhichGen;
+    Int_t genQQsize;
+    Int_t* genQQ_mupl_idx;
+    Int_t* genQQ_mumi_idx;
     Int_t* GenQQid;
     Int_t* sign;
 
@@ -48,6 +50,7 @@ struct Onia_Output
     Float_t pT_pl;
     Float_t eta_pl;
     Float_t phi_pl;
+    Float_t dR;
 };
 
 struct Onia_Aux
