@@ -271,6 +271,7 @@ void fitParamsWithErrors::serialize(const std::string& filename) const
         ser.read("checkSign",checkSign );
         ser.read("sign",sign);
         ser.read("prescale",prescale);
+        ser.read("genLoop",genLoop);
 
         ser.read("selectionBits",selectionBits);
         ser.read("minTracks",minTracks);

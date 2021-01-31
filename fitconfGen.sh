@@ -3,7 +3,7 @@
 OUTDIR=${1:-"../rootfiles/merged_HiForestAOD_skimmed4"}
 BASENAME="merged_HiForestAOD_fit"
 
-MULTIFITFILE=$( find $OUTDIR -name "*.multifit" )
+MULTIFITFILE=$( find $OUTDIR -maxdepth 1 -name "*.multifit" )
 
 ptLow=()
 ptHigh=()

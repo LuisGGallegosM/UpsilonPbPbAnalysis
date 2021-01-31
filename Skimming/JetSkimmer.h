@@ -18,6 +18,7 @@ struct Jet_Input
     Float_t* jtArea;
 
     Int_t getSize();
+    Int_t getSizeGen() {return 0;}
 
     Jet_Input();
     ~Jet_Input();

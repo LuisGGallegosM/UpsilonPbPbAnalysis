@@ -15,6 +15,7 @@ class JetCutter : public Cutter<Jet_Input>
     bool cut(Jet_Input* input, Int_t index, Int_t entry) override;
     bool prescale(Int_t entry) override;
     bool isMC() override {return MC;}
+    bool genLoop() override {return false;}
     JetCutter(Onia_Aux* auxDat);
 };
 

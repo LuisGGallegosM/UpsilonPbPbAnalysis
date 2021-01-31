@@ -21,6 +21,7 @@ class Cutter
     virtual bool cut(T* input, Int_t index,Int_t entry)=0;
     virtual bool prescale(Int_t entry)=0;
     virtual bool isMC()=0;
+    virtual bool genLoop()=0;
 
     virtual ~Cutter() {};
 };
@@ -87,7 +88,10 @@ class Skimmer
                 
             GetEntries(i);
 
-            for(Long64_t j=0;j<dataIn.getSize();++j)
+            Long64_t sizeQQ=dataIn.getSize();
+            if (cutter->genLoop()) sizeQQ=dataIn.getSizeGen();//loop over generated muons
+
+            for(Long64_t j=0;j<sizeQQ;++j)
             {
                 if (cutter->cut(&dataIn,j,i))
                 {
@@ -95,7 +99,6 @@ class Skimmer
                     FillEntries();
                 }
             }
-
         }
         std::cout << "Total readed entries " << entries;
         std::cout << " from '" << tree_input->GetName() << "' tree\n";

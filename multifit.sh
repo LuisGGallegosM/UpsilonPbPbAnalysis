@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #directory where files are located
-WORKDIR="../rootfiles/merged_HiForestAOD_skimmed4"
+WORKDIR="../rootfiles/merged_HiForestAOD_skimmed5"
 #directory where to save multifit results, inside WORKDIR
 OUTDIR="output"
 
@@ -35,6 +35,9 @@ mkdir "${WORKDIR}/${OUTDIR}"
 #fitconf files to read
 CONFIGFILES=()
 ALLFITFILES=$(find ${WORKDIR} -maxdepth 1 -name "*.fitconf")
+MULTIFITFILE=$(find ${WORKDIR} -maxdepth 1 -name "*.multifit")
+cp "$MULTIFITFILE" "${WORKDIR}/${OUTDIR}"
+
 for i in $ALLFITFILES
 do
     echo "reading fitconf file '${i}'"
@@ -42,7 +45,7 @@ do
 done
 
 #do the fits
-if [ 1 = 0 ]
+if [ 1 = 1 ]
 then
     echo "fitting..."
     #do the fitting jobs
@@ -82,12 +85,13 @@ fi
 if [ 1 = 1 ]
 then
     echo "starting comparative drawings..."
-    COMPCONFFILES=$(find ${WORKDIR} -name "*.drawcomp")
+    COMPCONFFILES=$(find ${WORKDIR} -maxdepth 1 -name "*.drawcomp")
     for COMP in $COMPCONFFILES
     do
         COMPFILES=$( cat ${COMP} )
         COMPNAME=$( basename ${COMP} )
         echo "reading file: $COMPNAME"
+        cp "$COMP" "${WORKDIR}/${OUTDIR}"
         ./multidraw.sh "${WORKDIR}/${OUTDIR}" "${WORKDIR}/${OUTDIR}/${COMPNAME%.*}" "${COMPFILES[@]}"
     done
 fi

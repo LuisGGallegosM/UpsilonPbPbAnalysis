@@ -8,6 +8,11 @@ kineCut(*cut)
 
 bool OniaCutter::cut(Onia_Input* input,Int_t index,Int_t entry)
 {
+    if(genLoop())
+    {
+        Int_t idPdg=input->GenQQid[index];
+        return (idPdg==UPSILON_Y1S_PDGID) || (idPdg==-UPSILON_Y1S_PDGID);
+    }
     //check for triggers
     if ((input->trig[index] & kineCut.trigSelect) != kineCut.trigSelect) return false;
 

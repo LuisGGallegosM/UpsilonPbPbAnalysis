@@ -30,7 +30,8 @@ struct Onia_Input
     Int_t* GenQQid;
     Int_t* sign;
 
-    Int_t getSize();
+    Int_t getSize() {return size;}
+    Int_t getSizeGen() {return genQQsize;}
 
     Onia_Input();
     ~Onia_Input();

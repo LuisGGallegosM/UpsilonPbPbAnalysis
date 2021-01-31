@@ -83,11 +83,6 @@ void OniaSkimmer::WriteData(Int_t index, Long64_t entry)
 //***********************************************
 //Onia structs
 
-Int_t Onia_Input::getSize()
-{
-    return size;
-}
-
 Onia_Input::Onia_Input()
 {
     mom4_QQ = new TClonesArray("TLorentzVector");
