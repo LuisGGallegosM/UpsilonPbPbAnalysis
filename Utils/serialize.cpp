@@ -78,6 +78,19 @@ void serializer::read(const std::string& varname, T& output)
     }     
 }
 
+template <typename T>
+void serializer::read(const std::string& varname, T& output, T defaultValue)
+{
+    std::string var = currentPrefix + varname;
+    if (vars.find(var) != vars.end())
+        std::stringstream(vars[var]) >> output;
+    else
+    {
+        output = defaultValue;
+        std::cout << "WARNING: No value found for "<< varname << " default value " << defaultValue <<" used.\n";
+    }     
+}
+
 void serializer::write(const std::string& varname, bool input)
 {
     std::string var = currentPrefix + varname;
@@ -109,10 +122,35 @@ void serializer::read(const std::string& varname, bool& output)
     }  
 }
 
+void serializer::read(const std::string& varname, bool& output, bool defaultValue)
+{
+    std::string var = currentPrefix + varname;
+    if (vars.find(var) != vars.end())
+    {
+        if(vars[var] == "true")
+            output=true;
+        else if (vars[var] == "false")
+            output=false;
+        else
+            throw std::invalid_argument(std::string("Variable '")+var+" not bool");
+    }
+    else
+    {
+        output=defaultValue;
+        std::string def= defaultValue? "true" :"false";
+        std::cout << "WARNING: No value found for "<<varname << " default value " << def << " used.\n";
+    }  
+}
+
 template void serializer::read(const std::string& var, int& output);
 template void serializer::read(const std::string& var, float& output);
 template void serializer::read(const std::string& var, unsigned long long& output);
 template void serializer::read(const std::string& var, std::string& output);
+
+template void serializer::read(const std::string& var, int& output, int defaultValue);
+template void serializer::read(const std::string& var, float& output, float defaultValue);
+template void serializer::read(const std::string& var, unsigned long long& output, unsigned long long defaultValue);
+template void serializer::read(const std::string& var, std::string& output, std::string defaultValue );
 
 template void serializer::write(const std::string& var, int output);
 template void serializer::write(const std::string& var, float output);

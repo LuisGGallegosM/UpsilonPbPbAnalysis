@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #directory where files are located
-WORKDIR="../rootfiles/merged_HiForestAOD_skimmed5"
+WORKDIR="../rootfiles/merged_HiForestAOD_skimmed6"
 #directory where to save multifit results, inside WORKDIR
 OUTDIR="output"
 
@@ -95,5 +95,10 @@ then
         ./multidraw.sh "${WORKDIR}/${OUTDIR}" "${WORKDIR}/${OUTDIR}/${COMPNAME%.*}" "${COMPFILES[@]}"
     done
 fi
+
+cp -R "${WORKDIR}/report" "${WORKDIR}/${OUTDIR}/report"
+cd "${WORKDIR}/${OUTDIR}/report"
+pdflatex -interaction nonstopmode "report.tex"
+#cd "../../.."
 
 echo "all done"

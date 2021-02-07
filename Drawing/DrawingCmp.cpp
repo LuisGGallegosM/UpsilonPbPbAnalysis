@@ -121,7 +121,10 @@ std::vector<toGet> fillVariables(const fitConfig* fit)
         getters.push_back(toGet{"chk4_k1",&fitParams::getChk4_k1});
         getters.push_back(toGet{"chk4_k2",&fitParams::getChk4_k2});
         break;
-        
+        case BkgParams::BkgType::expChev2:
+        getters.push_back(toGet{"chk4_k1",&fitParams::getChk4_k1});
+        getters.push_back(toGet{"chk4_k2",&fitParams::getChk4_k2});
+        break;
         case BkgParams::BkgType::special:
         getters.push_back(toGet{"lambda_bkg",&fitParams::getLambda});
         getters.push_back(toGet{"sigma_bkg",&fitParams::getSigmaBkg});

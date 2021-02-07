@@ -99,6 +99,24 @@ class ExponentialBkg : public BkgFunc
     BkgParams getBkgParamsLow() override;
 };
 
+class ExpChev2Bkg : public BkgFunc
+{
+    RooRealVar ch4_k1;
+    RooRealVar ch4_k2;
+    std::unique_ptr<RooGenericPdf> bkgPdf;
+    public:
+    ExpChev2Bkg(RooRealVar& var,const char* name,float* initial,float* low, float* high);
+
+    RooRealVar* getCh4_k1() {return &ch4_k1;}
+    RooRealVar* getCh4_k2() {return &ch4_k2;}
+
+    RooAbsReal* getFunc() override {return bkgPdf.get();}
+    BkgParams getBkgParams() override;
+    BkgParams getBkgParamsErrors() override;
+    BkgParams getBkgParamsHigh() override;
+    BkgParams getBkgParamsLow() override;
+};
+
 class CrystalBall
 {
     protected:

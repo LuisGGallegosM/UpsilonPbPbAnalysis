@@ -268,6 +268,50 @@ BkgParams ExponentialBkg::getBkgParamsLow()
     return p;
 }
 
+//ExpChevBkg
+
+ExpChev2Bkg::ExpChev2Bkg(RooRealVar& var,const char* name,float* initial, float* low, float* high):
+    ch4_k1("chk4_k1","chk4_k1",initial[0],low[0],high[0]),
+    ch4_k2("chk4_k2","chk4_k2",initial[1],low[1],high[1]),
+    bkgPdf()
+{
+    RooGenericPdf* pdf=
+        new RooGenericPdf(name,"Background","TMath::Exp(@2*(2.0*@0*@0-1.0)+@1*@0+1.0)",
+                           RooArgList(var, ch4_k1,ch4_k2));
+    bkgPdf.reset(pdf);
+}
+BkgParams ExpChev2Bkg::getBkgParams()
+{
+    BkgParams p;
+    p.setChk4(ch4_k1.getVal(),ch4_k2.getVal());
+    p.setBkgType(BkgParams::BkgType::expChev2);
+    return p;
+}
+
+BkgParams ExpChev2Bkg::getBkgParamsErrors()
+{
+    BkgParams p;
+    p.setChk4(ch4_k1.getError(),ch4_k2.getError());
+    p.setBkgType(BkgParams::BkgType::expChev2);
+    return p;
+}
+
+BkgParams ExpChev2Bkg::getBkgParamsHigh()
+{
+    BkgParams p;
+    p.setChk4(ch4_k1.getMax(),ch4_k2.getMax());
+    p.setBkgType(BkgParams::BkgType::expChev2);
+    return p;
+}
+
+BkgParams ExpChev2Bkg::getBkgParamsLow()
+{
+    BkgParams p;
+    p.setChk4(ch4_k1.getMin(),ch4_k2.getMin());
+    p.setBkgType(BkgParams::BkgType::expChev2);
+    return p;
+}
+
 
 BkgFunc* BkgFactory(RooRealVar& var, const fitConfig& config)
 {
@@ -286,6 +330,16 @@ BkgFunc* BkgFactory(RooRealVar& var, const fitConfig& config)
         high[0]=config.getInitValues()->getHighLimit().getChk4_k1();
         high[1]=config.getInitValues()->getHighLimit().getChk4_k2();
         b = new Chevychev2(var,"bkg",initials,low,high);
+        break;
+
+        case BkgParams::BkgType::expChev2:
+        initials[0]=config.getInitValues()->getChk4_k1();
+        initials[1]=config.getInitValues()->getChk4_k2();
+        low[0]=config.getInitValues()->getLowLimit().getChk4_k1();
+        low[1]=config.getInitValues()->getLowLimit().getChk4_k2();
+        high[0]=config.getInitValues()->getHighLimit().getChk4_k1();
+        high[1]=config.getInitValues()->getHighLimit().getChk4_k2();
+        b = new ExpChev2Bkg(var,"bkg",initials,low,high);
         break;
 
         case BkgParams::BkgType::special:

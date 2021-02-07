@@ -33,9 +33,14 @@ class serializer
     template <typename T>
     void read(const std::string& varname, T& output);
 
+    template <typename T>
+    void read(const std::string& varname, T& output, T defaultValue);
+
     void write(const std::string& varname, bool input);
 
     void read(const std::string& varname, bool& output);
+
+    void read(const std::string& varname, bool& output, bool defaultValue);
 };
 
 

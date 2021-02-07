@@ -47,7 +47,7 @@ class dcbParam
 class BkgParams
 {
     public:
-    enum class BkgType {error, none, chev, special,exponential };
+    enum class BkgType {error, none, chev, special,exponential,expChev2 };
 
     private:
     float chk4_k1;

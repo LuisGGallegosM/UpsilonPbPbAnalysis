@@ -81,12 +81,21 @@ do
     case ${BKGTYPE[$i]} in
         "chev")
             OUTPUT+="initialValues.bkg.chk4_k1 = ${CH1}\n"
-            OUTPUT+="initialValues.limits.low.bkg.chk4_k1 = -4.0\n"
-            OUTPUT+="initialValues.limits.high.bkg.chk4_k1 = 4.0\n"
+            OUTPUT+="initialValues.limits.low.bkg.chk4_k1 = -6.0\n"
+            OUTPUT+="initialValues.limits.high.bkg.chk4_k1 = 6.0\n"
 
             OUTPUT+="initialValues.bkg.chk4_k2 = ${CH2}\n"
-            OUTPUT+="initialValues.limits.low.bkg.chk4_k2 = -4.0\n"
-            OUTPUT+="initialValues.limits.high.bkg.chk4_k2 = 4.0\n"
+            OUTPUT+="initialValues.limits.low.bkg.chk4_k2 = -6.0\n"
+            OUTPUT+="initialValues.limits.high.bkg.chk4_k2 = 6.0\n"
+        ;;
+        "expChev2")
+            OUTPUT+="initialValues.bkg.chk4_k1 = ${CH1}\n"
+            OUTPUT+="initialValues.limits.low.bkg.chk4_k1 = -6.0\n"
+            OUTPUT+="initialValues.limits.high.bkg.chk4_k1 = 6.0\n"
+
+            OUTPUT+="initialValues.bkg.chk4_k2 = ${CH2}\n"
+            OUTPUT+="initialValues.limits.low.bkg.chk4_k2 = -6.0\n"
+            OUTPUT+="initialValues.limits.high.bkg.chk4_k2 = 6.0\n"
         ;;
         "special")
             OUTPUT+="initialValues.bkg.mu = ${MU_BKG}\n"
@@ -105,6 +114,8 @@ do
             OUTPUT+="initialValues.bkg.lambda = ${LAMBDA_BKG}\n"
             OUTPUT+="initialValues.limits.low.bkg.lambda = 0\n"
             OUTPUT+="initialValues.limits.high.bkg.lambda = 30.0\n"
+        ;;
+        "none")
         ;;
         *)
             echo "incorrect bkgType in ${OUTDIR}/${BASENAME}${i}.fitconf"

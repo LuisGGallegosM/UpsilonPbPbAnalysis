@@ -46,6 +46,10 @@
                 ser.read("chk4_k1",chk4_k1);
                 ser.read("chk4_k2",chk4_k2);
             break;
+            case BkgType::expChev2:
+                ser.read("chk4_k1",chk4_k1);
+                ser.read("chk4_k2",chk4_k2);
+            break;
             case BkgType::special:
                 ser.read("lambda",lambda);
                 ser.read("mu",mu);
@@ -66,6 +70,10 @@
                 ser.write("chk4_k1",chk4_k1);
                 ser.write("chk4_k2",chk4_k2);
             break;
+            case BkgType::expChev2:
+                ser.write("chk4_k1",chk4_k1);
+                ser.write("chk4_k2",chk4_k2);
+            break;
             case BkgType::special:
                 ser.write("lambda",lambda);
                 ser.write("mu",mu);
@@ -82,7 +90,8 @@
         {"none",BkgParams::BkgType::none},
         {"chev",BkgParams::BkgType::chev},
         {"special",BkgParams::BkgType::special},
-        {"exponential",BkgParams::BkgType::exponential}
+        {"exponential",BkgParams::BkgType::exponential},
+        {"expChev2",BkgParams::BkgType::expChev2}
     };
 
     std::string BkgParams::toStr(BkgType type)
@@ -271,7 +280,7 @@ void fitParamsWithErrors::serialize(const std::string& filename) const
         ser.read("checkSign",checkSign );
         ser.read("sign",sign);
         ser.read("prescale",prescale);
-        ser.read("genLoop",genLoop);
+        ser.read("genLoop",genLoop,false);
 
         ser.read("selectionBits",selectionBits);
         ser.read("minTracks",minTracks);
