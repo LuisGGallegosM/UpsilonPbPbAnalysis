@@ -8,7 +8,6 @@
 #include "../Utils/serialize.h"
 #include "../Utils/utils.h"
 #include "OniaSkimmer.h"
-#include "OniaCutter.h"
 
 void Skimming(const char* filename,const char* outputfilename);
 

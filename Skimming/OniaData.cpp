@@ -3,8 +3,10 @@
 
 Onia_Input::Onia_Input()
 {
-    mom4_QQ = new TClonesArray("TLorentzVector");
-    mom4_mu = new TClonesArray("TLorentzVector");
+    mom4_RecoQQ = new TClonesArray("TLorentzVector");
+    mom4_RecoMu = new TClonesArray("TLorentzVector");
+    mom4_GenQQ = new TClonesArray("TLorentzVector");
+    mom4_GenMu = new TClonesArray("TLorentzVector");
     mupl_idx = new Int_t[maxBranchSize];
     mumi_idx = new Int_t[maxBranchSize];
     SelectionType = new Int_t[maxBranchSize];
@@ -23,8 +25,10 @@ Onia_Input::Onia_Input()
 
 Onia_Input::~Onia_Input()
 {
-    delete mom4_QQ;
-    delete mom4_mu;
+    delete mom4_RecoQQ;
+    delete mom4_RecoMu;
+    delete mom4_GenQQ;
+    delete mom4_GenMu;
     delete[] mupl_idx;
     delete[] mumi_idx;
     delete[] SelectionType;

@@ -4,17 +4,18 @@
 
 #include "Skimmer.h"
 #include "OniaCutter.h"
+#include "OniaOutput.h"
 
-class OniaSkimmer : public Skimmer<Onia_Input,Onia_Output>
+class OniaSkimmer : public Skimmer
 {
-    private:
-    void ProcessEvent(Long64_t entry) override;
+    Onia_Input dataIn;
+    protected:
     OniaCutter* cutter;
+    OniaOutputer* outputer;
+    void ProcessEvent(Long64_t entry) override;
     public:
-    OniaSkimmer(TTree* treeIn,const char* treeOutName, OniaCutter* cut);
-
-    void WriteData(Int_t index, Long64_t entry);
-    std::unique_ptr<Onia_Aux> auxData;
+    OniaSkimmer(TTree* treeIn,const char* treeOutName, OniaOutputer* outp , OniaCutter* cut);
+    //std::unique_ptr<Onia_Aux> auxData;
 };
 
 #if defined(__CLING__)

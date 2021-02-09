@@ -1,4 +1,7 @@
 
+#ifndef ONIADATA
+#define ONIADATA
+
 #include "TClonesArray.h"
 #include <unordered_map>
 
@@ -6,8 +9,10 @@
 
 struct Onia_Input
 {
-    TClonesArray* mom4_QQ;
-    TClonesArray* mom4_mu;
+    TClonesArray* mom4_RecoQQ;
+    TClonesArray* mom4_RecoMu;
+    TClonesArray* mom4_GenQQ;
+    TClonesArray* mom4_GenMu;
     Int_t recoQQsize;
     Int_t genQQsize;
     Int_t recoMuSize;
@@ -40,23 +45,4 @@ struct Onia_Input
     ~Onia_Input();
 };
 
-struct Onia_Output
-{
-    Int_t Evt;
-    Float_t mass;
-    Float_t pT;
-    Float_t y;
-    Float_t phi;
-    Float_t eta;
-    Float_t pT_mi;
-    Float_t eta_mi;
-    Float_t phi_mi;
-    Float_t pT_pl;
-    Float_t eta_pl;
-    Float_t phi_pl;
-};
-
-struct Onia_Aux
-{
-    std::unordered_map<Long64_t,Onia_Output> events;
-};
+#endif

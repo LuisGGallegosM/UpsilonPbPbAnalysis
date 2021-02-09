@@ -87,12 +87,15 @@ TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>
     }
 
     //execute skim
-    OniaCutter cutter(cut);
+    //std::unique_ptr<OniaCutter> cutter(new OniaCutterRecoQQ(cut));
+    //std::unique_ptr<OniaOutputer> outputer(new OniaOutputerQQ());
+    std::unique_ptr<OniaCutter> cutter(new OniaCutterRecoMu());
+    std::unique_ptr<OniaOutputer> outputer(new OniaOutputerMu());
 
-    OniaSkimmer skimmer = OniaSkimmer(myTree,wroteTreeName,&cutter);
+    OniaSkimmer skimmer = OniaSkimmer(myTree,wroteTreeName,outputer.get(),cutter.get());
     TTree* wroteTree = skimmer.Skim();
 
-    (*auxData) = std::move(skimmer.auxData);
+    //(*auxData) = std::move(skimmer.auxData);
 
     return wroteTree;
 }

@@ -3,12 +3,12 @@
 #include "OniaCutter.h"
 #include "TLorentzVector.h"
 
-OniaCutter::OniaCutter(const cutParams* cut):
+OniaCutterRecoQQ::OniaCutterRecoQQ(const cutParams* cut):
 kineCut(*cut)
 {
 }
 
-bool OniaCutter::cut(Onia_Input* input,Int_t index,Int_t entry)
+bool OniaCutterRecoQQ::cut(Onia_Input* input,Int_t index,Int_t entry)
 {
     if(false)
     {
@@ -41,9 +41,9 @@ bool OniaCutter::cut(Onia_Input* input,Int_t index,Int_t entry)
     if (!isSoft(input,mumi_idx)) return false;
 
     //kinetic cut
-    TLorentzVector* mom4= (TLorentzVector*) input->mom4_QQ->At(index);
-    TLorentzVector* mom4_mumi = (TLorentzVector*) input->mom4_mu->At(input->mumi_idx[index]);
-    TLorentzVector* mom4_mupl = (TLorentzVector*) input->mom4_mu->At(input->mupl_idx[index]);
+    TLorentzVector* mom4= (TLorentzVector*) input->mom4_RecoQQ->At(index);
+    TLorentzVector* mom4_mumi = (TLorentzVector*) input->mom4_RecoMu->At(input->mumi_idx[index]);
+    TLorentzVector* mom4_mupl = (TLorentzVector*) input->mom4_RecoMu->At(input->mupl_idx[index]);
 
     if((mom4==nullptr) || (mom4_mumi==nullptr) || (mom4_mupl==nullptr))
     {
@@ -64,12 +64,7 @@ bool OniaCutter::cut(Onia_Input* input,Int_t index,Int_t entry)
     return true;
 }
 
-bool OniaCutter::prescale(Int_t entry)
-{
-    return (kineCut.prescale>1) && ((entry % kineCut.prescale)!=0);
-}
-
-bool OniaCutter::isSoft(Onia_Input* input,Int_t index)
+bool OniaCutterRecoQQ::isSoft(Onia_Input* input,Int_t index) const
 {
     bool passMuonTypePl = (input->SelectionType[index] & kineCut.selectionBits) == (kineCut.selectionBits);
     bool muplSoft = passMuonTypePl && ( input->nTrkWMea[index] >= kineCut.minTracks)
@@ -79,7 +74,7 @@ bool OniaCutter::isSoft(Onia_Input* input,Int_t index)
     return muplSoft;
 }
 
-Int_t OniaCutter::findMatchGenQQ(Int_t genMuPl, Int_t genMuMi, Int_t* genQQpl, Int_t* genQQmi, int size)
+Int_t OniaCutterRecoQQ::findMatchGenQQ(Int_t genMuPl, Int_t genMuMi, Int_t* genQQpl, Int_t* genQQmi, int size) const
 {
     Int_t match=-1;
     for(int i=0;i< size;i++)
@@ -91,4 +86,10 @@ Int_t OniaCutter::findMatchGenQQ(Int_t genMuPl, Int_t genMuMi, Int_t* genQQpl, I
         }
     }
     return match;
+}
+
+bool OniaCutterRecoMu::cut(Onia_Input* input, Int_t index,Int_t entry)
+{
+    int genMuIndex= input->RecoMuWhichGen[index];
+    return (genMuIndex >=0);
 }

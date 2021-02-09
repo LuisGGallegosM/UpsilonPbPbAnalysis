@@ -3,14 +3,14 @@
 #include "OniaSkimmer.h"
 #include "TLorentzVector.h"
 
-OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, OniaCutter* cut) 
-: Skimmer(treeIn,treeOutName), cutter(cut)
+OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, OniaOutputer* outp , OniaCutter* cut) 
+: Skimmer(treeIn,treeOutName), cutter(cut), outputer(outp)
 {
     TBranch* branch;
 
     //input branches
-    addInput("Reco_QQ_4mom",&dataIn.mom4_QQ);
-    addInput("Reco_mu_4mom",&dataIn.mom4_mu);
+    addInput("Reco_QQ_4mom",&dataIn.mom4_RecoQQ);
+    addInput("Reco_mu_4mom",&dataIn.mom4_RecoMu);
     addInput("Reco_QQ_size",&dataIn.recoQQsize);
     addInput("Reco_mu_size",&dataIn.recoMuSize);
     addInput("Reco_QQ_mupl_idx",dataIn.mupl_idx);
@@ -23,78 +23,70 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, OniaCutter* cut)
     addInput("Reco_QQ_VtxProb",dataIn.VtxProb);
     addInput("Reco_QQ_trig",dataIn.trig);
     addInput("Reco_QQ_sign",dataIn.sign);
-    
 
-    //MC only branch check
-    if((treeIn->GetBranch("Reco_mu_whichGen")!=nullptr) && (!cut->isMC()))
+    bool dataIsMC=(treeIn->GetBranch("Reco_mu_whichGen")!=nullptr);
+    if (cut->isMC() != dataIsMC)
     {
-        std::cerr << "\nWARNING: isMC = false and this root file looks like MC (contains 'Reco_mu_whichGen' branch)\n";
+        throw std::invalid_argument("ERROR : is MC cut and data mismatch\n");
     }
 
+    //MC only branch check
     if(cut->isMC())
-    {
+    {  
         addInput("Reco_mu_whichGen",dataIn.RecoMuWhichGen);
+        addInput("Gen_QQ_4mom",&dataIn.mom4_GenQQ);
+        addInput("Gen_mu_4mom",&dataIn.mom4_GenMu);
         addInput("Gen_QQ_size",&dataIn.genQQsize);
         addInput("Gen_mu_size",&dataIn.genMuSize);
         addInput("Gen_QQ_mupl_idx",dataIn.genQQ_mupl_idx);
         addInput("Gen_QQ_mumi_idx",dataIn.genQQ_mumi_idx);
         addInput("Gen_QQ_momId",dataIn.GenQQid);
     }
+    else
+    {
+        if( (cut->getLoopObj() == OniaCutter::loopObj::genMu) ||
+            (cut->getLoopObj() == OniaCutter::loopObj::genQQ) )
+        {
+            throw std::invalid_argument("ERROR: Cut inconsistency\n");
+        }
+    }
 
-    //output branches
-    addOutput("mass",&dataOut.mass);
-    addOutput("eta",&dataOut.eta);
-    addOutput("phi",&dataOut.phi);
-    addOutput("pT",&dataOut.pT);
-    addOutput("y",&dataOut.y);
-    addOutput("Evt",&dataOut.Evt);
-    addOutput("pT_mi",&dataOut.pT_mi);
-    addOutput("pT_pl",&dataOut.pT_pl);
-    addOutput("eta_mi",&dataOut.eta_mi);
-    addOutput("eta_pl",&dataOut.eta_pl);
-    addOutput("phi_mi",&dataOut.phi_mi);
-    addOutput("phi_pl",&dataOut.phi_pl);
-
-    auxData.reset(new Onia_Aux());
-    auxData->events.reserve(200000);
+    outputer->setOutputs(*this);
 
     return;
 }
 
+
+
 void OniaSkimmer::ProcessEvent(Long64_t entry)
 {
     if (cutter->prescale(entry)) return;
-    Long64_t size=dataIn.getSizeRecoQQ();
-    
-    for(Long64_t j=0;j<size;++j)
+    Long64_t size=0;
+    switch (cutter->getLoopObj())
     {
-        if (cutter->cut(&dataIn,j,entry))
+    case OniaCutter::loopObj::recoQQ :
+        size=dataIn.getSizeRecoQQ();
+    break;
+    case OniaCutter::loopObj::recoMu :
+        size=dataIn.getSizeRecoMu();
+    break;
+    case OniaCutter::loopObj::genQQ :
+        size=dataIn.getSizeGenQQ();
+    break;
+    case OniaCutter::loopObj::genMu :
+        size=dataIn.getSizeGenMu();
+    break;
+    default:
+        throw std::invalid_argument("Error: Cutter loop obj not properly set");
+        break;
+    }
+    
+    for(Long64_t i=0;i<size;++i)
+    {
+        if (cutter->cut(&dataIn,i,entry))
         {
-            WriteData(j,entry);
+            outputer->WriteData(dataIn,i,entry);
             FillEntries();
         }
     }
-}
-
-void OniaSkimmer::WriteData(Int_t index, Long64_t entry)
-{
-    TLorentzVector* mom4vec=(TLorentzVector*) dataIn.mom4_QQ->At(index);
-    TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn.mom4_mu->At(dataIn.mumi_idx[index]);
-    TLorentzVector* mom4vec_mupl = (TLorentzVector*) dataIn.mom4_mu->At(dataIn.mupl_idx[index]);
-    dataOut.mass= mom4vec->M();
-    dataOut.pT = mom4vec->Pt();
-    dataOut.y = mom4vec->Rapidity();
-    dataOut.phi = mom4vec->Phi();
-    dataOut.eta = mom4vec->Eta();
-    dataOut.Evt = entry;
-
-    dataOut.pT_mi = mom4vec_mumi->Pt();
-    dataOut.eta_mi = mom4vec_mumi->Eta();
-    dataOut.phi_mi = mom4vec_mumi->Phi();
-
-    dataOut.pT_pl = mom4vec_mupl->Pt();
-    dataOut.eta_pl = mom4vec_mupl->Eta();
-    dataOut.phi_pl = mom4vec_mupl->Phi();
-
-    auxData->events.insert({entry,dataOut});
 }
