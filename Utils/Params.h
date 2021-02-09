@@ -6,7 +6,10 @@
 #define RATIO_Y2S (10.023/9.460)
 #define RATIO_Y3S (10.355/9.460)
 
-#define UPSILON_Y1S_PDGID (553)
+//changed to Jpsi that is currently hardcoded to Jpsi
+//Upsilon Y1S PDG ID
+#define UPSILON_Y1S_PDGID (443)
+//#define UPSILON_Y1S_PDGID (553) true PDG
 
 #define ONIATTREENAME ("onia_skimmed")
 #define JETTTREENAME ("jet_skimmed")

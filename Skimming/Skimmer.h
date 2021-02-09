@@ -2,29 +2,11 @@
 #define SKIMMER
 
 #include "TTree.h"
-#include "TLorentzVector.h"
 #include "TString.h"
 #include "TClonesArray.h"
-#include <new>
-#include <functional>
-#include "TTree.h"
 #include <iostream>
 
-#define maxBranchSize (1000)
 #define MAXTREESIZE (25000000000)
-
-template<class T>
-class Cutter
-{
-    public:
-
-    virtual bool cut(T* input, Int_t index,Int_t entry)=0;
-    virtual bool prescale(Int_t entry)=0;
-    virtual bool isMC()=0;
-    virtual bool genLoop()=0;
-
-    virtual ~Cutter() {};
-};
 
 template <class T,class U>
 class Skimmer
@@ -34,7 +16,6 @@ class Skimmer
     std::vector<TBranch*> output_branches;
     TTree* tree_input;
     TTree* tree_output;
-    Cutter<T>* cutter;
 
     void GetEntries(Long64_t index)
     {
@@ -45,21 +26,21 @@ class Skimmer
         return;
     }
 
+    protected:
+    T dataIn;
+    U dataOut;
+
+    virtual void ProcessEvent(Long64_t entry) = 0;
+
     void FillEntries()
     {
         tree_output->Fill();
         return;
     }
 
-    protected:
-    T dataIn;
-    U dataOut;
-
-    virtual void WriteData(Int_t index, Long64_t entry) = 0;
-
     public:
-    Skimmer(TTree* treeIn, const char* treeOutName, Cutter<T>* cut) 
-    :tree_input(treeIn) ,input_branches(), output_branches(), cutter(cut)
+    Skimmer(TTree* treeIn, const char* treeOutName) 
+    :tree_input(treeIn) ,input_branches(), output_branches()
     {
         TString name(tree_input->GetName());
         tree_output= new TTree(treeOutName, "Skimmed tree");
@@ -82,23 +63,9 @@ class Skimmer
             {
                 std::cout <<"Processing: " << block*5 << "% \n";
                 ++block;
-            }
-
-            if (cutter->prescale(i)) continue;
-                
+            }  
             GetEntries(i);
-
-            Long64_t sizeQQ=dataIn.getSize();
-            if (cutter->genLoop()) sizeQQ=dataIn.getSizeGen();//loop over generated muons
-
-            for(Long64_t j=0;j<sizeQQ;++j)
-            {
-                if (cutter->cut(&dataIn,j,i))
-                {
-                    WriteData(j,i);
-                    FillEntries();
-                }
-            }
+            ProcessEvent(i);
         }
         std::cout << "Total readed entries " << entries;
         std::cout << " from '" << tree_input->GetName() << "' tree\n";

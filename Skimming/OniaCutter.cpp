@@ -1,5 +1,7 @@
 
+
 #include "OniaCutter.h"
+#include "TLorentzVector.h"
 
 OniaCutter::OniaCutter(const cutParams* cut):
 kineCut(*cut)
@@ -8,7 +10,7 @@ kineCut(*cut)
 
 bool OniaCutter::cut(Onia_Input* input,Int_t index,Int_t entry)
 {
-    if(genLoop())
+    if(false)
     {
         Int_t idPdg=input->GenQQid[index];
         return (idPdg==UPSILON_Y1S_PDGID) || (idPdg==-UPSILON_Y1S_PDGID);

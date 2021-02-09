@@ -9,8 +9,6 @@
 #include "../Utils/utils.h"
 #include "OniaSkimmer.h"
 #include "OniaCutter.h"
-#include "JetSkimmer.h"
-#include "JetCutter.h"
 
 void Skimming(const char* filename,const char* outputfilename);
 

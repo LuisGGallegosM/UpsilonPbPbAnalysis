@@ -97,31 +97,6 @@ TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>
     return wroteTree;
 }
 
-/**
- * @brief Same functionality as oniaSkim, but for jets.
- * 
- * @param file File where to get the tree to skim.
- * @param wroteTreeName Name of the skimmed tree to write
- * @param auxData A place where to get auxiliary data used for jet skimming.
- * @return Tree with skimmed data.
- */
-TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData)
-{
-    TTree *myTree = (TTree *)file->Get("ak3PFJetAnalyzer/t");
-    if (myTree == nullptr)
-    {
-        std::cout << "ak3PFJetAnalyzer/t tree not found\n";
-        return nullptr;
-    }
-
-    JetCutter cutter(auxData);
-    
-    JetSkimmer skimmer(myTree,wroteTreeName,auxData,&cutter);
-    TTree* wroteTree =skimmer.Skim();
-
-    return wroteTree;
-}
-
 #if !defined(__CLING__)
 
 int main(int argc, char **argv)

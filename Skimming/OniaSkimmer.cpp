@@ -1,16 +1,18 @@
 
 
 #include "OniaSkimmer.h"
+#include "TLorentzVector.h"
 
-OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, Cutter<Onia_Input>* cut) 
-: Skimmer(treeIn,treeOutName,cut)
+OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, OniaCutter* cut) 
+: Skimmer(treeIn,treeOutName), cutter(cut)
 {
     TBranch* branch;
 
     //input branches
     addInput("Reco_QQ_4mom",&dataIn.mom4_QQ);
     addInput("Reco_mu_4mom",&dataIn.mom4_mu);
-    addInput("Reco_QQ_size",&dataIn.size);
+    addInput("Reco_QQ_size",&dataIn.recoQQsize);
+    addInput("Reco_mu_size",&dataIn.recoMuSize);
     addInput("Reco_QQ_mupl_idx",dataIn.mupl_idx);
     addInput("Reco_QQ_mumi_idx",dataIn.mumi_idx);
     addInput("Reco_mu_SelectionType",dataIn.SelectionType);
@@ -21,6 +23,7 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, Cutter<Onia_Inpu
     addInput("Reco_QQ_VtxProb",dataIn.VtxProb);
     addInput("Reco_QQ_trig",dataIn.trig);
     addInput("Reco_QQ_sign",dataIn.sign);
+    
 
     //MC only branch check
     if((treeIn->GetBranch("Reco_mu_whichGen")!=nullptr) && (!cut->isMC()))
@@ -32,6 +35,7 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, Cutter<Onia_Inpu
     {
         addInput("Reco_mu_whichGen",dataIn.RecoMuWhichGen);
         addInput("Gen_QQ_size",&dataIn.genQQsize);
+        addInput("Gen_mu_size",&dataIn.genMuSize);
         addInput("Gen_QQ_mupl_idx",dataIn.genQQ_mupl_idx);
         addInput("Gen_QQ_mumi_idx",dataIn.genQQ_mumi_idx);
         addInput("Gen_QQ_momId",dataIn.GenQQid);
@@ -57,6 +61,21 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, Cutter<Onia_Inpu
     return;
 }
 
+void OniaSkimmer::ProcessEvent(Long64_t entry)
+{
+    if (cutter->prescale(entry)) return;
+    Long64_t size=dataIn.getSizeRecoQQ();
+    
+    for(Long64_t j=0;j<size;++j)
+    {
+        if (cutter->cut(&dataIn,j,entry))
+        {
+            WriteData(j,entry);
+            FillEntries();
+        }
+    }
+}
+
 void OniaSkimmer::WriteData(Int_t index, Long64_t entry)
 {
     TLorentzVector* mom4vec=(TLorentzVector*) dataIn.mom4_QQ->At(index);
@@ -78,47 +97,4 @@ void OniaSkimmer::WriteData(Int_t index, Long64_t entry)
     dataOut.phi_pl = mom4vec_mupl->Phi();
 
     auxData->events.insert({entry,dataOut});
-}
-
-//***********************************************
-//Onia structs
-
-Onia_Input::Onia_Input()
-{
-    mom4_QQ = new TClonesArray("TLorentzVector");
-    mom4_mu = new TClonesArray("TLorentzVector");
-    mupl_idx = new Int_t[maxBranchSize];
-    mumi_idx = new Int_t[maxBranchSize];
-    SelectionType = new Int_t[maxBranchSize];
-    nTrkWMea = new Int_t[maxBranchSize];
-    nPixWMea = new Int_t[maxBranchSize];
-    dxy = new Float_t[maxBranchSize];
-    dz = new Float_t[maxBranchSize]; 
-    VtxProb = new Float_t[maxBranchSize];
-    trig = new ULong64_t[maxBranchSize];
-    RecoMuWhichGen = new Int_t[maxBranchSize];
-    genQQ_mupl_idx = new Int_t[maxBranchSize];
-    genQQ_mumi_idx = new Int_t[maxBranchSize];
-    GenQQid = new Int_t[maxBranchSize];
-    sign = new Int_t[maxBranchSize];
-}
-
-Onia_Input::~Onia_Input()
-{
-    delete mom4_QQ;
-    delete mom4_mu;
-    delete[] mupl_idx;
-    delete[] mumi_idx;
-    delete[] SelectionType;
-    delete[] nTrkWMea;
-    delete[] nPixWMea;
-    delete[] dxy;
-    delete[] dz;
-    delete[] VtxProb;
-    delete[] trig;
-    delete[] RecoMuWhichGen;
-    delete[] genQQ_mupl_idx;
-    delete[] genQQ_mumi_idx;
-    delete[] GenQQid;
-    delete[] sign;
 }
