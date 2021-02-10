@@ -1,7 +1,6 @@
 #include "Skimming.h"
 
-TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData, const cutParams* kineCut);
-TTree* jetSkim(TFile *file,const char* wroteTreeName, Onia_Aux* auxData);
+std::unique_ptr<OniaOutputer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* kineCut);
 void SetCutParams(cutParams* kineCut);
 
 using std::ofstream;
@@ -52,15 +51,9 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
 
     //tree to write skimmed data
-    std::unique_ptr<Onia_Aux> auxData;
-
-    TTree* onia_skimmed =  oniaSkim(file,ONIATTREENAME,&auxData,&cut);
+    std::unique_ptr<OniaOutputer> onia_skimmed =  oniaSkim(file,ONIATTREENAME,&cut);
     if (onia_skimmed==nullptr) return;
-    onia_skimmed->Write(0,TObject::kOverwrite);
-
-    //TTree* jet_skimmed = jetSkim(file,JETTTREENAME,auxData.get());
-    //if (jet_skimmed==nullptr) return;
-    //jet_skimmed->Write(0,TObject::kOverwrite);
+    onia_skimmed->Write();
 
     outputfile.Close();
     file->Close();
@@ -77,7 +70,7 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
  * @param auxData A place where to save auxiliary data used for jet skimming.
  * @return Tree with skimmed data.
  */
-TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>* auxData, const cutParams* cut)
+std::unique_ptr<OniaOutputer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* cut)
 {
     TTree *myTree = (TTree *)file->Get("hionia/myTree");
     if (myTree == nullptr)
@@ -90,14 +83,12 @@ TTree* oniaSkim(TFile *file,const char* wroteTreeName, std::unique_ptr<Onia_Aux>
     //std::unique_ptr<OniaCutter> cutter(new OniaCutterRecoQQ(cut));
     //std::unique_ptr<OniaOutputer> outputer(new OniaOutputerQQ());
     std::unique_ptr<OniaCutter> cutter(new OniaCutterRecoMu());
-    std::unique_ptr<OniaOutputer> outputer(new OniaOutputerMu());
+    std::unique_ptr<OniaOutputer> outputer(new OniaOutputerMu(wroteTreeName));
 
-    OniaSkimmer skimmer = OniaSkimmer(myTree,wroteTreeName,outputer.get(),cutter.get());
-    TTree* wroteTree = skimmer.Skim();
+    OniaSkimmer skimmer = OniaSkimmer(myTree,outputer.get(),cutter.get());
+    skimmer.Skim();
 
-    //(*auxData) = std::move(skimmer.auxData);
-
-    return wroteTree;
+    return outputer;
 }
 
 #if !defined(__CLING__)

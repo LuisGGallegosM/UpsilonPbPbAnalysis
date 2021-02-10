@@ -1,12 +1,9 @@
 
 #include "Skimmer.h"
 
-Skimmer::Skimmer(TTree* treeIn, const char* treeOutName) 
-    :tree_input(treeIn) ,input_branches(), output_branches()
+Skimmer::Skimmer(TTree* treeIn) 
+    :tree_input(treeIn) ,input_branches()
 {
-    TString name(tree_input->GetName());
-    tree_output= new TTree(treeOutName, "Skimmed tree");
-    tree_output->SetMaxTreeSize(MAXTREESIZE);
 }
 
 void Skimmer::GetEntries(Long64_t index)
@@ -15,16 +12,9 @@ void Skimmer::GetEntries(Long64_t index)
     {
         input_branches[i]->GetEntry(index);
     }
-        return;
  }
 
-void Skimmer::FillEntries()
-{
-    tree_output->Fill();
-    return;
-}
-
-TTree* Skimmer::Skim()
+void Skimmer::Skim()
 {
     int block =0;
     Long64_t entries= tree_input->GetEntries();
@@ -38,27 +28,13 @@ TTree* Skimmer::Skim()
         {
             std::cout <<"Processing: " << block*5 << "% \n";
             ++block;
-        }  
+        }
         GetEntries(i);
         ProcessEvent(i);
     }
     std::cout << "Total readed entries " << entries;
     std::cout << " from '" << tree_input->GetName() << "' tree\n";
-    std::cout << "Total output entries " << tree_output->GetEntries();
-    std::cout << " to '" << tree_output->GetName() << "' tree\nDone.\n";
-    return tree_output;
-}
-
-void Skimmer::addOutput(const char* varName, Float_t* var)
-{
-    TBranch* branch =tree_output->Branch(varName, var);
-    output_branches.push_back(branch);
-}
-
-void Skimmer::addOutput(const char* varName, Int_t* var)
-{
-    TBranch* branch =tree_output->Branch(varName, var);
-    output_branches.push_back(branch);
+    return;
 }
 
 void Skimmer::addInput(const char* varName,void* address)
@@ -69,7 +45,6 @@ void Skimmer::addInput(const char* varName,void* address)
         std::string error = std::string("Tried to read branch '")+varName+ "' does not exist.";
         throw std::runtime_error(error);
     }
-
     branch->SetAddress(address);
     input_branches.push_back(branch);
  }

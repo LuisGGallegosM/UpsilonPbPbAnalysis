@@ -2,21 +2,49 @@
 #include "OniaOutput.h"
 #include "TLorentzVector.h"
 
-void OniaOutputerQQ::setOutputs(Skimmer& skimmer)
+//OniaOutputerTree
+OniaOutputerTree::OniaOutputerTree(const char* treeOutName)
+{
+    tree_output= new TTree(treeOutName, "Skimmed tree");
+    tree_output->SetMaxTreeSize(MAXTREESIZE);
+}
+
+void OniaOutputerTree::addOutput(const char* varName, Float_t* var)
+{
+    TBranch* branch =tree_output->Branch(varName, var);
+    output_branches.push_back(branch);
+}
+
+void OniaOutputerTree::addOutput(const char* varName, Int_t* var)
+{
+    TBranch* branch =tree_output->Branch(varName, var);
+    output_branches.push_back(branch);
+}
+
+void OniaOutputerTree::Write() 
+{
+    std::cout << "Total output entries " << tree_output->GetEntries();
+    std::cout << " to '" << tree_output->GetName() << "' tree\nDone.\n";
+    tree_output->Write(0,TObject::kOverwrite); 
+}
+
+//OniaOutputerQQ
+
+OniaOutputerQQ::OniaOutputerQQ(const char* treeOutName) : OniaOutputerTree(treeOutName) , dataOut()
 {
    //output branches
-    skimmer.addOutput("mass",&dataOut.mass);
-    skimmer.addOutput("eta",&dataOut.eta);
-    skimmer.addOutput("phi",&dataOut.phi);
-    skimmer.addOutput("pT",&dataOut.pT);
-    skimmer.addOutput("y",&dataOut.y);
-    skimmer.addOutput("Evt",&dataOut.Evt);
-    skimmer.addOutput("pT_mi",&dataOut.pT_mi);
-    skimmer.addOutput("pT_pl",&dataOut.pT_pl);
-    skimmer.addOutput("eta_mi",&dataOut.eta_mi);
-    skimmer.addOutput("eta_pl",&dataOut.eta_pl);
-    skimmer.addOutput("phi_mi",&dataOut.phi_mi);
-    skimmer.addOutput("phi_pl",&dataOut.phi_pl);
+    addOutput("mass",&dataOut.mass);
+    addOutput("eta",&dataOut.eta);
+    addOutput("phi",&dataOut.phi);
+    addOutput("pT",&dataOut.pT);
+    addOutput("y",&dataOut.y);
+    addOutput("Evt",&dataOut.Evt);
+    addOutput("pT_mi",&dataOut.pT_mi);
+    addOutput("pT_pl",&dataOut.pT_pl);
+    addOutput("eta_mi",&dataOut.eta_mi);
+    addOutput("eta_pl",&dataOut.eta_pl);
+    addOutput("phi_mi",&dataOut.phi_mi);
+    addOutput("phi_pl",&dataOut.phi_pl);
 
     //auxData.reset(new Onia_Aux());
     //auxData->events.reserve(200000);
@@ -42,24 +70,29 @@ void OniaOutputerQQ::WriteData(const Onia_Input& dataIn,Int_t index, Long64_t en
     dataOut.eta_pl = mom4vec_mupl->Eta();
     dataOut.phi_pl = mom4vec_mupl->Phi();
 
-    //auxData->events.insert({entry,dataOut});
+    FillEntries();
 }
 
-//mu
+//OniaOutputerMu
 
-void OniaOutputerMu::setOutputs(Skimmer& skimmer)
+OniaOutputerMu::OniaOutputerMu(const char* treeOutName) : OniaOutputerTree(treeOutName) , dataOut()
 {
    //output branches
-    skimmer.addOutput("mass",&dataOut.mass);
-    skimmer.addOutput("eta",&dataOut.eta);
-    skimmer.addOutput("phi",&dataOut.phi);
-    skimmer.addOutput("pT",&dataOut.pT);
-    skimmer.addOutput("y",&dataOut.y);
-    skimmer.addOutput("Evt",&dataOut.Evt);
-    skimmer.addOutput("dR",&dataOut.dR);
+    addOutput("mass",&dataOut.mass);
+    addOutput("eta",&dataOut.eta);
+    addOutput("phi",&dataOut.phi);
+    addOutput("pT",&dataOut.pT);
+    addOutput("y",&dataOut.y);
+    addOutput("Evt",&dataOut.Evt);
+    addOutput("dR",&dataOut.dR);
 
-    //auxData.reset(new Onia_Aux());
-    //auxData->events.reserve(200000);
+    hist = new TH1F("dR","dR",1000,-0.1,0.1);
+}
+
+void OniaOutputerMu::Write()
+{
+    OniaOutputerTree::Write(); 
+    hist->Write(); 
 }
 
 void OniaOutputerMu::WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry)
@@ -78,4 +111,9 @@ void OniaOutputerMu::WriteData(const Onia_Input& dataIn,Int_t index, Long64_t en
     if (dPhi > M_PI) dPhi-=M_PI;
     if (dPhi < -M_PI) dPhi+=M_PI;
     dataOut.dR=sqrt(dEta*dEta+dPhi*dPhi);
+
+    hist->Fill(dataOut.dR);
+    FillEntries();
 }
+
+

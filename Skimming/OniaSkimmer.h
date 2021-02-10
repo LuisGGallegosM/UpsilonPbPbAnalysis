@@ -14,8 +14,7 @@ class OniaSkimmer : public Skimmer
     OniaOutputer* outputer;
     void ProcessEvent(Long64_t entry) override;
     public:
-    OniaSkimmer(TTree* treeIn,const char* treeOutName, OniaOutputer* outp , OniaCutter* cut);
-    //std::unique_ptr<Onia_Aux> auxData;
+    OniaSkimmer(TTree* treeIn,OniaOutputer* outp , OniaCutter* cut);
 };
 
 #if defined(__CLING__)

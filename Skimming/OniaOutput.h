@@ -1,9 +1,10 @@
 #ifndef ONIAOUTPUT
 #define ONIAOUTPUT
 
-#include "RtypesCore.h"
+#include "TTree.h"
 #include "Skimmer.h"
 #include "OniaData.h"
+#include "TH1.h"
 
 struct Onia_Output_QQ
 {
@@ -32,39 +33,54 @@ struct Onia_Output_Mu
     Float_t dR;
 };
 
-struct Onia_Aux
-{
-    std::unordered_map<Long64_t,Onia_Output_QQ> events;
-};
-
 class OniaOutputer
 {
     public:
-    virtual void setOutputs(Skimmer& skimmer) = 0;
     virtual void WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry) = 0;
     virtual ~OniaOutputer() {};
+    virtual void Write() = 0;
 };
 
-class OniaOutputerQQ : public OniaOutputer
+class OniaOutputerTree : public OniaOutputer
+{
+    private:
+    TTree* tree_output;
+    std::vector<TBranch*> output_branches;
+
+    protected:
+    void addOutput(const char* varName,Float_t* var);
+    void addOutput(const char* varName,Int_t* var);
+
+    public:
+    OniaOutputerTree(const char* treeOutName);
+
+    TTree* GetTree() {return tree_output;}
+    void FillEntries(){ tree_output->Fill();}
+    void Write() override;
+};
+
+class OniaOutputerQQ : public OniaOutputerTree
 {
     private:
     Onia_Output_QQ dataOut;
-    public:
-    void setOutputs(Skimmer& skimmer) override;
-    void WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry) override;
 
-    OniaOutputerQQ() : dataOut() {}
+    public:
+    OniaOutputerQQ(const char* treeOutName);
+
+    void WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry) override;
 };
 
-class OniaOutputerMu : public OniaOutputer
+class OniaOutputerMu : public OniaOutputerTree
 {
     private:
+    TH1F* hist;
     Onia_Output_Mu dataOut;
-    public:
-    void setOutputs(Skimmer& skimmer) override;
-    void WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry) override;
 
-    OniaOutputerMu() : dataOut() {}
+    public:
+    OniaOutputerMu(const char* treeOutName);
+
+    void WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry) override;
+    void Write() override;
 };
 
 #endif

@@ -3,8 +3,8 @@
 #include "OniaSkimmer.h"
 #include "TLorentzVector.h"
 
-OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, OniaOutputer* outp , OniaCutter* cut) 
-: Skimmer(treeIn,treeOutName), cutter(cut), outputer(outp)
+OniaSkimmer::OniaSkimmer(TTree* treeIn, OniaOutputer* outp , OniaCutter* cut) 
+: Skimmer(treeIn), cutter(cut), outputer(outp)
 {
     TBranch* branch;
 
@@ -50,9 +50,6 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn,const char* treeOutName, OniaOutputer* ou
             throw std::invalid_argument("ERROR: Cut inconsistency\n");
         }
     }
-
-    outputer->setOutputs(*this);
-
     return;
 }
 
@@ -86,7 +83,6 @@ void OniaSkimmer::ProcessEvent(Long64_t entry)
         if (cutter->cut(&dataIn,i,entry))
         {
             outputer->WriteData(dataIn,i,entry);
-            FillEntries();
         }
     }
 }
