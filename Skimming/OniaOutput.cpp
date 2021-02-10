@@ -30,24 +30,20 @@ void OniaOutputerTree::Write()
 
 //OniaOutputerQQ
 
-OniaOutputerQQ::OniaOutputerQQ(const char* treeOutName) : OniaOutputerTree(treeOutName) , dataOut()
+OniaOutputerQQ::OniaOutputerQQ(const char* treeOutName) : OniaOutputerTree(treeOutName)
 {
-   //output branches
-    addOutput("mass",&dataOut.mass);
-    addOutput("eta",&dataOut.eta);
-    addOutput("phi",&dataOut.phi);
-    addOutput("pT",&dataOut.pT);
-    addOutput("y",&dataOut.y);
-    addOutput("Evt",&dataOut.Evt);
-    addOutput("pT_mi",&dataOut.pT_mi);
-    addOutput("pT_pl",&dataOut.pT_pl);
-    addOutput("eta_mi",&dataOut.eta_mi);
-    addOutput("eta_pl",&dataOut.eta_pl);
-    addOutput("phi_mi",&dataOut.phi_mi);
-    addOutput("phi_pl",&dataOut.phi_pl);
-
-    //auxData.reset(new Onia_Aux());
-    //auxData->events.reserve(200000);
+    addOutput("mass",&mass);
+    addOutput("eta",&eta);
+    addOutput("phi",&phi);
+    addOutput("pT",&pT);
+    addOutput("y",&y);
+    addOutput("Evt",&Evt);
+    addOutput("pT_mi",&pT_mi);
+    addOutput("pT_pl",&pT_pl);
+    addOutput("eta_mi",&eta_mi);
+    addOutput("eta_pl",&eta_pl);
+    addOutput("phi_mi",&phi_mi);
+    addOutput("phi_pl",&phi_pl);
 }
 
 void OniaOutputerQQ::WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry)
@@ -55,36 +51,35 @@ void OniaOutputerQQ::WriteData(const Onia_Input& dataIn,Int_t index, Long64_t en
     TLorentzVector* mom4vec=(TLorentzVector*) dataIn.mom4_RecoQQ->At(index);
     TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn.mom4_RecoMu->At(dataIn.mumi_idx[index]);
     TLorentzVector* mom4vec_mupl = (TLorentzVector*) dataIn.mom4_RecoMu->At(dataIn.mupl_idx[index]);
-    dataOut.mass= mom4vec->M();
-    dataOut.pT = mom4vec->Pt();
-    dataOut.y = mom4vec->Rapidity();
-    dataOut.phi = mom4vec->Phi();
-    dataOut.eta = mom4vec->Eta();
-    dataOut.Evt = entry;
+    mass= mom4vec->M();
+    pT = mom4vec->Pt();
+    y = mom4vec->Rapidity();
+    phi = mom4vec->Phi();
+    eta = mom4vec->Eta();
+    Evt = entry;
 
-    dataOut.pT_mi = mom4vec_mumi->Pt();
-    dataOut.eta_mi = mom4vec_mumi->Eta();
-    dataOut.phi_mi = mom4vec_mumi->Phi();
+    pT_mi = mom4vec_mumi->Pt();
+    eta_mi = mom4vec_mumi->Eta();
+    phi_mi = mom4vec_mumi->Phi();
 
-    dataOut.pT_pl = mom4vec_mupl->Pt();
-    dataOut.eta_pl = mom4vec_mupl->Eta();
-    dataOut.phi_pl = mom4vec_mupl->Phi();
+    pT_pl = mom4vec_mupl->Pt();
+    eta_pl = mom4vec_mupl->Eta();
+    phi_pl = mom4vec_mupl->Phi();
 
     FillEntries();
 }
 
 //OniaOutputerMu
 
-OniaOutputerMu::OniaOutputerMu(const char* treeOutName) : OniaOutputerTree(treeOutName) , dataOut()
+OniaOutputerMu::OniaOutputerMu(const char* treeOutName) : OniaOutputerTree(treeOutName)
 {
-   //output branches
-    addOutput("mass",&dataOut.mass);
-    addOutput("eta",&dataOut.eta);
-    addOutput("phi",&dataOut.phi);
-    addOutput("pT",&dataOut.pT);
-    addOutput("y",&dataOut.y);
-    addOutput("Evt",&dataOut.Evt);
-    addOutput("dR",&dataOut.dR);
+    addOutput("mass",&mass);
+    addOutput("eta",&eta);
+    addOutput("phi",&phi);
+    addOutput("pT",&pT);
+    addOutput("y",&y);
+    addOutput("Evt",&Evt);
+    addOutput("dR",&dR);
 
     hist = new TH1F("dR","dR",1000,-0.1,0.1);
 }
@@ -100,19 +95,20 @@ void OniaOutputerMu::WriteData(const Onia_Input& dataIn,Int_t index, Long64_t en
     TLorentzVector* mom4vecRecoMu=(TLorentzVector*) dataIn.mom4_RecoMu->At(index);
     int genMuIndex= dataIn.RecoMuWhichGen[index];
     TLorentzVector* mom4vecGenMu=(TLorentzVector*) dataIn.mom4_GenMu->At(genMuIndex);
-    dataOut.mass= mom4vecRecoMu->M();
-    dataOut.pT = mom4vecRecoMu->Pt();
-    dataOut.y = mom4vecRecoMu->Rapidity();
-    dataOut.phi = mom4vecRecoMu->Phi();
-    dataOut.eta = mom4vecRecoMu->Eta();
-    dataOut.Evt = entry;
-    float dEta = dataOut.eta - mom4vecGenMu->Eta();
-    float dPhi = dataOut.phi - mom4vecGenMu->Phi();
+    
+    mass= mom4vecRecoMu->M();
+    pT = mom4vecRecoMu->Pt();
+    y = mom4vecRecoMu->Rapidity();
+    phi = mom4vecRecoMu->Phi();
+    eta = mom4vecRecoMu->Eta();
+    Evt = entry;
+    float dEta = eta - mom4vecGenMu->Eta();
+    float dPhi = phi - mom4vecGenMu->Phi();
     if (dPhi > M_PI) dPhi-=M_PI;
     if (dPhi < -M_PI) dPhi+=M_PI;
-    dataOut.dR=sqrt(dEta*dEta+dPhi*dPhi);
+    dR=sqrt(dEta*dEta+dPhi*dPhi);
 
-    hist->Fill(dataOut.dR);
+    hist->Fill(dR);
     FillEntries();
 }
 

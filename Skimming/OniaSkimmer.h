@@ -8,11 +8,12 @@
 
 class OniaSkimmer : public Skimmer
 {
+    private:
     Onia_Input dataIn;
-    protected:
     OniaCutter* cutter;
     OniaOutputer* outputer;
     void ProcessEvent(Long64_t entry) override;
+    
     public:
     OniaSkimmer(TTree* treeIn,OniaOutputer* outp , OniaCutter* cut);
 };

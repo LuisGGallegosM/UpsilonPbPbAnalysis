@@ -22,7 +22,7 @@ class OniaCutterRecoQQ : public OniaCutter
 
     public:
     bool cut(Onia_Input* input, Int_t index,Int_t entry) override;
-    bool prescale(Int_t entry) const override {return (kineCut.prescale>1) && ((entry % kineCut.prescale)!=0);}
+    bool prescale(Int_t entry) const override { return (kineCut.prescale>1) && ((entry % kineCut.prescale)!=0); }
     bool isMC() const override { return kineCut.isMC; }
     loopObj getLoopObj() const override { return loopObj::recoQQ;};
     

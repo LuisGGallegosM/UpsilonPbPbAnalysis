@@ -53,8 +53,6 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn, OniaOutputer* outp , OniaCutter* cut)
     return;
 }
 
-
-
 void OniaSkimmer::ProcessEvent(Long64_t entry)
 {
     if (cutter->prescale(entry)) return;

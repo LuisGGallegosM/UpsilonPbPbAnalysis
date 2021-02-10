@@ -17,13 +17,14 @@ class Skimmer
 
     protected:
     virtual void ProcessEvent(Long64_t entry) = 0;
+    
+    void addInput(const char* varName,void* address);
 
     public:
     Skimmer(TTree* treeIn);
     virtual ~Skimmer() {}
 
     void Skim();
-    void addInput(const char* varName,void* address);
 };
 
 #endif
