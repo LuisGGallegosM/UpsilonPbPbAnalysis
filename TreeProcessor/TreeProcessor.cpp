@@ -1,12 +1,13 @@
 
-#include "Skimmer.h"
+#include "TreeProcessor.h"
+#include <iostream>
 
-Skimmer::Skimmer(TTree* treeIn) 
+TreeProcessor::TreeProcessor(TTree* treeIn) 
     :tree_input(treeIn) ,input_branches()
 {
 }
 
-void Skimmer::GetEntries(Long64_t index)
+void TreeProcessor::GetEntries(Long64_t index)
 {
     for(int i=0 ;i<input_branches.size();i++)
     {
@@ -14,7 +15,7 @@ void Skimmer::GetEntries(Long64_t index)
     }
  }
 
-void Skimmer::Skim()
+void TreeProcessor::Process()
 {
     int block =0;
     Long64_t entries= tree_input->GetEntries();
@@ -37,7 +38,7 @@ void Skimmer::Skim()
     return;
 }
 
-void Skimmer::addInput(const char* varName,void* address)
+void TreeProcessor::addInput(const char* varName,void* address)
 {
     TBranch* branch = tree_input->GetBranch(varName);
     if (branch ==nullptr)

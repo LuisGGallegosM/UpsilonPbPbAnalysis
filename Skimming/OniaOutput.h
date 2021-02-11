@@ -2,40 +2,18 @@
 #define ONIAOUTPUT
 
 #include "TTree.h"
-#include "Skimmer.h"
 #include "OniaData.h"
 #include "TH1.h"
+#include "../TreeProcessor/Outputer.h"
 
-class OniaOutputer
+class OniaOutputer : public TreeOutputer
 {
     public:
+    OniaOutputer(const char* treeOutName) : TreeOutputer(treeOutName) { }
     virtual void WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry) = 0;
-    virtual void Write() = 0;
-
-    virtual ~OniaOutputer() {};
 };
 
-class OniaOutputerTree : public OniaOutputer
-{
-    private:
-    TTree* tree_output;
-    std::vector<TBranch*> output_branches;
-
-    protected:
-    void addOutput(const char* varName,Float_t* var);
-    void addOutput(const char* varName,Int_t* var);
-
-    public:
-    OniaOutputerTree(const char* treeOutName);
-
-    void Write() override;
-
-    TTree* GetTree() {return tree_output;}
-    void FillEntries(){ tree_output->Fill();}
-    
-};
-
-class OniaOutputerQQ : public OniaOutputerTree
+class OniaOutputerQQ : public OniaOutputer
 {
     private:
     Int_t Evt;
@@ -55,25 +33,6 @@ class OniaOutputerQQ : public OniaOutputerTree
     OniaOutputerQQ(const char* treeOutName);
 
     void WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry) override;
-};
-
-class OniaOutputerMu : public OniaOutputerTree
-{
-    private:
-    TH1F* hist;
-    Int_t Evt;
-    Float_t mass;
-    Float_t pT;
-    Float_t y;
-    Float_t phi;
-    Float_t eta;
-    Float_t dR;
-
-    public:
-    OniaOutputerMu(const char* treeOutName);
-
-    void WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry) override;
-    void Write() override;
 };
 
 #endif

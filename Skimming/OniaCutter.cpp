@@ -10,11 +10,6 @@ kineCut(*cut)
 
 bool OniaCutterRecoQQ::cut(Onia_Input* input,Int_t index,Int_t entry)
 {
-    if(false)
-    {
-        Int_t idPdg=input->GenQQid[index];
-        return (idPdg==UPSILON_Y1S_PDGID) || (idPdg==-UPSILON_Y1S_PDGID);
-    }
     //check for triggers
     if ((input->trig[index] & kineCut.trigSelect) != kineCut.trigSelect) return false;
 
@@ -86,10 +81,4 @@ Int_t OniaCutterRecoQQ::findMatchGenQQ(Int_t genMuPl, Int_t genMuMi, Int_t* genQ
         }
     }
     return match;
-}
-
-bool OniaCutterRecoMu::cut(Onia_Input* input, Int_t index,Int_t entry)
-{
-    int genMuIndex= input->RecoMuWhichGen[index];
-    return (genMuIndex >=0);
 }

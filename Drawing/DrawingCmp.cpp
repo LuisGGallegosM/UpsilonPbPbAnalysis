@@ -3,7 +3,7 @@
 #include"DrawingCmp.h"
 #include <vector>
 #include<algorithm>
-#include"../Utils/Params.h"
+#include"../Utils/FitParams.h"
 #include"../Utils/utils.h"
 #include"TH1.h"
 #include"TCanvas.h"

@@ -1,6 +1,7 @@
-#include "Skimming.h"
 
-std::unique_ptr<OniaOutputer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* kineCut);
+#include "AccEff.h"
+
+std::unique_ptr<AccOutputer> AccEff(TFile *file,const char* wroteTreeName, const cutParams* kineCut);
 void SetCutParams(cutParams* kineCut);
 
 using std::ofstream;
@@ -12,7 +13,7 @@ using std::ofstream;
  * @param outputfilename Name of the root output file to save skimmed data.
  * @param cut Cut parameters
  */
-void Skimming(const char* filename,const char* outputfilename, const char* configname)
+void AccEff(const char* filename,const char* outputfilename, const char* configname)
 {
     std::cout << "\nSKIMMING\n";
     std::cout << "Reading input file: " << filename <<'\n';
@@ -38,7 +39,7 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
 
     //tree to write skimmed data
-    std::unique_ptr<OniaOutputer> onia_skimmed =  oniaSkim(file,ONIATTREENAME,&cut);
+    std::unique_ptr<AccOutputer> onia_skimmed =  AccTest(file,ONIATTREENAME,&cut);
     if (onia_skimmed==nullptr) return;
     onia_skimmed->Write();
 
@@ -57,7 +58,7 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
  * @param auxData A place where to save auxiliary data used for jet skimming.
  * @return Tree with skimmed data.
  */
-std::unique_ptr<OniaOutputer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* cut)
+std::unique_ptr<AccOutputer> AccTest(TFile *file,const char* wroteTreeName, const cutParams* cut)
 {
     TTree *myTree = (TTree *)file->Get("hionia/myTree");
     if (myTree == nullptr)
@@ -66,12 +67,11 @@ std::unique_ptr<OniaOutputer> oniaSkim(TFile *file,const char* wroteTreeName, co
         return nullptr;
     }
 
-    //execute skim
-    std::unique_ptr<OniaCutter> cutter(new OniaCutterRecoQQ(cut));
-    std::unique_ptr<OniaOutputer> outputer(new OniaOutputerQQ(wroteTreeName));
+    std::unique_ptr<AccEffCutter> cutter(new AccEffCutter(cut));
+    std::unique_ptr<AccOutputer> outputer(new AccOutputer(wroteTreeName));
 
-    OniaSkimmer skimmer = OniaSkimmer(myTree,outputer.get(),cutter.get());
-    skimmer.Skim();
+    AccTester accTester(myTree,outputer.get(),cutter.get());
+    accTester.Test();
 
     return outputer;
 }
@@ -81,7 +81,7 @@ std::unique_ptr<OniaOutputer> oniaSkim(TFile *file,const char* wroteTreeName, co
 int main(int argc, char **argv)
 {
     if (argc == 4)
-        Skimming(argv[1],argv[2],argv[3]);
+        AccEff(argv[1],argv[2],argv[3]);
     else
     {
           std::cerr << "Incorrect number of parameters\n";  

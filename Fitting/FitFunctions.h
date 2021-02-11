@@ -1,7 +1,7 @@
 #ifndef FITFUNCTIONS
 #define FITFUNCTIONS
 
-#include "../Utils/Params.h"
+#include "../Utils/FitParams.h"
 
 #include "RooRealVar.h"
 #include "RooCBShape.h"

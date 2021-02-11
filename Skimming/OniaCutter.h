@@ -2,15 +2,14 @@
 #define ONIACUTTER
 
 #include "OniaData.h"
-#include "Cutter.h"
+#include "../TreeProcessor/TreeCutter.h"
 #include "HLT_triggers.h"
-#include "../Utils/Params.h"
+#include "../Utils/SkimParams.h"
 
-class OniaCutter : public Cutter<Onia_Input>
+class OniaCutter : public TreeCutter<Onia_Input>
 {
     public:
-    enum class loopObj { none, recoQQ, recoMu, genQQ, genMu };
-    virtual loopObj getLoopObj() const = 0;
+    virtual bool isMC() const =0;
 };
 
 class OniaCutterRecoQQ : public OniaCutter
@@ -24,18 +23,8 @@ class OniaCutterRecoQQ : public OniaCutter
     bool cut(Onia_Input* input, Int_t index,Int_t entry) override;
     bool prescale(Int_t entry) const override { return (kineCut.prescale>1) && ((entry % kineCut.prescale)!=0); }
     bool isMC() const override { return kineCut.isMC; }
-    loopObj getLoopObj() const override { return loopObj::recoQQ;};
     
     OniaCutterRecoQQ(const cutParams* cut);
-};
-
-class OniaCutterRecoMu : public OniaCutter
-{
-    public:
-    bool cut(Onia_Input* input, Int_t index,Int_t entry) override;
-    bool prescale(Int_t entry) const override {return false;}
-    bool isMC() const override { return true; }
-    loopObj getLoopObj() const override { return loopObj::recoMu;};
 };
 
 #if defined(__CLING__)

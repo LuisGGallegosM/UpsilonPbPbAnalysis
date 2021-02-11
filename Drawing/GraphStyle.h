@@ -4,7 +4,7 @@
 #include "TCanvas.h"
 
 #include "RooPlot.h"
-#include "../Utils/Params.h"
+#include "../Utils/DrawParams.h"
 
 void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue ,float bottomValue , bool isLog);
 void setPullStyle(RooPlot* pullPlot, const drawConfig* config);

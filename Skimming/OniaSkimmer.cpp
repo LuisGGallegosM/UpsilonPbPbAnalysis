@@ -4,7 +4,7 @@
 #include "TLorentzVector.h"
 
 OniaSkimmer::OniaSkimmer(TTree* treeIn, OniaOutputer* outp , OniaCutter* cut) 
-: Skimmer(treeIn), cutter(cut), outputer(outp)
+: TreeProcessor(treeIn), cutter(cut), outputer(outp)
 {
     TBranch* branch;
 
@@ -42,39 +42,13 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn, OniaOutputer* outp , OniaCutter* cut)
         addInput("Gen_QQ_mumi_idx",dataIn.genQQ_mumi_idx);
         addInput("Gen_QQ_momId",dataIn.GenQQid);
     }
-    else
-    {
-        if( (cut->getLoopObj() == OniaCutter::loopObj::genMu) ||
-            (cut->getLoopObj() == OniaCutter::loopObj::genQQ) )
-        {
-            throw std::invalid_argument("ERROR: Cut inconsistency\n");
-        }
-    }
     return;
 }
 
 void OniaSkimmer::ProcessEvent(Long64_t entry)
 {
     if (cutter->prescale(entry)) return;
-    Long64_t size=0;
-    switch (cutter->getLoopObj())
-    {
-    case OniaCutter::loopObj::recoQQ :
-        size=dataIn.getSizeRecoQQ();
-    break;
-    case OniaCutter::loopObj::recoMu :
-        size=dataIn.getSizeRecoMu();
-    break;
-    case OniaCutter::loopObj::genQQ :
-        size=dataIn.getSizeGenQQ();
-    break;
-    case OniaCutter::loopObj::genMu :
-        size=dataIn.getSizeGenMu();
-    break;
-    default:
-        throw std::invalid_argument("Error: Cutter loop obj not properly set");
-        break;
-    }
+    Long64_t size=dataIn.getSizeRecoQQ();
     
     for(Long64_t i=0;i<size;++i)
     {

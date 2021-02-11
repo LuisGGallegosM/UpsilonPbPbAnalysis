@@ -2,20 +2,21 @@
 #ifndef ONIASKIMMER
 #define ONIASKIMMER
 
-#include "Skimmer.h"
+#include "../TreeProcessor/TreeProcessor.h"
 #include "OniaCutter.h"
 #include "OniaOutput.h"
 
-class OniaSkimmer : public Skimmer
+class OniaSkimmer : public TreeProcessor
 {
     private:
     Onia_Input dataIn;
     OniaCutter* cutter;
     OniaOutputer* outputer;
     void ProcessEvent(Long64_t entry) override;
-    
+
     public:
     OniaSkimmer(TTree* treeIn,OniaOutputer* outp , OniaCutter* cut);
+    void Skim() { Process(); }
 };
 
 #if defined(__CLING__)

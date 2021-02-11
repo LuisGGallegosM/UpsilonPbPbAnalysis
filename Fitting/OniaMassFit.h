@@ -9,7 +9,7 @@
 #include "RooFitResult.h"
 
 #include "FitFunctions.h"
-#include "../Utils/Params.h"
+#include "../Utils/FitParams.h"
 
 
 class OniaMassFitter
