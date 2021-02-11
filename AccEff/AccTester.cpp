@@ -21,12 +21,22 @@ AccTester::AccTester(TTree* treeIn, AccOutputer* outp , AccEffCutter* cut)
     addInput("Reco_QQ_VtxProb",dataIn.VtxProb);
     addInput("Reco_QQ_trig",dataIn.trig);
     addInput("Reco_QQ_sign",dataIn.sign);
+    addInput("Reco_mu_whichGen",dataIn.RecoMuWhichGen);
+    addInput("Gen_QQ_4mom",&dataIn.mom4_GenQQ);
+    addInput("Gen_mu_4mom",&dataIn.mom4_GenMu);
+    addInput("Gen_QQ_size",&dataIn.genQQsize);
+    addInput("Gen_mu_size",&dataIn.genMuSize);
+    addInput("Gen_QQ_mupl_idx",dataIn.genQQ_mupl_idx);
+    addInput("Gen_QQ_mumi_idx",dataIn.genQQ_mumi_idx);
+    addInput("Gen_QQ_momId",dataIn.GenQQid);
 
     bool dataIsMC=(treeIn->GetBranch("Reco_mu_whichGen")!=nullptr);
     if (!dataIsMC)
     {
         throw std::invalid_argument("ERROR : data is not MC\n");
     }
+
+    std::cout << "Using " << cutter->getName() <<" cutter.\n";
     return;
 }
 
@@ -52,7 +62,6 @@ AccOutputer::AccOutputer(const char* treeOutName) : TreeOutputer(treeOutName)
     addOutput("pT",&pT);
     addOutput("y",&y);
     addOutput("Evt",&Evt);
-    addOutput("dR",&dR);
 
     hist = new TH1F("dR","dR",1000,-0.1,0.1);
 }
@@ -65,22 +74,13 @@ void AccOutputer::Write()
 
 void AccOutputer::WriteData(const AccEffInput& dataIn,Int_t index, Long64_t entry)
 {
-    TLorentzVector* mom4vecRecoMu=(TLorentzVector*) dataIn.mom4_RecoMu->At(index);
-    int genMuIndex= dataIn.RecoMuWhichGen[index];
-    TLorentzVector* mom4vecGenMu=(TLorentzVector*) dataIn.mom4_GenMu->At(genMuIndex);
+    TLorentzVector* mom4vec=(TLorentzVector*) dataIn.mom4_GenMu->At(index);
 
-    mass= mom4vecRecoMu->M();
-    pT = mom4vecRecoMu->Pt();
-    y = mom4vecRecoMu->Rapidity();
-    phi = mom4vecRecoMu->Phi();
-    eta = mom4vecRecoMu->Eta();
+    mass= mom4vec->M();
+    pT = mom4vec->Pt();
+    y = mom4vec->Rapidity();
+    phi = mom4vec->Phi();
+    eta = mom4vec->Eta();
     Evt = entry;
-    float dEta = eta - mom4vecGenMu->Eta();
-    float dPhi = phi - mom4vecGenMu->Phi();
-    if (dPhi > M_PI) dPhi-=M_PI;
-    if (dPhi < -M_PI) dPhi+=M_PI;
-    dR=sqrt(dEta*dEta+dPhi*dPhi);
-
-    hist->Fill(dR);
     FillEntries();
 }

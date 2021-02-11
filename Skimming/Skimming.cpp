@@ -37,7 +37,7 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     //copy cut config file
     CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
 
-    //tree to write skimmed data
+    //skim the data
     std::unique_ptr<OniaOutputer> onia_skimmed =  oniaSkim(file,ONIATTREENAME,&cut);
     if (onia_skimmed==nullptr) return;
     onia_skimmed->Write();
@@ -54,8 +54,7 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
  * 
  * @param file File where to get the tree to skim.
  * @param wroteTreeName Name of the skimmed tree to write
- * @param auxData A place where to save auxiliary data used for jet skimming.
- * @return Tree with skimmed data.
+ * @return Output with skimmed data.
  */
 std::unique_ptr<OniaOutputer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* cut)
 {

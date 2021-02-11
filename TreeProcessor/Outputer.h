@@ -20,8 +20,15 @@ class TreeOutputer : public Outputer
     std::vector<TBranch*> output_branches;
 
     protected:
-    void addOutput(const char* varName,Float_t* var);
-    void addOutput(const char* varName,Int_t* var);
+    template<typename T>
+    void addOutput(const char* varName,T* var)
+    {
+        TBranch* branch =tree_output->Branch(varName, var);
+        if (branch==nullptr)
+            throw std::runtime_error(std::string("Error: Branch ")+varName+" does not exist.\n");
+        output_branches.push_back(branch);
+    }
+
     void FillEntries(){ tree_output->Fill();}
 
     public:

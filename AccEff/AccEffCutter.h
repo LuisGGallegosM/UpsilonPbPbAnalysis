@@ -13,7 +13,9 @@ class AccEffCutter : public TreeCutter<AccEffInput>
 
     public:
     bool cut(AccEffInput* input, Int_t index,Int_t entry) override;
-    bool prescale(Int_t entry) const override { return (kineCut.prescale>1) && ((entry % kineCut.prescale)!=0); }
+    bool prescale(Int_t entry) const override { return false; }
+
+    std::string getName() const override {return "Acceptancy";};
     
     AccEffCutter(const cutParams* cut);
 };

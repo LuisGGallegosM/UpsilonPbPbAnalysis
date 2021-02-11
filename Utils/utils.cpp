@@ -23,7 +23,7 @@ TFile* OpenFile(const char* filename, const char* option)
     //input file is found? is output filename valid?
     if (file==nullptr) 
     {
-        std::cerr << "file "<< filename <<" cannot be read\n";
+        throw std::runtime_error(std::string("file ") + filename +" cannot be read\n");
     }
     return file;
 }

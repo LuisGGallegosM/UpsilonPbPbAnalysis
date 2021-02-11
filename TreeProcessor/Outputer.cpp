@@ -9,18 +9,6 @@ TreeOutputer::TreeOutputer(const char* treeOutName)
     tree_output->SetMaxTreeSize(MAXTREESIZE);
 }
 
-void TreeOutputer::addOutput(const char* varName, Float_t* var)
-{
-    TBranch* branch =tree_output->Branch(varName, var);
-    output_branches.push_back(branch);
-}
-
-void TreeOutputer::addOutput(const char* varName, Int_t* var)
-{
-    TBranch* branch =tree_output->Branch(varName, var);
-    output_branches.push_back(branch);
-}
-
 void TreeOutputer::Write() 
 {
     std::cout << "Total output entries " << tree_output->GetEntries();

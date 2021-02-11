@@ -20,7 +20,7 @@ void TreeProcessor::Process()
     int block =0;
     Long64_t entries= tree_input->GetEntries();
 
-    std::cout << "Skimming of " << tree_input->GetName() <<" tree starting...\n";
+    std::cout << "Processing of " << tree_input->GetName() <<" tree starting...\n";
     std::cout << entries <<" entries in tree\n";
 
     for(Long64_t i=0;i<entries;++i)

@@ -1,21 +1,21 @@
 
 #include "AccEff.h"
 
-std::unique_ptr<AccOutputer> AccEff(TFile *file,const char* wroteTreeName, const cutParams* kineCut);
+std::unique_ptr<AccOutputer> AccTest(TFile *file,const char* wroteTreeName, const cutParams* cut);
 void SetCutParams(cutParams* kineCut);
 
 using std::ofstream;
 
 /**
- * @brief Execute Upsilon 1S skimming: Onia and Jets.
+ * @brief Execute Acceptancy and Efficiency tests.
  * 
- * @param filename Name of file where to find the tree to skim.
- * @param outputfilename Name of the root output file to save skimmed data.
+ * @param filename Name of file where to find the tree to process.
+ * @param outputfilename Name of the root output file to save processed data.
  * @param cut Cut parameters
  */
 void AccEff(const char* filename,const char* outputfilename, const char* configname)
 {
-    std::cout << "\nSKIMMING\n";
+    std::cout << "\nACCEPTANCY AND EFFICIENCY TEST\n";
     std::cout << "Reading input file: " << filename <<'\n';
     std::cout << "Writing to output file: " << outputfilename <<'\n';
     std::cout << "Cut configuration file: " << configname <<'\n';
@@ -38,10 +38,10 @@ void AccEff(const char* filename,const char* outputfilename, const char* confign
     //copy cut config file
     CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
 
-    //tree to write skimmed data
-    std::unique_ptr<AccOutputer> onia_skimmed =  AccTest(file,ONIATTREENAME,&cut);
-    if (onia_skimmed==nullptr) return;
-    onia_skimmed->Write();
+    //Run acceptancy test
+    std::unique_ptr<AccOutputer> results =  AccTest(file,ONIATTREENAME,&cut);
+    if (results==nullptr) return;
+    results->Write();
 
     outputfile->Close();
     file->Close();
@@ -51,12 +51,11 @@ void AccEff(const char* filename,const char* outputfilename, const char* confign
 }
 
 /**
- * @brief Skim 
+ * @brief Acceptancy test
  * 
- * @param file File where to get the tree to skim.
- * @param wroteTreeName Name of the skimmed tree to write
- * @param auxData A place where to save auxiliary data used for jet skimming.
- * @return Tree with skimmed data.
+ * @param file File where to get the tree to acceptancy test.
+ * @param wroteTreeName Name of the acceptancy tree to write
+ * @return Output data.
  */
 std::unique_ptr<AccOutputer> AccTest(TFile *file,const char* wroteTreeName, const cutParams* cut)
 {
@@ -84,7 +83,17 @@ int main(int argc, char **argv)
         AccEff(argv[1],argv[2],argv[3]);
     else
     {
-          std::cerr << "Incorrect number of parameters\n";  
+        if (argc == 1)
+        {
+            const char* defaultfilename = "../rootfiles/merged_HiForestAOD_MC.root";
+            const char* defaultoutputfile = "../rootfiles/merged_HiForestAOD_MC_AccEff";
+            const char* defaultconfig = "../rootfiles/merged_HiForestAOD_MC.cutconf";
+            AccEff(defaultfilename,defaultoutputfile,defaultconfig);
+        }
+        else
+        {
+            std::cerr << "Incorrect number of parameters\n";  
+        }
     }
     return 0;
 }

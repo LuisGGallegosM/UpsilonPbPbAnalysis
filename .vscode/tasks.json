@@ -10,6 +10,13 @@
 		},
 		{
 			"type": "shell",
+			"label": "C++: acceff",
+			"command": "./acceff.sh;",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"type": "shell",
 			"label": "C++: fit",
 			"command": "./fit.sh",
 			"problemMatcher": [],
@@ -40,6 +47,13 @@
 			"type": "shell",
 			"label": "C++: build skim",
 			"command": "./buildskim.sh",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"type": "shell",
+			"label": "C++: build acceff",
+			"command": "./buildacceff.sh",
 			"problemMatcher": [],
 			"group": "build"
 		},

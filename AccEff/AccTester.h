@@ -20,7 +20,7 @@ class AccOutputer : public TreeOutputer
     Float_t dR;
 
     public:
-    AccOutputer(const char* treeOutName) : TreeOutputer(treeOutName) { }
+    AccOutputer(const char* treeOutName);
 
     void WriteData(const AccEffInput& dataIn,Int_t index, Long64_t entry);
     void Write() override;

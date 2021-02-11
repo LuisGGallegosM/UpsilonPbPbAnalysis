@@ -27,6 +27,28 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
+            "name": "g++ acceeff debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/AccEff/acceff",
+            "args": ["../rootfiles/merged_HiForestAOD_MC.root", 
+                    "../rootfiles/merged_HiForestAOD_MC_AccEff",
+                    "../rootfiles/merged_HiForestAOD_MC.cutconf"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Habilitar la impresión con sangría para gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
             "name": "g++ fit debug",
             "type": "cppdbg",
             "request": "launch",
