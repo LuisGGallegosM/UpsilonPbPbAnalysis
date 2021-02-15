@@ -10,6 +10,7 @@ class OniaCutter : public TreeCutter<Onia_Input>
 {
     public:
     virtual bool isMC() const =0;
+    virtual ~OniaCutter() {}
 };
 
 class OniaCutterRecoQQ : public OniaCutter

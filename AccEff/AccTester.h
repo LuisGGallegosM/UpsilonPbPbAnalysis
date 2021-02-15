@@ -5,12 +5,15 @@
 #include "../TreeProcessor/Outputer.h"
 #include "AccEffCutter.h"
 #include "AccEffInput.h"
-#include "TH1.h"
+#include "TH2.h"
 
 class AccOutputer : public TreeOutputer
 {
     private:
-    TH1F* hist;
+    TH2F* etaVsPtHist;
+    TH1F* ptHist;
+    TH1F* ptAccHist;
+    std::map<int,int> pdgIds;
     Int_t Evt;
     Float_t mass;
     Float_t pT;
@@ -18,6 +21,7 @@ class AccOutputer : public TreeOutputer
     Float_t phi;
     Float_t eta;
     Float_t dR;
+    Int_t pdgId;
 
     public:
     AccOutputer(const char* treeOutName);

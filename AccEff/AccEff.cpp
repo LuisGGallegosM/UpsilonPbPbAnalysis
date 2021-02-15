@@ -24,7 +24,7 @@ void AccEff(const char* filename,const char* outputfilename, const char* confign
     TFile* file = OpenFile(filename,"READ");
 
     //output file
-    TFile* outputfile = OpenFile(outputfilename, "CREATE");
+    TFile* outputfile = OpenFile(outputfilename, "RECREATE");
 
     cutParams cut;
     cut.deserialize(configname);
@@ -36,7 +36,7 @@ void AccEff(const char* filename,const char* outputfilename, const char* confign
     }
 
     //copy cut config file
-    CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
+    //CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
 
     //Run acceptancy test
     std::unique_ptr<AccOutputer> results =  AccTest(file,ONIATTREENAME,&cut);

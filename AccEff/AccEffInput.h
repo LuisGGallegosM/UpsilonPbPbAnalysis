@@ -35,9 +35,6 @@ struct AccEffInput
     Int_t* GenQQid;
     Int_t* sign;
 
-    Int_t getSizeRecoMu() const {return recoMuSize;}
-    Int_t getSizeGenMu() const {return genMuSize;}
-
     AccEffInput();
     ~AccEffInput();
 };
