@@ -8,7 +8,7 @@
 class Outputer
 {
     public:
-    virtual void Write() = 0;
+    virtual void Write(const std::string& basename) = 0;
 
     virtual ~Outputer() {};
 };
@@ -34,7 +34,7 @@ class TreeOutputer : public Outputer
     public:
     TreeOutputer(const char* treeOutName);
 
-    void Write() override;
+    void Write(const std::string& basename = "") override;
 
     TTree* GetTree() {return tree_output;}
 };

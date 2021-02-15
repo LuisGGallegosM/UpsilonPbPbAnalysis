@@ -41,7 +41,7 @@ void AccEff(const char* filename,const char* outputfilename, const char* confign
     //Run acceptancy test
     std::unique_ptr<AccOutputer> results =  AccTest(file,ONIATTREENAME,&cut);
     if (results==nullptr) return;
-    results->Write();
+    results->Write(ReplaceExtension(outputfilename,""));
 
     outputfile->Close();
     file->Close();

@@ -11,7 +11,12 @@ class AccOutputer : public TreeOutputer
 {
     private:
     TH2F* etaVsPtHist;
+    TH2F* etaVsPtCutHist;
+    TH2F* etaVsPtMuonHist;
+    TH2F* etaVsPtPrecutMuonHist;
+    TH2F* etaVsPtCutMuonHist;
     TH1F* ptHist;
+    TH1F* ptHistCut;
     TH1F* ptAccHist;
     std::map<int,int> pdgIds;
     Int_t Evt;
@@ -26,8 +31,9 @@ class AccOutputer : public TreeOutputer
     public:
     AccOutputer(const char* treeOutName);
 
-    void WriteData(const AccEffInput& dataIn,Int_t index, Long64_t entry);
-    void Write() override;
+    void WriteData(const AccEffInput& dataIn,Int_t index, Long64_t entry,AccEffCutter& cut);
+    void Write(const std::string& basename) override;
+    void FillPtAccHist();
 };
 
 class AccTester : public TreeProcessor

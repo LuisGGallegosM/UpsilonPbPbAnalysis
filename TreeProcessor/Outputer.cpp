@@ -9,7 +9,7 @@ TreeOutputer::TreeOutputer(const char* treeOutName)
     tree_output->SetMaxTreeSize(MAXTREESIZE);
 }
 
-void TreeOutputer::Write() 
+void TreeOutputer::Write(const std::string& basename) 
 {
     std::cout << "Total output entries " << tree_output->GetEntries();
     std::cout << " to '" << tree_output->GetName() << "' tree\nDone.\n";
