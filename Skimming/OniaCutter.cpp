@@ -8,7 +8,7 @@ kineCut(*cut)
 {
 }
 
-bool OniaCutterRecoQQ::cut(Onia_Input* input,Int_t index,Int_t entry)
+bool OniaCutterRecoQQ::cut(const Onia_Input* input,Int_t index,Int_t entry)
 {
     //check for triggers
     if ((input->trig[index] & kineCut.trigSelect) != kineCut.trigSelect) return false;
@@ -59,7 +59,7 @@ bool OniaCutterRecoQQ::cut(Onia_Input* input,Int_t index,Int_t entry)
     return true;
 }
 
-bool OniaCutterRecoQQ::isSoft(Onia_Input* input,Int_t index) const
+bool OniaCutterRecoQQ::isSoft(const Onia_Input* input,Int_t index) const
 {
     bool passMuonTypePl = (input->SelectionType[index] & kineCut.selectionBits) == (kineCut.selectionBits);
     bool muplSoft = passMuonTypePl && ( input->nTrkWMea[index] >= kineCut.minTracks)
@@ -67,18 +67,4 @@ bool OniaCutterRecoQQ::isSoft(Onia_Input* input,Int_t index) const
     && ( fabs(input->dxy[index]) < kineCut.maxDxy)
     && ( fabs(input->dz[index]) < kineCut.maxDz);
     return muplSoft;
-}
-
-Int_t OniaCutterRecoQQ::findMatchGenQQ(Int_t genMuPl, Int_t genMuMi, Int_t* genQQpl, Int_t* genQQmi, int size) const
-{
-    Int_t match=-1;
-    for(int i=0;i< size;i++)
-    {
-        if ((genMuPl== genQQpl[i]) && (genMuMi== genQQmi[i]))
-        {
-            match=i;
-            break;
-        }
-    }
-    return match;
 }

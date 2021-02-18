@@ -17,8 +17,7 @@ class OniaCutterRecoQQ : public OniaCutter
 {
     private:
     cutParams kineCut;
-    bool isSoft(Onia_Input* input, Int_t index) const;
-    Int_t findMatchGenQQ(Int_t genMuPl, Int_t genMuMi, Int_t* genQQpl, Int_t* genQQmi, int size) const;
+    bool isSoft(const Onia_Input* input, Int_t index) const;
 
     public:
     bool cut(const Onia_Input* input, Int_t index,Int_t entry) override;
