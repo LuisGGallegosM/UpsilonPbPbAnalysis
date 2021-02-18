@@ -7,7 +7,7 @@
 
 #define maxBranchSize (1000)
 
-struct Onia_Input
+struct OniaInput
 {
     TClonesArray* mom4_RecoQQ;
     TClonesArray* mom4_RecoMu;
@@ -41,8 +41,8 @@ struct Onia_Input
     Int_t getSizeRecoMu() const {return recoMuSize;}
     Int_t getSizeGenMu() const {return genMuSize;}
 
-    Onia_Input();
-    ~Onia_Input();
+    OniaInput();
+    ~OniaInput();
 };
 
 #endif

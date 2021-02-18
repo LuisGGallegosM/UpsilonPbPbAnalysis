@@ -2,7 +2,7 @@
 #define ONIAOUTPUT
 
 #include "TTree.h"
-#include "OniaData.h"
+#include "../Utils/OniaInput.h"
 #include "TH1.h"
 #include "../TreeProcessor/Outputer.h"
 
@@ -10,7 +10,7 @@ class OniaOutputer : public TreeOutputer
 {
     public:
     OniaOutputer(const char* treeOutName) : TreeOutputer(treeOutName) { }
-    virtual void WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry) = 0;
+    virtual void WriteData(const OniaInput& dataIn,Int_t index, Long64_t entry) = 0;
 };
 
 class OniaOutputerQQ : public OniaOutputer
@@ -32,7 +32,7 @@ class OniaOutputerQQ : public OniaOutputer
     public:
     OniaOutputerQQ(const char* treeOutName);
 
-    void WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry) override;
+    void WriteData(const OniaInput& dataIn,Int_t index, Long64_t entry) override;
 };
 
 #endif

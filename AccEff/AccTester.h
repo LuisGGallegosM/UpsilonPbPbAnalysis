@@ -2,20 +2,21 @@
 #define ACCTESTER
 
 #include "../TreeProcessor/TreeProcessor.h"
-#include "AccOutputer.h"
+#include "AccEffOutputer.h"
 #include "AccEffCutter.h"
-#include "AccEffInput.h"
+#include "../Utils/OniaInput.h"
 
-class AccTester : public TreeProcessor
+class AccEffTester : public TreeProcessor
 {
     private:
-    AccEffInput dataIn;
-    AccEffCutter* cutter;
-    AccOutputer* outputer;
+    OniaInput dataIn;
+    AccCutter* accCutter;
+    EffCutter* effCutter;
+    AccEffOutputer* outputer;
     void ProcessEvent(Long64_t entry) override;
 
     public:
-    AccTester(TTree* treeIn,AccOutputer* outp , AccEffCutter* cut);
+    AccEffTester(TTree* treeIn,AccEffOutputer* outp , AccCutter* accCut, EffCutter* effCut);
     void Test() { Process(); }
 };
 

@@ -8,7 +8,7 @@ kineCut(*cut)
 {
 }
 
-bool OniaCutterRecoQQ::cut(const Onia_Input* input,Int_t index,Int_t entry)
+bool OniaCutterRecoQQ::cut(const OniaInput* input,Int_t index,Int_t entry)
 {
     //check for triggers
     if ((input->trig[index] & kineCut.trigSelect) != kineCut.trigSelect) return false;
@@ -59,7 +59,7 @@ bool OniaCutterRecoQQ::cut(const Onia_Input* input,Int_t index,Int_t entry)
     return true;
 }
 
-bool OniaCutterRecoQQ::isSoft(const Onia_Input* input,Int_t index) const
+bool OniaCutterRecoQQ::isSoft(const OniaInput* input,Int_t index) const
 {
     bool passMuonTypePl = (input->SelectionType[index] & kineCut.selectionBits) == (kineCut.selectionBits);
     bool muplSoft = passMuonTypePl && ( input->nTrkWMea[index] >= kineCut.minTracks)

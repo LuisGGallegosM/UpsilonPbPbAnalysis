@@ -9,7 +9,7 @@
 class OniaSkimmer : public TreeProcessor
 {
     private:
-    Onia_Input dataIn;
+    OniaInput dataIn;
     OniaCutter* cutter;
     OniaOutputer* outputer;
     void ProcessEvent(Long64_t entry) override;

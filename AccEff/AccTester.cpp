@@ -1,8 +1,8 @@
 
 #include "AccTester.h"
 
-AccTester::AccTester(TTree* treeIn, AccOutputer* outp , AccEffCutter* cut) 
-: TreeProcessor(treeIn), cutter(cut), outputer(outp)
+AccEffTester::AccEffTester(TTree* treeIn,AccEffOutputer* outp , AccCutter* accCut, EffCutter* effCut)
+: TreeProcessor(treeIn), accCutter(accCut),effCutter(effCut), outputer(outp)
 {
     TBranch* branch;
 
@@ -30,17 +30,17 @@ AccTester::AccTester(TTree* treeIn, AccOutputer* outp , AccEffCutter* cut)
     addInput("Gen_QQ_mumi_idx",dataIn.genQQ_mumi_idx);
     addInput("Gen_QQ_momId",dataIn.GenQQid);
     
-    std::cout << "Using " << cutter->getName() <<" cutter.\n";
+    std::cout << "Using " << accCutter->getName() <<" cutter.\n";
+    std::cout << "Using " << effCutter->getName() <<" cutter.\n";
     return;
 }
 
-void AccTester::ProcessEvent(Long64_t entry)
+void AccEffTester::ProcessEvent(Long64_t entry)
 {
-    if (cutter->prescale(entry)) return;
     Long64_t size=dataIn.genQQsize;
     
     for(Long64_t i=0;i<size;++i)
     {
-        outputer->WriteData(dataIn,i,entry,*cutter);
+        outputer->WriteData(dataIn,i,entry,*accCutter,*effCutter);
     }
 }

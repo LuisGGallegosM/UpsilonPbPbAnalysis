@@ -22,7 +22,7 @@ OniaOutputerQQ::OniaOutputerQQ(const char* treeOutName) : OniaOutputer(treeOutNa
     addOutput("phi_pl",&phi_pl);
 }
 
-void OniaOutputerQQ::WriteData(const Onia_Input& dataIn,Int_t index, Long64_t entry)
+void OniaOutputerQQ::WriteData(const OniaInput& dataIn,Int_t index, Long64_t entry)
 {
     TLorentzVector* mom4vec=(TLorentzVector*) dataIn.mom4_RecoQQ->At(index);
     TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn.mom4_RecoMu->At(dataIn.mumi_idx[index]);

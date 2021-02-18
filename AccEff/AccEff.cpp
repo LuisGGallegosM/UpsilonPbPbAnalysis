@@ -1,7 +1,7 @@
 
 #include "AccEff.h"
 
-std::unique_ptr<AccOutputer> AccTest(TFile *file,const char* wroteTreeName, const cutParams* cut);
+std::unique_ptr<AccEffOutputer> AccEffTest(TFile *file,const char* wroteTreeName, const cutParams* cut);
 void SetCutParams(cutParams* kineCut);
 
 using std::ofstream;
@@ -36,10 +36,10 @@ void AccEff(const char* filename,const char* outputfilename, const char* confign
     }
 
     //copy cut config file
-    //CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
+    CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
 
     //Run acceptancy test
-    std::unique_ptr<AccOutputer> results =  AccTest(file,ONIATTREENAME,&cut);
+    std::unique_ptr<AccEffOutputer> results =  AccEffTest(file,ONIATTREENAME,&cut);
     if (results==nullptr) return;
     results->Write(ReplaceExtension(outputfilename,""));
 
@@ -57,7 +57,7 @@ void AccEff(const char* filename,const char* outputfilename, const char* confign
  * @param wroteTreeName Name of the acceptancy tree to write
  * @return Output data.
  */
-std::unique_ptr<AccOutputer> AccTest(TFile *file,const char* wroteTreeName, const cutParams* cut)
+std::unique_ptr<AccEffOutputer> AccEffTest(TFile *file,const char* wroteTreeName, const cutParams* cut)
 {
     TTree *myTree = (TTree *)file->Get("hionia/myTree");
     if (myTree == nullptr)
@@ -66,10 +66,11 @@ std::unique_ptr<AccOutputer> AccTest(TFile *file,const char* wroteTreeName, cons
         return nullptr;
     }
 
-    std::unique_ptr<AccEffCutter> cutter(new AccEffCutter(cut));
-    std::unique_ptr<AccOutputer> outputer(new AccOutputer(wroteTreeName));
+    std::unique_ptr<AccCutter> cutterAcc(new AccCutter());
+    std::unique_ptr<EffCutter> cutterEff(new EffCutter(cut));
+    std::unique_ptr<AccEffOutputer> outputer(new AccEffOutputer(wroteTreeName));
 
-    AccTester accTester(myTree,outputer.get(),cutter.get());
+    AccEffTester accTester(myTree,outputer.get(),cutterAcc.get(),cutterEff.get());
     accTester.Test();
 
     return outputer;

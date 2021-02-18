@@ -1,6 +1,7 @@
-#include "AccEffInput.h"
 
-AccEffInput::AccEffInput()
+#include "OniaInput.h"
+
+OniaInput::OniaInput()
 {
     mom4_RecoQQ = new TClonesArray("TLorentzVector");
     mom4_RecoMu = new TClonesArray("TLorentzVector");
@@ -22,7 +23,7 @@ AccEffInput::AccEffInput()
     sign = new Int_t[maxBranchSize];
 }
 
-AccEffInput::~AccEffInput()
+OniaInput::~OniaInput()
 {
     delete mom4_RecoQQ;
     delete mom4_RecoMu;
