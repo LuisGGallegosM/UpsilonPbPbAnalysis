@@ -212,8 +212,8 @@ void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
     float ptHigh=config->fitConf.getCut()->getPtHigh();
     float yLow=config->fitConf.getCut()->getYLow();
     float yHigh=config->fitConf.getCut()->getYHigh();
-    float singleMuPtLow=config->cut.singleMuPtLow;
-    float singleMuEtaHigh=config->cut.singleMuEtaHigh;
+    float singleMuPtLow=config->cut.getMuPtLow();
+    float singleMuEtaHigh=config->cut.getMuEtaHigh();
 
     TextDrawer tdrawer2(0.45,0.8);
     if (ptLow == 0.0f)

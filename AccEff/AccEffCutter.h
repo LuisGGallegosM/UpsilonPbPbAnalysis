@@ -19,6 +19,7 @@ class AccCutter : public TreeCutter<OniaInput>
     std::string getName() const override {return "Acceptancy test";};
     
     AccCutter() {}
+    virtual ~AccCutter()=default;
 };
 
 class EffCutter : public TreeCutter<OniaInput>
@@ -33,6 +34,7 @@ class EffCutter : public TreeCutter<OniaInput>
     std::string getName() const override {return "Efficiency test";};
     
     EffCutter(const cutParams* cut);
+    virtual ~EffCutter()=default;
 };
 
 #if defined(__CLING__)

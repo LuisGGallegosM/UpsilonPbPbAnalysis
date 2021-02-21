@@ -102,20 +102,21 @@ void AccEffOutputer::WriteData(const OniaInput& dataIn,Int_t index, Long64_t ent
     }
 }
 
+const std::array<double,7> pTBins  { 0.0f,2.0f,4.0f,6.0f,9.0f,12.0f,30.0f};
+
 TH2F* AccEffOutputer::createTH2(const std::string& name,const std::string& title)
 {
     const int binPtN = 40;
-    const int binEtaN = 30;
+    const int binEtaN = 6;
     const float ptMax=8.0f;
     const float etaMax=3.0f;
-    TH2F* result =new TH2F(name.data(),title.data(),binEtaN,0.0,etaMax,binPtN,0.0,ptMax);
+    TH2F* result =new TH2F(name.data(),title.data(),binEtaN,0.0,etaMax,pTBins.size()-1,pTBins.data());
     result->Sumw2();
     return result;
 }
 
 TH1F* AccEffOutputer::createTH1(const std::string& name,const std::string& title)
 {
-    static const std::array<float,7> pTBins  { 0.0f,2.0f,4.0f,6.0f,9.0f,12.0f,30.0f};
     TH1F* result=new TH1F(name.data(),title.data(),pTBins.size()-1,pTBins.data());
     result->Sumw2();
     return result;

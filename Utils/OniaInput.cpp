@@ -17,6 +17,7 @@ OniaInput::OniaInput()
     VtxProb = new Float_t[maxBranchSize];
     trig = new ULong64_t[maxBranchSize];
     RecoMuWhichGen = new Int_t[maxBranchSize];
+    GenMuWhichReco = new Int_t[maxBranchSize];
     genQQ_mupl_idx = new Int_t[maxBranchSize];
     genQQ_mumi_idx = new Int_t[maxBranchSize];
     GenQQid = new Int_t[maxBranchSize];
@@ -39,8 +40,23 @@ OniaInput::~OniaInput()
     delete[] VtxProb;
     delete[] trig;
     delete[] RecoMuWhichGen;
+    delete[] GenMuWhichReco;
     delete[] genQQ_mupl_idx;
     delete[] genQQ_mumi_idx;
     delete[] GenQQid;
     delete[] sign;
+}
+
+Int_t OniaInput::findRecoParent(int recoMuPl,int recoMuMi) const
+{
+    Int_t parentIndex=-1;
+    for(int i=0;i< recoMuSize;i++)
+    {
+        if ((mupl_idx[i]==recoMuPl) && (mumi_idx[i]==recoMuMi) )
+        {
+            parentIndex=i;
+            break;
+        }
+    }
+    return parentIndex;
 }

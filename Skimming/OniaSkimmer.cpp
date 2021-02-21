@@ -34,6 +34,7 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn, OniaOutputer* outp , OniaCutter* cut)
     if(cut->isMC())
     {  
         addInput("Reco_mu_whichGen",dataIn.RecoMuWhichGen);
+        addInput("Gen_mu_whichReco",dataIn.GenMuWhichReco);
         addInput("Gen_QQ_4mom",&dataIn.mom4_GenQQ);
         addInput("Gen_mu_4mom",&dataIn.mom4_GenMu);
         addInput("Gen_QQ_size",&dataIn.genQQsize);

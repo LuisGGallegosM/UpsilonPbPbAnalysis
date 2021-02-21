@@ -25,7 +25,7 @@ void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue, floa
         maxValue *=2.00f;
     }
 
-    if (config->cut.isMC)
+    if (config->cut.getIsMC())
         plot->SetTitle(" ");
     else
         plot->SetTitle(" ");

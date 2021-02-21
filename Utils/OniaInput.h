@@ -30,6 +30,7 @@ struct OniaInput
     UInt_t eventNb;
     UInt_t lumi;
     Int_t* RecoMuWhichGen;
+    Int_t* GenMuWhichReco;
     
     Int_t* genQQ_mupl_idx;
     Int_t* genQQ_mumi_idx;
@@ -40,6 +41,8 @@ struct OniaInput
     Int_t getSizeGenQQ() const {return genQQsize;}
     Int_t getSizeRecoMu() const {return recoMuSize;}
     Int_t getSizeGenMu() const {return genMuSize;}
+
+    Int_t findRecoParent(int recoMuPl,int recoMuMi) const;
 
     OniaInput();
     ~OniaInput();
