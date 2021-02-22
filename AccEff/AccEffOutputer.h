@@ -12,17 +12,17 @@
 class AccEffOutputer : public TreeOutputer
 {
     private:
-    TH2F* etaVsPtQQ;
-    TH2F* etaVsPtQQAcc;
-    TH2F* etaVsPtQQEff;
-    TH2F* etaVsPtMu;
-    TH2F* etaVsPtMuAcc;
-    TH2F* etaVsPtMuEff;
-    TH1F* ptHist;
-    TH1F* ptHistAcc;
-    TH1F* ptHistEff;
-    TEfficiency* ptAcceptancy;
-    TEfficiency* ptEfficiency;
+    TH2F* etaVsPtQQGen;
+    TH2F* etaVsPtQQDet;
+    TH2F* etaVsPtQQRecoCut;
+    TH2F* etaVsPtMuGen;
+    TH2F* etaVsPtMuDet;
+    TH2F* etaVsPtMuRecoCut;
+    TH1F* ptHistQQGen;
+    TH1F* ptHistQQDet;
+    TH1F* ptHistQQRecoCut;
+    TEfficiency* ptQQAcceptancy;
+    TEfficiency* ptQQEfficiency;
     Int_t Evt;
     Float_t mass;
     Float_t pT;
@@ -32,7 +32,8 @@ class AccEffOutputer : public TreeOutputer
     Float_t dR;
     Int_t pdgId;
 
-    TH2F* createTH2(const std::string& name,const std::string& title);
+    TH2F* createTH2QQ(const std::string& name,const std::string& title);
+    TH2F* createTH2Mu(const std::string& name,const std::string& title);
     TH1F* createTH1(const std::string& name,const std::string& title);
 
     void writeToCanvas(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname);

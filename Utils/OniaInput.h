@@ -5,20 +5,32 @@
 #include "TClonesArray.h"
 #include <unordered_map>
 
-#define maxBranchSize (1000)
+#define maxBranchSize (64)
 
 struct OniaInput
 {
-    TClonesArray* mom4_RecoQQ;
-    TClonesArray* mom4_RecoMu;
-    TClonesArray* mom4_GenQQ;
-    TClonesArray* mom4_GenMu;
-    Int_t recoQQsize;
-    Int_t genQQsize;
-    Int_t recoMuSize;
-    Int_t genMuSize;
-    Int_t* mupl_idx;
-    Int_t* mumi_idx;
+    struct baseQQ
+    {
+        TClonesArray* mom4;
+        Int_t size;
+        Int_t* mupl_idx;
+        Int_t* mumi_idx;
+        Int_t* sign;
+        baseQQ();
+        ~baseQQ();
+    };
+    struct baseMu
+    {
+        TClonesArray* mom4;
+        Int_t size;
+        baseMu();
+        ~baseMu();      
+    };
+    baseQQ recoQQ;
+    baseQQ genQQ;
+    baseMu recoMu;
+    baseMu genMu;
+
     Int_t* SelectionType;
     Int_t* nTrkWMea;
     Int_t* nPixWMea;
@@ -31,18 +43,13 @@ struct OniaInput
     UInt_t lumi;
     Int_t* RecoMuWhichGen;
     Int_t* GenMuWhichReco;
-    
-    Int_t* genQQ_mupl_idx;
-    Int_t* genQQ_mumi_idx;
+    Int_t* GenQQWhichReco;
     Int_t* GenQQid;
-    Int_t* sign;
-
-    Int_t getSizeRecoQQ() const {return recoQQsize;}
-    Int_t getSizeGenQQ() const {return genQQsize;}
-    Int_t getSizeRecoMu() const {return recoMuSize;}
-    Int_t getSizeGenMu() const {return genMuSize;}
-
-    Int_t findRecoParent(int recoMuPl,int recoMuMi) const;
+    
+    Int_t getSizeRecoQQ() const {return recoQQ.size;}
+    Int_t getSizeGenQQ() const {return genQQ.size;}
+    Int_t getSizeRecoMu() const {return recoMu.size;}
+    Int_t getSizeGenMu() const {return genMu.size;}
 
     OniaInput();
     ~OniaInput();

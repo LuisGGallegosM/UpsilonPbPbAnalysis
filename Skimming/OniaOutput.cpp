@@ -24,9 +24,9 @@ OniaOutputerQQ::OniaOutputerQQ(const char* treeOutName) : OniaOutputer(treeOutNa
 
 void OniaOutputerQQ::WriteData(const OniaInput& dataIn,Int_t index, Long64_t entry)
 {
-    TLorentzVector* mom4vec=(TLorentzVector*) dataIn.mom4_RecoQQ->At(index);
-    TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn.mom4_RecoMu->At(dataIn.mumi_idx[index]);
-    TLorentzVector* mom4vec_mupl = (TLorentzVector*) dataIn.mom4_RecoMu->At(dataIn.mupl_idx[index]);
+    TLorentzVector* mom4vec=(TLorentzVector*) dataIn.recoQQ.mom4->At(index);
+    TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn.recoMu.mom4->At(dataIn.recoQQ.mumi_idx[index]);
+    TLorentzVector* mom4vec_mupl = (TLorentzVector*) dataIn.recoMu.mom4->At(dataIn.recoQQ.mupl_idx[index]);
     mass= mom4vec->M();
     pT = mom4vec->Pt();
     y = mom4vec->Rapidity();
