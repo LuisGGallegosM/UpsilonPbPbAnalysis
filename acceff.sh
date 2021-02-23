@@ -3,12 +3,13 @@
 CLING="NO"
 #input file to skim
 INPUTFILE="../rootfiles/merged_HiForestAOD_MCFix.root"
+WORKDIR="../rootfiles/merged_HiForestAOD_MCFix_AccEff"
 #how to folder name skim result file
-OUTPUTFOLDER="../rootfiles/merged_HiForestAOD_MCFix_AccEff"
+OUTPUTFOLDER="${WORKDIR}/output"
 #cut configuration file
-CONFIG="../rootfiles/merged_HiForestAOD_MC.cutconf"
+CONFIG="${WORKDIR}/merged_HiForestAOD_MC.cutconf"
 #output skimmed file, put in OUTPUTFOLDER and same as output folder but with .root extensiom
-OUTPUTFILE="${OUTPUTFOLDER}/$(basename ${OUTPUTFOLDER}).root"
+OUTPUTFILE="${OUTPUTFOLDER}/output.root"
 
 mkdir -p $OUTPUTFOLDER
 

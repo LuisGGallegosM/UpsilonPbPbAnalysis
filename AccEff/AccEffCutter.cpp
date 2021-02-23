@@ -16,10 +16,8 @@ bool AccCutter::isMuonInAcceptance(const TLorentzVector* Muon) const
     //Acceptance cuts in CMS AN-18-316 , Page 17
     float eta= fabs(Muon->Eta());
     float pt = Muon->Pt();
-    if(eta> 2.4f) return false;                          // 0.0 < eta < 2.4
-    if((pt < 3.5f) || (pt > 50.0f) ) return false;       //??
-
-    if      (eta<1.2f) return (pt >  3.5f);             // 0.0 < eta < 1.2
+    if (eta> 2.4f) return false;                        // 0.0 < eta < 2.4
+    if (eta< 1.2f)  return (pt >  3.5f);                // 0.0 < eta < 1.2
     else if (eta<2.1f) return (pt > (5.47f-1.89f*eta)); // 1.2 < eta < 2.1
     else return pt >1.5f;                               // 2.1 < eta < 2.4
 }

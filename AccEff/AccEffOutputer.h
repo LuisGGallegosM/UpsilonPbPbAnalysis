@@ -36,7 +36,9 @@ class AccEffOutputer : public TreeOutputer
     TH2F* createTH2Mu(const std::string& name,const std::string& title);
     TH1F* createTH1(const std::string& name,const std::string& title);
 
+    void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option);
     void writeToCanvas(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname);
+    void writeToCanvas(TH2* hist,const std::string& xname,const std::string& yname, const std::string& outname);
     void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname);
 
     public:
