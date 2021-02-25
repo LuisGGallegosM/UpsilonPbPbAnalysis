@@ -5,10 +5,12 @@
 .PHONY: Skimming
 .PHONY: Utils
 .PHONY: TreeProcessor
+.PHONY: OniaBase
 
 all:
 	$(MAKE) -C Utils
 	$(MAKE) -C TreeProcessor
+	$(MAKE) -C OniaBase
 	$(MAKE) -C Skimming
 	$(MAKE) -C Fitting
 	$(MAKE) -C Drawing
@@ -17,6 +19,7 @@ all:
 clear:
 	$(MAKE) clear -C Utils
 	$(MAKE) clear -C TreeProcessor
+	$(MAKE) clear -C OniaBase
 	$(MAKE) clear -C Skimming
 	$(MAKE) clear -C Fitting
 	$(MAKE) clear -C Drawing
@@ -39,3 +42,6 @@ Utils:
 
 TreeProcessor:
 	$(MAKE) -C TreeProcessor
+
+OniaBase:
+	$(MAKE) -C OniaBase

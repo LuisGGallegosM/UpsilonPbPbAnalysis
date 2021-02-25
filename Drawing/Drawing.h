@@ -18,7 +18,7 @@
 
 #include "GraphStyle.h"
 #include "TextDrawer.h"
-#include "../Utils/DrawParams.h"
+#include "../OniaBase/DrawParams.h"
 #include "../Utils/utils.h"
 #include "DrawingCmp.h"
 

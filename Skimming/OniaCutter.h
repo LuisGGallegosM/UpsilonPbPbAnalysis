@@ -1,10 +1,10 @@
 #ifndef ONIACUTTER
 #define ONIACUTTER
 
-#include "../Utils/OniaInput.h"
+#include "../OniaBase/OniaInput.h"
 #include "../TreeProcessor/TreeCutter.h"
 #include "HLT_triggers.h"
-#include "../Utils/SkimParams.h"
+#include "../OniaBase/SkimParams.h"
 
 class OniaCutter : public TreeCutter<OniaInput>
 {

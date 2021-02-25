@@ -1,13 +1,10 @@
 #ifndef FITPARAMS
 #define FITPARAMS
 
-#include "serialize.h"
+#include "../Utils/serialize.h"
 
 #define RATIO_Y2S (10.023/9.460)
 #define RATIO_Y3S (10.355/9.460)
-
-#define ONIATTREENAME ("onia_skimmed")
-#define JETTTREENAME ("jet_skimmed")
 
 class dcbParam
 {

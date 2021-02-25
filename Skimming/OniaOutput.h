@@ -2,7 +2,7 @@
 #define ONIAOUTPUT
 
 #include "TTree.h"
-#include "../Utils/OniaInput.h"
+#include "../OniaBase/OniaInput.h"
 #include "TH1.h"
 #include "../TreeProcessor/Outputer.h"
 

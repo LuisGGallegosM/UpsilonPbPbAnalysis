@@ -1,7 +1,7 @@
 #ifndef FITFUNCTIONS
 #define FITFUNCTIONS
 
-#include "../Utils/FitParams.h"
+#include "../OniaBase/FitParams.h"
 
 #include "RooRealVar.h"
 #include "RooCBShape.h"

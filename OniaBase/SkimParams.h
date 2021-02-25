@@ -1,7 +1,7 @@
 #ifndef SKIMPARAMS
 #define SKIMPARAMS
 
-#include "serialize.h"
+#include "../Utils/serialize.h"
 #include "OniaInput.h"
 
 //changed to Jpsi that is currently hardcoded to Jpsi

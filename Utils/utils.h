@@ -2,7 +2,6 @@
 #define UTILS
 
 #include <string>
-#include "FitParams.h"
 #include "RooRealVar.h"
 #include "RooAbsReal.h"
 #include "TFile.h"

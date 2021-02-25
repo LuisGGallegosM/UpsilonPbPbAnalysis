@@ -3,9 +3,9 @@
 #define ACCEFFCUTTER
 
 #include "TLorentzVector.h"
-#include "../Utils/OniaInput.h"
+#include "../OniaBase/OniaInput.h"
 #include "../TreeProcessor/TreeCutter.h"
-#include "../Utils/SkimParams.h"
+#include "../OniaBase/SkimParams.h"
 
 class AccCutter : public TreeCutter<OniaInput>
 {

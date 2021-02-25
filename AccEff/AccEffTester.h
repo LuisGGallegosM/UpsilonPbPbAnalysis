@@ -4,7 +4,7 @@
 #include "../TreeProcessor/TreeProcessor.h"
 #include "AccEffOutputer.h"
 #include "AccEffCutter.h"
-#include "../Utils/OniaInput.h"
+#include "../OniaBase/OniaInput.h"
 
 class AccEffTester : public TreeProcessor
 {
