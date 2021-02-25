@@ -3,3 +3,5 @@ draw
 fit
 skim
 acceff
+*.o
+*.a

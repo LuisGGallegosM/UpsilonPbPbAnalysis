@@ -39,35 +39,35 @@
 		{
 			"type": "shell",
 			"label": "C++: build all",
-			"command": "./compileall.sh",
+			"command": "make",
 			"problemMatcher": [],
 			"group": "build"
 		},
 		{
 			"type": "shell",
 			"label": "C++: build skim",
-			"command": "./buildskim.sh",
+			"command": "make Skimming",
 			"problemMatcher": [],
 			"group": "build"
 		},
 		{
 			"type": "shell",
 			"label": "C++: build acceff",
-			"command": "./buildacceff.sh",
+			"command": "make AccEff",
 			"problemMatcher": [],
 			"group": "build"
 		},
 		{
 			"type": "shell",
 			"label": "C++: build fit",
-			"command": "./buildfit.sh",
+			"command": "make Fitting",
 			"problemMatcher": [],
 			"group": "build"
 		},
 		{
 			"type": "shell",
 			"label": "C++: build draw",
-			"command": "./builddraw.sh",
+			"command": "make Drawing",
 			"problemMatcher": [],
 			"group": "build"
 		},

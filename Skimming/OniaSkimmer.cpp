@@ -41,7 +41,7 @@ OniaSkimmer::OniaSkimmer(TTree* treeIn, OniaOutputer* outp , OniaCutter* cut)
         addInput("Gen_QQ_momId",dataIn.GenQQid);
         
         addInput("Reco_mu_whichGen",dataIn.RecoMuWhichGen);
-        addInput("Gen_mu_whichReco",dataIn.GenMuWhichReco);
+        addInput("Gen_mu_whichRec",dataIn.GenMuWhichReco);
         addInput("Gen_mu_4mom",&dataIn.genMu.mom4);
         addInput("Gen_mu_size",&dataIn.genMu.size);
 

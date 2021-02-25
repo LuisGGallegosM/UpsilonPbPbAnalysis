@@ -1,9 +1,16 @@
 #!/bin/bash
 
-OUTDIR=${1:-"../rootfiles/merged_HiForestAOD_skimmed4"}
-BASENAME="merged_HiForestAOD_fit"
+echo "generating fitconf files..."
 
-MULTIFITFILE=$( find $OUTDIR -maxdepth 1 -name "*.multifit" )
+OUTDIR=${1:-"../rootfiles/merged_HiForestAOD_skimmed4"}
+BASENAME="fit"
+MULTIFITFILE="${OUTDIR}/merged_HiForestAOD.multifit"
+
+if [ ! -f "$MULTIFITFILE" ]
+then
+    echo "Error: ${MULTIFITFILE} file does not exist!"
+    exit 1
+fi
 
 ptLow=()
 ptHigh=()
