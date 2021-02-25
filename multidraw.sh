@@ -4,7 +4,7 @@ echo "multiple drawing"
 INPUTDIR="${1}"
 OUTDIR="${2}"
 CONFIGFILES=( ${@:3} )
-NAME="${OUTDIR}/merged_HiForestAOD_fit.pdf"
+NAME="${OUTDIR}/fit.pdf"
 mkdir ${OUTDIR}
 
 FITFILENAMES=()

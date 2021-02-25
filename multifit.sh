@@ -1,4 +1,21 @@
 #!/bin/bash
+DOFIT="true"
+DODRAW="true"
+DOCDRAW="true"
+for FLAG in "$@"
+do
+    case $FLAG in
+    "-nofit")
+    DOFIT="false"
+    ;;
+    "-nodraw")
+    DODRAW="false"
+    ;;
+    "-nocomp")
+    DOCDRAW="false"
+    ;;
+    esac
+done
 
 #directory where files are located
 WORKDIR="../rootfiles/merged_HiForestAOD_MCFix_skimmed0"
@@ -9,44 +26,22 @@ OUTDIR="output"
 SKIMFILE="${WORKDIR}/$( basename $WORKDIR ).root"
 #drawing configuration file
 DRAWCONFIG="${SKIMFILE%.*}.drawconf"
-#cut configuration file
-CUTCONFIG="${SKIMFILE%.*}.cutconf"
 
 echo "multiple fitting"
-echo "reading skim file '${SKIMFILE}'"
-echo "reading draw configuration file '${DRAWCONFIG}'"
-echo "reading cut file '${CUTCONFIG}'"
-
-./fitconfGen.sh "$WORKDIR"
-
-for F in "$SKIMFILE" "$DRAWCONFIG" "$CUTCONFIG"
-do
-    if [ ! -f "$F" ]
-    then
-        echo "Error: ${F} file does not exist!"
-        exit 1
-    fi
-done
-
 echo "saving files in '${OUTDIR}' directory"
 mkdir "${WORKDIR}/${OUTDIR}"
 
 #fitconf files to read
-CONFIGFILES=()
-ALLFITFILES=$(find ${WORKDIR} -maxdepth 1 -name "*.fitconf")
+CONFIGFILES=$(find ${WORKDIR} -maxdepth 1 -name "*.fitconf")
 MULTIFITFILE=$(find ${WORKDIR} -maxdepth 1 -name "*.multifit")
 cp "$MULTIFITFILE" "${WORKDIR}/${OUTDIR}"
 
-for i in $ALLFITFILES
-do
-    echo "reading fitconf file '${i}'"
-    CONFIGFILES=( ${CONFIGFILES[@]} $(basename $i) )
-done
-
 #do the fits
-if [ 1 = 1 ]
+if [ ${DOFIT} = "true" ]
 then
     echo "fitting..."
+    ./fitconfGen.sh "$WORKDIR"
+    echo "reading skim file '${SKIMFILE}'"
     #do the fitting jobs
     MAXJOBS=6
     for CONFIG in ${CONFIGFILES[@]}
@@ -66,7 +61,7 @@ then
 fi
 
 #draw graphs
-if [ 1 = 1 ]
+if [ ${DODRAW} = "true" ]
 then
     #execute drawing
     echo "generating drawings"
@@ -81,7 +76,7 @@ then
 fi
 
 #do comparation drawing
-if [ 1 = 1 ]
+if [ ${DOCDRAW} = "true" ]
 then
     echo "starting comparative drawings..."
     COMPCONFFILES=$(find ${WORKDIR} -maxdepth 1 -name "*.drawcomp")
@@ -97,7 +92,7 @@ fi
 
 cp -R "${WORKDIR}/report" "${WORKDIR}/${OUTDIR}/report"
 cd "${WORKDIR}/${OUTDIR}/report"
-pdflatex -interaction nonstopmode "report.tex"
+pdflatex -interaction nonstopmode "report.tex" >/dev/null
 #cd "../../.."
 
 echo "all done"
