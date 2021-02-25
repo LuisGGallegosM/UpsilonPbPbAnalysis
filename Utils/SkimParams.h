@@ -6,8 +6,7 @@
 
 //changed to Jpsi that is currently hardcoded to Jpsi
 //Upsilon Y1S PDG ID
-#define UPSILON_Y1S_PDGID (443)
-//#define UPSILON_Y1S_PDGID (553) true PDG
+#define UPSILON_Y1S_PDGID (553) true PDG
 
 class cutParams
 {

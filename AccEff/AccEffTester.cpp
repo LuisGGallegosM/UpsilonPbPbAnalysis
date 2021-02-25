@@ -1,8 +1,8 @@
 
-#include "AccTester.h"
+#include "AccEffTester.h"
 
-AccEffTester::AccEffTester(TTree* treeIn,AccEffOutputer* outp , AccCutter* accCut, EffCutter* effCut)
-: TreeProcessor(treeIn), accCutter(accCut),effCutter(effCut), outputer(outp)
+AccEffTester::AccEffTester(TTree* treeIn,AccEffOutputer* outp)
+: TreeProcessor(treeIn), outputer(outp)
 {
     TBranch* branch;
 
@@ -33,9 +33,6 @@ AccEffTester::AccEffTester(TTree* treeIn,AccEffOutputer* outp , AccCutter* accCu
 
     addInput("Gen_mu_4mom",&dataIn.genMu.mom4);
     addInput("Gen_mu_size",&dataIn.genMu.size);
-    
-    std::cout << "Using " << accCutter->getName() <<" cutter.\n";
-    std::cout << "Using " << effCutter->getName() <<" cutter.\n";
     return;
 }
 
@@ -45,6 +42,6 @@ void AccEffTester::ProcessEvent(Long64_t entry)
     
     for(Long64_t i=0;i<size;++i)
     {
-        outputer->WriteData(dataIn,i,entry,*accCutter,*effCutter);
+        outputer->WriteData(dataIn,i,entry);
     }
 }

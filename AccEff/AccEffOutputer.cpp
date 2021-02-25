@@ -4,7 +4,8 @@
 #include "TPie.h"
 #include <array>
 
-AccEffOutputer::AccEffOutputer(const char* treeOutName) : TreeOutputer(treeOutName)
+AccEffOutputer::AccEffOutputer(const char* treeOutName,AccCutter* accCut, EffCutter* effCut) : 
+    TreeOutputer(treeOutName), accCutter(accCut), effCutter(effCut)
 {
     //variables to read from tree
     addOutput("mass",&mass);
@@ -54,7 +55,7 @@ void AccEffOutputer::Write(const std::string& basename)
     writeToCanvasEff(ptQQEfficiency, "p^{#mu#mu}_{T} ( GeV/c )", "Eff",    basename+"_PtQQ_Efficiency.pdf");
 }
 
-void AccEffOutputer::WriteData(const OniaInput& dataIn,Int_t index, Long64_t entry,AccCutter& accCut,EffCutter& effCut)
+void AccEffOutputer::WriteData(const OniaInput& dataIn,Int_t index, Long64_t entry)
 {
     //read variables
     TLorentzVector* mom4vec=(TLorentzVector*) dataIn.genQQ.mom4->At(index);
@@ -87,7 +88,7 @@ void AccEffOutputer::WriteData(const OniaInput& dataIn,Int_t index, Long64_t ent
     etaVsPtMuGen->Fill(etaMuMi,ptMuMi);
 
     //fill data for onia with acceptancy cuts
-    if(accCut.cut(&dataIn,index,entry))
+    if(accCutter->cut(&dataIn,index,entry))
     {
         ptHistQQDet->Fill(pT);
         etaVsPtQQDet->Fill(y,pT);
@@ -95,7 +96,7 @@ void AccEffOutputer::WriteData(const OniaInput& dataIn,Int_t index, Long64_t ent
         etaVsPtMuDet->Fill(etaMuMi,ptMuMi);
 
         //fill data for onia with efficiency cuts
-        if (effCut.cut(&dataIn,index,entry))
+        if (effCutter->cut(&dataIn,index,entry))
         {
             ptHistQQRecoCut->Fill(pT);
             etaVsPtQQRecoCut->Fill(y,pT);
@@ -113,6 +114,7 @@ TH2F* AccEffOutputer::createTH2QQ(const std::string& name,const std::string& tit
     const int binyN = 6;
     const float yMax = 3.0f;
     TH2F* result =new TH2F(name.data(),title.data(),binyN,0.0,yMax,pTBins.size()-1,pTBins.data());
+    result->SetStats(false);
     result->Sumw2();
     return result;
 }
@@ -124,6 +126,7 @@ TH2F* AccEffOutputer::createTH2Mu(const std::string& name,const std::string& tit
     const int binEtaN = 30;
     const float etaMax = 3.0f;
     TH2F* result =new TH2F(name.data(),title.data(),binEtaN,0.0,etaMax,binPtN,0.0,ptMax);
+    result->SetStats(false);
     result->Sumw2();
     return result;
 }
@@ -131,15 +134,16 @@ TH2F* AccEffOutputer::createTH2Mu(const std::string& name,const std::string& tit
 TH1F* AccEffOutputer::createTH1(const std::string& name,const std::string& title)
 {
     TH1F* result=new TH1F(name.data(),title.data(),pTBins.size()-1,pTBins.data());
+    result->SetStats(false);
     result->Sumw2();
     return result;
 }
 
 void AccEffOutputer::writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option)
 {
-    TCanvas canvas("Fit_plot","fit",4,45,550,520);
+    TCanvas canvas("Fit_plot","fit",4,45,600,600);
     canvas.cd();
-    TPad pad("pad","fit", 0.02, 0.02, 0.98, 0.98);
+    TPad pad("pad","fit", 0.08, 0.08, 0.92, 0.92);
     pad.Draw();
     pad.cd();
     hist->GetYaxis()->SetTitle(yname.data());

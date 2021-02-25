@@ -68,9 +68,9 @@ std::unique_ptr<AccEffOutputer> AccEffTest(TFile *file,const char* wroteTreeName
 
     std::unique_ptr<AccCutter> cutterAcc(new AccCutter());
     std::unique_ptr<EffCutter> cutterEff(new EffCutter(cut));
-    std::unique_ptr<AccEffOutputer> outputer(new AccEffOutputer(wroteTreeName));
+    std::unique_ptr<AccEffOutputer> outputer(new AccEffOutputer(wroteTreeName,cutterAcc.get(),cutterEff.get()));
 
-    AccEffTester accTester(myTree,outputer.get(),cutterAcc.get(),cutterEff.get());
+    AccEffTester accTester(myTree,outputer.get());
     accTester.Test();
 
     return outputer;

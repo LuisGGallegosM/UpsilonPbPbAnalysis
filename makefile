@@ -1,4 +1,11 @@
 
+.PHONY: AccEff
+.PHONY: Drawing
+.PHONY: Fitting
+.PHONY: Skimming
+.PHONY: Utils
+.PHONY: TreeProcessor
+
 all:
 	$(MAKE) -C Utils
 	$(MAKE) -C TreeProcessor

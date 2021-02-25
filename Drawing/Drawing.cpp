@@ -41,7 +41,7 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
         return;
     }
 
-    TFile file(filename,"UPDATE");
+    TFile file(filename,"READ");
 
     if (file.IsZombie())
     {
@@ -89,7 +89,6 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
         drawPullText(pullHist,fitResults);
 
         canvas->Update();
-        canvas->Write(0,TObject::kOverwrite);
         if (isLog)
             canvas->SaveAs(ReplaceExtension(drawfilename,"_log.pdf").data());
         else

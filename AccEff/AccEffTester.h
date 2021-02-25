@@ -10,13 +10,11 @@ class AccEffTester : public TreeProcessor
 {
     private:
     OniaInput dataIn;
-    AccCutter* accCutter;
-    EffCutter* effCutter;
     AccEffOutputer* outputer;
     void ProcessEvent(Long64_t entry) override;
 
     public:
-    AccEffTester(TTree* treeIn,AccEffOutputer* outp , AccCutter* accCut, EffCutter* effCut);
+    AccEffTester(TTree* treeIn,AccEffOutputer* outp);
     void Test() { Process(); }
 };
 

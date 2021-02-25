@@ -32,6 +32,9 @@ class AccEffOutputer : public TreeOutputer
     Float_t dR;
     Int_t pdgId;
 
+    AccCutter* accCutter;
+    EffCutter* effCutter;
+
     TH2F* createTH2QQ(const std::string& name,const std::string& title);
     TH2F* createTH2Mu(const std::string& name,const std::string& title);
     TH1F* createTH1(const std::string& name,const std::string& title);
@@ -42,9 +45,9 @@ class AccEffOutputer : public TreeOutputer
     void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname);
 
     public:
-    AccEffOutputer(const char* treeOutName);
+    AccEffOutputer(const char* treeOutName,AccCutter* accCut, EffCutter* effCut);
 
-    void WriteData(const OniaInput& dataIn,Int_t index, Long64_t entry,AccCutter& accCut,EffCutter& effCut);
+    void WriteData(const OniaInput& dataIn,Int_t index, Long64_t entry);
     void Write(const std::string& basename) override;
 };
 

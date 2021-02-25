@@ -71,36 +71,5 @@
         "locale": "cpp",
         "queue": "cpp",
         "stack": "cpp"
-    },
-    "actionButtons": {
-        "defaultColor": "#ff0034", // Can also use string color names.
-        "loadNpmCommands":false, // Disables automatic generation of actions for npm commands.
-        "reloadButton":"♻️", // Custom reload button text or icon (default ↻). null value enables automatic reload on configuration change
-        "commands": [
-            {
-                "cwd": "${workspaceFolder}",     // Terminal initial folder ${workspaceFolder} and os user home as defaults
-                "name": "SKIM",
-                "color": "white",
-                "command": "./skim.sh", // This is executed in the terminal.
-            },
-            {
-                "cwd": "${workspaceFolder}",     // Terminal initial folder ${workspaceFolder} and os user home as defaults
-                "name": "FIT",
-                "color": "white",
-                "command": "./fit.sh", // This is executed in the terminal.
-            },
-            {
-                "cwd": "${workspaceFolder}",     // Terminal initial folder ${workspaceFolder} and os user home as defaults
-                "name": "DRAW",
-                "color": "white",
-                "command": "./draw.sh", // This is executed in the terminal.
-            },
-            {
-                "cwd": "${workspaceFolder}",     // Terminal initial folder ${workspaceFolder} and os user home as defaults
-                "name": "COMPILE ALL",
-                "color": "white",
-                "command": "./compileall.sh", // This is executed in the terminal.
-            }
-        ]
     }
 }
