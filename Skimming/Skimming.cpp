@@ -1,6 +1,6 @@
 #include "Skimming.h"
 
-std::unique_ptr<OniaOutputer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* kineCut);
+std::unique_ptr<OniaSkimmer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* kineCut);
 void SetCutParams(cutParams* kineCut);
 
 using std::ofstream;
@@ -38,9 +38,9 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
 
     //skim the data
-    std::unique_ptr<OniaOutputer> onia_skimmed =  oniaSkim(file,ONIATTREENAME,&cut);
-    if (onia_skimmed==nullptr) return;
-    onia_skimmed->Write();
+    std::unique_ptr<OniaSkimmer> skimmer = oniaSkim(file,ONIATTREENAME,&cut);
+    if (skimmer==nullptr) return;
+    skimmer->Write();
 
     outputfile->Close();
     file->Close();
@@ -56,7 +56,7 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
  * @param wroteTreeName Name of the skimmed tree to write
  * @return Output with skimmed data.
  */
-std::unique_ptr<OniaOutputer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* cut)
+std::unique_ptr<OniaSkimmer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* cut)
 {
     TTree *myTree = (TTree *)file->Get("hionia/myTree");
     if (myTree == nullptr)
@@ -66,13 +66,14 @@ std::unique_ptr<OniaOutputer> oniaSkim(TFile *file,const char* wroteTreeName, co
     }
 
     //execute skim
-    std::unique_ptr<OniaCutter> cutter(new OniaCutterRecoQQ(cut));
-    std::unique_ptr<OniaOutputer> outputer(new OniaOutputerQQ(wroteTreeName));
+    OniaReader* reader = new OniaReader(myTree,cut->getIsMC());
+    OniaCutter* cutter =new OniaCutterRecoQQ(cut);
+    OniaWriter* writer=new OniaWriterFull(wroteTreeName,QQtype::Reco);
 
-    OniaSkimmer skimmer = OniaSkimmer(myTree,outputer.get(),cutter.get());
-    skimmer.Skim();
+    std::unique_ptr<OniaSkimmer> skimmer (new OniaSkimmer(reader,cutter, writer));
+    skimmer->Skim();
 
-    return outputer;
+    return skimmer;
 }
 
 #if !defined(__CLING__)

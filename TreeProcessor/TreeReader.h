@@ -10,6 +10,7 @@ class TreeReader
     virtual void addInput(const char* varName,void* address)=0;
     virtual Long64_t getEntriesNumber() const=0;
     virtual std::string getName() const=0;
+    virtual TTree* getTree() =0;
 
     virtual ~TreeReader() = default;
 };
@@ -22,11 +23,12 @@ class TreeReaderBase : public TreeReader
 
     public:
     TreeReaderBase(TTree* treeIn);
-    void readTree(Long64_t index);
-    void addInput(const char* varName,void* address);
 
-    Long64_t getEntriesNumber() const {return tree_input->GetEntries();}
-    std::string getName() const {return tree_input->GetName();}
+    void readTree(Long64_t index) override;
+    void addInput(const char* varName,void* address) override;
+    Long64_t getEntriesNumber() const override {return tree_input->GetEntries();}
+    std::string getName() const override {return tree_input->GetName();}
+    TTree* getTree() override {return tree_input;}
 };
 
 #endif

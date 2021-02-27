@@ -3,17 +3,17 @@
 #define ACCEFFCUTTER
 
 #include "TLorentzVector.h"
-#include "../OniaBase/OniaInput.h"
+#include "../OniaBase/OniaReader.h"
 #include "../TreeProcessor/TreeCutter.h"
 #include "../OniaBase/SkimParams.h"
 
-class AccCutter : public TreeCutter<OniaInput>
+class AccCutter : public TreeCutter<OniaReader>
 {
     private:
     bool isMuonInAcceptance(const TLorentzVector* Muon) const;
 
     public:
-    bool cut(const OniaInput* input, Int_t index,Int_t entry) override;
+    bool cut(const OniaReader* input, Int_t index,Int_t entry) override;
     bool prescale(Int_t entry) const override { return false; }
 
     std::string getName() const override {return "Acceptancy test";};
@@ -22,13 +22,13 @@ class AccCutter : public TreeCutter<OniaInput>
     virtual ~AccCutter()=default;
 };
 
-class EffCutter : public TreeCutter<OniaInput>
+class EffCutter : public TreeCutter<OniaReader>
 {
     private:
     cutParams kineCut;
 
     public:
-    bool cut(const OniaInput* input, Int_t index,Int_t entry) override;
+    bool cut(const OniaReader* input, Int_t index,Int_t entry) override;
     bool prescale(Int_t entry) const override { return false; }
 
     std::string getName() const override {return "Efficiency test";};

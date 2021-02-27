@@ -1,21 +1,12 @@
 
-#include "AccEffOutputer.h"
+#include "AccEffAnalyzer.h"
 #include "TCanvas.h"
 #include "TPie.h"
 #include <array>
 
-AccEffOutputer::AccEffOutputer(const char* treeOutName,AccCutter* accCut, EffCutter* effCut) : 
-    TreeOutputer(treeOutName), accCutter(accCut), effCutter(effCut)
+AccEffAnalyzer::AccEffAnalyzer(OniaReader* input,AccCutter* accCut, EffCutter* effCut, OniaWriter* writer) : 
+    oniaWriter(writer), accCutter(accCut), effCutter(effCut),oniaReader(input)
 {
-    //variables to read from tree
-    addOutput("mass",&mass);
-    addOutput("eta",&eta);
-    addOutput("phi",&phi);
-    addOutput("pT",&pT);
-    addOutput("y",&y);
-    addOutput("Evt",&Evt);
-    addOutput("pdfId",&pdgId);
-
     //initialize Histograms
     etaVsPtQQGen =      createTH2QQ("eta vs pt QQ Generated" ,"p^{#mu#mu}_{t} vs |#eta^{#mu#mu}|");
     etaVsPtQQDet =      createTH2QQ("eta vs pt QQ Detected"  ,"p^{#mu#mu}_{t} vs |#eta^{#mu#mu}| QQ Detected");
@@ -29,9 +20,19 @@ AccEffOutputer::AccEffOutputer(const char* treeOutName,AccCutter* accCut, EffCut
     ptHistQQRecoCut=createTH1("p_{t} QQ Reco + Cut","p^{#mu#mu}_{t} QQ Reco + Cut");
 }
 
-void AccEffOutputer::Write(const std::string& basename)
+void AccEffAnalyzer::ProcessEvent(Long64_t entry)
 {
-    TreeOutputer::Write();
+    Long64_t size=oniaReader->genQQ.size;
+    
+    for(Long64_t i=0;i<size;++i)
+    {
+        WriteData(i,entry);
+    }
+}
+
+void AccEffAnalyzer::Write(const std::string& basename)
+{
+    oniaWriter->Write();
 
     //calculate acceptancy
     ptQQAcceptancy = new  TEfficiency(*ptHistQQDet,*ptHistQQGen);
@@ -55,24 +56,19 @@ void AccEffOutputer::Write(const std::string& basename)
     writeToCanvasEff(ptQQEfficiency, "p^{#mu#mu}_{T} ( GeV/c )", "Eff",    basename+"_PtQQ_Efficiency.pdf");
 }
 
-void AccEffOutputer::WriteData(const OniaInput& dataIn,Int_t index, Long64_t entry)
+void AccEffAnalyzer::WriteData(Int_t index, Long64_t entry)
 {
     //read variables
-    TLorentzVector* mom4vec=(TLorentzVector*) dataIn.genQQ.mom4->At(index);
+    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader->genQQ.mom4->At(index);
 
-    int mupl_idx = dataIn.genQQ.mupl_idx[index];//plus muon index
-    int mumi_idx = dataIn.genQQ.mumi_idx[index];//minus muon index
-    TLorentzVector* mom4vecPl=(TLorentzVector*) dataIn.genMu.mom4->At(mupl_idx);
-    TLorentzVector* mom4vecMi=(TLorentzVector*) dataIn.genMu.mom4->At(mumi_idx);
+    int mupl_idx = oniaReader->genQQ.mupl_idx[index];//plus muon index
+    int mumi_idx = oniaReader->genQQ.mumi_idx[index];//minus muon index
+    TLorentzVector* mom4vecPl=(TLorentzVector*) oniaReader->genMu.mom4->At(mupl_idx);
+    TLorentzVector* mom4vecMi=(TLorentzVector*) oniaReader->genMu.mom4->At(mumi_idx);
 
-    mass= mom4vec->M();
-    pT = mom4vec->Pt();
-    y = fabs(mom4vec->Rapidity());
-    phi = mom4vec->Phi();
-    eta = mom4vec->Eta();
-    Evt = entry;
-    pdgId = dataIn.GenQQid[index];
-    int AbsPdgId= abs(pdgId);
+    float pT = mom4vec->Pt();
+    float y = fabs(mom4vec->Rapidity());
+    float eta = mom4vec->Eta();
 
     //cuts
     if(y > 2.4f) return;
@@ -88,7 +84,7 @@ void AccEffOutputer::WriteData(const OniaInput& dataIn,Int_t index, Long64_t ent
     etaVsPtMuGen->Fill(etaMuMi,ptMuMi);
 
     //fill data for onia with acceptancy cuts
-    if(accCutter->cut(&dataIn,index,entry))
+    if(accCutter->cut(oniaReader.get(),index,entry))
     {
         ptHistQQDet->Fill(pT);
         etaVsPtQQDet->Fill(y,pT);
@@ -96,20 +92,20 @@ void AccEffOutputer::WriteData(const OniaInput& dataIn,Int_t index, Long64_t ent
         etaVsPtMuDet->Fill(etaMuMi,ptMuMi);
 
         //fill data for onia with efficiency cuts
-        if (effCutter->cut(&dataIn,index,entry))
+        if (effCutter->cut(oniaReader.get(),index,entry))
         {
             ptHistQQRecoCut->Fill(pT);
             etaVsPtQQRecoCut->Fill(y,pT);
             etaVsPtMuRecoCut->Fill(etaMuPl,ptMuPl);
             etaVsPtMuRecoCut->Fill(etaMuMi,ptMuMi);
-            FillEntries();
+            oniaWriter->writeEntries(oniaReader.get(),index,entry);
         }
     }
 }
 
 constexpr std::array<double,7> pTBins  { 0.0f,2.0f,4.0f,6.0f,9.0f,12.0f,30.0f};
 
-TH2F* AccEffOutputer::createTH2QQ(const std::string& name,const std::string& title)
+TH2F* AccEffAnalyzer::createTH2QQ(const std::string& name,const std::string& title)
 {
     const int binyN = 6;
     const float yMax = 3.0f;
@@ -119,7 +115,7 @@ TH2F* AccEffOutputer::createTH2QQ(const std::string& name,const std::string& tit
     return result;
 }
 
-TH2F* AccEffOutputer::createTH2Mu(const std::string& name,const std::string& title)
+TH2F* AccEffAnalyzer::createTH2Mu(const std::string& name,const std::string& title)
 {
     const int binPtN = 40;
     const float ptMax = 20.0f;
@@ -131,7 +127,7 @@ TH2F* AccEffOutputer::createTH2Mu(const std::string& name,const std::string& tit
     return result;
 }
 
-TH1F* AccEffOutputer::createTH1(const std::string& name,const std::string& title)
+TH1F* AccEffAnalyzer::createTH1(const std::string& name,const std::string& title)
 {
     TH1F* result=new TH1F(name.data(),title.data(),pTBins.size()-1,pTBins.data());
     result->SetStats(false);
@@ -139,7 +135,7 @@ TH1F* AccEffOutputer::createTH1(const std::string& name,const std::string& title
     return result;
 }
 
-void AccEffOutputer::writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option)
+void AccEffAnalyzer::writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option)
 {
     TCanvas canvas("Fit_plot","fit",4,45,600,600);
     canvas.cd();
@@ -153,17 +149,17 @@ void AccEffOutputer::writeToCanvasBase(TH1* hist,const std::string& xname,const 
     canvas.SaveAs(outname.data());
 }
 
-void AccEffOutputer::writeToCanvas(TH2* hist,const std::string& xname,const std::string& yname, const std::string& outname)
+void AccEffAnalyzer::writeToCanvas(TH2* hist,const std::string& xname,const std::string& yname, const std::string& outname)
 {
     writeToCanvasBase(hist,xname,yname,outname,"COLZ");
 }
 
-void AccEffOutputer::writeToCanvas(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname)
+void AccEffAnalyzer::writeToCanvas(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname)
 {
      writeToCanvasBase(hist,xname,yname,outname,"COL");
 }
 
-void AccEffOutputer::writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname)
+void AccEffAnalyzer::writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname)
 {
     TCanvas canvas("Fit_plot","fit",4,45,550,520);
     canvas.cd();

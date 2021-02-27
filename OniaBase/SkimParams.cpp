@@ -28,7 +28,7 @@ void cutParams::deserialize(const std::string& filename)
     ser.read("singleMuEtaHigh",singleMuEtaHigh);
 }
 
-bool cutParams::cut(const OniaInput* input,Int_t index,Int_t entry)
+bool cutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
 {
     //check for triggers
     if ((input->trig[index] & trigSelect) != trigSelect) return false;
@@ -79,7 +79,7 @@ bool cutParams::cut(const OniaInput* input,Int_t index,Int_t entry)
     return true;
 }
 
-bool cutParams::isSoft(const OniaInput* input,Int_t index) const
+bool cutParams::isSoft(const OniaReader* input,Int_t index) const
 {
     bool passMuonTypePl = (input->SelectionType[index] & selectionBits) == (selectionBits);
     bool muplSoft = passMuonTypePl && ( input->nTrkWMea[index] >= minTracks)

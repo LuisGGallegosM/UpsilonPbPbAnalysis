@@ -1,25 +1,19 @@
-#ifndef OUTPUTER
-#define OUTPUTER
+#ifndef TREEWRITER
+#define TREEWRITER
 
 #include "TTree.h"
 
 #define MAXTREESIZE (25000000000)
 
-class Outputer
-{
-    public:
-    virtual void Write(const std::string& basename) = 0;
-
-    virtual ~Outputer() {};
-};
-
-class TreeOutputer : public Outputer
+class TreeWriter
 {
     private:
     TTree* tree_output;
     std::vector<TBranch*> output_branches;
 
-    protected:
+    public:
+    TreeWriter(const char* treeOutName);
+
     template<typename T>
     void addOutput(const char* varName,T* var)
     {
@@ -29,14 +23,9 @@ class TreeOutputer : public Outputer
         output_branches.push_back(branch);
     }
 
-    void FillEntries(){ tree_output->Fill();}
-
-    public:
-    TreeOutputer(const char* treeOutName);
-
-    void Write(const std::string& basename = "") override;
-
-    TTree* GetTree() {return tree_output;}
+    void FillEntries() { tree_output->Fill();}
+    void Write();
+    TTree* getTree() {return tree_output;}
 };
 
 #endif

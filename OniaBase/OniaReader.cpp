@@ -1,7 +1,7 @@
 
-#include "OniaInput.h"
+#include "OniaReader.h"
 
-OniaInput::OniaInput(TTree* treeIn, bool isMC) : TreeReaderBase(treeIn), genQQ(), recoQQ(), genMu(), recoMu()
+OniaReader::OniaReader(TTree* treeIn, bool isMC) : TreeReaderBase(treeIn), genQQ(), recoQQ(), recoMu(), genMu()
 {
     SelectionType = new Int_t[maxBranchSize];
     nTrkWMea = new Int_t[maxBranchSize];
@@ -48,7 +48,7 @@ OniaInput::OniaInput(TTree* treeIn, bool isMC) : TreeReaderBase(treeIn), genQQ()
     }
 }
 
-OniaInput::~OniaInput()
+OniaReader::~OniaReader()
 {
     delete[] SelectionType;
     delete[] nTrkWMea;
@@ -62,27 +62,29 @@ OniaInput::~OniaInput()
     delete[] GenQQid;
 }
 
-OniaInput::baseQQ::baseQQ()
+baseQQ::baseQQ()
 {
     mom4 = new TClonesArray("TLorentzVector");
     mupl_idx = new Int_t[maxBranchSize];
     mumi_idx = new Int_t[maxBranchSize];
     sign = new Int_t[maxBranchSize];
+    id = new Int_t[maxBranchSize];
 }
-OniaInput::baseQQ::~baseQQ()
+baseQQ::~baseQQ()
 {
     delete mom4;
     delete[] mupl_idx;
     delete[] mumi_idx;
     delete[] sign;
+    delete[] id;
 }
 
-OniaInput::baseMu::baseMu()
+baseMu::baseMu()
 {
     mom4 = new TClonesArray("TLorentzVector");
 }
 
-OniaInput::baseMu::~baseMu()
+baseMu::~baseMu()
 {
     delete mom4;
 }

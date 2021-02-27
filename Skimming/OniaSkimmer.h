@@ -4,19 +4,21 @@
 
 #include "../TreeProcessor/TreeProcessor.h"
 #include "OniaCutter.h"
-#include "OniaOutput.h"
+#include "../OniaBase/OniaReader.h"
+#include "../OniaBase/OniaWriter.h"
 
 class OniaSkimmer : public TreeProcessor
 {
     private:
-    OniaInput dataIn;
-    OniaCutter* cutter;
-    OniaOutputer* outputer;
+    std::unique_ptr<OniaReader> oniaReader;
+    std::unique_ptr<OniaCutter> oniaCutter;
+    std::unique_ptr<OniaWriter> oniaWriter;
     void ProcessEvent(Long64_t entry) override;
 
     public:
-    OniaSkimmer(TTree* treeIn,OniaOutputer* outp , OniaCutter* cut);
-    void Skim() { Process(&dataIn); }
+    OniaSkimmer(OniaReader* reader , OniaCutter* cutter, OniaWriter* writer);
+    void Write() { oniaWriter->Write(); }
+    void Skim() { Process(oniaReader.get()); }
 };
 
 #if defined(__CLING__)

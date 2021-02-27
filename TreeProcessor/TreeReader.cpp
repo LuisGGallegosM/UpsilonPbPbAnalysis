@@ -8,9 +8,9 @@ TreeReaderBase::TreeReaderBase(TTree* treeIn)
 
 void TreeReaderBase::readTree(Long64_t index)
 {
-    for(int i=0 ;i<input_branches.size();i++)
+    for(TBranch* branch : input_branches)
     {
-        input_branches[i]->GetEntry(index);
+        branch->GetEntry(index);
     }
 }
 

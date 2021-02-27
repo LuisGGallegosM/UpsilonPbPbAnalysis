@@ -3,22 +3,24 @@
 #include "OniaSkimmer.h"
 #include "TLorentzVector.h"
 
-OniaSkimmer::OniaSkimmer(TTree* treeIn, OniaOutputer* outp , OniaCutter* cut) 
-: TreeProcessor(), cutter(cut), outputer(outp), dataIn(treeIn,cut->isMC())
+OniaSkimmer::OniaSkimmer(OniaReader* reader , OniaCutter* cutter, OniaWriter* writer)
+: oniaWriter(writer), oniaCutter(cutter) ,oniaReader(reader)
 {
-    return;
 }
 
 void OniaSkimmer::ProcessEvent(Long64_t entry)
 {
-    if (cutter->prescale(entry)) return;
-    Long64_t size=dataIn.getSizeRecoQQ();
+    if (oniaCutter->prescale(entry)) return;
+
+    Long64_t size=oniaReader->recoQQ.size;
+    if(oniaWriter->getType()==QQtype::Gen)
+        size=oniaReader->genQQ.size;
     
     for(Long64_t i=0;i<size;++i)
     {
-        if (cutter->cut(&dataIn,i,entry))
+        if (oniaCutter->cut(oniaReader.get(),i,entry))
         {
-            outputer->WriteData(dataIn,i,entry);
+            oniaWriter->writeEntries(oniaReader.get(),i,entry);
         }
     }
 }

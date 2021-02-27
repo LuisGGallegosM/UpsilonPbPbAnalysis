@@ -1,6 +1,6 @@
 #include "AccEffCutter.h"
 
-bool AccCutter::cut(const OniaInput* input,Int_t index,Int_t entry)
+bool AccCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
 {
     int mupl_idx = input->genQQ.mupl_idx[index];//plus muon index
     int mumi_idx = input->genQQ.mumi_idx[index];//minus muon index
@@ -27,7 +27,7 @@ EffCutter::EffCutter(const cutParams* cut) : kineCut(*cut)
 
 }
 
-bool EffCutter::cut(const OniaInput* input,Int_t index,Int_t entry)
+bool EffCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
 {
     int mupl_idx = input->genQQ.mupl_idx[index];//plus muon index
     int mumi_idx = input->genQQ.mumi_idx[index];//minus muon index

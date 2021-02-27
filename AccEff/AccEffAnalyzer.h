@@ -1,15 +1,16 @@
-#ifndef ACCEFFOUTPUTER
-#define ACCEFFOUTPUTER
+#ifndef ACCEFFANALYZER
+#define ACCEFFANALYZER
 
 #include "TH2.h"
 #include "TEfficiency.h"
 
-#include "../TreeProcessor/Outputer.h"
-#include "../OniaBase/OniaInput.h"
+#include "../TreeProcessor/TreeProcessor.h"
+#include "../OniaBase/OniaWriter.h"
+#include "../OniaBase/OniaReader.h"
 #include "AccEffCutter.h"
 #include "../Skimming/OniaCutter.h"
 
-class AccEffOutputer : public TreeOutputer
+class AccEffAnalyzer : public TreeProcessor
 {
     private:
     TH2F* etaVsPtQQGen;
@@ -23,17 +24,11 @@ class AccEffOutputer : public TreeOutputer
     TH1F* ptHistQQRecoCut;
     TEfficiency* ptQQAcceptancy;
     TEfficiency* ptQQEfficiency;
-    Int_t Evt;
-    Float_t mass;
-    Float_t pT;
-    Float_t y;
-    Float_t phi;
-    Float_t eta;
-    Float_t dR;
-    Int_t pdgId;
 
-    AccCutter* accCutter;
-    EffCutter* effCutter;
+    std::unique_ptr<OniaReader> oniaReader;
+    std::unique_ptr<AccCutter> accCutter;
+    std::unique_ptr<EffCutter> effCutter;
+    std::unique_ptr<OniaWriter> oniaWriter;
 
     TH2F* createTH2QQ(const std::string& name,const std::string& title);
     TH2F* createTH2Mu(const std::string& name,const std::string& title);
@@ -45,10 +40,14 @@ class AccEffOutputer : public TreeOutputer
     void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname);
 
     public:
-    AccEffOutputer(const char* treeOutName,AccCutter* accCut, EffCutter* effCut);
+    AccEffAnalyzer(OniaReader* input,AccCutter* accCut, EffCutter* effCut, OniaWriter* writer);
 
-    void WriteData(const OniaInput& dataIn,Int_t index, Long64_t entry);
-    void Write(const std::string& basename) override;
+    void WriteData(Int_t index, Long64_t entry);
+
+    void Write(const std::string& basename);
+
+    void Test() { Process(oniaReader.get()); }
+    void ProcessEvent(Long64_t entry) override;
 };
 
 

@@ -1,7 +1,7 @@
 
 #include "AccEff.h"
 
-std::unique_ptr<AccEffOutputer> AccEffTest(TFile *file,const char* wroteTreeName, const cutParams* cut);
+std::unique_ptr<AccEffAnalyzer> AccEffTest(TFile *file,const char* wroteTreeName, const cutParams* cut);
 void SetCutParams(cutParams* kineCut);
 
 using std::ofstream;
@@ -39,7 +39,7 @@ void AccEff(const char* filename,const char* outputfilename, const char* confign
     CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
 
     //Run acceptancy test
-    std::unique_ptr<AccEffOutputer> results =  AccEffTest(file,ONIATTREENAME,&cut);
+    std::unique_ptr<AccEffAnalyzer> results =  AccEffTest(file,ONIATTREENAME,&cut);
     if (results==nullptr) return;
     results->Write(ReplaceExtension(outputfilename,""));
 
@@ -57,7 +57,7 @@ void AccEff(const char* filename,const char* outputfilename, const char* confign
  * @param wroteTreeName Name of the acceptancy tree to write
  * @return Output data.
  */
-std::unique_ptr<AccEffOutputer> AccEffTest(TFile *file,const char* wroteTreeName, const cutParams* cut)
+std::unique_ptr<AccEffAnalyzer> AccEffTest(TFile *file,const char* wroteTreeName, const cutParams* cut)
 {
     TTree *myTree = (TTree *)file->Get("hionia/myTree");
     if (myTree == nullptr)
@@ -66,13 +66,13 @@ std::unique_ptr<AccEffOutputer> AccEffTest(TFile *file,const char* wroteTreeName
         return nullptr;
     }
 
-    std::unique_ptr<AccCutter> cutterAcc(new AccCutter());
-    std::unique_ptr<EffCutter> cutterEff(new EffCutter(cut));
-    std::unique_ptr<AccEffOutputer> outputer(new AccEffOutputer(wroteTreeName,cutterAcc.get(),cutterEff.get()));
+    AccCutter* cutterAcc =new AccCutter();
+    EffCutter* cutterEff =new EffCutter(cut);
+    OniaWriter* writer =new OniaWriterBase(wroteTreeName,QQtype::Gen);
+    OniaReader* reader=new OniaReader(myTree,true);
+    std::unique_ptr<AccEffAnalyzer> outputer(new AccEffAnalyzer(reader,cutterAcc,cutterEff,writer));
 
-    AccEffTester accTester(myTree,outputer.get());
-    accTester.Test();
-
+    outputer->Test();
     return outputer;
 }
 
