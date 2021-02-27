@@ -1,12 +1,12 @@
 
 #include"TreeReader.h"
 
-TreeReaderBase::TreeReaderBase(TTree* treeIn) 
+TreeReader::TreeReader(TTree* treeIn) 
     :tree_input(treeIn) ,input_branches()
 {
 }
 
-void TreeReaderBase::readTree(Long64_t index)
+void TreeReader::readTree(Long64_t index)
 {
     for(TBranch* branch : input_branches)
     {
@@ -14,7 +14,7 @@ void TreeReaderBase::readTree(Long64_t index)
     }
 }
 
-void TreeReaderBase::addInput(const char* varName,void* address)
+void TreeReader::addInput(const char* varName,void* address)
 {
     TBranch* branch = tree_input->GetBranch(varName);
     if (branch ==nullptr)

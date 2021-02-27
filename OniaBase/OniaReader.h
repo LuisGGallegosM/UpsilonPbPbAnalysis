@@ -27,7 +27,7 @@ struct baseQQ
     ~baseQQ();
 };
 
-class OniaReader : public TreeReaderBase 
+class OniaReader : public TreeReader 
 {
     public:
     baseQQ recoQQ;
@@ -48,7 +48,6 @@ class OniaReader : public TreeReaderBase
     Int_t* RecoMuWhichGen;
     Int_t* GenMuWhichReco;
     Int_t* GenQQWhichReco;
-    Int_t* GenQQid;
 
     OniaReader(TTree* treeIn, bool isMC);
     ~OniaReader();

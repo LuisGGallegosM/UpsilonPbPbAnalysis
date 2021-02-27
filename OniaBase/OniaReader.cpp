@@ -1,7 +1,7 @@
 
 #include "OniaReader.h"
 
-OniaReader::OniaReader(TTree* treeIn, bool isMC) : TreeReaderBase(treeIn), genQQ(), recoQQ(), recoMu(), genMu()
+OniaReader::OniaReader(TTree* treeIn, bool isMC) : TreeReader(treeIn), genQQ(), recoQQ(), recoMu(), genMu()
 {
     SelectionType = new Int_t[maxBranchSize];
     nTrkWMea = new Int_t[maxBranchSize];
@@ -13,7 +13,6 @@ OniaReader::OniaReader(TTree* treeIn, bool isMC) : TreeReaderBase(treeIn), genQQ
     RecoMuWhichGen = new Int_t[maxBranchSize];
     GenMuWhichReco = new Int_t[maxBranchSize];
     GenQQWhichReco = new Int_t[maxBranchSize];
-    GenQQid = new Int_t[maxBranchSize];
 
     //input branches
     addInput("Reco_QQ_4mom",&recoQQ.mom4);
@@ -23,6 +22,7 @@ OniaReader::OniaReader(TTree* treeIn, bool isMC) : TreeReaderBase(treeIn), genQQ
     addInput("Reco_QQ_VtxProb",VtxProb);
     addInput("Reco_QQ_trig",trig);
     addInput("Reco_QQ_sign",recoQQ.sign);
+    addInput("Reco_QQ_momId",recoQQ.id);
 
     addInput("Reco_mu_4mom",&recoMu.mom4);
     addInput("Reco_mu_size",&recoMu.size);
@@ -40,7 +40,7 @@ OniaReader::OniaReader(TTree* treeIn, bool isMC) : TreeReaderBase(treeIn), genQQ
         addInput("Gen_QQ_size",&genQQ.size);
         addInput("Gen_QQ_mupl_idx",genQQ.mupl_idx);
         addInput("Gen_QQ_mumi_idx",genQQ.mumi_idx);
-        addInput("Gen_QQ_momId",GenQQid);
+        addInput("Gen_QQ_momId",genQQ.id);
         addInput("Gen_QQ_whichRec",GenQQWhichReco);
 
         addInput("Gen_mu_4mom",&genMu.mom4);
@@ -59,7 +59,6 @@ OniaReader::~OniaReader()
     delete[] trig;
     delete[] RecoMuWhichGen;
     delete[] GenMuWhichReco;
-    delete[] GenQQid;
 }
 
 baseQQ::baseQQ()
