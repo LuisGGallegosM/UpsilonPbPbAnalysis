@@ -12,7 +12,7 @@ libOniaBase.a : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	ar xv ../Utils/libUtils.a
 	ar xv ../TreeProcessor/libTreeProcessor.a
 	ar rcs ${OUTPUT} *.o 
-	rm *.o
+	rm -f *.o
 
 ../TreeProcessor/libTreeProcessor.a :
 	$(MAKE) -C ../TreeProcessor
@@ -21,4 +21,4 @@ libOniaBase.a : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	$(MAKE) -C ../Utils
 
 clear :
-	rm libOniaBase.a
+	rm -f libOniaBase.a *.o

@@ -20,4 +20,4 @@ skim : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	$(MAKE) -C ../OniaBase
 
 clear :
-	rm skim
+	rm -f skim

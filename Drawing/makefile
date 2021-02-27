@@ -20,4 +20,4 @@ draw : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	$(MAKE) -C ../OniaBase
 
 clear :
-	rm draw
+	rm -f draw

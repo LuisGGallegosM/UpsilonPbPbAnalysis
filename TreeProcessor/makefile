@@ -9,7 +9,7 @@ OUTPUT:=libTreeProcessor.a
 libTreeProcessor.a : ${SOURCES} ${HEADERS}
 	g++ ${SOURCES} ${INC} ${LIBS} ${FLAGS}
 	ar rcs ${OUTPUT} *.o
-	rm *.o
+	rm -f *.o
 
 clear :
-	rm libTreeProcessor.a
+	rm -f libTreeProcessor.a *.o

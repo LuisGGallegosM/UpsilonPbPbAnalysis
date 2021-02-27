@@ -9,7 +9,7 @@ OUTPUT:=libUtils.a
 libUtils.a : ${SOURCES} ${HEADERS}
 	g++ ${SOURCES} ${INC} ${LIBS} ${FLAGS}
 	ar rcs ${OUTPUT} *.o
-	rm *.o
+	rm -f *.o
 
 clear :
-	rm libUtils.a
+	rm -f libUtils.a *.o

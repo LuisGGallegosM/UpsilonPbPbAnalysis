@@ -20,4 +20,4 @@ fit : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	$(MAKE) -C ../OniaBase
 
 clear :
-	rm fit
+	rm -f fit

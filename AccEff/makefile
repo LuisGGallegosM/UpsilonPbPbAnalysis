@@ -20,4 +20,4 @@ acceff : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	$(MAKE) -C ../OniaBase
 
 clear :
-	rm acceff
+	rm -f acceff
