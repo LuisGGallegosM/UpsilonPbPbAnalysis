@@ -16,7 +16,7 @@ class OniaSkimmer : public TreeProcessor
 
     public:
     OniaSkimmer(TTree* treeIn,OniaOutputer* outp , OniaCutter* cut);
-    void Skim() { Process(); }
+    void Skim() { Process(&dataIn); }
 };
 
 #if defined(__CLING__)

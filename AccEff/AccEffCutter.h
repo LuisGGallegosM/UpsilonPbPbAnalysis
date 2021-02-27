@@ -10,11 +10,11 @@
 class AccCutter : public TreeCutter<OniaInput>
 {
     private:
+    bool isMuonInAcceptance(const TLorentzVector* Muon) const;
 
     public:
     bool cut(const OniaInput* input, Int_t index,Int_t entry) override;
     bool prescale(Int_t entry) const override { return false; }
-    bool isMuonInAcceptance(const TLorentzVector* Muon) const;
 
     std::string getName() const override {return "Acceptancy test";};
     

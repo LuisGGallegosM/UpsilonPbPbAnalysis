@@ -15,7 +15,7 @@ class AccEffTester : public TreeProcessor
 
     public:
     AccEffTester(TTree* treeIn,AccEffOutputer* outp);
-    void Test() { Process(); }
+    void Test() { Process(&dataIn); }
 };
 
 #endif

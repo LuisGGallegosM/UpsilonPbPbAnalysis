@@ -4,11 +4,13 @@
 
 #include "TClonesArray.h"
 #include <unordered_map>
+#include "../TreeProcessor/TreeReader.h"
 
 #define maxBranchSize (64)
 
-struct OniaInput
+class OniaInput : public TreeReaderBase 
 {
+    public:
     struct baseQQ
     {
         TClonesArray* mom4;
@@ -51,7 +53,7 @@ struct OniaInput
     Int_t getSizeRecoMu() const {return recoMu.size;}
     Int_t getSizeGenMu() const {return genMu.size;}
 
-    OniaInput();
+    OniaInput(TTree* treeIn, bool isMC);
     ~OniaInput();
 };
 
