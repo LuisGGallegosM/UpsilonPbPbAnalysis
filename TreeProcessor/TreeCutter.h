@@ -1,6 +1,6 @@
 
-#ifndef CUTTER
-#define CUTTER
+#ifndef TREECUTTER
+#define TREECUTTER
 
 #include "RtypesCore.h"
 #include <iostream>

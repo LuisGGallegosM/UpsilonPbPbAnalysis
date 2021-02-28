@@ -3,6 +3,8 @@
 #include"OniaWriter.h"
 #include"TLorentzVector.h"
 
+//OniaWriterBase
+
 OniaWriterBase::OniaWriterBase(const char* treeName, QQtype type):
     TreeWriter(treeName), qqType(type)
 {
@@ -24,7 +26,7 @@ void OniaWriterBase::readGenQQ(const OniaReader* dataIn, int index, int entry)
     phi = dimuon->Phi();
     eta = dimuon->Eta();
     Evt = entry;
-    pdgId = dataIn->genQQ.id[index],entry;
+    pdgId = dataIn->genQQid[index];
 }
 
 void OniaWriterBase::readRecoQQ(const OniaReader* dataIn, int index, int entry)
@@ -36,7 +38,7 @@ void OniaWriterBase::readRecoQQ(const OniaReader* dataIn, int index, int entry)
     phi = dimuon->Phi();
     eta = dimuon->Eta();
     Evt = entry;
-    pdgId = dataIn->recoQQ.id[index],entry;
+    pdgId=0;
 }
 
 void OniaWriterBase::writeEntries(const OniaReader* dataIn, int index, int entry)
@@ -47,6 +49,8 @@ void OniaWriterBase::writeEntries(const OniaReader* dataIn, int index, int entry
         readRecoQQ(dataIn,index,entry);
     TreeWriter::FillEntries(); 
 };
+
+//OniaWriterFull
 
 OniaWriterFull::OniaWriterFull(const char* treeName, QQtype type):
     OniaWriterBase(treeName,type)

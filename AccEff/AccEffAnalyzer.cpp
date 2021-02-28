@@ -7,6 +7,8 @@
 AccEffAnalyzer::AccEffAnalyzer(OniaReader* input,AccCutter* accCut, EffCutter* effCut, OniaWriter* writer) : 
     oniaWriter(writer), accCutter(accCut), effCutter(effCut),oniaReader(input)
 {
+    if (writer->getType()!= QQtype::Gen)
+        throw std::runtime_error("Error: Writer not set to Gen");
     //initialize Histograms
     etaVsPtQQGen =      createTH2QQ("eta vs pt QQ Generated" ,"p^{#mu#mu}_{t} vs |#eta^{#mu#mu}|");
     etaVsPtQQDet =      createTH2QQ("eta vs pt QQ Detected"  ,"p^{#mu#mu}_{t} vs |#eta^{#mu#mu}| QQ Detected");

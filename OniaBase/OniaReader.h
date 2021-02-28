@@ -3,7 +3,6 @@
 #define ONIADATA
 
 #include "TClonesArray.h"
-#include <unordered_map>
 #include "../TreeProcessor/TreeReader.h"
 
 #define maxBranchSize (64)
@@ -15,6 +14,7 @@ struct baseMu
     baseMu();
     ~baseMu();      
 };
+
 struct baseQQ
 {
     TClonesArray* mom4;
@@ -22,7 +22,6 @@ struct baseQQ
     Int_t* mupl_idx;
     Int_t* mumi_idx;
     Int_t* sign;
-    Int_t* id;
     baseQQ();
     ~baseQQ();
 };
@@ -42,12 +41,11 @@ class OniaReader : public TreeReader
     Float_t* dz;
     Float_t* VtxProb;
     ULong64_t* trig;
-    UInt_t runNb;
-    UInt_t eventNb;
-    UInt_t lumi;
     Int_t* RecoMuWhichGen;
     Int_t* GenMuWhichReco;
     Int_t* GenQQWhichReco;
+
+    Int_t* genQQid;
 
     OniaReader(TTree* treeIn, bool isMC);
     ~OniaReader();

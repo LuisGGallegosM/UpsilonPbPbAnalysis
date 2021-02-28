@@ -3,7 +3,6 @@
 
 #include "../OniaBase/OniaReader.h"
 #include "../TreeProcessor/TreeCutter.h"
-#include "HLT_triggers.h"
 #include "../OniaBase/SkimParams.h"
 
 class OniaCutter : public TreeCutter<OniaReader>

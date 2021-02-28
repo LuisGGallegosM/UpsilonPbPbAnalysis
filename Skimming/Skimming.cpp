@@ -66,9 +66,9 @@ std::unique_ptr<OniaSkimmer> oniaSkim(TFile *file,const char* wroteTreeName, con
     }
 
     //execute skim
-    OniaReader* reader = new OniaReader(myTree,cut->getIsMC());
+    OniaReader* reader =new OniaReader(myTree,cut->getIsMC());
     OniaCutter* cutter =new OniaCutterRecoQQ(cut);
-    OniaWriter* writer=new OniaWriterFull(wroteTreeName,QQtype::Reco);
+    OniaWriter* writer =new OniaWriterFull(wroteTreeName,QQtype::Reco);
 
     std::unique_ptr<OniaSkimmer> skimmer (new OniaSkimmer(reader,cutter, writer));
     skimmer->Skim();
