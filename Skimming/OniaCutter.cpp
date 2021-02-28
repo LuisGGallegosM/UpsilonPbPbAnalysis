@@ -3,7 +3,7 @@
 #include "OniaCutter.h"
 #include "TLorentzVector.h"
 
-OniaCutterRecoQQ::OniaCutterRecoQQ(const cutParams* cut):
+OniaCutter::OniaCutter(const cutParams* cut):
 kineCut(*cut)
 {
 }
