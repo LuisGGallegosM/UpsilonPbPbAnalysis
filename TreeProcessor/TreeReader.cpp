@@ -14,7 +14,7 @@ void TreeReader::readTree(Long64_t index)
     }
 }
 
-void TreeReader::addInput(const char* varName,void* address)
+void TreeReader::addInputNoOpt(const char* varName,void* address)
 {
     TBranch* branch = tree_input->GetBranch(varName);
     if (branch ==nullptr)
@@ -24,4 +24,28 @@ void TreeReader::addInput(const char* varName,void* address)
     }
     branch->SetAddress(address);
     input_branches.push_back(branch);
+}
+
+bool TreeReader::addInput(const char* varName,void* address)
+{
+    TBranch* branch = tree_input->GetBranch(varName);
+    if (branch ==nullptr) return false;
+    branch->SetAddress(address);
+    input_branches.push_back(branch);
+    return true;
+}
+
+bool TreeReader::hasBranch(const char* varName) const
+{
+    bool result=false;
+    const std::string name=varName;
+    for(const TBranch* branch : input_branches)
+    {
+        if(branch->GetName() == name)
+        {
+            result=true;
+            break;
+        }
+    }
+    return result;
 }

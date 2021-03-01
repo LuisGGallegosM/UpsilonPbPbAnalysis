@@ -19,7 +19,7 @@ OniaWriterBase::OniaWriterBase(const char* treeName, QQtype type):
 
 void OniaWriterBase::readGenQQ(const OniaReader* dataIn, int index, int entry)
 {
-    TLorentzVector* dimuon =(TLorentzVector*) dataIn->genQQ.mom4->At(index);
+    TLorentzVector* dimuon =(TLorentzVector*) dataIn->genQQ_mom4->At(index);
     mass= dimuon->M();
     pT = dimuon->Pt();
     y = fabs(dimuon->Rapidity());
@@ -31,7 +31,7 @@ void OniaWriterBase::readGenQQ(const OniaReader* dataIn, int index, int entry)
 
 void OniaWriterBase::readRecoQQ(const OniaReader* dataIn, int index, int entry)
 {
-    TLorentzVector* dimuon =(TLorentzVector*) dataIn->recoQQ.mom4->At(index);
+    TLorentzVector* dimuon =(TLorentzVector*) dataIn->recoQQ_mom4->At(index);
     mass= dimuon->M();
     pT = dimuon->Pt();
     y = fabs(dimuon->Rapidity());
@@ -65,8 +65,8 @@ OniaWriterFull::OniaWriterFull(const char* treeName, QQtype type):
 
 void OniaWriterFull::readRecoMu(const OniaReader* dataIn, int index, int entry)
 {
-    TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn->recoMu.mom4->At(dataIn->recoQQ.mumi_idx[index]);
-    TLorentzVector* mom4vec_mupl = (TLorentzVector*) dataIn->recoMu.mom4->At(dataIn->recoQQ.mupl_idx[index]);
+    TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn->recoMu_mom4->At(dataIn->recoQQ_mumi_idx[index]);
+    TLorentzVector* mom4vec_mupl = (TLorentzVector*) dataIn->recoMu_mom4->At(dataIn->recoQQ_mupl_idx[index]);
     pT_mi = mom4vec_mumi->Pt();
     eta_mi = mom4vec_mumi->Eta();
     phi_mi = mom4vec_mumi->Phi();
@@ -78,8 +78,8 @@ void OniaWriterFull::readRecoMu(const OniaReader* dataIn, int index, int entry)
 
 void OniaWriterFull::readGenMu(const OniaReader* dataIn, int index, int entry)
 {
-    TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn->genMu.mom4->At(dataIn->genQQ.mumi_idx[index]);
-    TLorentzVector* mom4vec_mupl = (TLorentzVector*) dataIn->genMu.mom4->At(dataIn->genQQ.mupl_idx[index]);
+    TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn->genMu_mom4->At(dataIn->genQQ_mumi_idx[index]);
+    TLorentzVector* mom4vec_mupl = (TLorentzVector*) dataIn->genMu_mom4->At(dataIn->genQQ_mupl_idx[index]);
     pT_mi = mom4vec_mumi->Pt();
     eta_mi = mom4vec_mumi->Eta();
     phi_mi = mom4vec_mumi->Phi();

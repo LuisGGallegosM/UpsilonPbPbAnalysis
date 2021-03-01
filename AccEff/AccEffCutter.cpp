@@ -2,11 +2,8 @@
 
 bool AccCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
 {
-    int mupl_idx = input->genQQ.mupl_idx[index];//plus muon index
-    int mumi_idx = input->genQQ.mumi_idx[index];//minus muon index
-
-    if(!isMuonInAcceptance((TLorentzVector*) input->genMu.mom4->At(mupl_idx))) return false;
-    if(!isMuonInAcceptance((TLorentzVector*) input->genMu.mom4->At(mumi_idx))) return false;
+    if(!isMuonInAcceptance((TLorentzVector*) input->genQQ_mupl_mom4->At(index))) return false;
+    if(!isMuonInAcceptance((TLorentzVector*) input->genQQ_mumi_mom4->At(index))) return false;
 
     return true;
 }
@@ -29,19 +26,18 @@ EffCutter::EffCutter(const cutParams* cut) : kineCut(*cut)
 
 bool EffCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
 {
-    int mupl_idx = input->genQQ.mupl_idx[index];//plus muon index
-    int mumi_idx = input->genQQ.mumi_idx[index];//minus muon index
+    int mupl_idx = input->recoQQ_mupl_idx[index];//plus muon index
+    int mumi_idx = input->recoQQ_mumi_idx[index];//minus muon index
 
     //are both muons reconstructed?
-    if (input->GenMuWhichReco[mupl_idx] < 0) return false;
-    if (input->GenMuWhichReco[mumi_idx] < 0) return false;
+    if (input->RecoMuWhichGen[mupl_idx] < 0) return false;
+    if (input->RecoMuWhichGen[mumi_idx] < 0) return false;
 
-    //find QQ parent of both muons
-    int recoQQIndex=input->GenQQWhichReco[index];
-    if (recoQQIndex < 0) return false;
+    int genQQIndex=input->RecoQQWhichGen[index];
+    if (genQQIndex < 0) return false;
 
-    TLorentzVector* mom4=(TLorentzVector*)input->recoQQ.mom4->At(recoQQIndex);
+    TLorentzVector* mom4=(TLorentzVector*)input->recoQQ_mom4->At(index);
     if ((mom4->M() < 8.5f) || (mom4->M() >11.0f)) return false;
 
-    return kineCut.cut(input,recoQQIndex,entry);
+    return kineCut.cut(input,index,entry);
 }

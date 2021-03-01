@@ -10,7 +10,6 @@ void cutParams::deserialize(const std::string& filename)
     ser.read("checkSign",checkSign );
     ser.read("sign",sign);
     ser.read("prescale",prescale);
-    ser.read("genLoop",genLoop,false);
 
     ser.read("selectionBits",selectionBits);
     ser.read("minTracks",minTracks);
@@ -33,10 +32,10 @@ bool cutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
     //check for triggers
     if ((input->trig[index] & trigSelect) != trigSelect) return false;
 
-    if ((checkSign) && (input->recoQQ.sign[index] != sign)) return false;
+    if ((checkSign) && (input->recoQQ_sign[index] != sign)) return false;
 
-    int mupl_idx = input->recoQQ.mupl_idx[index];//plus muon index
-    int mumi_idx = input->recoQQ.mumi_idx[index];//minus muon index
+    int mupl_idx = input->recoQQ_mupl_idx[index];//plus muon index
+    int mumi_idx = input->recoQQ_mumi_idx[index];//minus muon index
 
     //check if missing index, missing when equals -1
     if ((mupl_idx <0) || (mumi_idx<0)) return false;
@@ -56,9 +55,9 @@ bool cutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
     if (!isSoft(input,mumi_idx)) return false;
 
     //kinetic cut
-    TLorentzVector* mom4= (TLorentzVector*) input->recoQQ.mom4->At(index);
-    TLorentzVector* mom4_mumi = (TLorentzVector*) input->recoMu.mom4->At(input->recoQQ.mumi_idx[index]);
-    TLorentzVector* mom4_mupl = (TLorentzVector*) input->recoMu.mom4->At(input->recoQQ.mupl_idx[index]);
+    TLorentzVector* mom4= (TLorentzVector*) input->recoQQ_mom4->At(index);
+    TLorentzVector* mom4_mumi = (TLorentzVector*) input->recoMu_mom4->At(input->recoQQ_mumi_idx[index]);
+    TLorentzVector* mom4_mupl = (TLorentzVector*) input->recoMu_mom4->At(input->recoQQ_mupl_idx[index]);
 
     if((mom4==nullptr) || (mom4_mumi==nullptr) || (mom4_mupl==nullptr))
     {

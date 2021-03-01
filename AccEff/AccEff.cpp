@@ -1,54 +1,8 @@
 
+
 #include "AccEff.h"
 
-std::unique_ptr<AccEffAnalyzer> AccEffTest(TFile *file,const char* wroteTreeName, const cutParams* cut);
-void SetCutParams(cutParams* kineCut);
-
 using std::ofstream;
-
-/**
- * @brief Execute Acceptancy and Efficiency tests.
- * 
- * @param filename Name of file where to find the tree to process.
- * @param outputfilename Name of the root output file to save processed data.
- * @param cut Cut parameters
- */
-void AccEff(const char* filename,const char* outputfilename, const char* configname)
-{
-    std::cout << "\nACCEPTANCY AND EFFICIENCY TEST\n";
-    std::cout << "Reading input file: " << filename <<'\n';
-    std::cout << "Writing to output file: " << outputfilename <<'\n';
-    std::cout << "Cut configuration file: " << configname <<'\n';
-
-    //input file
-    TFile* file = OpenFile(filename,"READ");
-
-    //output file
-    TFile* outputfile = OpenFile(outputfilename, "RECREATE");
-
-    cutParams cut;
-    cut.deserialize(configname);
-
-    if(!cut.isValid())
-    {
-        std::cerr << "Error: Invalid cut parameters.\n";
-        return;
-    }
-
-    //copy cut config file
-    CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
-
-    //Run acceptancy test
-    std::unique_ptr<AccEffAnalyzer> results =  AccEffTest(file,ONIATTREENAME,&cut);
-    if (results==nullptr) return;
-    results->Write(ReplaceExtension(outputfilename,""));
-
-    outputfile->Close();
-    file->Close();
-    delete file;
-    std::cout << "Success.\n TTrees wrote to '" << outputfilename<< "' root file\n";
-    return;
-}
 
 /**
  * @brief Acceptancy test
@@ -57,44 +11,115 @@ void AccEff(const char* filename,const char* outputfilename, const char* confign
  * @param wroteTreeName Name of the acceptancy tree to write
  * @return Output data.
  */
-std::unique_ptr<AccEffAnalyzer> AccEffTest(TFile *file,const char* wroteTreeName, const cutParams* cut)
+void AccTest(const char* filename,const char* outputfilename, const char* configname)
 {
+    std::cout << "\nACCEPTANCY TEST\n";
+
+    //input file
+    std::cout << "Reading input file: " << filename <<'\n';
+    TFile* file = OpenFile(filename,"READ");
+    
+    //output file
+    std::string outfilename=ReplaceExtension(outputfilename,"Acc.root");
+    std::cout << "Writing to output file: " << outfilename <<'\n';
+    TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
+
     TTree *myTree = (TTree *)file->Get("hionia/myTree");
     if (myTree == nullptr)
     {
         std::cout << "hionia/myTree tree not found\n";
-        return nullptr;
+        throw std::runtime_error("Error: Tree not found.\n");
     }
 
     AccCutter* cutterAcc =new AccCutter();
-    EffCutter* cutterEff =new EffCutter(cut);
-    OniaWriter* writer =new OniaWriterBase(wroteTreeName,QQtype::Gen);
-    OniaReader* reader=new OniaReader(myTree,true);
-    std::unique_ptr<AccEffAnalyzer> outputer(new AccEffAnalyzer(reader,cutterAcc,cutterEff,writer));
+    OniaWriter* writer =new OniaWriterBase("DetectableOnia",QQtype::Gen);
+    OniaReader* reader=new OniaReader(myTree);
+    std::unique_ptr<AccAnalyzer> accAnalyzer(new AccAnalyzer(reader,cutterAcc,writer));
 
-    outputer->Test();
-    return outputer;
+    //Run acceptancy test
+    accAnalyzer->Test();
+
+    //write results to same folder as outputfilename
+    std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
+    accAnalyzer->Write(outputfilesBasename);
+
+    outputfile->Close();
+    file->Close();
+    delete file;
+    std::cout << "Success.\n TTrees wrote to '" << outfilename<< "' root file\n";
+}
+
+/**
+ * @brief Efficiency test
+ * 
+ * @param file File where to get the tree to acceptancy test.
+ * @param wroteTreeName Name of the acceptancy tree to write
+ * @return Output data.
+ */
+void EffTest(const char* filename,const char* outputfilename, const char* configname)
+{
+    std::cout << "\nEFFICIENCY TEST\n";
+
+    //input file
+    std::cout << "Reading input file: " << filename <<'\n';
+    TFile* file = OpenFile(filename,"READ");
+
+    //input file of acceptancy
+    std::string accfilename=ReplaceExtension(outputfilename,"Acc.root");
+    std::cout << "Reading acceptancy input file: " << filename <<'\n';
+    TFile* accfile = OpenFile(accfilename.data(),"READ");
+    
+    //output file
+    std::string outfilename= ReplaceExtension(outputfilename,"Eff.root");
+    std::cout << "Writing to output file: " << outfilename <<'\n';
+    TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
+
+    TTree *myTree = (TTree *)file->Get("hionia/myTree");
+    if (myTree == nullptr)
+    {
+        std::cout << "hionia/myTree tree not found\n";
+        return;
+    }
+
+    cutParams cut;
+    cut.deserialize(configname);
+    if(!cut.isValid())
+    {
+        std::cerr << "Error: Invalid cut parameters.\n";
+        return;
+    }
+
+    EffCutter* cutterAcc =new EffCutter(&cut);
+    OniaWriter* writer =new OniaWriterBase("RecoCutOnia",QQtype::Reco);
+    OniaReader* reader=new OniaReader(myTree);
+    EffAnalyzer effAnalyzer(reader,cutterAcc,writer,(TH1F*)accfile->Get("p_{t} QQ Detected"));
+
+    //Run efficiency test
+    effAnalyzer.Test();
+
+    //write results to same folder as outputfilename
+    std::string outputfilesBasename=outfilename;
+    effAnalyzer.Write(outputfilesBasename);
+
+    outputfile->Close();
+    file->Close();
+    delete file;
+    std::cout << "Success.\n TTrees wrote to '" << outfilename<< "' root file\n";
+    return;
 }
 
 #if !defined(__CLING__)
 
 int main(int argc, char **argv)
 {
-    if (argc == 4)
-        AccEff(argv[1],argv[2],argv[3]);
+    if (argc == 5)
+    {
+        AccTest(argv[1],argv[3],argv[4]);
+        EffTest(argv[2],argv[3],argv[4]);
+    }
     else
     {
-        if (argc == 1)
-        {
-            const char* defaultfilename = "../rootfiles/merged_HiForestAOD_MC.root";
-            const char* defaultoutputfile = "../rootfiles/merged_HiForestAOD_MC_AccEff";
-            const char* defaultconfig = "../rootfiles/merged_HiForestAOD_MC.cutconf";
-            AccEff(defaultfilename,defaultoutputfile,defaultconfig);
-        }
-        else
-        {
-            std::cerr << "Incorrect number of parameters\n";  
-        }
+        std::cerr << "Incorrect number of parameters\n";
     }
     return 0;
 }

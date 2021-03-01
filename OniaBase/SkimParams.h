@@ -16,7 +16,6 @@ class cutParams
     unsigned long long trigSelect;
     int sign;
     int prescale;
-    bool genLoop;
 
     int selectionBits;
     int minTracks;
@@ -33,7 +32,7 @@ class cutParams
     float singleMuEtaHigh;
 
     public:
-    cutParams() : isMC(false), checkSign(false), trigSelect(0LL), prescale(0), genLoop(false),
+    cutParams() : isMC(false), checkSign(false), trigSelect(0LL), prescale(0),
     sign(0), selectionBits(0), minPixels(-1),minTracks(-1), maxDxy(-1.0f),maxDz(-1.0f),
     minVtxProb(-1.0f),ptHigh(-1.0f),ptLow(-1.0f),yLow(-1.0f),yHigh(-1.0f),
     singleMuPtLow(-1.0f), singleMuEtaHigh(-1.0f)
@@ -44,7 +43,7 @@ class cutParams
     {
         return (minTracks>=0) && (minPixels>=0) && (ptLow>=0.0f) 
         && (ptHigh>0.0f) && (singleMuPtLow>=0.0f) && (maxDxy>0.0f)
-        && (maxDz > 0.0f) && (minVtxProb >0.0f) && (prescale>0) && (!(genLoop && (!isMC)));
+        && (maxDz > 0.0f) && (minVtxProb >0.0f) && (prescale>0);
     }
 
     bool cut(const OniaReader* input,Int_t index,Int_t entry);

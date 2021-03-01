@@ -8,4 +8,5 @@
 #include "../Utils/utils.h"
 #include "../OniaBase/OniaBase.h"
 #include "../OniaBase/OniaWriter.h"
-#include "AccEffAnalyzer.h"
+#include "AccAnalyzer.h"
+#include "EffAnalyzer.h"

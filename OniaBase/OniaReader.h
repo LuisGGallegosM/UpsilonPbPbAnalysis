@@ -5,50 +5,47 @@
 #include "TClonesArray.h"
 #include "../TreeProcessor/TreeReader.h"
 
-#define maxBranchSize (64)
-
-struct baseMu
-{
-    TClonesArray* mom4;
-    Int_t size;
-    baseMu();
-    ~baseMu();      
-};
-
-struct baseQQ
-{
-    TClonesArray* mom4;
-    Int_t size;
-    Int_t* mupl_idx;
-    Int_t* mumi_idx;
-    Int_t* sign;
-    baseQQ();
-    ~baseQQ();
-};
+#define maxBranchSize (32)
 
 class OniaReader : public TreeReader 
 {
     public:
-    baseQQ recoQQ;
-    baseQQ genQQ;
-    baseMu recoMu;
-    baseMu genMu;
+    std::unique_ptr<TClonesArray> genQQ_mom4;
+    Int_t genQQ_size;
+    Int_t genQQ_mupl_idx[maxBranchSize];
+    Int_t genQQ_mumi_idx[maxBranchSize];
+    Int_t genQQ_sign[maxBranchSize];
 
-    Int_t* SelectionType;
-    Int_t* nTrkWMea;
-    Int_t* nPixWMea;
-    Float_t* dxy;
-    Float_t* dz;
-    Float_t* VtxProb;
-    ULong64_t* trig;
-    Int_t* RecoMuWhichGen;
-    Int_t* GenMuWhichReco;
-    Int_t* GenQQWhichReco;
+    std::unique_ptr<TClonesArray> recoQQ_mom4;
+    Int_t recoQQ_size;
+    Int_t recoQQ_mupl_idx[maxBranchSize];
+    Int_t recoQQ_mumi_idx[maxBranchSize];
+    Int_t recoQQ_sign[maxBranchSize];
 
-    Int_t* genQQid;
+    std::unique_ptr<TClonesArray> genMu_mom4;
+    Int_t genMu_size;
 
-    OniaReader(TTree* treeIn, bool isMC);
-    ~OniaReader();
+    std::unique_ptr<TClonesArray> recoMu_mom4;
+    Int_t recoMu_size;
+
+    Int_t SelectionType[maxBranchSize];
+    Int_t nTrkWMea[maxBranchSize];
+    Int_t nPixWMea[maxBranchSize];
+    Float_t dxy[maxBranchSize];
+    Float_t dz[maxBranchSize];
+    Float_t VtxProb[maxBranchSize];
+    ULong64_t trig[maxBranchSize];
+    Int_t RecoMuWhichGen[maxBranchSize];
+    Int_t GenQQWhichReco[maxBranchSize];
+    Int_t GenMuWhichReco[maxBranchSize];
+    Int_t RecoQQWhichGen[maxBranchSize];
+
+    Int_t genQQid[maxBranchSize];
+
+    std::unique_ptr<TClonesArray> genQQ_mupl_mom4;
+    std::unique_ptr<TClonesArray> genQQ_mumi_mom4;
+
+    OniaReader(TTree* treeIn);
 };
 
 #endif
