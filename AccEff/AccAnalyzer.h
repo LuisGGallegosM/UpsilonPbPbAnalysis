@@ -20,7 +20,8 @@ class AccAnalyzer : public TreeProcessor
     TH2F* etaVsPtMuDet;
     TH1F* ptHistQQGen;
     TH1F* ptHistQQDet;
-    TEfficiency* ptQQAcceptancy;
+    std::unique_ptr<TEfficiency> ptQQAcceptancy;
+    std::unique_ptr<TEfficiency> etaVsPtQQAcceptancy;
 
     std::unique_ptr<OniaReader> oniaReader;
     std::unique_ptr<AccCutter> accCutter;

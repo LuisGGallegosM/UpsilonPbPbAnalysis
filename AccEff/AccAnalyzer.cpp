@@ -36,9 +36,13 @@ void AccAnalyzer::Write(const std::string& basename)
     oniaWriter->Write();
 
     //calculate acceptancy
-    ptQQAcceptancy = new  TEfficiency(*ptHistQQDet,*ptHistQQGen);
+    ptQQAcceptancy.reset( new  TEfficiency(*ptHistQQDet,*ptHistQQGen));
     ptQQAcceptancy->SetStatisticOption(TEfficiency::EStatOption::kFNormal);
     ptQQAcceptancy->SetName("pt QQ Acceptancy");
+
+    etaVsPtQQAcceptancy.reset( new TEfficiency(*etaVsPtQQDet,*etaVsPtQQGen) );
+    etaVsPtQQAcceptancy->SetStatisticOption(TEfficiency::EStatOption::kFNormal);
+    etaVsPtQQAcceptancy->SetName("eta vs pt QQ Acceptancy");
 
     //write 2D plots
     writeToCanvas(etaVsPtQQGen,    "|y^{#mu#mu}|","p^{#mu#mu}_{T} ( GeV/c )",basename+"_EtaPtQQ_Gen.pdf");
@@ -54,11 +58,13 @@ void AccAnalyzer::Write(const std::string& basename)
     //write 1D plots
     writeToCanvas(ptHistQQGen,       "p^{#mu#mu}_{T} ( GeV/c )", "N_{Gen}^{#mu#mu}",basename+"_PtQQ_Gen.pdf");
     writeToCanvas(ptHistQQDet,       "p^{#mu#mu}_{T} ( GeV/c )", "N_{Det}^{#mu#mu}",basename+"_PtQQ_Det.pdf");
-    writeToCanvasEff(ptQQAcceptancy, "p^{#mu#mu}_{T} ( GeV/c )", "Acc",    basename+"_PtQQ_Acceptancy.pdf");
+    writeToCanvasEff(ptQQAcceptancy.get(), "p^{#mu#mu}_{T} ( GeV/c )", "Acc",    basename+"_PtQQ_Acceptancy.pdf");
+    writeToCanvasEff(etaVsPtQQAcceptancy.get(), "p^{#mu#mu}_{T} ( GeV/c )", "Acc",    basename+"_PtQQ_Acceptancy.pdf");
 
     ptHistQQGen->Write(0,TObject::kOverwrite);
     ptHistQQDet->Write(0,TObject::kOverwrite);
     ptQQAcceptancy->Write(0,TObject::kOverwrite);
+    etaVsPtQQAcceptancy->Write(0,TObject::kOverwrite);
 }
 
 void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
