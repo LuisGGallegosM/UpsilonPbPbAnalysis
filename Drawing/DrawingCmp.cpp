@@ -61,10 +61,18 @@ void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
     const std::vector<double> xbins = generateBinBoundaries(fits);
     const std::vector<toGet> getters = fillVariables(&(fits[0].configs));
 
+    //root output file
+    std::string outfilename= ReplaceExtension(outputfilename,".root");
+    std::cout << "Writing to output file: " << outfilename <<'\n';
+    TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
+
     for(const auto& getter : getters)
     {
         const char* name= getter.name.data();
-        TCanvas canvas("Fit_plot","fit",4,45,550,520);
+        std::string outfilename = ReplaceExtension(outputfilename,"_")+name+".pdf";
+        std::string plotname = std::string(name)+" plot";
+
+        TCanvas canvas(plotname.data(),plotname.data(),4,45,550,520);
         canvas.cd();
 
         TPad pad("pad","fit", 0.02, 0.02, 0.98, 0.98);
@@ -78,10 +86,14 @@ void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
         compGraph.GetYaxis()->SetLabelSize(0.03f);
         drawCompGraph(getter.getter,fits,&compGraph);
         compGraph.Draw();
-        std::string outfilename = (ReplaceExtension(outputfilename,"_")+name+".pdf");
+        
+        compGraph.Write();
+        canvas.Write();
         canvas.SaveAs(outfilename.data());
         std::cout << "output file: "<< outfilename << "\n";
     }
+
+    outputfile->Close();
 
     return;
 }

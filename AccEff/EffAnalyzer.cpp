@@ -39,6 +39,8 @@ void EffAnalyzer::Write(const std::string& basename)
     //calculate efficiency
     ptQQEfficiency = new  TEfficiency(*ptHistQQRecoCut,*ptHistQQDet);
     ptQQEfficiency->SetStatisticOption(TEfficiency::EStatOption::kFNormal);
+    ptQQEfficiency->SetName("pt QQ Efficiency");
+
     writeToCanvasEff(ptQQEfficiency, "p^{#mu#mu}_{T} ( GeV/c )", "Eff",    basename+"_PtQQ_Efficiency.pdf");
 }
 

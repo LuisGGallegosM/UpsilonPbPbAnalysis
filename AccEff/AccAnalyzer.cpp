@@ -17,8 +17,8 @@ AccAnalyzer::AccAnalyzer(OniaReader* input,AccCutter* accCut, OniaWriter* writer
     etaVsPtMuGen = createTH2Mu("eta vs pt Mu Generated" ,"p^{#mu}_{t} vs |#eta^{#mu}| Mu Generated");
     etaVsPtMuDet = createTH2Mu("eta vs pt Mu Detectable"  ,"p^{#mu}_{t} vs |#eta^{#mu}| Mu Detected");
 
-    ptHistQQGen= createTH1("p_{t} QQ Generated" ,"p^{#mu#mu}_{t} QQ Generated");
-    ptHistQQDet= createTH1("p_{t} QQ Detected"  ,"p^{#mu#mu}_{t} QQ Detected");
+    ptHistQQGen= createTH1("pt QQ Generated" ,"p^{#mu#mu}_{t} QQ Generated");
+    ptHistQQDet= createTH1("pt QQ Detected"  ,"p^{#mu#mu}_{t} QQ Detected");
 }
 
 void AccAnalyzer::ProcessEvent(Long64_t entry)
@@ -38,6 +38,7 @@ void AccAnalyzer::Write(const std::string& basename)
     //calculate acceptancy
     ptQQAcceptancy = new  TEfficiency(*ptHistQQDet,*ptHistQQGen);
     ptQQAcceptancy->SetStatisticOption(TEfficiency::EStatOption::kFNormal);
+    ptQQAcceptancy->SetName("pt QQ Acceptancy");
 
     //write 2D plots
     writeToCanvas(etaVsPtQQGen,    "|y^{#mu#mu}|","p^{#mu#mu}_{T} ( GeV/c )",basename+"_EtaPtQQ_Gen.pdf");

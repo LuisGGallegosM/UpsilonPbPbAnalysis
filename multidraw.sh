@@ -11,7 +11,7 @@ FITFILENAMES=()
 for CONFIG in ${CONFIGFILES[@]}
 do
     INPUTFILE="${INPUTDIR}/${CONFIG%.*}/${CONFIG%.*}.fit"
-    echo "reading fit result file '${INPUTFILE}'"
+    echo "Reading fit result file '${INPUTFILE}'"
 
     if [ ! -f ${INPUTFILE} ]
     then

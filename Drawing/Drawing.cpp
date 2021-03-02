@@ -196,16 +196,20 @@ void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
     TextDrawer tdrawer(0.22f,0.8f,9.0f);
     
     tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
-    tdrawer.drawText( Form("#alpha=%.3f #pm %.3f",fParams->getAlpha(),fParams->getErrors().getAlpha()));
     tdrawer.drawText( Form("m_{Y1S}=%.3f #pm %.3f",fParams->getMeanY1S(),fParams->getErrors().getMeanY1S()));
-    tdrawer.drawText( Form("m_{Y2S}=%.3f #pm %.3f",fParams->getMeanY2S(),fParams->getErrors().getMeanY2S()));
-    tdrawer.drawText( Form("m_{Y3S}=%.3f #pm %.3f",fParams->getMeanY3S(),fParams->getErrors().getMeanY3S()));
-    tdrawer.drawText( Form("n=%.3f #pm %.3f",fParams->getN(),fParams->getErrors().getN()));
+    if (!config->fitConf.getFixAlpha())
+        tdrawer.drawText( Form("#alpha=%.3f #pm %.3f",fParams->getAlpha(),fParams->getErrors().getAlpha()));
+    if (!config->fitConf.getFixN())
+        tdrawer.drawText( Form("n=%.3f #pm %.3f",fParams->getN(),fParams->getErrors().getN()));
     tdrawer.drawText( Form("#sigma_{1}^{Y1S}=%.4f #pm %.4f",fParams->getSigmaY1S(),fParams->getErrors().getSigmaY1S()));
-    tdrawer.drawText( Form("#sigma_{1}^{Y2S}=%.4f #pm %.4f",fParams->getSigmaY2S(),fParams->getErrors().getSigmaY2S()));
-    tdrawer.drawText( Form("#sigma_{1}^{Y3S}=%.4f #pm %.4f",fParams->getSigmaY3S(),fParams->getErrors().getSigmaY3S()));
     tdrawer.drawText( Form("#frac{#sigma_{2}}{#sigma_{1}}=%.4f #pm %.4f",fParams->getX(),fParams->getErrors().getX()));
     tdrawer.drawText( Form("f=%.4f #pm %.4f",fParams->getF(),fParams->getErrors().getF()));
+    
+    if (config->fitConf.getBkgType() == BkgParams::BkgType::chev)
+    {
+        tdrawer.drawText( Form("chk_k1=%.4f #pm %.4f",fParams->getChk4_k1(),fParams->getErrors().getChk4_k1()));
+        tdrawer.drawText( Form("chk_k2=%.4f #pm %.4f",fParams->getChk4_k2(),fParams->getErrors().getChk4_k2()));
+    }
 
     float ptLow=config->fitConf.getCut()->getPtLow();
     float ptHigh=config->fitConf.getCut()->getPtHigh();

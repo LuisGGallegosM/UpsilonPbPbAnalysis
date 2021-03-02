@@ -20,7 +20,7 @@ void AccTest(const char* filename,const char* outputfilename, const char* config
     TFile* file = OpenFile(filename,"READ");
     
     //output file
-    std::string outfilename=ReplaceExtension(outputfilename,"Acc.root");
+    std::string outfilename=outputfilename;
     std::cout << "Writing to output file: " << outfilename <<'\n';
     TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
 
@@ -46,6 +46,7 @@ void AccTest(const char* filename,const char* outputfilename, const char* config
     outputfile->Close();
     file->Close();
     delete file;
+    delete outputfile;
     std::cout << "Success.\n TTrees wrote to '" << outfilename<< "' root file\n";
 }
 
@@ -65,8 +66,8 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
     TFile* file = OpenFile(filename,"READ");
 
     //input file of acceptancy
-    std::string accfilename=ReplaceExtension(outputfilename,"Acc.root");
-    std::cout << "Reading acceptancy input file: " << filename <<'\n';
+    std::string accfilename=outputfilename;
+    std::cout << "Reading efficiency input file: " << filename <<'\n';
     TFile* accfile = OpenFile(accfilename.data(),"READ");
     
     //output file
@@ -92,7 +93,15 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
     EffCutter* cutterAcc =new EffCutter(&cut);
     OniaWriter* writer =new OniaWriterBase("RecoCutOnia",QQtype::Reco);
     OniaReader* reader=new OniaReader(myTree);
-    EffAnalyzer effAnalyzer(reader,cutterAcc,writer,(TH1F*)accfile->Get("p_{t} QQ Detected"));
+
+    TH1F* ptQQdetected=(TH1F*)accfile->Get("pt QQ Detected");
+    if(ptQQdetected==nullptr)
+    {
+        std::cerr << "Error: 'pt QQ Detected' histogram not found.\n";
+        return;
+    }
+
+    EffAnalyzer effAnalyzer(reader,cutterAcc,writer,ptQQdetected);
 
     //Run efficiency test
     effAnalyzer.Test();
@@ -101,9 +110,12 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
     std::string outputfilesBasename=outfilename;
     effAnalyzer.Write(outputfilesBasename);
 
+    accfile->Close();
     outputfile->Close();
     file->Close();
     delete file;
+    delete outputfile;
+    delete accfile;
     std::cout << "Success.\n TTrees wrote to '" << outfilename<< "' root file\n";
     return;
 }
@@ -112,10 +124,18 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
 
 int main(int argc, char **argv)
 {
+    std::string flags(argv[1]);
     if (argc == 5)
     {
-        AccTest(argv[1],argv[3],argv[4]);
-        EffTest(argv[2],argv[3],argv[4]);
+        if (flags=="-acc")
+            AccTest(argv[2],argv[3],argv[4]);
+        else if (flags=="-eff")
+            EffTest(argv[2],argv[3],argv[4]);
+    }
+    else if (argc == 6)
+    {
+        if (flags=="-final")
+            AccEffResults(argv[2],argv[3],argv[4],argv[5]);
     }
     else
     {

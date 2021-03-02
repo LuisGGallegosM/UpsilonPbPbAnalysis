@@ -37,7 +37,8 @@ TH1F* createTH1(const std::string& name,const std::string& title)
 
 void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option)
 {
-    TCanvas canvas("Fit_plot","fit",4,45,600,600);
+    const std::string canvasName=std::string(hist->GetName())+" plot";
+    TCanvas canvas(canvasName.data(),canvasName.data(),4,45,600,600);
     canvas.cd();
     TPad pad("pad","fit", 0.08, 0.08, 0.92, 0.92);
     pad.Draw();
@@ -61,7 +62,8 @@ void writeToCanvas(TH1* hist,const std::string& xname,const std::string& yname, 
 
 void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname)
 {
-    TCanvas canvas("Fit_plot","fit",4,45,550,520);
+    const std::string canvasName=std::string(hist->GetName())+" plot";
+    TCanvas canvas(canvasName.data(),canvasName.data(),4,45,550,520);
     canvas.cd();
     TPad pad("pad","fit", 0.02, 0.02, 0.98, 0.98);
     pad.Draw();

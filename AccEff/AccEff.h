@@ -10,3 +10,4 @@
 #include "../OniaBase/OniaWriter.h"
 #include "AccAnalyzer.h"
 #include "EffAnalyzer.h"
+#include "AccEffResults.h"

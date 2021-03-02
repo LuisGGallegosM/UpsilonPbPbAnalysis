@@ -18,7 +18,7 @@ do
 done
 
 #directory where files are located
-WORKDIR="../rootfiles/merged_HiForestAOD_MCFix_skimmed0"
+WORKDIR="../rootfiles/merged_HiForestAOD_MCFix2_skimmed0"
 #directory where to save multifit results, inside WORKDIR
 OUTDIR="output"
 
@@ -32,6 +32,7 @@ echo "saving files in '${OUTDIR}' directory"
 mkdir "${WORKDIR}/${OUTDIR}"
 
 #fitconf files to read
+./fitconfGen.sh "$WORKDIR"
 CONFIGFILES=$(find ${WORKDIR} -maxdepth 1 -name "*.fitconf")
 MULTIFITFILE=$(find ${WORKDIR} -maxdepth 1 -name "*.multifit")
 cp "$MULTIFITFILE" "${WORKDIR}/${OUTDIR}"
@@ -40,15 +41,17 @@ cp "$MULTIFITFILE" "${WORKDIR}/${OUTDIR}"
 if [ ${DOFIT} = "true" ]
 then
     echo "fitting..."
-    ./fitconfGen.sh "$WORKDIR"
+    
     echo "reading skim file '${SKIMFILE}'"
     #do the fitting jobs
     MAXJOBS=6
     for CONFIG in ${CONFIGFILES[@]}
     do
-        FITFILE="${WORKDIR}/${CONFIG}"
+        FITFILE="${CONFIG}"
+        FITNAME=$(basename $CONFIG)
+        FITOUTPUTDIR="${WORKDIR}/${OUTDIR}/${FITNAME%.*}"
         echo "fitting file: $CONFIG"
-        ./fit.sh "$SKIMFILE" "$FITFILE" "${WORKDIR}/${OUTDIR}/${CONFIG%.*}" &
+        ./fit.sh "$SKIMFILE" "$FITFILE" "${FITOUTPUTDIR}" &
         JOBS=( $(jobs -p) )
         JOBNUM="${#JOBS[@]}"
         if [ $MAXJOBS = $JOBNUM ]
@@ -68,8 +71,8 @@ then
     echo "reading drawing configuration file: ${DRAWCONFIG}"
     for CONFIG in ${CONFIGFILES[@]}
     do
-    NAME=${CONFIG%.*}
-    ROOTFILEDRAW="${WORKDIR}/${OUTDIR}/${NAME}/${NAME}.root"
+    NAME=$(basename $CONFIG)
+    ROOTFILEDRAW="${WORKDIR}/${OUTDIR}/${NAME%.*}/${NAME%.*}.root"
     echo "drawing ${ROOTFILEDRAW}"
     ./draw.sh "${ROOTFILEDRAW}" "${DRAWCONFIG}"
     done
