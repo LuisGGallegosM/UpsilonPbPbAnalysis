@@ -5,8 +5,8 @@
 
 //OniaWriterBase
 
-OniaWriterBase::OniaWriterBase(const char* treeName, QQtype type):
-    TreeWriter(treeName), qqType(type)
+OniaWriterBase::OniaWriterBase(const char* treeName):
+    TreeWriter(treeName)
 {
     addOutput("mass",&mass);
     addOutput("eta",&eta);
@@ -41,19 +41,22 @@ void OniaWriterBase::readRecoQQ(const OniaReader* dataIn, int index, int entry)
     pdgId=0;
 }
 
-void OniaWriterBase::writeEntries(const OniaReader* dataIn, int index, int entry)
-{ 
-    if (getType()==QQtype::Gen)
-        readGenQQ(dataIn,index,entry);
-    else
-        readRecoQQ(dataIn,index,entry);
-    TreeWriter::FillEntries(); 
-};
+void OniaWriterBase::writeRecoQQ(const OniaReader* dataIn, int index, int entry)
+{
+    readRecoQQ(dataIn,index,entry);
+    FillEntries(); 
+}
+
+void OniaWriterBase::writeGenQQ(const OniaReader* dataIn, int index, int entry)
+{
+    readGenQQ(dataIn,index,entry);
+    FillEntries(); 
+}
 
 //OniaWriterFull
 
-OniaWriterFull::OniaWriterFull(const char* treeName, QQtype type):
-    OniaWriterBase(treeName,type)
+OniaWriterFull::OniaWriterFull(const char* treeName):
+    OniaWriterBase(treeName)
 {
     addOutput("pT_mi",&pT_mi);
     addOutput("pT_pl",&pT_pl);
@@ -89,17 +92,15 @@ void OniaWriterFull::readGenMu(const OniaReader* dataIn, int index, int entry)
     phi_pl = mom4vec_mupl->Phi();
 }
 
-void OniaWriterFull::writeEntries(const OniaReader* dataIn, int index, int entry)
-{ 
-    if (getType()==QQtype::Gen)
-    {
-        readGenQQ(dataIn,index,entry);
-        readGenMu(dataIn,index,entry);
-    }
-    else
-    {
-        readRecoQQ(dataIn,index,entry);
-        readRecoMu(dataIn,index,entry);
-    }
-    TreeWriter::FillEntries(); 
-};
+void OniaWriterFull::writeRecoQQ(const OniaReader* dataIn, int index, int entry)
+{
+    readRecoQQ(dataIn,index,entry);
+    readRecoMu(dataIn,index,entry);
+    FillEntries(); 
+}
+void OniaWriterFull::writeGenQQ(const OniaReader* dataIn, int index, int entry)
+{
+    readGenQQ(dataIn,index,entry);
+    readGenMu(dataIn,index,entry);
+    FillEntries(); 
+}

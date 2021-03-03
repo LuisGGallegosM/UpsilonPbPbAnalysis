@@ -5,6 +5,8 @@
 #include "TH1.h"
 #include "TEfficiency.h"
 #include "../Utils/utils.h"
+#include "AccAnalyzer.h"
+#include "EffAnalyzer.h"
 
 void AccEffResults(const char* accFilename, const char* effFilename, const char* fitfilepath, const char* outputname)
 {
@@ -23,14 +25,21 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     std::cout << "Writing to file: " << outputname <<'\n';
     TFile* outFile = OpenFile(outputname,"CREATE");
 
-    TEfficiency* acceptancy = (TEfficiency*) accFile->Get("pt QQ Acceptancy");
-    TEfficiency* efficiency = (TEfficiency*) effFile->Get("pt QQ Efficiency");
+    TH1F* acc_num= (TH1F*) accFile->Get(accNumName);
+    TH1F* eff_num= (TH1F*) effFile->Get(effNumName);
+    TH1F* acc_den= (TH1F*) accFile->Get(accDenName);
+    TH1F* eff_den= (TH1F*) effFile->Get(effDenName);
 
-    TH2* acc = acceptancy->CreateHistogram();
+    TH1F dens= (*acc_den)*(*eff_den);
+    TH1F nums= (*acc_num)*(*eff_num);
 
-    //TH1F AccXEff = ((*acceptancy)*(*efficiency));
+    std::unique_ptr<TEfficiency> AccXEff = createTEff(&nums,&dens,"pt QQ AccXEff");
 
-    //AccXEff.Write();
+    std::string outbasename= ReplaceExtension(outputname,"Final.pdf");
+
+    writeToCanvasEff(AccXEff.get(),"p_{T}","Acc x Eff",outbasename);
+
+    AccXEff->Write();
 
     outFile->Close();
     accFile->Close();

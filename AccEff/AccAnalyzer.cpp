@@ -9,16 +9,15 @@ const std::vector<const char*> requiredBranches{"lol"};
 AccAnalyzer::AccAnalyzer(OniaReader* input,AccCutter* accCut, OniaWriter* writer) : 
     oniaWriter(writer), accCutter(accCut),oniaReader(input)
 {
-    if (writer->getType()!= QQtype::Gen)
-        throw std::runtime_error("Error: Writer not set to Gen");
     //initialize Histograms
-    etaVsPtQQGen = createTH2QQ("eta vs pt QQ Generated" ,"p^{#mu#mu}_{t} vs |#eta^{#mu#mu}|");
-    etaVsPtQQDet = createTH2QQ("eta vs pt QQ Detectable"  ,"p^{#mu#mu}_{t} vs |#eta^{#mu#mu}| QQ Detected");
-    etaVsPtMuGen = createTH2Mu("eta vs pt Mu Generated" ,"p^{#mu}_{t} vs |#eta^{#mu}| Mu Generated");
-    etaVsPtMuDet = createTH2Mu("eta vs pt Mu Detectable"  ,"p^{#mu}_{t} vs |#eta^{#mu}| Mu Detected");
+    etaVsPtQQGen = createTH2QQ("y vs pt QQ Generated",  "p^{#mu#mu}_{t} vs |y^{#mu#mu}|");
+    etaVsPtQQDet = createTH2QQ("y vs pt QQ Detectable", "p^{#mu#mu}_{t} vs |y^{#mu#mu}| QQ Detected");
 
-    ptHistQQGen= createTH1("pt QQ Generated" ,"p^{#mu#mu}_{t} QQ Generated");
-    ptHistQQDet= createTH1("pt QQ Detected"  ,"p^{#mu#mu}_{t} QQ Detected");
+    etaVsPtMuGen = createTH2Mu("eta vs pt Mu Generated","p^{#mu}_{t} vs |#eta^{#mu}| Mu Generated");
+    etaVsPtMuDet = createTH2Mu("eta vs pt Mu Detectable","p^{#mu}_{t} vs |#eta^{#mu}| Mu Detected");
+
+    ptHistQQGen= createTH1(accDenName ,"p^{#mu#mu}_{t} QQ Generated");
+    ptHistQQDet= createTH1(accNumName ,"p^{#mu#mu}_{t} QQ Detectable");
 }
 
 void AccAnalyzer::ProcessEvent(Long64_t entry)
@@ -36,13 +35,8 @@ void AccAnalyzer::Write(const std::string& basename)
     oniaWriter->Write();
 
     //calculate acceptancy
-    ptQQAcceptancy.reset( new  TEfficiency(*ptHistQQDet,*ptHistQQGen));
-    ptQQAcceptancy->SetStatisticOption(TEfficiency::EStatOption::kFNormal);
-    ptQQAcceptancy->SetName("pt QQ Acceptancy");
-
-    etaVsPtQQAcceptancy.reset( new TEfficiency(*etaVsPtQQDet,*etaVsPtQQGen) );
-    etaVsPtQQAcceptancy->SetStatisticOption(TEfficiency::EStatOption::kFNormal);
-    etaVsPtQQAcceptancy->SetName("eta vs pt QQ Acceptancy");
+    ptQQAcceptancy=createTEff(ptHistQQDet,ptHistQQGen,"pt QQ Acceptancy");
+    etaVsPtQQAcceptancy=createTEff(etaVsPtQQDet,etaVsPtQQGen,"eta vs pt QQ Acceptancy");
 
     //write 2D plots
     writeToCanvas(etaVsPtQQGen,    "|y^{#mu#mu}|","p^{#mu#mu}_{T} ( GeV/c )",basename+"_EtaPtQQ_Gen.pdf");
@@ -58,8 +52,8 @@ void AccAnalyzer::Write(const std::string& basename)
     //write 1D plots
     writeToCanvas(ptHistQQGen,       "p^{#mu#mu}_{T} ( GeV/c )", "N_{Gen}^{#mu#mu}",basename+"_PtQQ_Gen.pdf");
     writeToCanvas(ptHistQQDet,       "p^{#mu#mu}_{T} ( GeV/c )", "N_{Det}^{#mu#mu}",basename+"_PtQQ_Det.pdf");
-    writeToCanvasEff(ptQQAcceptancy.get(), "p^{#mu#mu}_{T} ( GeV/c )", "Acc",    basename+"_PtQQ_Acceptancy.pdf");
-    writeToCanvasEff(etaVsPtQQAcceptancy.get(), "p^{#mu#mu}_{T} ( GeV/c )", "Acc",    basename+"_PtQQ_Acceptancy.pdf");
+    writeToCanvasEff(ptQQAcceptancy.get(), "p^{#mu#mu}_{T} ( GeV/c )", "Acc",       basename+"_PtQQ_Acceptancy.pdf");
+    writeToCanvasEff2D(etaVsPtQQAcceptancy.get(), "p^{#mu#mu}_{T} ( GeV/c )", "Acc",  basename+"_EtaPtQQ_Acceptancy.pdf");
 
     ptHistQQGen->Write(0,TObject::kOverwrite);
     ptHistQQDet->Write(0,TObject::kOverwrite);
@@ -78,7 +72,6 @@ void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
     float y = fabs(mom4vec->Rapidity());
     float eta = mom4vec->Eta();
 
-    //cuts
     if(y > 2.4f) return;
     float etaMuPl=fabs(mom4vecPl->Eta());
     float etaMuMi=fabs(mom4vecMi->Eta());
@@ -98,6 +91,6 @@ void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
         etaVsPtQQDet->Fill(y,pT);
         etaVsPtMuDet->Fill(etaMuPl,ptMuPl);
         etaVsPtMuDet->Fill(etaMuMi,ptMuMi);
-        oniaWriter->writeEntries(oniaReader.get(),index,entry);
+        oniaWriter->writeGenQQ(oniaReader.get(),index,entry);
     }
 }

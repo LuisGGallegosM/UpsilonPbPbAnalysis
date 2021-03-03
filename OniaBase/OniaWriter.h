@@ -5,14 +5,12 @@
 #include"../TreeProcessor/TreeWriter.h"
 #include"OniaReader.h"
 
-enum class QQtype { Reco, Gen };
-
 class OniaWriter
 {
     public:
     virtual void Write()=0;
-    virtual void writeEntries(const OniaReader* dataIn, int index, int entry)=0;
-    virtual QQtype getType() const =0;
+    virtual void writeRecoQQ(const OniaReader* dataIn, int index, int entry)=0;
+    virtual void writeGenQQ(const OniaReader* dataIn, int index, int entry)=0;
 
     virtual ~OniaWriter()=default;
 };
@@ -27,18 +25,18 @@ class OniaWriterBase : public TreeWriter, public OniaWriter
     Float_t phi;
     Float_t eta;
     Int_t pdgId;
-    QQtype qqType;
 
     protected:
-    void readRecoQQ(const OniaReader* dataIn, int index, int entry);
     void readGenQQ(const OniaReader* dataIn, int index, int entry);
+    void readRecoQQ(const OniaReader* dataIn, int index, int entry);
 
     public:
-    OniaWriterBase(const char* treeName, QQtype type);
+    OniaWriterBase(const char* treeName);
 
-    void writeEntries(const OniaReader* dataIn, int index, int entry) override;
+    void writeRecoQQ(const OniaReader* dataIn, int index, int entry) override;
+    void writeGenQQ(const OniaReader* dataIn, int index, int entry) override;
+
     void Write() override { TreeWriter::Write(); }
-    QQtype getType() const override {return qqType;}
 
     virtual ~OniaWriterBase() =default;
 };
@@ -56,8 +54,9 @@ class OniaWriterFull : public OniaWriterBase
     void readGenMu(const OniaReader* dataIn, int index, int entry);
 
     public:
-    OniaWriterFull(const char* treeName, QQtype type);
-    void writeEntries(const OniaReader* dataIn, int index, int entry) override;
+    OniaWriterFull(const char* treeName);
+    void writeRecoQQ(const OniaReader* dataIn, int index, int entry) override;
+    void writeGenQQ(const OniaReader* dataIn, int index, int entry) override;
 };
 
 #endif

@@ -219,10 +219,8 @@ void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
     float singleMuEtaHigh=config->cut.getMuEtaHigh();
 
     TextDrawer tdrawer2(0.45,0.8);
-    if (ptLow == 0.0f)
-        tdrawer2.drawText(Form("p_{T}^{#mu#mu} < %.1f GeV/c", ptHigh));
-    else 
-        tdrawer2.drawText(Form("%.1f < p_{T}^{#mu#mu} < %.1f GeV/c",ptLow, ptHigh));
+    
+    tdrawer2.drawText(Form("%.1f < p_{T}^{#mu#mu} < %.1f GeV/c",ptLow, ptHigh));
     
     if (yLow == 0.0f)
         tdrawer2.drawText(Form("|y^{#mu#mu}| < %.2f", yHigh));

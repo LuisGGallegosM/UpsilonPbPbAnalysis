@@ -11,6 +11,9 @@
 #include "../Skimming/OniaCutter.h"
 #include "AccEffAux.h"
 
+constexpr const char* accDenName ="pt QQ Generated";
+constexpr const char* accNumName ="pt QQ Detectable Acceptancy";
+
 class AccAnalyzer : public TreeProcessor
 {
     private:

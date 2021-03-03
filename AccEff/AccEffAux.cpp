@@ -72,3 +72,25 @@ void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::stri
     canvas.Write();
     canvas.SaveAs(outname.data());
 }
+
+void writeToCanvasEff2D(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname)
+{
+    const std::string canvasName=std::string(hist->GetName())+" plot";
+    TCanvas canvas(canvasName.data(),canvasName.data(),4,45,550,520);
+    canvas.cd();
+    TPad pad("pad","fit", 0.02, 0.02, 0.98, 0.98);
+    pad.Draw();
+    pad.cd();
+    hist->Draw("COLZ");
+    canvas.Write();
+    canvas.SaveAs(outname.data());
+}
+
+std::unique_ptr<TEfficiency> createTEff(TH1* num, TH1* den, const std::string& name)
+{
+    TEfficiency* teff=new TEfficiency(*num,*den);
+    teff->SetStatisticOption(TEfficiency::EStatOption::kFNormal);
+    teff->SetName(name.data());
+    teff->SetTitle(name.data());
+    return std::unique_ptr<TEfficiency>(teff);
+}

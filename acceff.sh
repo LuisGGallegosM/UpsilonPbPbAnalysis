@@ -5,7 +5,7 @@ CLING="NO"
 ACCINPUTFILENAME="OniaTree_Ups1SMM_5p02TeV_TuneCUETP8M1_nofilter_pp502Fall15-MCRUN2_71_V1-v1_GENONLY.root"
 EFFINPUTFILENAME="merged_HiForestAOD_MCFix2.root"
 FITINPUTFILENAME="../rootfiles/merged_HiForestAOD_skimmed7/output/merged_HiForestAOD_comp0/fit.root"
-FLAGS=${1:-"-final"}
+FLAGS=${1:-"-all"}
 #input file with relative path for Acceptancy
 ACCINPUTFILE="../rootfiles/datasets/${ACCINPUTFILENAME}"
 #input file with relative path for Effiency

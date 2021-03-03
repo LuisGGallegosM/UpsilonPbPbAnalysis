@@ -8,6 +8,17 @@ bool AccCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
     return true;
 }
 
+
+bool AccCutter::cut2(const OniaReader* input,Int_t index,Int_t entry)
+{
+    int mupl_idx = input->genQQ_mupl_idx[index];//plus muon index
+    int mumi_idx = input->genQQ_mumi_idx[index];//minus muon index
+    if(!isMuonInAcceptance((TLorentzVector*) input->genMu_mom4->At(mupl_idx))) return false;
+    if(!isMuonInAcceptance((TLorentzVector*) input->genMu_mom4->At(mumi_idx))) return false;
+
+    return true;
+}
+
 bool AccCutter::isMuonInAcceptance(const TLorentzVector* Muon) const
 {
     //Acceptance cuts in CMS AN-18-316 , Page 17

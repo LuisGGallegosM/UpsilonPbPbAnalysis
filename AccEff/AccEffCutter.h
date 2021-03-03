@@ -13,6 +13,7 @@ class AccCutter
 
     public:
     bool cut(const OniaReader* input, Int_t index,Int_t entry);
+    bool cut2(const OniaReader* input, Int_t index,Int_t entry);
     bool prescale(Int_t entry) const { return false; }
 
     std::string getName() const {return "Acceptancy test";};

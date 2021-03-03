@@ -32,7 +32,7 @@ void AccTest(const char* filename,const char* outputfilename, const char* config
     }
 
     AccCutter* cutterAcc =new AccCutter();
-    OniaWriter* writer =new OniaWriterBase("DetectableOnia",QQtype::Gen);
+    OniaWriter* writer =new OniaWriterBase("DetectableOnia");
     OniaReader* reader=new OniaReader(myTree);
     std::unique_ptr<AccAnalyzer> accAnalyzer(new AccAnalyzer(reader,cutterAcc,writer));
 
@@ -64,14 +64,9 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
     //input file
     std::cout << "Reading input file: " << filename <<'\n';
     TFile* file = OpenFile(filename,"READ");
-
-    //input file of acceptancy
-    std::string accfilename=outputfilename;
-    std::cout << "Reading efficiency input file: " << filename <<'\n';
-    TFile* accfile = OpenFile(accfilename.data(),"READ");
     
     //output file
-    std::string outfilename= ReplaceExtension(outputfilename,"Eff.root");
+    std::string outfilename= outputfilename;
     std::cout << "Writing to output file: " << outfilename <<'\n';
     TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
 
@@ -90,32 +85,24 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
         return;
     }
 
-    EffCutter* cutterAcc =new EffCutter(&cut);
-    OniaWriter* writer =new OniaWriterBase("RecoCutOnia",QQtype::Reco);
-    OniaReader* reader=new OniaReader(myTree);
+    AccCutter* cutterAcc =  new AccCutter();
+    EffCutter* cutterEff =  new EffCutter(&cut);
+    OniaWriter* writer =    new OniaWriterBase("RecoCutOnia");
+    OniaReader* reader=     new OniaReader(myTree);
 
-    TH1F* ptQQdetected=(TH1F*)accfile->Get("pt QQ Detected");
-    if(ptQQdetected==nullptr)
-    {
-        std::cerr << "Error: 'pt QQ Detected' histogram not found.\n";
-        return;
-    }
-
-    EffAnalyzer effAnalyzer(reader,cutterAcc,writer,ptQQdetected);
+    EffAnalyzer effAnalyzer(reader,cutterEff,writer,cutterAcc);
 
     //Run efficiency test
     effAnalyzer.Test();
 
     //write results to same folder as outputfilename
-    std::string outputfilesBasename=outfilename;
+    std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
     effAnalyzer.Write(outputfilesBasename);
 
-    accfile->Close();
     outputfile->Close();
     file->Close();
     delete file;
     delete outputfile;
-    delete accfile;
     std::cout << "Success.\n TTrees wrote to '" << outfilename<< "' root file\n";
     return;
 }

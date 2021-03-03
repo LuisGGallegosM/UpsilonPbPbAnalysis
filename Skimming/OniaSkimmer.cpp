@@ -6,8 +6,6 @@
 OniaSkimmer::OniaSkimmer(OniaReader* reader , OniaCutter* cutter, OniaWriter* writer)
 : oniaWriter(writer), oniaCutter(cutter) ,oniaReader(reader)
 {
-    if(oniaWriter->getType()!=QQtype::Reco)
-        throw std::runtime_error("Error: OniaWriter is not Reco");
 }
 
 void OniaSkimmer::ProcessEvent(Long64_t entry)
@@ -20,7 +18,7 @@ void OniaSkimmer::ProcessEvent(Long64_t entry)
     {
         if (oniaCutter->cut(oniaReader.get(),i,entry))
         {
-            oniaWriter->writeEntries(oniaReader.get(),i,entry);
+            oniaWriter->writeRecoQQ(oniaReader.get(),i,entry);
         }
     }
 }
