@@ -5,17 +5,7 @@
 #include"../TreeProcessor/TreeWriter.h"
 #include"OniaReader.h"
 
-class OniaWriter
-{
-    public:
-    virtual void Write()=0;
-    virtual void writeRecoQQ(const OniaReader* dataIn, int index, int entry)=0;
-    virtual void writeGenQQ(const OniaReader* dataIn, int index, int entry)=0;
-
-    virtual ~OniaWriter()=default;
-};
-
-class OniaWriterBase : public TreeWriter, public OniaWriter
+class OniaWriter : public TreeWriter
 {
     private:
     Int_t Evt;
@@ -28,22 +18,20 @@ class OniaWriterBase : public TreeWriter, public OniaWriter
 
     protected:
     void readGenQQ(const OniaReader* dataIn, int index, int entry);
+    void readGenQQ(const OniaReader2* dataIn, int index, int entry);
     void readRecoQQ(const OniaReader* dataIn, int index, int entry);
 
     Int_t getPdgId() const {return pdgId;}
 
     public:
-    OniaWriterBase(const char* treeName);
+    OniaWriter(const char* treeName);
 
-    void writeRecoQQ(const OniaReader* dataIn, int index, int entry) override;
-    void writeGenQQ(const OniaReader* dataIn, int index, int entry) override;
-
-    void Write() override { TreeWriter::Write(); }
-
-    virtual ~OniaWriterBase() =default;
+    void writeRecoQQ(const OniaReader* dataIn, int index, int entry);
+    void writeGenQQ(const OniaReader* dataIn, int index, int entry);
+    void writeGenQQ(const OniaReader2* dataIn, int index, int entry);
 };
 
-class OniaWriterFull : public OniaWriterBase
+class OniaWriterFull : public OniaWriter
 {
     Float_t pT_mi;
     Float_t eta_mi;
@@ -55,13 +43,15 @@ class OniaWriterFull : public OniaWriterBase
 
     void readRecoMu(const OniaReader* dataIn, int index, int entry);
     void readGenMu(const OniaReader* dataIn, int index, int entry);
+     void readGenMu(const OniaReader2* dataIn, int index, int entry);
 
     public:
     OniaWriterFull(const char* treeName);
-    void writeRecoQQ(const OniaReader* dataIn, int index, int entry) override;
-    void writeGenQQ(const OniaReader* dataIn, int index, int entry) override;
+    void writeRecoQQ(const OniaReader* dataIn, int index, int entry);
+    void writeGenQQ(const OniaReader* dataIn, int index, int entry);
+    void writeGenQQ(const OniaReader2* dataIn, int index, int entry);
 
-    void Write() override;
+    void Write();
 };
 
 #endif

@@ -10,9 +10,9 @@
 
 void writePie(const std::map<int,int>& values, const std::string& name);
 
-//OniaWriterBase
+//OniaWriter
 
-OniaWriterBase::OniaWriterBase(const char* treeName):
+OniaWriter::OniaWriter(const char* treeName):
     TreeWriter(treeName)
 {
     addOutput("mass",&mass);
@@ -24,7 +24,7 @@ OniaWriterBase::OniaWriterBase(const char* treeName):
     addOutput("pdfId",&pdgId);
 }
 
-void OniaWriterBase::readGenQQ(const OniaReader* dataIn, int index, int entry)
+void OniaWriter::readGenQQ(const OniaReader* dataIn, int index, int entry)
 {
     TLorentzVector* dimuon =(TLorentzVector*) dataIn->genQQ_mom4->At(index);
     mass= dimuon->M();
@@ -33,10 +33,22 @@ void OniaWriterBase::readGenQQ(const OniaReader* dataIn, int index, int entry)
     phi = dimuon->Phi();
     eta = dimuon->Eta();
     Evt = entry;
-    pdgId = dataIn->genQQid[index];
+    pdgId = dataIn->genQQ_id[index];
 }
 
-void OniaWriterBase::readRecoQQ(const OniaReader* dataIn, int index, int entry)
+void OniaWriter::readGenQQ(const OniaReader2* dataIn, int index, int entry)
+{
+    TLorentzVector* dimuon =(TLorentzVector*) dataIn->genQQ_mom4->At(index);
+    mass= dimuon->M();
+    pT = dimuon->Pt();
+    y = fabs(dimuon->Rapidity());
+    phi = dimuon->Phi();
+    eta = dimuon->Eta();
+    Evt = entry;
+    pdgId = dataIn->genQQ_id[index];
+}
+
+void OniaWriter::readRecoQQ(const OniaReader* dataIn, int index, int entry)
 {
     TLorentzVector* dimuon =(TLorentzVector*) dataIn->recoQQ_mom4->At(index);
     mass= dimuon->M();
@@ -47,27 +59,32 @@ void OniaWriterBase::readRecoQQ(const OniaReader* dataIn, int index, int entry)
     Evt = entry;
     int genQQindex=dataIn->RecoQQWhichGen[index];
     if (genQQindex>=0)
-        pdgId= dataIn->genQQid[genQQindex];
+        pdgId= dataIn->genQQ_id[genQQindex];
     else
         pdgId=0;
 }
 
-void OniaWriterBase::writeRecoQQ(const OniaReader* dataIn, int index, int entry)
+void OniaWriter::writeRecoQQ(const OniaReader* dataIn, int index, int entry)
 {
     readRecoQQ(dataIn,index,entry);
     FillEntries(); 
 }
 
-void OniaWriterBase::writeGenQQ(const OniaReader* dataIn, int index, int entry)
+void OniaWriter::writeGenQQ(const OniaReader* dataIn, int index, int entry)
 {
     readGenQQ(dataIn,index,entry);
     FillEntries(); 
 }
 
+void OniaWriter::writeGenQQ(const OniaReader2* dataIn, int index, int entry)
+{
+    readGenQQ(dataIn,index,entry);
+    FillEntries(); 
+}
 //OniaWriterFull
 
 OniaWriterFull::OniaWriterFull(const char* treeName):
-    OniaWriterBase(treeName)
+    OniaWriter(treeName)
 {
     addOutput("pT_mi",&pT_mi);
     addOutput("pT_pl",&pT_pl);
@@ -103,6 +120,19 @@ void OniaWriterFull::readGenMu(const OniaReader* dataIn, int index, int entry)
     phi_pl = mom4vec_mupl->Phi();
 }
 
+void OniaWriterFull::readGenMu(const OniaReader2* dataIn, int index, int entry)
+{
+    TLorentzVector* mom4vec_mumi = (TLorentzVector*) dataIn->genMu_mom4->At(index);
+    TLorentzVector* mom4vec_mupl = (TLorentzVector*) dataIn->genMu_mom4->At(index);
+    pT_mi = mom4vec_mumi->Pt();
+    eta_mi = mom4vec_mumi->Eta();
+    phi_mi = mom4vec_mumi->Phi();
+
+    pT_pl = mom4vec_mupl->Pt();
+    eta_pl = mom4vec_mupl->Eta();
+    phi_pl = mom4vec_mupl->Phi();
+}
+
 void OniaWriterFull::writeRecoQQ(const OniaReader* dataIn, int index, int entry)
 {
     readRecoQQ(dataIn,index,entry);
@@ -123,11 +153,21 @@ void OniaWriterFull::writeGenQQ(const OniaReader* dataIn, int index, int entry)
     pdgIds[id]= pdgIds[id]+1;
     FillEntries(); 
 }
+void OniaWriterFull::writeGenQQ(const OniaReader2* dataIn, int index, int entry)
+{
+    readGenQQ(dataIn,index,entry);
+    readGenMu(dataIn,index,entry);
+    int id=getPdgId();
+    if (pdgIds.find(id) == pdgIds.end()) 
+        pdgIds[id]=0;
+    pdgIds[id]= pdgIds[id]+1;
+    FillEntries(); 
+}
 
 void OniaWriterFull::Write()
 {
     writePie(pdgIds,"pdgIdPie");
-    OniaWriterBase::Write();
+    OniaWriter::Write();
 }
 
 void writePie(const std::map<int,int>& values, const std::string& name)

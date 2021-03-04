@@ -4,9 +4,7 @@
 #include "TPie.h"
 #include <array>
 
-const std::vector<const char*> requiredBranches{"lol"};
-
-AccAnalyzer::AccAnalyzer(OniaReader* input,AccCutter* accCut, OniaWriter* writer) : 
+AccAnalyzer::AccAnalyzer(OniaReader2* input,AccCutter* accCut, OniaWriter* writer) : 
     oniaWriter(writer), accCutter(accCut),oniaReader(input)
 {
     //initialize Histograms

@@ -32,8 +32,8 @@ void AccTest(const char* filename,const char* outputfilename, const char* config
     }
 
     AccCutter* cutterAcc =new AccCutter();
-    OniaWriter* writer =new OniaWriterBase("DetectableOnia");
-    OniaReader* reader=new OniaReader(myTree);
+    OniaWriter* writer =new OniaWriter("DetectableOnia");
+    OniaReader2* reader=new OniaReader2(myTree);
     std::unique_ptr<AccAnalyzer> accAnalyzer(new AccAnalyzer(reader,cutterAcc,writer));
 
     //Run acceptancy test
@@ -87,7 +87,7 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
 
     AccCutter* cutterAcc =  new AccCutter();
     EffCutter* cutterEff =  new EffCutter(&cut);
-    OniaWriter* writer =    new OniaWriterBase("RecoCutOnia");
+    OniaWriter* writer =    new OniaWriter("RecoCutOnia");
     OniaReader* reader=     new OniaReader(myTree);
 
     EffAnalyzer effAnalyzer(reader,cutterEff,writer,cutterAcc);

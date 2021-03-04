@@ -18,8 +18,8 @@ class TreeReader
     TreeReader(TTree* treeIn);
 
     void readTree(Long64_t index);
-    bool addInput(const char* varName,void* address);
-    void addInputNoOpt(const char* varName,void* address);
+    bool addInputOpt(const char* varName,void* address);
+    void addInput(const char* varName,void* address);
     bool hasBranch(const char* varName) const;
     Long64_t getEntriesNumber() const {return tree_input->GetEntries();}
     std::string getName() const {return tree_input->GetName();}

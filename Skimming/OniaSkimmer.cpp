@@ -3,7 +3,7 @@
 #include "OniaSkimmer.h"
 #include "TLorentzVector.h"
 
-OniaSkimmer::OniaSkimmer(OniaReader* reader , OniaCutter* cutter, OniaWriter* writer)
+OniaSkimmer::OniaSkimmer(OniaReader* reader , OniaCutter* cutter, OniaWriterFull* writer)
 : oniaWriter(writer), oniaCutter(cutter) ,oniaReader(reader)
 {
 }

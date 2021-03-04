@@ -13,11 +13,11 @@ class OniaSkimmer : public TreeProcessor
     std::map<std::string,int> pdgIds;
     std::unique_ptr<OniaReader> oniaReader;
     std::unique_ptr<OniaCutter> oniaCutter;
-    std::unique_ptr<OniaWriter> oniaWriter;
+    std::unique_ptr<OniaWriterFull> oniaWriter;
     void ProcessEvent(Long64_t entry) override;
 
     public:
-    OniaSkimmer(OniaReader* reader , OniaCutter* cutter, OniaWriter* writer);
+    OniaSkimmer(OniaReader* reader , OniaCutter* cutter, OniaWriterFull* writer);
     void Write() { oniaWriter->Write(); }
     void Skim() { Process(oniaReader.get()); }
 };

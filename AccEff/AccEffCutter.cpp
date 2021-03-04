@@ -1,6 +1,6 @@
 #include "AccEffCutter.h"
 
-bool AccCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
+bool AccCutter::cut(const OniaReader2* input,Int_t index,Int_t entry)
 {
     if(!isMuonInAcceptance((TLorentzVector*) input->genQQ_mupl_mom4->At(index))) return false;
     if(!isMuonInAcceptance((TLorentzVector*) input->genQQ_mumi_mom4->At(index))) return false;
@@ -9,7 +9,7 @@ bool AccCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
 }
 
 
-bool AccCutter::cut2(const OniaReader* input,Int_t index,Int_t entry)
+bool AccCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
 {
     int mupl_idx = input->genQQ_mupl_idx[index];//plus muon index
     int mumi_idx = input->genQQ_mumi_idx[index];//minus muon index

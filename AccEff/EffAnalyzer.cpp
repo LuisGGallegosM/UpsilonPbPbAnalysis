@@ -59,7 +59,7 @@ void EffAnalyzer::Write(const std::string& basename)
 
 void EffAnalyzer::Analyze(Int_t index, Long64_t entry)
 {
-    if (accCutter->cut2(oniaReader.get(),index,entry))
+    if (accCutter->cut(oniaReader.get(),index,entry))
     {
         CaptureDetQQ(index,entry);
         int recoQQindex= oniaReader->GenQQWhichReco[index];

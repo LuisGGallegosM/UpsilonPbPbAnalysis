@@ -30,7 +30,7 @@ void CutParams::deserialize(const std::string& filename)
 bool CutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
 {
     //check for triggers
-    if ((input->trig[index] & trigSelect) != trigSelect) return false;
+    if ((input->recoQQ_trig[index] & trigSelect) != trigSelect) return false;
 
     if ((checkSign) && (input->recoQQ_sign[index] != sign)) return false;
 
@@ -73,17 +73,17 @@ bool CutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
     if (mom4_mupl->Pt() < singleMuPtLow) return false;
     if (fabs(mom4_mupl->Eta()) > singleMuEtaHigh) return false;
 
-    if (input->VtxProb[index] < minVtxProb) return false;
+    if (input->recoQQ_VtxProb[index] < minVtxProb) return false;
 
     return true;
 }
 
 bool CutParams::isSoft(const OniaReader* input,Int_t index) const
 {
-    bool passMuonTypePl = (input->SelectionType[index] & selectionBits) == (selectionBits);
-    bool muplSoft = passMuonTypePl && ( input->nTrkWMea[index] >= minTracks)
-    && ( input->nPixWMea[index] >= minPixels)
-    && ( fabs(input->dxy[index]) < maxDxy)
-    && ( fabs(input->dz[index]) < maxDz);
+    bool passMuonTypePl = (input->recoMu_SelectionType[index] & selectionBits) == (selectionBits);
+    bool muplSoft = passMuonTypePl && ( input->recoMu_nTrkWMea[index] >= minTracks)
+    && ( input->recoMu_nPixWMea[index] >= minPixels)
+    && ( fabs(input->recoMu_dxy[index]) < maxDxy)
+    && ( fabs(input->recoMu_dz[index]) < maxDz);
     return muplSoft;
 }
