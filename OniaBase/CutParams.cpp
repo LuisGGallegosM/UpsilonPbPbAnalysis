@@ -1,8 +1,8 @@
 
-#include "SkimParams.h"
+#include "CutParams.h"
 #include "TLorentzVector.h"
 
-void cutParams::deserialize(const std::string& filename)
+void CutParams::deserialize(const std::string& filename)
 {
     serializer ser(filename);
     ser.read("isMC",isMC);
@@ -27,7 +27,7 @@ void cutParams::deserialize(const std::string& filename)
     ser.read("singleMuEtaHigh",singleMuEtaHigh);
 }
 
-bool cutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
+bool CutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
 {
     //check for triggers
     if ((input->trig[index] & trigSelect) != trigSelect) return false;
@@ -78,7 +78,7 @@ bool cutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
     return true;
 }
 
-bool cutParams::isSoft(const OniaReader* input,Int_t index) const
+bool CutParams::isSoft(const OniaReader* input,Int_t index) const
 {
     bool passMuonTypePl = (input->SelectionType[index] & selectionBits) == (selectionBits);
     bool muplSoft = passMuonTypePl && ( input->nTrkWMea[index] >= minTracks)

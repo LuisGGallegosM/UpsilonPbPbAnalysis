@@ -77,7 +77,7 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
         return;
     }
 
-    cutParams cut;
+    CutParams cut;
     cut.deserialize(configname);
     if(!cut.isValid())
     {

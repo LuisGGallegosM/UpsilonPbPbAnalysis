@@ -30,6 +30,8 @@ class OniaWriterBase : public TreeWriter, public OniaWriter
     void readGenQQ(const OniaReader* dataIn, int index, int entry);
     void readRecoQQ(const OniaReader* dataIn, int index, int entry);
 
+    Int_t getPdgId() const {return pdgId;}
+
     public:
     OniaWriterBase(const char* treeName);
 
@@ -49,6 +51,7 @@ class OniaWriterFull : public OniaWriterBase
     Float_t pT_pl;
     Float_t eta_pl;
     Float_t phi_pl;
+    std::map<int,int> pdgIds;
 
     void readRecoMu(const OniaReader* dataIn, int index, int entry);
     void readGenMu(const OniaReader* dataIn, int index, int entry);
@@ -57,6 +60,8 @@ class OniaWriterFull : public OniaWriterBase
     OniaWriterFull(const char* treeName);
     void writeRecoQQ(const OniaReader* dataIn, int index, int entry) override;
     void writeGenQQ(const OniaReader* dataIn, int index, int entry) override;
+
+    void Write() override;
 };
 
 #endif

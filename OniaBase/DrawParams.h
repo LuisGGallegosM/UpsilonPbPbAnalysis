@@ -1,13 +1,13 @@
 #ifndef DRAWPARAMS
 #define DRAWPARAMS
 
-#include "SkimParams.h"
+#include "CutParams.h"
 #include "FitParams.h"
 
 struct drawConfig
 {
     int nBins;
-    cutParams cut;
+    CutParams cut;
     fitConfig fitConf;
 
     bool isValid() const

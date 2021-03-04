@@ -8,7 +8,7 @@
 //Upsilon Y1S PDG ID
 #define UPSILON_Y1S_PDGID (553) true PDG
 
-class cutParams
+class CutParams
 {
     private:
     bool isMC;
@@ -32,7 +32,7 @@ class cutParams
     float singleMuEtaHigh;
 
     public:
-    cutParams() : isMC(false), checkSign(false), trigSelect(0LL), prescale(0),
+    CutParams() : isMC(false), checkSign(false), trigSelect(0LL), prescale(0),
     sign(0), selectionBits(0), minPixels(-1),minTracks(-1), maxDxy(-1.0f),maxDz(-1.0f),
     minVtxProb(-1.0f),ptHigh(-1.0f),ptLow(-1.0f),yLow(-1.0f),yHigh(-1.0f),
     singleMuPtLow(-1.0f), singleMuEtaHigh(-1.0f)

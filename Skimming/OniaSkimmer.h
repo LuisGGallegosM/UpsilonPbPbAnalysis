@@ -10,6 +10,7 @@
 class OniaSkimmer : public TreeProcessor
 {
     private:
+    std::map<std::string,int> pdgIds;
     std::unique_ptr<OniaReader> oniaReader;
     std::unique_ptr<OniaCutter> oniaCutter;
     std::unique_ptr<OniaWriter> oniaWriter;

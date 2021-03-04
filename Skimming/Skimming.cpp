@@ -1,7 +1,7 @@
 #include "Skimming.h"
 
-std::unique_ptr<OniaSkimmer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* kineCut);
-void SetCutParams(cutParams* kineCut);
+std::unique_ptr<OniaSkimmer> oniaSkim(TFile *file,const char* wroteTreeName, const CutParams* kineCut);
+void SetCutParams(CutParams* kineCut);
 
 using std::ofstream;
 
@@ -25,7 +25,7 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
     //output file
     TFile* outputfile = OpenFile(outputfilename, "CREATE");
 
-    cutParams cut;
+    CutParams cut;
     cut.deserialize(configname);
 
     if(!cut.isValid())
@@ -56,7 +56,7 @@ void Skimming(const char* filename,const char* outputfilename, const char* confi
  * @param wroteTreeName Name of the skimmed tree to write
  * @return Output with skimmed data.
  */
-std::unique_ptr<OniaSkimmer> oniaSkim(TFile *file,const char* wroteTreeName, const cutParams* cut)
+std::unique_ptr<OniaSkimmer> oniaSkim(TFile *file,const char* wroteTreeName, const CutParams* cut)
 {
     TTree *myTree = (TTree *)file->Get("hionia/myTree");
     if (myTree == nullptr)

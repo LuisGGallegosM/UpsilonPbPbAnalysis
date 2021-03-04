@@ -30,7 +30,7 @@ bool AccCutter::isMuonInAcceptance(const TLorentzVector* Muon) const
     else return pt >1.5f;                               // 2.1 < eta < 2.4
 }
 
-EffCutter::EffCutter(const cutParams* cut) : kineCut(*cut)
+EffCutter::EffCutter(const CutParams* cut) : kineCut(*cut)
 {
 
 }

@@ -2,12 +2,12 @@
 #define ONIACUTTER
 
 #include "../OniaBase/OniaReader.h"
-#include "../OniaBase/SkimParams.h"
+#include "../OniaBase/CutParams.h"
 
 class OniaCutter
 {
     private:
-    cutParams kineCut;
+    CutParams kineCut;
     bool isSoft(const OniaReader* input, Int_t index) const;
 
     public:
@@ -16,7 +16,7 @@ class OniaCutter
     bool isMC() const { return kineCut.getIsMC(); }
     std::string getName() const {return "Onia reco QQ";};
     
-    OniaCutter(const cutParams* cut);
+    OniaCutter(const CutParams* cut);
 };
 
 #if defined(__CLING__)

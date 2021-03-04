@@ -5,7 +5,7 @@ CLING="NO"
 #input file to skim
 INPUTFILE="../rootfiles/datasets/merged_HiForestAOD_MCFix2.root"
 #how to folder name skim result file
-OUTPUTFOLDER="../rootfiles/merged_HiForestAOD_MCFix2_skimmed0"
+OUTPUTFOLDER="../rootfiles/test"
 #cut configuration file
 CONFIG="../rootfiles/confFiles/merged_HiForestAOD_MC.cutconf"
 #output skimmed file, put in OUTPUTFOLDER and same as output folder but with .root extensiom

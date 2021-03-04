@@ -4,7 +4,7 @@
 
 #include "TLorentzVector.h"
 #include "../OniaBase/OniaReader.h"
-#include "../OniaBase/SkimParams.h"
+#include "../OniaBase/CutParams.h"
 
 class AccCutter
 {
@@ -22,7 +22,7 @@ class AccCutter
 class EffCutter
 {
     private:
-    cutParams kineCut;
+    CutParams kineCut;
 
     public:
     bool cut(const OniaReader* input, Int_t index,Int_t entry) ;
@@ -30,7 +30,7 @@ class EffCutter
 
     std::string getName() const {return "Efficiency test";};
     
-    EffCutter(const cutParams* cut);
+    EffCutter(const CutParams* cut);
 };
 
 #if defined(__CLING__)
