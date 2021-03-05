@@ -89,6 +89,6 @@ void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
         etaVsPtQQDet->Fill(y,pT);
         etaVsPtMuDet->Fill(etaMuPl,ptMuPl);
         etaVsPtMuDet->Fill(etaMuMi,ptMuMi);
-        oniaWriter->writeGenQQ(oniaReader.get(),index,entry);
+        oniaWriter->writeGen(oniaReader.get(),index,entry);
     }
 }

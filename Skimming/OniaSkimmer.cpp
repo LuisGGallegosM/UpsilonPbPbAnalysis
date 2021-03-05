@@ -18,7 +18,7 @@ void OniaSkimmer::ProcessEvent(Long64_t entry)
     {
         if (oniaCutter->cut(oniaReader.get(),i,entry))
         {
-            oniaWriter->writeRecoQQ(oniaReader.get(),i,entry);
+            oniaWriter->writeReco(oniaReader.get(),i,entry);
         }
     }
 }

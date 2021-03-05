@@ -103,5 +103,5 @@ void EffAnalyzer::CaptureRecoQQ(Int_t index, Long64_t entry)
     etaVsPtQQRecoCut->Fill(y,pT);
     etaVsPtMuRecoCut->Fill(etaMuPl,ptMuPl);
     etaVsPtMuRecoCut->Fill(etaMuMi,ptMuMi);
-    oniaWriter->writeRecoQQ(oniaReader.get(),index,entry);
+    oniaWriter->writeReco(oniaReader.get(),index,entry);
 }
