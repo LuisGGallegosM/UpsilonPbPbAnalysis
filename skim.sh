@@ -4,12 +4,14 @@ CLING="NO"
 
 #input file to skim
 INPUTFILE="../rootfiles/datasets/merged_HiForestAOD_MCFix2.root"
+INPUTFILENAME=$(basename $INPUTFILE)
 #how to folder name skim result file
-OUTPUTFOLDER="../rootfiles/test"
+OUTPUTFOLDER="../rootfiles/skims/${INPUTFILENAME%.*}_skim"
 #cut configuration file
 CONFIG="../rootfiles/confFiles/merged_HiForestAOD_MC.cutconf"
-#output skimmed file, put in OUTPUTFOLDER and same as output folder but with .root extensiom
-OUTPUTFILE="${OUTPUTFOLDER}/$(basename ${OUTPUTFOLDER}).root"
+#output skimmed file, put in OUTPUTFOLDER and name based in inputfile
+OUTPUTFILENAME="${INPUTFILENAME%.*}_skim.root"
+OUTPUTFILE="${OUTPUTFOLDER}/${OUTPUTFILENAME}"
 
 mkdir -p $OUTPUTFOLDER
 
