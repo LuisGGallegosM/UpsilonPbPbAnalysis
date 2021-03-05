@@ -3,8 +3,6 @@
 #include "TLorentzVector.h"
 #include <algorithm>
 
-constexpr std::array<int,3> selectedId={9950003,9951003,9952003};
-
 void CutParams::deserialize(const std::string& filename)
 {
     serializer ser(filename);
@@ -53,9 +51,6 @@ bool CutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
         if(genMuonPl < 0) return false;
         if(genMuonMi < 0) return false;
         if(genQQidx <0) return false;
-
-        int pdgId=input->genQQ_id[genQQidx];
-        if (std::find(begin(selectedId),end(selectedId),pdgId) == end(selectedId)) return false;
     }
 
     //check if plus and minus muons are soft

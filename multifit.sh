@@ -18,7 +18,7 @@ do
 done
 
 #directory where files are located
-WORKDIR="../rootfiles/merged_HiForestAOD_MCFix2_skimmed0"
+WORKDIR="../rootfiles/merged_HiForestAOD_MCFix2_skimmed1"
 #directory where to save multifit results, inside WORKDIR
 OUTDIR="output"
 
@@ -32,7 +32,7 @@ echo "saving files in '${OUTDIR}' directory"
 mkdir "${WORKDIR}/${OUTDIR}"
 
 #fitconf files to read
-./fitconfGen.sh "$WORKDIR"
+./HelperScripts/fitconfGen.sh "$WORKDIR"
 CONFIGFILES=$(find ${WORKDIR} -maxdepth 1 -name "*.fitconf")
 MULTIFITFILE=$(find ${WORKDIR} -maxdepth 1 -name "*.multifit")
 cp "$MULTIFITFILE" "${WORKDIR}/${OUTDIR}"
