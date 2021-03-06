@@ -31,12 +31,12 @@ void CutParams::deserialize(const std::string& filename)
 bool CutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
 {
     //check for triggers
-    if ((input->recoQQ_trig[index] & trigSelect) != trigSelect) return false;
+    if ((input->recoQQ.trig[index] & trigSelect) != trigSelect) return false;
 
-    if ((checkSign) && (input->recoQQ_sign[index] != sign)) return false;
+    if ((checkSign) && (input->recoQQ.sign[index] != sign)) return false;
 
-    int mupl_idx = input->recoQQ_mupl_idx[index];//plus muon index
-    int mumi_idx = input->recoQQ_mumi_idx[index];//minus muon index
+    int mupl_idx = input->recoQQ.mupl_idx[index];//plus muon index
+    int mumi_idx = input->recoQQ.mumi_idx[index];//minus muon index
 
     //check if missing index, missing when equals -1
     if ((mupl_idx <0) || (mumi_idx<0)) return false;
@@ -44,9 +44,9 @@ bool CutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
     if(isMC)
     {
         //gen index of the two muon in generated muon array
-        Int_t genMuonPl = input->RecoMuWhichGen[mupl_idx];
-        Int_t genMuonMi = input->RecoMuWhichGen[mumi_idx];
-        Int_t genQQidx = input->RecoQQWhichGen[index];
+        Int_t genMuonPl = input->which.RecoMuWhichGen[mupl_idx];
+        Int_t genMuonMi = input->which.RecoMuWhichGen[mumi_idx];
+        Int_t genQQidx = input->which.RecoQQWhichGen[index];
         //check if both muons are matched to generated muons
         if(genMuonPl < 0) return false;
         if(genMuonMi < 0) return false;
@@ -58,9 +58,9 @@ bool CutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
     if (!isSoft(input,mumi_idx)) return false;
 
     //kinetic cut
-    TLorentzVector* mom4= (TLorentzVector*) input->recoQQ_mom4->At(index);
-    TLorentzVector* mom4_mumi = (TLorentzVector*) input->recoMu_mom4->At(input->recoQQ_mumi_idx[index]);
-    TLorentzVector* mom4_mupl = (TLorentzVector*) input->recoMu_mom4->At(input->recoQQ_mupl_idx[index]);
+    TLorentzVector* mom4= (TLorentzVector*) input->recoQQ.mom4->At(index);
+    TLorentzVector* mom4_mumi = (TLorentzVector*) input->recoMu.mom4->At(input->recoQQ.mumi_idx[index]);
+    TLorentzVector* mom4_mupl = (TLorentzVector*) input->recoMu.mom4->At(input->recoQQ.mupl_idx[index]);
 
     if((mom4==nullptr) || (mom4_mumi==nullptr) || (mom4_mupl==nullptr))
     {
@@ -76,17 +76,17 @@ bool CutParams::cut(const OniaReader* input,Int_t index,Int_t entry)
     if (mom4_mupl->Pt() < singleMuPtLow) return false;
     if (fabs(mom4_mupl->Eta()) > singleMuEtaHigh) return false;
 
-    if (input->recoQQ_VtxProb[index] < minVtxProb) return false;
+    if (input->recoQQ.VtxProb[index] < minVtxProb) return false;
 
     return true;
 }
 
 bool CutParams::isSoft(const OniaReader* input,Int_t index) const
 {
-    bool passMuonTypePl = (input->recoMu_SelectionType[index] & selectionBits) == (selectionBits);
-    bool muplSoft = passMuonTypePl && ( input->recoMu_nTrkWMea[index] >= minTracks)
-    && ( input->recoMu_nPixWMea[index] >= minPixels)
-    && ( fabs(input->recoMu_dxy[index]) < maxDxy)
-    && ( fabs(input->recoMu_dz[index]) < maxDz);
+    bool passMuonTypePl = (input->recoMu.SelectionType[index] & selectionBits) == (selectionBits);
+    bool muplSoft = passMuonTypePl && ( input->recoMu.nTrkWMea[index] >= minTracks)
+    && ( input->recoMu.nPixWMea[index] >= minPixels)
+    && ( fabs(input->recoMu.dxy[index]) < maxDxy)
+    && ( fabs(input->recoMu.dz[index]) < maxDz);
     return muplSoft;
 }

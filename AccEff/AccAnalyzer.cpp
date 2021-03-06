@@ -20,7 +20,7 @@ AccAnalyzer::AccAnalyzer(OniaReader2* input,AccCutter* accCut, OniaWriter* write
 
 void AccAnalyzer::ProcessEvent(Long64_t entry)
 {
-    Long64_t size=oniaReader->genQQ_size;
+    Long64_t size=oniaReader->genQQ.size;
     
     for(Long64_t i=0;i<size;++i)
     {
@@ -62,9 +62,9 @@ void AccAnalyzer::Write(const std::string& basename)
 void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
 {
     //read variables
-    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader->genQQ_mom4->At(index);
-    TLorentzVector* mom4vecPl=(TLorentzVector*) oniaReader->genQQ_mupl_mom4->At(index);
-    TLorentzVector* mom4vecMi=(TLorentzVector*) oniaReader->genQQ_mumi_mom4->At(index);
+    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader->genQQ.mom4->At(index);
+    TLorentzVector* mom4vecPl=(TLorentzVector*) oniaReader->genQQ.mupl_mom4->At(index);
+    TLorentzVector* mom4vecMi=(TLorentzVector*) oniaReader->genQQ.mumi_mom4->At(index);
 
     float pT = mom4vec->Pt();
     float y = fabs(mom4vec->Rapidity());

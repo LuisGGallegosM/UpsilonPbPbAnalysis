@@ -11,9 +11,9 @@ void writePie(const std::map<int,int>& values, const std::string& name);
 int getRecoPdgId(const OniaReader* dataIn, int index)
 {
     int pdgId=0;
-    int genQQindex=dataIn->RecoQQWhichGen[index];
+    int genQQindex=dataIn->which.RecoQQWhichGen[index];
     if (genQQindex>=0)
-        pdgId= dataIn->genQQ_id[genQQindex];
+        pdgId= dataIn->genQQ.id[genQQindex];
     return pdgId;
 }
 
@@ -78,21 +78,21 @@ void OniaWriter::writeReco(const OniaReader* dataIn, int index, int entry)
 {
     int pdgId=getRecoPdgId(dataIn,index);
     oniaInfoOut.Write(entry, pdgId);
-    oniaQQOut.Write((TLorentzVector*) dataIn->recoQQ_mom4->At(index));
+    oniaQQOut.Write((TLorentzVector*) dataIn->recoQQ.mom4->At(index));
     FillEntries(); 
 }
 
 void OniaWriter::writeGen(const OniaReader* dataIn, int index, int entry)
 {
-    oniaInfoOut.Write(entry,dataIn->genQQ_id[index]);
-    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ_mom4->At(index));
+    oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
+    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
     FillEntries(); 
 }
 
 void OniaWriter::writeGen(const OniaReader2* dataIn, int index, int entry)
 {
-    oniaInfoOut.Write(entry,dataIn->genQQ_id[index]);
-    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ_mom4->At(index));
+    oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
+    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
     FillEntries(); 
 }
 //OniaWriterFull
@@ -106,32 +106,32 @@ void OniaWriterFull::writeReco(const OniaReader* dataIn, int index, int entry)
 {
     int pdgId=getRecoPdgId(dataIn,index);
     oniaInfoOut.Write(entry,pdgId);
-    oniaQQOut.Write((TLorentzVector*) dataIn->recoQQ_mom4->At(index));
-    int mumi_idx= dataIn->recoQQ_mumi_idx[index];
-    int mupl_idx= dataIn->recoQQ_mupl_idx[index];
-    TLorentzVector* mumi = (TLorentzVector*) dataIn->recoMu_mom4->At(mumi_idx);
-    TLorentzVector* mupl = (TLorentzVector*) dataIn->recoMu_mom4->At(mupl_idx);
+    oniaQQOut.Write((TLorentzVector*) dataIn->recoQQ.mom4->At(index));
+    int mumi_idx= dataIn->recoQQ.mumi_idx[index];
+    int mupl_idx= dataIn->recoQQ.mupl_idx[index];
+    TLorentzVector* mumi = (TLorentzVector*) dataIn->recoMu.mom4->At(mumi_idx);
+    TLorentzVector* mupl = (TLorentzVector*) dataIn->recoMu.mom4->At(mupl_idx);
     oniaMuOut.Write(mupl,mumi);
     FillEntries(); 
 }
 void OniaWriterFull::writeGen(const OniaReader* dataIn, int index, int entry)
 {
-    oniaInfoOut.Write(entry,dataIn->genQQ_id[index]);
-    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ_mom4->At(index));
-    int mumi_idx= dataIn->genQQ_mumi_idx[index];
-    int mupl_idx= dataIn->genQQ_mupl_idx[index];
-    TLorentzVector* mumi = (TLorentzVector*) dataIn->genMu_mom4->At(mumi_idx);
-    TLorentzVector* mupl = (TLorentzVector*) dataIn->genMu_mom4->At(mupl_idx);
+    oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
+    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
+    int mumi_idx= dataIn->genQQ.mumi_idx[index];
+    int mupl_idx= dataIn->genQQ.mupl_idx[index];
+    TLorentzVector* mumi = (TLorentzVector*) dataIn->genMu.mom4->At(mumi_idx);
+    TLorentzVector* mupl = (TLorentzVector*) dataIn->genMu.mom4->At(mupl_idx);
     oniaMuOut.Write(mupl,mumi);
     FillEntries(); 
 }
 
 void OniaWriterFull::writeGen(const OniaReader2* dataIn, int index, int entry)
 {
-    oniaInfoOut.Write(entry,dataIn->genQQ_id[index]);
-    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ_mom4->At(index));
-    TLorentzVector* mumi = (TLorentzVector*) dataIn->genQQ_mumi_mom4->At(index);
-    TLorentzVector* mupl = (TLorentzVector*) dataIn->genQQ_mupl_mom4->At(index);
+    oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
+    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
+    TLorentzVector* mumi = (TLorentzVector*) dataIn->genQQ.mumi_mom4->At(index);
+    TLorentzVector* mupl = (TLorentzVector*) dataIn->genQQ.mupl_mom4->At(index);
     oniaMuOut.Write(mupl,mumi);
     FillEntries(); 
 }

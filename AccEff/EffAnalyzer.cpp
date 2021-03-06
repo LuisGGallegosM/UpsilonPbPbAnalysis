@@ -20,7 +20,7 @@ EffAnalyzer::EffAnalyzer(OniaReader* input,EffCutter* effCut, OniaWriter* writer
 
 void EffAnalyzer::ProcessEvent(Long64_t entry)
 {
-    Long64_t size=oniaReader->genQQ_size;
+    Long64_t size=oniaReader->genQQ.size;
     
     for(Long64_t i=0;i<size;++i)
     {
@@ -62,7 +62,7 @@ void EffAnalyzer::Analyze(Int_t index, Long64_t entry)
     if (accCutter->cut(oniaReader.get(),index,entry))
     {
         CaptureDetQQ(index,entry);
-        int recoQQindex= oniaReader->GenQQWhichReco[index];
+        int recoQQindex= oniaReader->which.GenQQWhichReco[index];
         if (recoQQindex>=0)
         {
             if (effCutter->cut(oniaReader.get(),recoQQindex,entry))
@@ -73,7 +73,7 @@ void EffAnalyzer::Analyze(Int_t index, Long64_t entry)
 
 void EffAnalyzer::CaptureDetQQ(Int_t index, Long64_t entry)
 {
-    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader->genQQ_mom4->At(index);
+    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader->genQQ.mom4->At(index);
     float pT = mom4vec->Pt();
     float y = fabs(mom4vec->Rapidity());
 
@@ -84,12 +84,12 @@ void EffAnalyzer::CaptureDetQQ(Int_t index, Long64_t entry)
 void EffAnalyzer::CaptureRecoQQ(Int_t index, Long64_t entry)
 {
     //read variables
-    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader->recoQQ_mom4->At(index);
+    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader->recoQQ.mom4->At(index);
 
-    int mupl_idx = oniaReader->recoQQ_mupl_idx[index];//plus muon index
-    int mumi_idx = oniaReader->recoQQ_mumi_idx[index];//minus muon index
-    TLorentzVector* mom4vecPl=(TLorentzVector*) oniaReader->recoMu_mom4->At(mupl_idx);
-    TLorentzVector* mom4vecMi=(TLorentzVector*) oniaReader->recoMu_mom4->At(mumi_idx);
+    int mupl_idx = oniaReader->recoQQ.mupl_idx[index];//plus muon index
+    int mumi_idx = oniaReader->recoQQ.mumi_idx[index];//minus muon index
+    TLorentzVector* mom4vecPl=(TLorentzVector*) oniaReader->recoMu.mom4->At(mupl_idx);
+    TLorentzVector* mom4vecMi=(TLorentzVector*) oniaReader->recoMu.mom4->At(mumi_idx);
 
     float pT = mom4vec->Pt();
     float y = fabs(mom4vec->Rapidity());

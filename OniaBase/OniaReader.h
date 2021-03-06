@@ -9,57 +9,57 @@
 
 struct OniaGenQQ
 {
-    std::unique_ptr<TClonesArray> genQQ_mom4;
-    Int_t genQQ_size;
-    Int_t genQQ_mupl_idx[maxBranchSize];
-    Int_t genQQ_mumi_idx[maxBranchSize];
-    Int_t genQQ_id[maxBranchSize];
+    std::unique_ptr<TClonesArray> mom4;
+    Int_t size;
+    Int_t mupl_idx[maxBranchSize];
+    Int_t mumi_idx[maxBranchSize];
+    Int_t id[maxBranchSize];
 
-    OniaGenQQ(TreeReader* reader);
+    void addInputs(TreeReader* reader);
 };
 
 struct OniaGenQQ2
 {
-    std::unique_ptr<TClonesArray> genQQ_mom4;
-    Int_t genQQ_size;
-    std::unique_ptr<TClonesArray> genQQ_mupl_mom4;
-    std::unique_ptr<TClonesArray> genQQ_mumi_mom4;
-    Int_t genQQ_id[maxBranchSize];
+    std::unique_ptr<TClonesArray> mom4;
+    Int_t size;
+    std::unique_ptr<TClonesArray> mupl_mom4;
+    std::unique_ptr<TClonesArray> mumi_mom4;
+    Int_t id[maxBranchSize];
 
-    OniaGenQQ2(TreeReader* reader);
+    void addInputs(TreeReader* reader);
 };
 
 struct OniaRecoQQ
 {
-    std::unique_ptr<TClonesArray> recoQQ_mom4;
-    Int_t recoQQ_size;
-    Int_t recoQQ_mupl_idx[maxBranchSize];
-    Int_t recoQQ_mumi_idx[maxBranchSize];
-    Int_t recoQQ_sign[maxBranchSize];
-    Float_t recoQQ_VtxProb[maxBranchSize];
-    ULong64_t recoQQ_trig[maxBranchSize];
+    std::unique_ptr<TClonesArray> mom4;
+    Int_t size;
+    Int_t mupl_idx[maxBranchSize];
+    Int_t mumi_idx[maxBranchSize];
+    Int_t sign[maxBranchSize];
+    Float_t VtxProb[maxBranchSize];
+    ULong64_t trig[maxBranchSize];
 
-    OniaRecoQQ(TreeReader* reader);
+    void addInputs(TreeReader* reader);
 };
 
 struct OniaGenMu
 {
-    std::unique_ptr<TClonesArray> genMu_mom4;
-    Int_t genMu_size;
+    std::unique_ptr<TClonesArray> mom4;
+    Int_t size;
 
-    OniaGenMu(TreeReader* reader);
+    void addInputs(TreeReader* reader);
 };
 
 struct OniaRecoMu
 {
-    std::unique_ptr<TClonesArray> recoMu_mom4;
-    Int_t recoMu_size;
-    Int_t recoMu_SelectionType[maxBranchSize];
-    Int_t recoMu_nTrkWMea[maxBranchSize];
-    Int_t recoMu_nPixWMea[maxBranchSize];
-    Float_t recoMu_dxy[maxBranchSize];
-    Float_t recoMu_dz[maxBranchSize];
-    OniaRecoMu(TreeReader* reader);
+    std::unique_ptr<TClonesArray> mom4;
+    Int_t size;
+    Int_t SelectionType[maxBranchSize];
+    Int_t nTrkWMea[maxBranchSize];
+    Int_t nPixWMea[maxBranchSize];
+    Float_t dxy[maxBranchSize];
+    Float_t dz[maxBranchSize];
+    void addInputs(TreeReader* reader);
 };
 
 struct OniaWhich
@@ -69,19 +69,28 @@ struct OniaWhich
     Int_t GenMuWhichReco[maxBranchSize];
     Int_t RecoQQWhichGen[maxBranchSize];
 
-    OniaWhich(TreeReader* reader);
+    void addInputs(TreeReader* reader);
 };
 
-class OniaReader : public TreeReader, 
-    public OniaGenQQ, public OniaRecoQQ, public OniaGenMu, public OniaRecoMu, public OniaWhich
+class OniaReader
 {
     public:
+    TreeReader reader;
+    OniaGenQQ genQQ;
+    OniaRecoQQ recoQQ;
+    OniaGenMu genMu;
+    OniaRecoMu recoMu;
+    OniaWhich which;
+
     OniaReader(TTree* treeIn);
 };
 
-class OniaReader2 : public TreeReader, public OniaGenQQ2, public OniaGenMu
+class OniaReader2
 {
     public:
+    TreeReader reader;
+    OniaGenQQ2 genQQ;
+    OniaGenMu genMu;
     OniaReader2(TTree* treeIn);
 };
 
