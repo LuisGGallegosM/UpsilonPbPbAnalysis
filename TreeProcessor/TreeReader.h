@@ -5,25 +5,21 @@
 
 class TreeReader
 {
-    struct Branch
-    {
-        std::string name;
-
-    };
     private:
-    std::vector<TBranch*> input_branches;
-    TTree* tree_input;
+    std::vector<TBranch*> inputBranches;
+    TTree* inputTree;
 
     public:
     TreeReader(TTree* treeIn);
 
-    void readTree(Long64_t index);
+    void readTree(Long64_t index) const;
     bool addInputOpt(const char* varName,void* address);
     void addInput(const char* varName,void* address);
-    bool hasBranch(const char* varName) const;
-    Long64_t getEntriesNumber() const {return tree_input->GetEntries();}
-    std::string getName() const {return tree_input->GetName();}
-    TTree* getTree() {return tree_input;}
+    bool hasBranchInInputs(const char* varName) const;
+    bool HasBranchInTree(const char* varName) const;
+    Long64_t getEntriesNumber() const {return inputTree->GetEntries();}
+    std::string getName() const {return inputTree->GetName();}
+    TTree* getTree() {return inputTree;}
 };
 
 #endif
