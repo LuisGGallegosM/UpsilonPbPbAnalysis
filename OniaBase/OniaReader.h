@@ -74,8 +74,10 @@ struct OniaWhich
 
 class OniaReader
 {
-    public:
+    private:
     TreeReader reader;
+    
+    public:
     OniaGenQQ genQQ;
     OniaRecoQQ recoQQ;
     OniaGenMu genMu;
@@ -83,15 +85,18 @@ class OniaReader
     OniaWhich which;
 
     OniaReader(TTree* treeIn);
+    const TreeReader* getReader() const {return &reader;}
 };
 
 class OniaReader2
 {
-    public:
+    private:
     TreeReader reader;
+    public:
     OniaGenQQ2 genQQ;
     OniaGenMu genMu;
     OniaReader2(TTree* treeIn);
+    const TreeReader* getReader() const {return &reader;}
 };
 
 #endif

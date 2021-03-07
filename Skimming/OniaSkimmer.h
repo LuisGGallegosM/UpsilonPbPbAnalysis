@@ -19,7 +19,7 @@ class OniaSkimmer : public TreeProcessor
     public:
     OniaSkimmer(OniaReader* reader , OniaCutter* cutter, OniaWriterFull* writer);
     void Write() { oniaWriter->Write(); }
-    void Skim() { Process(&(oniaReader->reader)); }
+    void Skim() { Process(oniaReader->getReader()); }
 };
 
 #if defined(__CLING__)

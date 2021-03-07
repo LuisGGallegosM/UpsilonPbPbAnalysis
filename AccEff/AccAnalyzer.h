@@ -37,7 +37,7 @@ class AccAnalyzer : public TreeProcessor
 
     void Write(const std::string& basename);
 
-    void Test() { Process(&(oniaReader->reader)); }
+    void Test() { Process(oniaReader->getReader()); }
     void ProcessEvent(Long64_t entry) override;
 
     TH1F* getPtHistQQDet() {return ptHistQQDet;}

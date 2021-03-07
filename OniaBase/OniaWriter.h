@@ -10,7 +10,7 @@ struct OniaSimpleInfo
     Int_t Evt;
     Int_t pdgId;
 
-    OniaSimpleInfo(TreeWriter* writer);
+    void addOutputs(TreeWriter* writer);
     void Write(int entry, int id)
     {
         Evt=entry;
@@ -26,7 +26,7 @@ struct OniaSimpleQQ
     Float_t phi;
     Float_t eta;
 
-    OniaSimpleQQ(TreeWriter* writer);
+    void addOutputs(TreeWriter* writer);
     void Write(TLorentzVector* dimuon);
 };
 
@@ -39,12 +39,13 @@ struct OniaSimpleMu
     Float_t eta_pl;
     Float_t phi_pl;
 
-    OniaSimpleMu(TreeWriter* writer);
+    void addOutputs(TreeWriter* writer);
     void Write(TLorentzVector* muonPl, TLorentzVector* muonMi);
 };
 
-class OniaWriter : public TreeWriter
+class OniaWriter
 {
+    TreeWriter writer;
     OniaSimpleInfo oniaInfoOut;
     OniaSimpleQQ oniaQQOut;
 
@@ -54,10 +55,13 @@ class OniaWriter : public TreeWriter
     void writeReco(const OniaReader* dataIn, int index, int entry);
     void writeGen(const OniaReader* dataIn, int index, int entry);
     void writeGen(const OniaReader2* dataIn, int index, int entry);
+
+    void Write() {writer.Write();}
 };
 
-class OniaWriterFull : public TreeWriter
+class OniaWriterFull
 {
+    TreeWriter writer;
     OniaSimpleInfo oniaInfoOut;
     OniaSimpleQQ oniaQQOut;
     OniaSimpleMu oniaMuOut;
@@ -67,6 +71,8 @@ class OniaWriterFull : public TreeWriter
     void writeReco(const OniaReader* dataIn, int index, int entry);
     void writeGen(const OniaReader* dataIn, int index, int entry);
     void writeGen(const OniaReader2* dataIn, int index, int entry);
+
+    void Write() {writer.Write();}
 };
 
 #endif

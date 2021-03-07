@@ -38,7 +38,7 @@ class EffAnalyzer : public TreeProcessor
 
     void Write(const std::string& basename);
 
-    void Test() { Process(&(oniaReader->reader)); }
+    void Test() { Process(oniaReader->getReader()); }
     void ProcessEvent(Long64_t entry) override;
 };
 

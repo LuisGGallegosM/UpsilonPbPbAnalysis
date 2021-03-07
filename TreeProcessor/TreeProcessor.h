@@ -8,7 +8,7 @@ class TreeProcessor
 {
     protected:
     virtual void ProcessEvent(Long64_t entry) = 0;
-    void Process(TreeReader* treeReader);
+    void Process(const TreeReader* treeReader);
 
     public:
     TreeProcessor() = default;

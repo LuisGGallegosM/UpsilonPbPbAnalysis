@@ -2,7 +2,7 @@
 #include "TreeProcessor.h"
 #include <iostream>
 
-void TreeProcessor::Process(TreeReader* treeReader)
+void TreeProcessor::Process(const TreeReader* treeReader)
 {
     int block =0;
     Long64_t entries= treeReader->getEntriesNumber();
