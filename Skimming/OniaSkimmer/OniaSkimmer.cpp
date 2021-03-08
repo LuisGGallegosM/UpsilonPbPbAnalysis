@@ -3,7 +3,7 @@
 #include "OniaSkimmer.h"
 #include "TLorentzVector.h"
 
-std::unique_ptr<Skimmer> createSkimmer(TTree* tree ,const CutParams* cutter, const char* outTreeName)
+std::unique_ptr<Skimmer> createOniaSkimmer(TTree* tree ,const CutParams* cutter, const char* outTreeName)
 {
     if (cutter->getIsMC())
     {

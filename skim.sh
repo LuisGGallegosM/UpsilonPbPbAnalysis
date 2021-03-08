@@ -2,6 +2,8 @@
 
 CLING="NO"
 
+FLAGS=${1:-""}
+
 #input file to skim
 INPUTFILE="../rootfiles/datasets/merged_HiForestAOD_MCFix2.root"
 INPUTFILENAME=$(basename $INPUTFILE)
@@ -22,5 +24,5 @@ cd Skimming
 root -q 'Skimming.cpp("'../${INPUTFILE}'","'../${OUTPUTFILE}'","'../${CONFIG}'")'
 cd ..
 else
-./Skimming/skim "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}"
+./Skimming/skim ${FLAGS} "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}"
 fi

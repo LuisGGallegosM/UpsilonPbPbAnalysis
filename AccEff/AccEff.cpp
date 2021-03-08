@@ -24,12 +24,7 @@ void AccTest(const char* filename,const char* outputfilename, const char* config
     std::cout << "Writing to output file: " << outfilename <<'\n';
     TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
 
-    TTree *myTree = (TTree *)file->Get("hionia/myTree");
-    if (myTree == nullptr)
-    {
-        std::cout << "hionia/myTree tree not found\n";
-        throw std::runtime_error("Error: Tree not found.\n");
-    }
+    TTree *myTree = GetTree(file,"hionia/myTree");
 
     AccAnalyzer accAnalyzer(myTree,"DetectableOnia");
 
@@ -67,12 +62,7 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
     std::cout << "Writing to output file: " << outfilename <<'\n';
     TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
 
-    TTree *myTree = (TTree *)file->Get("hionia/myTree");
-    if (myTree == nullptr)
-    {
-        std::cout << "hionia/myTree tree not found\n";
-        return;
-    }
+    TTree *myTree = GetTree(file,"hionia/myTree");
 
     CutParams cut;
     cut.deserialize(configname);

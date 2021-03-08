@@ -9,7 +9,6 @@
 #include "../Utils/serialize.h"
 #include "../Utils/utils.h"
 #include "OniaSkimmer/OniaSkimmer.h"
-
-void Skimming(const char* filename,const char* outputfilename);
+#include "OniaJetSkimmer/OniaJetSkimmer.h"
 
 #endif

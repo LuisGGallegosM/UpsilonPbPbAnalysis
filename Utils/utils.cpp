@@ -27,3 +27,13 @@ TFile* OpenFile(const char* filename, const char* option)
     }
     return file;
 }
+
+TTree* GetTree(TFile* file,const char* name)
+{
+    TTree* tree =(TTree *)file->Get(name);
+    if (tree == nullptr)
+    {
+        throw std::invalid_argument(std::string(name) + " tree not found\n");
+    }
+    return tree;
+}

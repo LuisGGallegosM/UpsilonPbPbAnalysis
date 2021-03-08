@@ -48,7 +48,7 @@ class OniaJetSkimmer : public TreeProcessor, public Skimmer
 using OniaJetSkimmerMC = OniaJetSkimmer<OniaJetReaderMC>;
 using OniaJetSkimmerRealData = OniaJetSkimmer<OniaJetReaderRealData>;
 
-std::unique_ptr<Skimmer> createSkimmer(TTree* tree ,const CutParams* cutter, const char* outTreeName);
+std::unique_ptr<Skimmer> createJetSkimmer(TTree* tree ,const CutParams* cutter, const char* outTreeName);
 
 
 #endif
