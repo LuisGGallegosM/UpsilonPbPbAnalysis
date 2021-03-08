@@ -1,5 +1,5 @@
-#ifndef SKIMMING
-#define SKIMMING
+#ifndef SKIMMINGJET
+#define SKIMMINGJET
 
 #include "TTree.h"
 #include "TFile.h"
@@ -8,8 +8,7 @@
 #include "../OniaBase/OniaBase.h"
 #include "../Utils/serialize.h"
 #include "../Utils/utils.h"
-#include "OniaSkimmer/OniaSkimmer.h"
 
-void Skimming(const char* filename,const char* outputfilename);
+#include "OniaJetSkimmer/OniaJetSkimmer.h"
 
 #endif

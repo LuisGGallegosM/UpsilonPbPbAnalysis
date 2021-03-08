@@ -8,7 +8,6 @@
 #include "../OniaBase/OniaWriter.h"
 #include "../OniaBase/OniaReader.h"
 #include "AccEffCutter.h"
-#include "../Skimming/OniaCutter.h"
 #include "AccEffAux.h"
 
 constexpr const char* accDenName ="pt QQ Generated";

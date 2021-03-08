@@ -45,4 +45,31 @@ class OniaReaderGenOnly
     const TreeReader* getReader() const {return &reader;}
 };
 
+class OniaJetReaderMC
+{
+    private:
+    TreeReader reader;   
+    public:
+    OniaRecoQQ recoQQ;
+    OniaRecoMu recoMu;
+    OniaGenQQ genQQ;
+    OniaGenMu genMu;
+    OniaWhich which;
+
+    OniaJetReaderMC(TTree* treeIn);
+    const TreeReader* getReader() const {return &reader;} 
+};
+
+class OniaJetReaderRealData
+{
+    private:
+    TreeReader reader;   
+    public:
+    OniaRecoQQ recoQQ;
+    OniaRecoMu recoMu;
+
+    OniaJetReaderRealData(TTree* treeIn);
+    const TreeReader* getReader() const {return &reader;} 
+};
+
 #endif

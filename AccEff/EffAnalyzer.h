@@ -8,7 +8,6 @@
 #include "../OniaBase/OniaWriter.h"
 #include "../OniaBase/OniaReader.h"
 #include "AccEffCutter.h"
-#include "../Skimming/OniaCutter.h"
 
 constexpr const char* effDenName= "p_{t} QQ Detectable Efficiency";
 constexpr const char* effNumName= "p_{t} QQ Reco + Cut";

@@ -24,3 +24,20 @@ OniaReaderGenOnly::OniaReaderGenOnly(TTree* treeIn) :
     genQQ.addInputs(&reader);
     genMu.addInputs(&reader);
 }
+
+OniaJetReaderMC::OniaJetReaderMC(TTree* treeIn) : 
+    reader(treeIn)
+{
+    recoQQ.addInputs(&reader);
+    recoMu.addInputs(&reader);
+    which.addInputs(&reader);
+    genQQ.addInputs(&reader);
+    genMu.addInputs(&reader);
+}
+
+OniaJetReaderRealData::OniaJetReaderRealData(TTree* treeIn) : 
+    reader(treeIn)
+{
+    recoQQ.addInputs(&reader);
+    recoMu.addInputs(&reader);
+}

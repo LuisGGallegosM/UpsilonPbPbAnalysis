@@ -1,19 +1,12 @@
 #ifndef ONIACUTTER
 #define ONIACUTTER
 
-#include "../OniaBase/OniaReader.h"
-#include "../OniaBase/CutParams.h"
+#include "../../OniaBase/OniaReader.h"
+#include "../../OniaBase/CutParams.h"
+#include "../Skimmer.h"
 
 template<typename Reader>
-class OniaCutter
-{
-    public:
-    virtual bool cut(const Reader* input, Int_t index,Int_t entry) = 0;
-    virtual ~OniaCutter() = default;
-};
-
-template<typename Reader>
-class OniaCutterBase : public OniaCutter<Reader>
+class OniaCutterBase : public Cutter<Reader>
 {
     private:
     CutParams kineCut;
