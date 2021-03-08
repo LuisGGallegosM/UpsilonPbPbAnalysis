@@ -15,12 +15,34 @@ class OniaJetSkimmer : public TreeProcessor, public Skimmer
     Reader oniaReader;
     std::unique_ptr<Cutter<Reader>> oniaCutter;
     OniaWriterReco<Reader> oniaWriter;
-    void ProcessEvent(Long64_t entry) override;
+    void ProcessEvent(Long64_t entry) override
+    {
+        Long64_t size=oniaReader.recoQQ.size;
+        
+        for(Long64_t i=0;i<size;++i)
+        {
+            if (oniaCutter->cut(&oniaReader,i,entry))
+            {
+                oniaWriter.writeQQ(&oniaReader,i,entry);
+            }
+        }
+    }
 
     public:
-    OniaJetSkimmer(TTree* tree , Cutter<Reader>* cutter, const char* outTreeName);
-    void Write() override { oniaWriter.Write(); }
-    void Skim() override { Process(oniaReader.getReader()); }
+    OniaJetSkimmer(TTree* tree , Cutter<Reader>* cutter, const char* outTreeName): 
+        oniaCutter(cutter) ,oniaReader(tree), oniaWriter(outTreeName)
+    {
+    }
+
+    void Write() override 
+    { 
+        oniaWriter.Write(); 
+    }
+    
+    void Skim() override 
+    {
+        Process(oniaReader.getReader()); 
+    }
 };
 
 using OniaJetSkimmerMC = OniaJetSkimmer<OniaJetReaderMC>;

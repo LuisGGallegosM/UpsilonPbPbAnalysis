@@ -12,9 +12,14 @@ class OniaJetCutterBase : public Cutter<Reader>
     CutParams kineCut;
 
     public:
-    OniaJetCutterBase(const CutParams* cut): kineCut(*cut) {};
+    OniaJetCutterBase(const CutParams* cut): kineCut(*cut)
+    {
+    }
 
-    bool cut(const Reader* input, Int_t index,Int_t entry) override;
+    bool cut(const Reader* input, Int_t index,Int_t entry) override
+    {
+        return true;
+    };
 };
 
 using OniaJetCutterMC = OniaJetCutterBase<OniaJetReaderMC>;
