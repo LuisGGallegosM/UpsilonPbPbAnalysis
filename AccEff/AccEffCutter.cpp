@@ -1,20 +1,21 @@
 #include "AccEffCutter.h"
 
-bool AccCutter::cut(const OniaReader2* input,Int_t index,Int_t entry)
-{
-    if(!isMuonInAcceptance((TLorentzVector*) input->genQQ.mupl_mom4->At(index))) return false;
-    if(!isMuonInAcceptance((TLorentzVector*) input->genQQ.mumi_mom4->At(index))) return false;
-
-    return true;
-}
-
-
-bool AccCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
+template<typename Reader>
+bool AccCutter::cut(const Reader* input,Int_t index,Int_t entry)
 {
     int mupl_idx = input->genQQ.mupl_idx[index];//plus muon index
     int mumi_idx = input->genQQ.mumi_idx[index];//minus muon index
     if(!isMuonInAcceptance((TLorentzVector*) input->genMu.mom4->At(mupl_idx))) return false;
     if(!isMuonInAcceptance((TLorentzVector*) input->genMu.mom4->At(mumi_idx))) return false;
+
+    return true;
+}
+
+template<>
+bool AccCutter::cut<OniaReaderGenOnly>(const OniaReaderGenOnly* input,Int_t index,Int_t entry)
+{
+    if(!isMuonInAcceptance((TLorentzVector*) input->genQQ.mupl_mom4->At(index))) return false;
+    if(!isMuonInAcceptance((TLorentzVector*) input->genQQ.mumi_mom4->At(index))) return false;
 
     return true;
 }
@@ -30,17 +31,16 @@ bool AccCutter::isMuonInAcceptance(const TLorentzVector* Muon) const
     else return pt >1.5f;                               // 2.1 < eta < 2.4
 }
 
-EffCutter::EffCutter(const CutParams* cut) : kineCut(*cut)
+template bool AccCutter::cut<OniaReaderGenOnly>(const OniaReaderGenOnly* input,Int_t index,Int_t entry);
+template bool AccCutter::cut<OniaReaderMC>(const OniaReaderMC* input,Int_t index,Int_t entry);
+
+//EffCutter
+
+template<typename Reader>
+bool EffCutter::cut(const Reader* input,Int_t index,Int_t entry)
 {
-
-}
-
-bool EffCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
-{
-    int mupl_idx = input->recoQQ.mupl_idx[index];//plus muon index
-    int mumi_idx = input->recoQQ.mumi_idx[index];//minus muon index
-
-    //are both muons reconstructed?
+    int mupl_idx = input->recoQQ.mupl_idx[index];//plus muon indexGenOnly
+    int mumi_idx = input->recoQQ.mumi_idx[index];//minus muon indexGenOnly
     if (input->which.RecoMuWhichGen[mupl_idx] < 0) return false;
     if (input->which.RecoMuWhichGen[mumi_idx] < 0) return false;
 
@@ -52,3 +52,5 @@ bool EffCutter::cut(const OniaReader* input,Int_t index,Int_t entry)
 
     return kineCut.cut(input,index,entry);
 }
+
+template bool EffCutter::cut<OniaReaderMC>(const OniaReaderMC* input,Int_t index,Int_t entry);

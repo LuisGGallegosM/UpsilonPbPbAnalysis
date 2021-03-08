@@ -1,17 +1,24 @@
 
 #include "OniaReader.h"
 
-OniaReader::OniaReader(TTree* treeIn) : 
+OniaReaderMC::OniaReaderMC(TTree* treeIn) : 
     reader(treeIn)
 {
-    genQQ.addInputs(&reader);
     recoQQ.addInputs(&reader);
-    genMu.addInputs(&reader);
     recoMu.addInputs(&reader);
     which.addInputs(&reader);
+    genQQ.addInputs(&reader);
+    genMu.addInputs(&reader);
 }
 
-OniaReader2::OniaReader2(TTree* treeIn) : 
+OniaReaderRealData::OniaReaderRealData(TTree* treeIn) : 
+    reader(treeIn)
+{
+    recoQQ.addInputs(&reader);
+    recoMu.addInputs(&reader);
+}
+
+OniaReaderGenOnly::OniaReaderGenOnly(TTree* treeIn) : 
     reader(treeIn)
 {
     genQQ.addInputs(&reader);

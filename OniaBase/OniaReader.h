@@ -6,30 +6,42 @@
 #include "../TreeProcessor/TreeReader.h"
 #include "OniaData/OniaDataQQ.h"
 
-class OniaReader
+class OniaReaderRealData
 {
     private:
     TreeReader reader;
     
     public:
-    OniaGenQQ genQQ;
     OniaRecoQQ recoQQ;
-    OniaGenMu genMu;
     OniaRecoMu recoMu;
-    OniaWhich which;
 
-    OniaReader(TTree* treeIn);
+    OniaReaderRealData(TTree* treeIn);
     const TreeReader* getReader() const {return &reader;}
 };
 
-class OniaReader2
+class OniaReaderMC
+{
+    private:
+    TreeReader reader;   
+    public:
+    OniaRecoQQ recoQQ;
+    OniaRecoMu recoMu;
+    OniaGenQQ genQQ;
+    OniaGenMu genMu;
+    OniaWhich which;
+
+    OniaReaderMC(TTree* treeIn);
+    const TreeReader* getReader() const {return &reader;}
+};
+
+class OniaReaderGenOnly
 {
     private:
     TreeReader reader;
     public:
     OniaGenQQ2 genQQ;
     OniaGenMu genMu;
-    OniaReader2(TTree* treeIn);
+    OniaReaderGenOnly(TTree* treeIn);
     const TreeReader* getReader() const {return &reader;}
 };
 

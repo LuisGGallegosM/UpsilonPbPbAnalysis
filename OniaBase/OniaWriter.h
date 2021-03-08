@@ -6,24 +6,17 @@
 #include"OniaReader.h"
 #include"OniaData/OniaDataSimple.h"
 
-
+template<typename Reader>
 class OniaWriter
 {
-    TreeWriter writer;
-    OniaSimpleInfo oniaInfoOut;
-    OniaSimpleQQ oniaQQOut;
-
     public:
-    OniaWriter(const char* treeName);
-
-    void writeReco(const OniaReader* dataIn, int index, int entry);
-    void writeGen(const OniaReader* dataIn, int index, int entry);
-    void writeGen(const OniaReader2* dataIn, int index, int entry);
-
-    void Write() {writer.Write();}
+    virtual void writeQQ(const Reader* dataIn, int index, int entry) = 0;
+    virtual void Write() = 0;
+    ~OniaWriter() = default;
 };
 
-class OniaWriterFull
+template<typename Reader>
+class OniaWriterReco :public OniaWriter<Reader>
 {
     TreeWriter writer;
     OniaSimpleInfo oniaInfoOut;
@@ -31,12 +24,25 @@ class OniaWriterFull
     OniaSimpleMu oniaMuOut;
 
     public:
-    OniaWriterFull(const char* treeName);
-    void writeReco(const OniaReader* dataIn, int index, int entry);
-    void writeGen(const OniaReader* dataIn, int index, int entry);
-    void writeGen(const OniaReader2* dataIn, int index, int entry);
-
-    void Write() {writer.Write();}
+    OniaWriterReco(const char* treeName);
+    void writeQQ(const Reader* dataIn, int index, int entry) override;
+    void Write() override {writer.Write();}
 };
+
+template<typename Reader>
+class OniaWriterGen :public OniaWriter<Reader>
+{
+    TreeWriter writer;
+    OniaSimpleInfo oniaInfoOut;
+    OniaSimpleQQ oniaQQOut;
+    OniaSimpleMu oniaMuOut;
+
+    public:
+    OniaWriterGen(const char* treeName);
+    void writeQQ(const Reader* dataIn, int index, int entry) override;
+    void Write() override {writer.Write();}
+};
+
+using OniaWriterGenOnly = OniaWriterGen<OniaReaderGenOnly>;
 
 #endif

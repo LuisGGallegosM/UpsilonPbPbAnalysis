@@ -8,7 +8,7 @@
 
 void writePie(const std::map<int,int>& values, const std::string& name);
 
-int getRecoPdgId(const OniaReader* dataIn, int index)
+int getRecoPdgId(const OniaReaderMC* dataIn, int index)
 {
     int pdgId=0;
     int genQQindex=dataIn->which.RecoQQWhichGen[index];
@@ -17,39 +17,8 @@ int getRecoPdgId(const OniaReader* dataIn, int index)
     return pdgId;
 }
 
-//OniaWriter
-
-OniaWriter::OniaWriter(const char* treeName):
-    writer(treeName)
-{
-    oniaInfoOut.addOutputs(&writer);
-    oniaQQOut.addOutputs(&writer);
-}
-
-void OniaWriter::writeReco(const OniaReader* dataIn, int index, int entry)
-{
-    int pdgId=getRecoPdgId(dataIn,index);
-    oniaInfoOut.Write(entry, pdgId);
-    oniaQQOut.Write((TLorentzVector*) dataIn->recoQQ.mom4->At(index));
-    writer.FillEntries(); 
-}
-
-void OniaWriter::writeGen(const OniaReader* dataIn, int index, int entry)
-{
-    oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
-    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
-    writer.FillEntries(); 
-}
-
-void OniaWriter::writeGen(const OniaReader2* dataIn, int index, int entry)
-{
-    oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
-    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
-    writer.FillEntries(); 
-}
-//OniaWriterFull
-
-OniaWriterFull::OniaWriterFull(const char* treeName):
+template<typename Reader>
+OniaWriterReco<Reader>::OniaWriterReco(const char* treeName):
     writer(treeName)
 {
     oniaInfoOut.addOutputs(&writer);
@@ -57,9 +26,10 @@ OniaWriterFull::OniaWriterFull(const char* treeName):
     oniaMuOut.addOutputs(&writer);
 }
 
-void OniaWriterFull::writeReco(const OniaReader* dataIn, int index, int entry)
+template<typename Reader>
+void OniaWriterReco<Reader>::writeQQ(const Reader* dataIn, int index, int entry)
 {
-    int pdgId=getRecoPdgId(dataIn,index);
+    int pdgId=0;
     oniaInfoOut.Write(entry,pdgId);
     oniaQQOut.Write((TLorentzVector*) dataIn->recoQQ.mom4->At(index));
     int mumi_idx= dataIn->recoQQ.mumi_idx[index];
@@ -69,7 +39,19 @@ void OniaWriterFull::writeReco(const OniaReader* dataIn, int index, int entry)
     oniaMuOut.Write(mupl,mumi);
     writer.FillEntries(); 
 }
-void OniaWriterFull::writeGen(const OniaReader* dataIn, int index, int entry)
+
+
+template<typename Reader>
+OniaWriterGen<Reader>::OniaWriterGen(const char* treeName):
+    writer(treeName)
+{
+    oniaInfoOut.addOutputs(&writer);
+    oniaQQOut.addOutputs(&writer);
+    oniaMuOut.addOutputs(&writer);
+}
+
+template<typename Reader>
+void OniaWriterGen<Reader>::writeQQ(const Reader* dataIn, int index, int entry)
 {
     oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
     oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
@@ -81,7 +63,8 @@ void OniaWriterFull::writeGen(const OniaReader* dataIn, int index, int entry)
     writer.FillEntries(); 
 }
 
-void OniaWriterFull::writeGen(const OniaReader2* dataIn, int index, int entry)
+template<>
+void OniaWriterGen<OniaReaderGenOnly>::writeQQ(const OniaReaderGenOnly* dataIn, int index, int entry)
 {
     oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
     oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
@@ -90,6 +73,12 @@ void OniaWriterFull::writeGen(const OniaReader2* dataIn, int index, int entry)
     oniaMuOut.Write(mupl,mumi);
     writer.FillEntries(); 
 }
+
+
+template class OniaWriterReco<OniaReaderMC>;
+template class OniaWriterReco<OniaReaderRealData>;
+template class OniaWriterGen<OniaReaderMC>;
+template class OniaWriterGen<OniaReaderGenOnly>;
 
 void writePie(const std::map<int,int>& values, const std::string& name)
 {

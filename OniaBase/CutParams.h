@@ -3,6 +3,7 @@
 
 #include "../Utils/serialize.h"
 #include "OniaReader.h"
+#include "TLorentzVector.h"
 
 //changed to Jpsi that is currently hardcoded to Jpsi
 //Upsilon Y1S PDG ID
@@ -46,9 +47,13 @@ class CutParams
         && (maxDz > 0.0f) && (minVtxProb >0.0f) && (prescale>0);
     }
 
-    bool cut(const OniaReader* input,Int_t index,Int_t entry);
-    bool isSoft(const OniaReader* input,Int_t index) const;
+    bool cut(const OniaReaderMC* input,Int_t index,Int_t entry);
+    bool cut(const OniaReaderRealData* input,Int_t index,Int_t entry);
+    bool isSoft(const OniaRecoMu* input,Int_t index) const;
+    bool isMatchedQQ(const OniaWhich* which,int mupl_idx, int mumi_idx, int index) const;
     bool isPrescaled(Int_t entry) const { return (prescale>1) && ((entry % prescale)!=0); }
+    bool isTriggered(const OniaRecoQQ* recoQQ, int index);
+    bool kineticCut(const TLorentzVector* mom4,const TLorentzVector* mom4_mumi,const TLorentzVector* mom4_mupl );
 
     bool getIsMC() const { return isMC;}
     float getMuPtLow() const {return singleMuPtLow;}

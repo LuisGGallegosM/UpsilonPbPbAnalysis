@@ -12,11 +12,8 @@ class AccCutter
     bool isMuonInAcceptance(const TLorentzVector* Muon) const;
 
     public:
-    bool cut(const OniaReader2* input, Int_t index,Int_t entry);
-    bool cut(const OniaReader* input, Int_t index,Int_t entry);
-    bool prescale(Int_t entry) const { return false; }
-
-    std::string getName() const {return "Acceptancy test";};
+    template<typename Reader>
+    bool cut(const Reader* input, Int_t index,Int_t entry);
 };
 
 class EffCutter
@@ -25,12 +22,10 @@ class EffCutter
     CutParams kineCut;
 
     public:
-    bool cut(const OniaReader* input, Int_t index,Int_t entry) ;
-    bool prescale(Int_t entry) const { return false; }
-
-    std::string getName() const {return "Efficiency test";};
+    template<typename Reader>
+    bool cut(const Reader* input, Int_t index,Int_t entry) ;
     
-    EffCutter(const CutParams* cut);
+    EffCutter(const CutParams* cut)  : kineCut(*cut) {}
 };
 
 #if defined(__CLING__)

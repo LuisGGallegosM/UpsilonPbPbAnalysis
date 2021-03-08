@@ -4,19 +4,24 @@
 #include "../OniaBase/OniaReader.h"
 #include "../OniaBase/CutParams.h"
 
+template<typename Reader>
 class OniaCutter
+{
+    public:
+    virtual bool cut(const Reader* input, Int_t index,Int_t entry) = 0;
+    virtual ~OniaCutter() = default;
+};
+
+template<typename Reader>
+class OniaCutterBase : public OniaCutter<Reader>
 {
     private:
     CutParams kineCut;
-    bool isSoft(const OniaReader* input, Int_t index) const;
 
     public:
-    bool cut(const OniaReader* input, Int_t index,Int_t entry) {return kineCut.cut(input,index,entry);}
-    bool prescale(Int_t entry) const {return kineCut.isPrescaled(entry); }
-    bool isMC() const { return kineCut.getIsMC(); }
-    std::string getName() const {return "Onia reco QQ";};
-    
-    OniaCutter(const CutParams* cut);
+    OniaCutterBase(const CutParams* cut): kineCut(*cut) {};
+
+    bool cut(const Reader* input, Int_t index,Int_t entry) override {return kineCut.cut(input,index,entry);}
 };
 
 #if defined(__CLING__)

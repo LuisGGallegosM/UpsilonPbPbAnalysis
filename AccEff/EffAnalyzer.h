@@ -13,7 +13,17 @@
 constexpr const char* effDenName= "p_{t} QQ Detectable Efficiency";
 constexpr const char* effNumName= "p_{t} QQ Reco + Cut";
 
-class EffAnalyzer : public TreeProcessor
+class EffAnalyzer
+{
+    public:
+    virtual void Write(const std::string& basename) = 0;
+    virtual void Test() = 0;
+
+    virtual ~EffAnalyzer() = default;
+};
+
+template<typename Reader>
+class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
 {
     private:
     TH2F* etaVsPtQQRecoCut;
@@ -24,9 +34,9 @@ class EffAnalyzer : public TreeProcessor
     std::unique_ptr<TEfficiency> ptQQEfficiency;
     std::unique_ptr<TEfficiency> etaVsPtQQEfficiency;
 
-    std::unique_ptr<OniaReader> oniaReader;
-    std::unique_ptr<EffCutter> effCutter;
-    std::unique_ptr<OniaWriter> oniaWriter;
+    Reader oniaReader;
+    EffCutter effCutter;
+    OniaWriterReco<Reader> oniaWriter;
     std::unique_ptr<AccCutter> accCutter;
 
     void Analyze(Int_t index, Long64_t entry);
@@ -34,13 +44,17 @@ class EffAnalyzer : public TreeProcessor
     void CaptureDetQQ(Int_t index, Long64_t entry);
 
     public:
-    EffAnalyzer(OniaReader* input,EffCutter* effCut, OniaWriter* writer, AccCutter* accCut );
+    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName );
 
-    void Write(const std::string& basename);
+    void Write(const std::string& basename) override;
 
-    void Test() { Process(oniaReader->getReader()); }
+    void Test() override { Process(oniaReader.getReader()); }
     void ProcessEvent(Long64_t entry) override;
 };
 
+using EffAnalyzerRealData = EffAnalyzerBase<OniaReaderRealData>;
+using EffAnalyzerMC = EffAnalyzerBase<OniaReaderMC>;
+
+std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName );
 
 #endif

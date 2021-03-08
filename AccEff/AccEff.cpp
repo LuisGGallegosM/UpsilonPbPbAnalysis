@@ -31,17 +31,14 @@ void AccTest(const char* filename,const char* outputfilename, const char* config
         throw std::runtime_error("Error: Tree not found.\n");
     }
 
-    AccCutter* cutterAcc =new AccCutter();
-    OniaWriter* writer =new OniaWriter("DetectableOnia");
-    OniaReader2* reader=new OniaReader2(myTree);
-    std::unique_ptr<AccAnalyzer> accAnalyzer(new AccAnalyzer(reader,cutterAcc,writer));
+    AccAnalyzer accAnalyzer(myTree,"DetectableOnia");
 
     //Run acceptancy test
-    accAnalyzer->Test();
+    accAnalyzer.Test();
 
     //write results to same folder as outputfilename
     std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
-    accAnalyzer->Write(outputfilesBasename);
+    accAnalyzer.Write(outputfilesBasename);
 
     outputfile->Close();
     file->Close();
@@ -85,19 +82,14 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
         return;
     }
 
-    AccCutter* cutterAcc =  new AccCutter();
-    EffCutter* cutterEff =  new EffCutter(&cut);
-    OniaWriter* writer =    new OniaWriter("RecoCutOnia");
-    OniaReader* reader=     new OniaReader(myTree);
-
-    EffAnalyzer effAnalyzer(reader,cutterEff,writer,cutterAcc);
+    std::unique_ptr<EffAnalyzer> effAnalyzer = createEffAnalyzer(myTree,&cut,"RecoCutOnia");
 
     //Run efficiency test
-    effAnalyzer.Test();
+    effAnalyzer->Test();
 
     //write results to same folder as outputfilename
     std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
-    effAnalyzer.Write(outputfilesBasename);
+    effAnalyzer->Write(outputfilesBasename);
 
     outputfile->Close();
     file->Close();

@@ -26,18 +26,18 @@ class AccAnalyzer : public TreeProcessor
     std::unique_ptr<TEfficiency> ptQQAcceptancy;
     std::unique_ptr<TEfficiency> etaVsPtQQAcceptancy;
 
-    std::unique_ptr<OniaReader2> oniaReader;
-    std::unique_ptr<AccCutter> accCutter;
-    std::unique_ptr<OniaWriter> oniaWriter;
+    OniaReaderGenOnly oniaReader;
+    AccCutter accCutter;
+    OniaWriterGenOnly oniaWriter;
 
     void Analyze(Int_t index, Long64_t entry);
 
     public:
-    AccAnalyzer(OniaReader2* input,AccCutter* accCut, OniaWriter* writer);
+    AccAnalyzer(TTree* input,const char* outTreeName);
 
     void Write(const std::string& basename);
 
-    void Test() { Process(oniaReader->getReader()); }
+    void Test() { Process(oniaReader.getReader()); }
     void ProcessEvent(Long64_t entry) override;
 
     TH1F* getPtHistQQDet() {return ptHistQQDet;}

@@ -3,22 +3,42 @@
 #include "OniaSkimmer.h"
 #include "TLorentzVector.h"
 
-OniaSkimmer::OniaSkimmer(OniaReader* reader , OniaCutter* cutter, OniaWriterFull* writer)
-: oniaWriter(writer), oniaCutter(cutter) ,oniaReader(reader)
+template<typename Reader>
+OniaSkimmerBase<Reader>::OniaSkimmerBase(TTree* tree , OniaCutter<Reader>* cutter, const char* outTreeName)
+: oniaCutter(cutter) ,oniaReader(tree), oniaWriter(outTreeName)
 {
 }
 
-void OniaSkimmer::ProcessEvent(Long64_t entry)
+template<typename Reader>
+void OniaSkimmerBase<Reader>::ProcessEvent(Long64_t entry)
 {
-    if (oniaCutter->prescale(entry)) return;
-
-    Long64_t size=oniaReader->recoQQ.size;
+    Long64_t size=oniaReader.recoQQ.size;
     
     for(Long64_t i=0;i<size;++i)
     {
-        if (oniaCutter->cut(oniaReader.get(),i,entry))
+        if (oniaCutter->cut(&oniaReader,i,entry))
         {
-            oniaWriter->writeReco(oniaReader.get(),i,entry);
+            oniaWriter.writeQQ(&oniaReader,i,entry);
         }
     }
 }
+
+std::unique_ptr<OniaSkimmer> createSkimmer(TTree* tree ,const CutParams* cutter, const char* outTreeName)
+{
+    if (cutter->getIsMC())
+    {
+        OniaCutterBase<OniaReaderMC>* oniaCutter =new OniaCutterBase<OniaReaderMC>(cutter);
+        return std::unique_ptr<OniaSkimmer>(new OniaSkimmerMC(tree,oniaCutter,outTreeName));
+    }
+    else
+    {
+        OniaCutterBase<OniaReaderRealData>* oniaCutter = new OniaCutterBase<OniaReaderRealData>(cutter);
+        return std::unique_ptr<OniaSkimmer>(new OniaSkimmerReadData(tree,oniaCutter,outTreeName));
+    } 
+}
+        
+
+
+template class OniaSkimmerBase<OniaReaderMC>;
+template class OniaSkimmerBase<OniaReaderRealData>;
+
