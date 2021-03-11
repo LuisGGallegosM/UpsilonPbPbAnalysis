@@ -89,7 +89,7 @@ void SkimmingOniaJet(const char* filename,const char* outputfilename, const char
     TTree *skimTree = GetTree(file,"skimanalysis/HltTree");
 
     oniaTree->AddFriend(jetTree);
-    skimTree->AddFriend(skimTree);
+    oniaTree->AddFriend(skimTree);
 
     //execute skim
     std::unique_ptr<Skimmer> skimmer = createJetSkimmer(oniaTree,&cut,ONIATTREENAME);

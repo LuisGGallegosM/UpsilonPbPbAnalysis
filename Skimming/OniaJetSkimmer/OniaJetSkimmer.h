@@ -49,6 +49,7 @@ class OniaJetSkimmer : public TreeProcessor, public Skimmer
         int iJet=0;
         for(;iJet< jetNumber;iJet++)
         {
+            if (oniaReader.jetInfo.refpt[iJet] < 0.0f) continue;
             float jt_eta=oniaReader.jetInfo.eta[iJet];
             float jt_phi=oniaReader.jetInfo.phi[iJet];
             jecCorrector.SetJetPT(oniaReader.jetInfo.rawpt[iJet]);
@@ -61,8 +62,7 @@ class OniaJetSkimmer : public TreeProcessor, public Skimmer
             TLorentzVector v_jet;
 	        v_jet.SetPtEtaPhiM(jt_pt_noZJEC, jt_eta, jt_phi, oniaReader.jetInfo.m[iJet]);
             TLorentzVector* RecoQQ4mom= (TLorentzVector*) oniaReader.recoQQ.mom4->At(index);
-            float dR=RecoQQ4mom->DeltaR(v_jet);
-            if (dR<=drmin) break;
+            if (RecoQQ4mom->DeltaR(v_jet)<=drmin) break;
         }
         return iJet;
     }

@@ -20,7 +20,7 @@ class OniaJetCutterBase : public Cutter<Reader>
 
     bool cut(const Reader* input, Int_t index,Int_t entry) override
     {
-        //if (!(input->jetInfo.pPAprimaryVertexFilter && input->jetInfo.pBeamScrapingFilter)) return false;
+        if (!(input->jetInfo.pPAprimaryVertexFilter && input->jetInfo.pBeamScrapingFilter)) return false;
         if (!kineCut.cut(input,index,entry)) return false;
 
         return true;

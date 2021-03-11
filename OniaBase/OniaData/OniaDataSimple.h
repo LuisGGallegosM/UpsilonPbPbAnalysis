@@ -38,7 +38,7 @@ struct OniaSimpleMu
     Float_t eta_pl;
     Float_t phi_pl;
 
-    void addOutputs(TreeWriter* writer);
+    void addOutputs(TreeWriter* writer, const char* prefix=nullptr);
     void Write(TLorentzVector* muonPl, TLorentzVector* muonMi);
 };
 

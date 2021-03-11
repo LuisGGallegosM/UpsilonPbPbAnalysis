@@ -154,7 +154,7 @@ class OniaWriterJet
         oniaInfoOut.addOutputs(&writer);
         recoQQOut.addOutputs(&writer,"reco_");
         genQQOut.addOutputs(&writer,"gen_");
-        oniaMuOut.addOutputs(&writer);
+        oniaMuOut.addOutputs(&writer, "reco_");
         oniaJetOut.addOutputs(&writer);
     }
 

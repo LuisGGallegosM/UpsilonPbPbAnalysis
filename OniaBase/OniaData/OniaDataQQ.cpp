@@ -64,8 +64,8 @@ void OniaWhich::addInputs(TreeReader* reader)
 
 void OniaJetInfo::addInputs(TreeReader* reader)
 {
-    //reader->addInput("pBeamScrapingFilter",&pBeamScrapingFilter);
-    //reader->addInput("pPAprimaryVertexFilter",&pPAprimaryVertexFilter);
+    reader->addInput("pBeamScrapingFilter",&pBeamScrapingFilter);
+    reader->addInput("pPAprimaryVertexFilter",&pPAprimaryVertexFilter);
     reader->addInput("nref",&nref);
     reader->addInput("rawpt",rawpt);
     reader->addInput("jtpt",pt);
