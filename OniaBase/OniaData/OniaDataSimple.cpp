@@ -11,13 +11,13 @@ void OniaSimpleInfo::addOutputs(TreeWriter* writer)
 
 //OniaSimpleQQ
 
-void OniaSimpleQQ::addOutputs(TreeWriter* writer)
+void OniaSimpleQQ::addOutputs(TreeWriter* writer,const char* prefix)
 {
-    writer->addOutput("mass",&mass);
-    writer->addOutput("eta",&eta);
-    writer->addOutput("phi",&phi);
-    writer->addOutput("pT",&pT);
-    writer->addOutput("y",&y);
+    writer->addOutput("mass",&mass,prefix);
+    writer->addOutput("eta",&eta,prefix);
+    writer->addOutput("phi",&phi,prefix);
+    writer->addOutput("pT",&pT,prefix);
+    writer->addOutput("y",&y,prefix);
 }
 
 void OniaSimpleQQ::Write(TLorentzVector* dimuon)
@@ -49,4 +49,24 @@ void OniaSimpleMu::addOutputs(TreeWriter* writer)
     writer->addOutput("eta_pl",&eta_pl);
     writer->addOutput("phi_mi",&phi_mi);
     writer->addOutput("phi_pl",&phi_pl);
+}
+
+void OniaSimpleJet::addOutputs(TreeWriter* writer)
+{
+    writer->addOutput("jt_pt",&jt_pt);
+    writer->addOutput("jt_rap",&jt_rap);
+    writer->addOutput("jt_eta",&jt_eta);
+    writer->addOutput("jt_phi",&jt_phi);
+    writer->addOutput("jt_pt_JEU_Down",&jt_pt_JEU_Down);
+    writer->addOutput("z",&z);
+    writer->addOutput("jt_pt_JEU_Up",&jt_pt_JEU_Up);
+    writer->addOutput("jt_pt_jettyCorr",&jt_pt_jettyCorr);
+    writer->addOutput("z_jettyCorr",&z_jettyCorr);
+
+    writer->addOutput("jt_ref_pt",&jt_ref_pt);
+    writer->addOutput("jt_ref_rap",&jt_ref_rap);
+    writer->addOutput("jt_ref_eta",&jt_ref_eta);
+    writer->addOutput("jt_ref_phi",&jt_ref_phi);
+    writer->addOutput("gen_z",&gen_z);
+    writer->addOutput("jt_pt_genZJEC",&jt_pt_genZJEC);
 }

@@ -10,6 +10,13 @@
 		},
 		{
 			"type": "shell",
+			"label": "C++: skim jet",
+			"command": "./skim.sh -jet;",
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"type": "shell",
 			"label": "C++: acceff",
 			"command": "./acceff.sh;",
 			"problemMatcher": [],

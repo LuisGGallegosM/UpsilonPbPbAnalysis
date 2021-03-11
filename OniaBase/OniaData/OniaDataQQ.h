@@ -1,7 +1,7 @@
 #ifndef ONIADATAQQ
 #define ONIADATAQQ
 
-#define maxBranchSize (32)
+#define maxBranchSize (64)
 
 #include "TClonesArray.h"
 #include "../../TreeProcessor/TreeReader.h"
@@ -67,6 +67,29 @@ struct OniaWhich
     Int_t GenQQWhichReco[maxBranchSize];
     Int_t GenMuWhichReco[maxBranchSize];
     Int_t RecoQQWhichGen[maxBranchSize];
+
+    void addInputs(TreeReader* reader);
+};
+
+struct OniaJetInfo
+{
+    Int_t pPAprimaryVertexFilter;
+    Int_t pBeamScrapingFilter;
+    Int_t nref;
+    Float_t rawpt[maxBranchSize];
+    Float_t pt[maxBranchSize];
+    Float_t eta[maxBranchSize];
+    Float_t y[maxBranchSize];
+    Float_t phi[maxBranchSize];
+    Float_t area[maxBranchSize];
+    Float_t m[maxBranchSize];
+    
+    Float_t refpt[maxBranchSize];
+    Float_t refeta[maxBranchSize];
+    Float_t refy[maxBranchSize];
+    Float_t refphi[maxBranchSize];
+    Float_t refm[maxBranchSize];
+    Float_t refarea[maxBranchSize];
 
     void addInputs(TreeReader* reader);
 };

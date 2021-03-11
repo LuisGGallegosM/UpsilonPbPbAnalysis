@@ -28,6 +28,21 @@ void OniaWriterGen<OniaReaderGenOnly>::writeQQ(const OniaReaderGenOnly* dataIn, 
     writer.FillEntries(); 
 }
 
+double jeuCorr (double jtPt, double z, double jeu) 
+{
+  return ( (1-z)*(1+jeu)*jtPt + z*jtPt );
+}
+
+double jecCorr(double jtPt, double rawPt, double jpsiPt) 
+{
+  return ( (1-(jpsiPt/rawPt))*jtPt + ((jpsiPt/rawPt)/(jtPt/rawPt))*jtPt );
+}
+
+double zjecCorr(double jtPt, double rawPt, double z) 
+{
+  return ( (1-z)*jtPt + z*rawPt );
+}
+
 void writePie(const std::map<int,int>& values, const std::string& name)
 {
     TCanvas canvas((name + " plot").data(),"fit",4,45,800,600);

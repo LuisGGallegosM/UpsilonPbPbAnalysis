@@ -41,16 +41,25 @@ bool CutParams::isMatchedQQ(const OniaWhich* which,int mupl_idx, int mumi_idx, i
     return true;
 }
 
-bool CutParams::kineticCut(const TLorentzVector* mom4,const TLorentzVector* mom4_mumi,const TLorentzVector* mom4_mupl )
+bool CutParams::kineticQQCut(const OniaRecoQQ* recoQQ, int index)
 {
+    TLorentzVector* mom4= (TLorentzVector*) recoQQ->mom4->At(index);
+    if (mom4==nullptr) return false;
     if ((mom4->Pt() < ptLow) || (mom4->Pt() > ptHigh)) return false;
     if (( fabs(mom4->Rapidity()) < yLow) || (fabs(mom4->Rapidity()) >yHigh)) return false;
-    
+    if (recoQQ->VtxProb[index] < minVtxProb) return false;
+    return true;
+}
+
+bool CutParams::kineticMuCut(const OniaRecoMu* recoMu, int mupl_idx, int mumi_idx)
+{
+    TLorentzVector* mom4_mupl = (TLorentzVector*) recoMu->mom4->At(mupl_idx);
+    TLorentzVector* mom4_mumi = (TLorentzVector*) recoMu->mom4->At(mumi_idx);
+    if((mom4_mumi==nullptr) || (mom4_mupl==nullptr)) return false;
     if (mom4_mumi->Pt() < singleMuPtLow) return false;
     if (fabs(mom4_mumi->Eta()) > singleMuEtaHigh) return false;
     if (mom4_mupl->Pt() < singleMuPtLow) return false;
     if (fabs(mom4_mupl->Eta()) > singleMuEtaHigh) return false;
-
     return true;
 }
 
@@ -62,10 +71,10 @@ bool CutParams::isTriggered(const OniaRecoQQ* recoQQ, int index)
     return true;
 }
 
-bool CutParams::cut(const OniaReaderMC* input,Int_t index,Int_t entry)
+template<>
+bool CutParams::cut<OniaReaderMC>(const OniaReaderMC* input,Int_t index,Int_t entry)
 {
     if (!isTriggered(&input->recoQQ,index)) return false;
-
     int mupl_idx = input->recoQQ.mupl_idx[index];//plus muon index
     int mumi_idx = input->recoQQ.mumi_idx[index];//minus muon index
     if ((mupl_idx <0) || (mumi_idx<0)) return false;
@@ -75,42 +84,30 @@ bool CutParams::cut(const OniaReaderMC* input,Int_t index,Int_t entry)
     //check if plus and minus muons are soft
     if (!isSoft(&input->recoMu,mupl_idx)) return false;
     if (!isSoft(&input->recoMu,mumi_idx)) return false;
-
     //kinetic cut
-    TLorentzVector* mom4= (TLorentzVector*) input->recoQQ.mom4->At(index);
-    TLorentzVector* mom4_mupl = (TLorentzVector*) input->recoMu.mom4->At(mupl_idx);
-    TLorentzVector* mom4_mumi = (TLorentzVector*) input->recoMu.mom4->At(mumi_idx);
-
-    if((mom4==nullptr) || (mom4_mumi==nullptr) || (mom4_mupl==nullptr)) return false;
-
-    if (!kineticCut(mom4,mom4_mumi,mom4_mupl)) return false;
-
-    if (input->recoQQ.VtxProb[index] < minVtxProb) return false;
+    if (!kineticQQCut(&input->recoQQ,index)) return false;
+    if (!kineticMuCut(&input->recoMu,mupl_idx,mumi_idx)) return false;
+    
     return true;
 }
 
-bool CutParams::cut(const OniaReaderRealData* input,Int_t index,Int_t entry)
+template<>
+bool CutParams::cut<OniaJetReaderMC>(const OniaJetReaderMC* input,Int_t index,Int_t entry)
 {
     if (!isTriggered(&input->recoQQ,index)) return false;
-
     int mupl_idx = input->recoQQ.mupl_idx[index];//plus muon index
     int mumi_idx = input->recoQQ.mumi_idx[index];//minus muon index
     if ((mupl_idx <0) || (mumi_idx<0)) return false;
 
+    //check if muon is matched
+    if(!isMatchedQQ(&input->which,mupl_idx,mumi_idx,index)) return false;
     //check if plus and minus muons are soft
     if (!isSoft(&input->recoMu,mupl_idx)) return false;
     if (!isSoft(&input->recoMu,mumi_idx)) return false;
-
     //kinetic cut
-    TLorentzVector* mom4= (TLorentzVector*) input->recoQQ.mom4->At(index);
-    TLorentzVector* mom4_mupl = (TLorentzVector*) input->recoMu.mom4->At(mupl_idx);
-    TLorentzVector* mom4_mumi = (TLorentzVector*) input->recoMu.mom4->At(mumi_idx);
-
-    if((mom4==nullptr) || (mom4_mumi==nullptr) || (mom4_mupl==nullptr)) return false;
-
-    if (!kineticCut(mom4,mom4_mumi,mom4_mupl)) return false;
-
-    if (input->recoQQ.VtxProb[index] < minVtxProb) return false;
+    if (!kineticQQCut(&input->recoQQ,index)) return false;
+    if (!kineticMuCut(&input->recoMu,mupl_idx,mumi_idx)) return false;
+    
     return true;
 }
 

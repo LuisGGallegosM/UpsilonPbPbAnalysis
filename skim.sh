@@ -3,6 +3,7 @@
 CLING="NO"
 
 FLAGS=${1:-""}
+FLAGS2=${2:-"-nocmd"}
 
 #input file to skim
 INPUTFILE="../rootfiles/datasets/merged_HiForestAOD_MCFix2.root"
@@ -17,12 +18,17 @@ OUTPUTFILE="${OUTPUTFOLDER}/${OUTPUTFILENAME}"
 
 mkdir -p $OUTPUTFOLDER
 
-#execute skim
-if [ $CLING = "YES" ]
+if [ $FLAGS2 = "-cmd" ]
 then
-cd Skimming
-root -q 'Skimming.cpp("'../${INPUTFILE}'","'../${OUTPUTFILE}'","'../${CONFIG}'")'
-cd ..
+    echo ${FLAGS} "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}"
 else
-./Skimming/skim ${FLAGS} "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}"
+        #execute skim
+    if [ $CLING = "YES" ]
+    then
+        cd Skimming
+        root -q 'Skimming.cpp("'../${INPUTFILE}'","'../${OUTPUTFILE}'","'../${CONFIG}'")'
+        cd ..
+    else
+        ./Skimming/skim ${FLAGS} "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}"
+    fi
 fi

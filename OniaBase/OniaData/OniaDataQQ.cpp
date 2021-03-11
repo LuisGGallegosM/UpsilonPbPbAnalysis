@@ -61,3 +61,24 @@ void OniaWhich::addInputs(TreeReader* reader)
     reader->addInput("Gen_QQ_whichRec",GenQQWhichReco);
     reader->addInput("Reco_QQ_whichGen",RecoQQWhichGen);
 }
+
+void OniaJetInfo::addInputs(TreeReader* reader)
+{
+    //reader->addInput("pBeamScrapingFilter",&pBeamScrapingFilter);
+    //reader->addInput("pPAprimaryVertexFilter",&pPAprimaryVertexFilter);
+    reader->addInput("nref",&nref);
+    reader->addInput("rawpt",rawpt);
+    reader->addInput("jtpt",pt);
+    reader->addInput("jteta",eta);
+    reader->addInput("jty",y);
+    reader->addInput("jtphi",phi);
+    reader->addInput("jtarea",area);
+    reader->addInput("jtm",m);
+    
+    reader->addInput("refpt",refpt);
+    reader->addInput("refeta",refeta);
+    reader->addInput("refy",refy);
+    reader->addInput("refphi",refphi);
+    reader->addInput("refm",refm);
+    reader->addInput("refarea",refarea);
+}
