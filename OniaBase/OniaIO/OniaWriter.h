@@ -1,12 +1,12 @@
 #ifndef ONIAWRITER
 #define ONIAWRITER
 
-#include"TLorentzVector.h"
-#include"../TreeProcessor/TreeWriter.h"
+#include"../../TreeProcessor/TreeWriter.h"
+#include"../JEC/JetCorrector.h"
+#include"../JEC/JetUncertainty.h"
 #include"OniaReader.h"
-#include"OniaData/OniaDataSimple.h"
-#include"JEC/JetCorrector.h"
-#include"JEC/JetUncertainty.h"
+#include"OniaDataSimple.h"
+#include"TLorentzVector.h"
 
 double jeuCorr (double jtPt, double z, double jeu);
 double jecCorr(double jtPt, double rawPt, double jpsiPt);

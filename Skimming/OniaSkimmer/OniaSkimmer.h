@@ -3,8 +3,7 @@
 #define ONIASKIMMER
 
 #include "../../TreeProcessor/TreeProcessor.h"
-#include "../../OniaBase/OniaReader.h"
-#include "../../OniaBase/OniaWriter.h"
+#include "../../OniaBase/OniaIO/OniaIO.h"
 #include "../Skimmer.h"
 #include "OniaCutter.h"
 

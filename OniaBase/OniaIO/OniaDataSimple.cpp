@@ -41,7 +41,7 @@ void OniaSimpleMu::Write(TLorentzVector* muonPl, TLorentzVector* muonMi)
     phi_pl = muonPl->Phi();
 }
 
-void OniaSimpleMu::addOutputs(TreeWriter* writer, const char* prefix=nullptr)
+void OniaSimpleMu::addOutputs(TreeWriter* writer, const char* prefix)
 {
     writer->addOutput("pT_mi",&pT_mi, prefix);
     writer->addOutput("pT_pl",&pT_pl, prefix);

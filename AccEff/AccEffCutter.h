@@ -3,7 +3,7 @@
 #define ACCEFFCUTTER
 
 #include "TLorentzVector.h"
-#include "../OniaBase/OniaReader.h"
+#include "../OniaBase/OniaIO/OniaIO.h"
 #include "../OniaBase/CutParams.h"
 
 class AccCutter

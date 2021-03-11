@@ -1,7 +1,7 @@
 #ifndef ONIAJETCUTTER
 #define ONIAJETCUTTER
 
-#include "../../OniaBase/OniaReader.h"
+#include "../../OniaBase/OniaIO/OniaIO.h"
 #include "../../OniaBase/CutParams.h"
 #include "../Skimmer.h"
 

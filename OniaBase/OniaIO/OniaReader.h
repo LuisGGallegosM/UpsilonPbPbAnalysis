@@ -2,9 +2,9 @@
 #ifndef ONIADATA
 #define ONIADATA
 
+#include "../../TreeProcessor/TreeReader.h"
+#include "OniaDataQQ.h"
 #include "TClonesArray.h"
-#include "../TreeProcessor/TreeReader.h"
-#include "OniaData/OniaDataQQ.h"
 
 class OniaReaderRealData
 {

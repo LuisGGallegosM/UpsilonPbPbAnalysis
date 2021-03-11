@@ -5,8 +5,7 @@
 #include "TEfficiency.h"
 
 #include "../TreeProcessor/TreeProcessor.h"
-#include "../OniaBase/OniaWriter.h"
-#include "../OniaBase/OniaReader.h"
+#include "../OniaBase/OniaIO/OniaIO.h"
 #include "AccEffCutter.h"
 #include "AccEffAux.h"
 

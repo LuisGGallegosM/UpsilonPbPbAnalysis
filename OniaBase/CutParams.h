@@ -2,7 +2,7 @@
 #define SKIMPARAMS
 
 #include "../Utils/serialize.h"
-#include "OniaReader.h"
+#include "OniaIO/OniaIO.h"
 #include "TLorentzVector.h"
 
 //changed to Jpsi that is currently hardcoded to Jpsi

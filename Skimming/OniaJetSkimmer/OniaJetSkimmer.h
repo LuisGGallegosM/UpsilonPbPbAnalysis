@@ -2,8 +2,7 @@
 #define ONIAJETSKIMMER
 
 #include "../../TreeProcessor/TreeProcessor.h"
-#include "../../OniaBase/OniaReader.h"
-#include "../../OniaBase/OniaWriter.h"
+#include "../../OniaBase/OniaIO/OniaIO.h"
 #include "../../OniaBase/JEC/JetCorrector.h"
 #include "../../OniaBase/JEC/JetUncertainty.h"
 #include "../Skimmer.h"
