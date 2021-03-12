@@ -9,6 +9,7 @@ OUTPUT:=fit
 
 fit : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	g++ ${SOURCES} ${STATICLIBS} ${INC} ${LIBS} ${FLAGS} ${OUTPUT}
+	objdump -d -S -Mintel --no-show-raw-insn ${OUTPUT} > ${OUTPUT}.s
 
 ../TreeProcessor/libTreeProcessor.a :
 	$(MAKE) -C ../TreeProcessor
@@ -20,4 +21,4 @@ fit : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	$(MAKE) -C ../OniaBase
 
 clear :
-	rm -f fit
+	rm -f fit *.o *.s

@@ -9,6 +9,7 @@ OUTPUT:=draw
 
 draw : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	g++ ${SOURCES} ${STATICLIBS} ${INC} ${LIBS} ${FLAGS} ${OUTPUT}
+	objdump -d -S -Mintel --no-show-raw-insn ${OUTPUT} > ${OUTPUT}.s
 
 ../TreeProcessor/libTreeProcessor.a :
 	$(MAKE) -C ../TreeProcessor
@@ -20,4 +21,4 @@ draw : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	$(MAKE) -C ../OniaBase
 
 clear :
-	rm -f draw
+	rm -f draw *.o *.s
