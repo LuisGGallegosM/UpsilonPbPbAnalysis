@@ -11,6 +11,8 @@
 double jeuCorr (double jtPt, double z, double jeu);
 double jecCorr(double jtPt, double rawPt, double jpsiPt);
 double zjecCorr(double jtPt, double rawPt, double z);
+float getCorrectedPt(JetCorrector* JEC,const OniaJetInfo* inputJet, int iJet);
+float zTolerance(float z);
 
 template<typename Reader>
 class OniaWriter
@@ -97,53 +99,71 @@ class OniaWriterJet
     OniaSimpleQQ recoQQOut;
     OniaSimpleQQ genQQOut;
     OniaSimpleMu oniaMuOut;
-    OniaSimpleJet oniaJetOut;
+    OniaSimpleJet jetOut;
+    OniaSimpleRefJet refJetOut;
 
     void writeJet(const Reader* input, int index, int iJet, JetCorrector* JEC, JetUncertainty* JEU)
     {
-        const OniaJetInfo* inJet =  &(input->jetInfo);
+        const OniaJetInfo* inputJet =  &(input->jetInfo);
         const TLorentzVector* recoQQmom4 =(TLorentzVector*) input->recoQQ.mom4->At(index);
-        const TLorentzVector* genQQmom4 = (TLorentzVector*) input->genQQ.mom4->At(input->which.RecoQQWhichGen[index]);
-        float pt=recoQQmom4->Pt();
+        float recoQQpt=recoQQmom4->Pt();
 
-        oniaJetOut.jt_eta = inJet->eta[iJet];
-        oniaJetOut.jt_phi = inJet->phi[iJet];
-        oniaJetOut.jt_rap = inJet->y[iJet];
+        float jt_pt_noZJEC = getCorrectedPt(JEC,inputJet,iJet);
+        float jt_pt=jecCorr(jt_pt_noZJEC, inputJet->rawpt[iJet],recoQQpt);
+        float z = zTolerance(recoQQpt/jt_pt);
 
-        JEC->SetJetPT(input->jetInfo.rawpt[iJet]);
-        JEC->SetJetEta(oniaJetOut.jt_eta);
-        JEC->SetJetPhi(oniaJetOut.jt_phi);
-        JEC->SetRho(1);
-        JEC->SetJetArea(input->jetInfo.area[iJet]);
-        float jt_pt_noZJEC = JEC->GetCorrectedPT();
+        jetOut.jt_eta = inputJet->eta[iJet];
+        jetOut.jt_phi = inputJet->phi[iJet];
+        jetOut.jt_rap = inputJet->y[iJet];
+        jetOut.jt_pt_noZJEC = jt_pt_noZJEC;
+        jetOut.jt_pt = jt_pt;
+        jetOut.z = z;
 
-        oniaJetOut.jt_pt = jecCorr(jt_pt_noZJEC, inJet->rawpt[iJet],pt);
-	    oniaJetOut.z = recoQQmom4->Pt()/oniaJetOut.jt_pt;
-	    if (oniaJetOut.z >= 1.0f && oniaJetOut.z <= 1.0001f) oniaJetOut.z = 0.9999f;
+        jetOut.jt_pt_jettyCorr = recoQQpt;
+        if ( inputJet->rawpt[iJet] > recoQQpt ) 
+        {
+            JEC->SetJetPT(inputJet->rawpt[iJet]-recoQQpt); 
+            jetOut.jt_pt_jettyCorr = recoQQpt+JEC->GetCorrectedPT();
+        }
+        jetOut.z_jettyCorr = recoQQpt/jetOut.jt_pt_jettyCorr;
 
         JEU->SetJetPT(jt_pt_noZJEC);
-        JEU->SetJetEta(oniaJetOut.jt_eta);
-        JEU->SetJetPhi(oniaJetOut.jt_phi);
+        JEU->SetJetEta(inputJet->eta[iJet]);
+        JEU->SetJetPhi(inputJet->phi[iJet]);
+	    jetOut.jt_pt_JEU_Down = jeuCorr(jt_pt, z, -1*(JEU->GetUncertainty().first));
+	    jetOut.jt_pt_JEU_Up = jeuCorr(jt_pt, z, JEU->GetUncertainty().second);
 
-	    oniaJetOut.jt_pt_JEU_Down = jeuCorr(oniaJetOut.jt_pt, oniaJetOut.z, -1*(JEU->GetUncertainty().first));
-	    oniaJetOut.jt_pt_JEU_Up = jeuCorr(oniaJetOut.jt_pt, oniaJetOut.z, JEU->GetUncertainty().second);
+    }
 
-        oniaJetOut.jt_ref_eta = inJet->refeta[iJet];
-        oniaJetOut.jt_ref_phi = inJet->refphi[iJet];
-        oniaJetOut.jt_ref_rap = inJet->refy[iJet];
-        oniaJetOut.jt_ref_pt = inJet->refpt[iJet];
+    void writeRefJet(const Reader* input, int index, int iJet, float jt_pt_noZJEC)
+    {
+        const OniaJetInfo* inputJet =  &(input->jetInfo);
+        const TLorentzVector* genQQmom4 = (TLorentzVector*) input->genQQ.mom4->At(input->which.RecoQQWhichGen[index]);
+        refJetOut.jt_ref_eta = inputJet->refeta[iJet];
+        refJetOut.jt_ref_phi = inputJet->refphi[iJet];
+        refJetOut.jt_ref_rap = inputJet->refy[iJet];
+        refJetOut.jt_ref_pt = inputJet->refpt[iJet];
+        refJetOut.gen_z = genQQmom4->Pt()/refJetOut.jt_ref_pt;
+	    if (refJetOut.gen_z >= 1 && refJetOut.gen_z <= 1.0001) refJetOut.gen_z = 0.9999;
+	    refJetOut.jt_pt_genZJEC = zjecCorr(jt_pt_noZJEC, inputJet->rawpt[iJet], refJetOut.gen_z);
+    }
 
-        oniaJetOut.jt_pt_jettyCorr = pt;
-        if ( inJet->rawpt[iJet] > pt ) 
-        {
-            JEC->SetJetPT(inJet->rawpt[iJet]-pt); 
-            oniaJetOut.jt_pt_jettyCorr = pt+JEC->GetCorrectedPT();
-        }
-        oniaJetOut.z_jettyCorr = pt/oniaJetOut.jt_pt_jettyCorr;
+    void writeQQ(const Reader* dataIn, int iQQ,int entry)
+    {
+        TLorentzVector *RecoQQ4mom = (TLorentzVector*) dataIn->recoQQ.mom4->At(iQQ);
+        TLorentzVector *GenQQ4mom = (TLorentzVector*) dataIn->genQQ.mom4->At(dataIn->which.RecoQQWhichGen[iQQ]);
+        oniaInfoOut.Write(entry,dataIn->genQQ.id[iQQ]);
+        recoQQOut.Write(RecoQQ4mom);
+        genQQOut.Write(GenQQ4mom);
+    }
 
-        oniaJetOut.gen_z = genQQmom4->Pt()/oniaJetOut.jt_ref_pt;
-	    if (oniaJetOut.gen_z >= 1 && oniaJetOut.gen_z <= 1.0001) oniaJetOut.gen_z = 0.9999;
-	    oniaJetOut.jt_pt_genZJEC = zjecCorr(jt_pt_noZJEC, inJet->rawpt[iJet], oniaJetOut.gen_z);
+    void writeMu(const Reader* dataIn, int iQQ)
+    {
+        int mumi_idx= dataIn->recoQQ.mumi_idx[iQQ];
+        int mupl_idx= dataIn->recoQQ.mupl_idx[iQQ];
+        TLorentzVector* mumi = (TLorentzVector*) dataIn->recoMu.mom4->At(mumi_idx);
+        TLorentzVector* mupl = (TLorentzVector*) dataIn->recoMu.mom4->At(mupl_idx);
+        oniaMuOut.Write(mupl,mumi);
     }
 
     public:
@@ -155,23 +175,16 @@ class OniaWriterJet
         recoQQOut.addOutputs(&writer,"reco_");
         genQQOut.addOutputs(&writer,"gen_");
         oniaMuOut.addOutputs(&writer, "reco_");
-        oniaJetOut.addOutputs(&writer);
+        jetOut.addOutputs(&writer);
+        refJetOut.addOutputs(&writer);
     }
 
-    void writeQQ(const Reader* dataIn, int iQQ, int iJet, int entry, JetCorrector* JEC, JetUncertainty* JEU)
+    void write(const Reader* dataIn, int iQQ, int iJet, int entry, JetCorrector* JEC, JetUncertainty* JEU)
     {
-        TLorentzVector *RecoQQ4mom = (TLorentzVector*) dataIn->recoQQ.mom4->At(iQQ);
-        TLorentzVector *GenQQ4mom = (TLorentzVector*) dataIn->genQQ.mom4->At(dataIn->which.RecoQQWhichGen[iQQ]);
-        oniaInfoOut.Write(entry,dataIn->genQQ.id[iQQ]);
-        recoQQOut.Write(RecoQQ4mom);
-        genQQOut.Write(GenQQ4mom);
-        int mumi_idx= dataIn->recoQQ.mumi_idx[iQQ];
-        int mupl_idx= dataIn->recoQQ.mupl_idx[iQQ];
-        TLorentzVector* mumi = (TLorentzVector*) dataIn->recoMu.mom4->At(mumi_idx);
-        TLorentzVector* mupl = (TLorentzVector*) dataIn->recoMu.mom4->At(mupl_idx);
-        oniaMuOut.Write(mupl,mumi);
-
+        writeQQ(dataIn,iQQ,entry);
+        writeMu(dataIn,iQQ);
         writeJet(dataIn,iQQ,iJet,JEC,JEU);
+        writeRefJet(dataIn,iQQ,iJet,jetOut.jt_pt_noZJEC);
         
         writer.FillEntries(); 
     }

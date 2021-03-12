@@ -1,5 +1,5 @@
 
-FLAGS=-g -o
+FLAGS=$(shell ../HelperScripts/compilerFlags.sh ) -o
 SOURCES:=$(wildcard *.cpp)
 HEADERS:=$(wildcard *.h)
 STATICLIBS:=../Utils/libUtils.a ../TreeProcessor/libTreeProcessor.a ../OniaBase/libOniaBase.a

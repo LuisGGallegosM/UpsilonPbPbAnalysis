@@ -62,7 +62,11 @@ void OniaSimpleJet::addOutputs(TreeWriter* writer)
     writer->addOutput("jt_pt_JEU_Up",&jt_pt_JEU_Up);
     writer->addOutput("jt_pt_jettyCorr",&jt_pt_jettyCorr);
     writer->addOutput("z_jettyCorr",&z_jettyCorr);
+    writer->addOutput("jt_pt_noZJEC",&jt_pt_noZJEC);
+}
 
+void OniaSimpleRefJet::addOutputs(TreeWriter* writer)
+{
     writer->addOutput("jt_ref_pt",&jt_ref_pt);
     writer->addOutput("jt_ref_rap",&jt_ref_rap);
     writer->addOutput("jt_ref_eta",&jt_ref_eta);

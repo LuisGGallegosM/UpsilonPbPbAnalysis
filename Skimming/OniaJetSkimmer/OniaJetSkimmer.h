@@ -35,7 +35,7 @@ class OniaJetSkimmer : public TreeProcessor, public Skimmer
                 int iJet=FindJet(iQQ);
                 if(iJet< oniaReader.jetInfo.nref)
                 {
-                    oniaWriter.writeQQ(&oniaReader,iQQ,iJet,entry,&jecCorrector,&jecUncertainty);
+                    oniaWriter.write(&oniaReader,iQQ,iJet,entry,&jecCorrector,&jecUncertainty);
                 }
             }
         }

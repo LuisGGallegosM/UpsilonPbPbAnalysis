@@ -53,13 +53,20 @@ struct OniaSimpleJet
     Float_t jt_pt_JEU_Up;
     Float_t jt_pt_jettyCorr;
     Float_t z_jettyCorr;
+    Float_t jt_pt_noZJEC;
 
+    void addOutputs(TreeWriter* writer);
+};
+
+struct OniaSimpleRefJet
+{
     Float_t jt_ref_pt;
     Float_t jt_ref_rap;
     Float_t jt_ref_eta;
     Float_t jt_ref_phi;
     Float_t gen_z;
     Float_t jt_pt_genZJEC;
+
     void addOutputs(TreeWriter* writer);
 };
 

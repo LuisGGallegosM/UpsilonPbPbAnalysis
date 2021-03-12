@@ -10,22 +10,39 @@ void writePie(const std::map<int,int>& values, const std::string& name);
 
 int getRecoPdgId(const OniaReaderMC* dataIn, int index)
 {
-    int pdgId=0;
-    int genQQindex=dataIn->which.RecoQQWhichGen[index];
-    if (genQQindex>=0)
-        pdgId= dataIn->genQQ.id[genQQindex];
-    return pdgId;
+  int pdgId=0;
+  int genQQindex=dataIn->which.RecoQQWhichGen[index];
+  if (genQQindex>=0)
+      pdgId= dataIn->genQQ.id[genQQindex];
+  return pdgId;
 }
 
 template<>
 void OniaWriterGen<OniaReaderGenOnly>::writeQQ(const OniaReaderGenOnly* dataIn, int index, int entry)
 {
-    oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
-    oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
-    TLorentzVector* mumi = (TLorentzVector*) dataIn->genQQ.mumi_mom4->At(index);
-    TLorentzVector* mupl = (TLorentzVector*) dataIn->genQQ.mupl_mom4->At(index);
-    oniaMuOut.Write(mupl,mumi);
-    writer.FillEntries(); 
+  oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
+  oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
+  TLorentzVector* mumi = (TLorentzVector*) dataIn->genQQ.mumi_mom4->At(index);
+  TLorentzVector* mupl = (TLorentzVector*) dataIn->genQQ.mupl_mom4->At(index);
+  oniaMuOut.Write(mupl,mumi);
+  writer.FillEntries(); 
+}
+
+float getCorrectedPt(JetCorrector* JEC,const OniaJetInfo* inputJet, int iJet)
+{
+  JEC->SetJetPT(inputJet->rawpt[iJet]);
+  JEC->SetJetEta(inputJet->eta[iJet]);
+  JEC->SetJetPhi(inputJet->phi[iJet]);
+  JEC->SetRho(1);
+  JEC->SetJetArea(inputJet->area[iJet]);
+  return JEC->GetCorrectedPT();
+}
+
+float zTolerance(float z)
+{
+  float result=z;
+  if (z >= 1.0f && z <= 1.0001f) result = 0.9999f;
+  return result;
 }
 
 double jeuCorr (double jtPt, double z, double jeu) 

@@ -1,5 +1,5 @@
 
-FLAGS=-g -c
+FLAGS=$(shell ../HelperScripts/compilerFlags.sh ) -c
 SOURCES:=$(wildcard *.cpp)
 HEADERS:=$(wildcard *.h)
 INC:=-I $(shell $(ROOTSYS)/bin/root-config --cflags)
