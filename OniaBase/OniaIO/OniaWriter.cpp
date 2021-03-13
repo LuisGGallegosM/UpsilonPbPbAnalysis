@@ -38,6 +38,21 @@ float getCorrectedPt(JetCorrector* JEC,const OniaJetInfo* inputJet, int iJet)
   return JEC->GetCorrectedPT();
 }
 
+float getJettyCorr(JetCorrector* JEC,const OniaJetInfo* inputJet, int iJet,float recoQQpt)
+{
+  float result = recoQQpt;
+  if ( inputJet->rawpt[iJet] > recoQQpt ) 
+  {
+    JEC->SetJetPT(inputJet->rawpt[iJet]-recoQQpt);
+    JEC->SetJetEta(inputJet->eta[iJet]);
+    JEC->SetJetPhi(inputJet->phi[iJet]);
+    JEC->SetRho(1);
+    JEC->SetJetArea(inputJet->area[iJet]);
+    result = recoQQpt+JEC->GetCorrectedPT();
+  }
+  return result;
+}
+
 float zTolerance(float z)
 {
   float result=z;
@@ -82,4 +97,28 @@ void writePie(const std::map<int,int>& values, const std::string& name)
     pie.Write();
     canvas.Write();
     canvas.SaveAs("/media/luisg/ALMACEN/rootfiles/test/pdgId.pdf");
+}
+
+TH2F* createTH2Z(const std::string& name,const std::string& title)
+{
+    const int binyN = 10;
+    TH2F* result =new TH2F(name.data(),title.data(),binyN,0.0,1.0,binyN,0.0,1.0);
+    result->SetStats(false);
+    result->Sumw2();
+    return result;
+}
+
+void writeToCanvasZ(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option)
+{
+    const std::string canvasName=std::string(hist->GetName())+" plot";
+    TCanvas canvas(canvasName.data(),canvasName.data(),4,45,600,600);
+    canvas.cd();
+    TPad pad("pad","fit", 0.08, 0.08, 0.92, 0.92);
+    pad.Draw();
+    pad.cd();
+    hist->GetYaxis()->SetTitle(yname.data());
+    hist->GetXaxis()->SetTitle(xname.data());
+    hist->Draw(option.data());
+    canvas.Write();
+    canvas.SaveAs(outname.data());
 }

@@ -10,6 +10,7 @@
 
 std::vector<std::string> LoadJECFiles(bool isMC);
 std::string LoadJEUFiles();
+int FindJet(const OniaJetInfo* jetInfo, JetCorrector* JEC, const TLorentzVector* RecoQQ4mom, const OniaJetRef* jetRef=nullptr);
 
 //template<typename Reader>
 class OniaJetSkimmer : public TreeProcessor, public Skimmer
@@ -21,8 +22,8 @@ class OniaJetSkimmer : public TreeProcessor, public Skimmer
     //OniaWriterJet<Reader> oniaWriter;
     OniaWriterJet oniaWriter;
 
-    JetCorrector jecCorrector;
-    JetUncertainty jecUncertainty;
+    JetCorrector JEC;
+    JetUncertainty JEU;
 
     void ProcessEvent(Long64_t entry) override
     {
@@ -32,44 +33,19 @@ class OniaJetSkimmer : public TreeProcessor, public Skimmer
         {
             if (oniaCutter.cut(&oniaReader,iQQ,entry))
             {
-                int iJet=FindJet(iQQ);
-                if(iJet< oniaReader.jetInfo.nref)
+                int iJet=FindJet(&oniaReader.jetInfo,&JEC,(TLorentzVector*)oniaReader.recoQQ.mom4->At(iQQ),&oniaReader.jetRef);
+                if(iJet>=0)
                 {
-                    oniaWriter.write(&oniaReader,iQQ,iJet,entry,&jecCorrector,&jecUncertainty);
+                    oniaWriter.write(&oniaReader,iQQ,iJet,entry,&JEC,&JEU);
                 }
             }
         }
     }
 
-    int FindJet(int index)
-    {
-        const int jetNumber= oniaReader.jetInfo.nref;
-        const float drmin=0.5f;
-        int iJet=0;
-        for(;iJet< jetNumber;iJet++)
-        {
-            if (oniaReader.jetInfo.refpt[iJet] < 0.0f) continue;
-            float jt_eta=oniaReader.jetInfo.eta[iJet];
-            float jt_phi=oniaReader.jetInfo.phi[iJet];
-            jecCorrector.SetJetPT(oniaReader.jetInfo.rawpt[iJet]);
-            jecCorrector.SetJetEta(jt_eta);
-            jecCorrector.SetJetPhi(jt_phi);
-            jecCorrector.SetRho(1);
-            jecCorrector.SetJetArea(oniaReader.jetInfo.area[iJet]);
-            float jt_pt_noZJEC = jecCorrector.GetCorrectedPT();
-
-            TLorentzVector v_jet;
-	        v_jet.SetPtEtaPhiM(jt_pt_noZJEC, jt_eta, jt_phi, oniaReader.jetInfo.m[iJet]);
-            TLorentzVector* RecoQQ4mom= (TLorentzVector*) oniaReader.recoQQ.mom4->At(index);
-            if (RecoQQ4mom->DeltaR(v_jet)<=drmin) break;
-        }
-        return iJet;
-    }
-
     public:
     OniaJetSkimmer(TTree* tree , const CutParams* cutter, const char* outTreeName): 
         oniaCutter(cutter) ,oniaReader(tree), oniaWriter(outTreeName),
-        jecCorrector(LoadJECFiles(cutter->getIsMC())), jecUncertainty(LoadJEUFiles())
+        JEC(LoadJECFiles(cutter->getIsMC())), JEU(LoadJEUFiles())
     {
     }
 

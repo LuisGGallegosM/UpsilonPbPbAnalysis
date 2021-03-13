@@ -37,6 +37,7 @@ struct OniaRecoQQ
     Int_t sign[maxBranchSize];
     Float_t VtxProb[maxBranchSize];
     ULong64_t trig[maxBranchSize];
+    Float_t ctau[maxBranchSize];
 
     void addInputs(TreeReader* reader);
 };
@@ -83,7 +84,12 @@ struct OniaJetInfo
     Float_t phi[maxBranchSize];
     Float_t area[maxBranchSize];
     Float_t m[maxBranchSize];
-    
+
+    void addInputs(TreeReader* reader);
+};
+
+struct OniaJetRef
+{
     Float_t refpt[maxBranchSize];
     Float_t refeta[maxBranchSize];
     Float_t refy[maxBranchSize];

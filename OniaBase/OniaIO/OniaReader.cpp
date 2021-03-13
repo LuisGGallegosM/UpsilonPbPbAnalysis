@@ -34,6 +34,7 @@ OniaJetReaderMC::OniaJetReaderMC(TTree* treeIn) :
     genQQ.addInputs(&reader);
     genMu.addInputs(&reader);
     jetInfo.addInputs(&reader);
+    jetRef.addInputs(&reader);
 }
 
 OniaJetReaderRealData::OniaJetReaderRealData(TTree* treeIn) : 

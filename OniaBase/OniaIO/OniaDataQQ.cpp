@@ -33,6 +33,7 @@ void OniaRecoQQ::addInputs(TreeReader* reader)
     reader->addInput("Reco_QQ_VtxProb",VtxProb);
     reader->addInput("Reco_QQ_trig",trig);
     reader->addInput("Reco_QQ_sign",sign);
+    reader->addInput("Reco_QQ_ctau", ctau);
 }
 
 void OniaRecoMu::addInputs(TreeReader* reader)
@@ -74,7 +75,10 @@ void OniaJetInfo::addInputs(TreeReader* reader)
     reader->addInput("jtphi",phi);
     reader->addInput("jtarea",area);
     reader->addInput("jtm",m);
-    
+}
+
+void OniaJetRef::addInputs(TreeReader* reader)
+{
     reader->addInput("refpt",refpt);
     reader->addInput("refeta",refeta);
     reader->addInput("refy",refy);

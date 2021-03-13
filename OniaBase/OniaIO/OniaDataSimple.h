@@ -29,6 +29,14 @@ struct OniaSimpleQQ
     void Write(TLorentzVector* dimuon);
 };
 
+struct OniaSimpleExtraQQ : public OniaSimpleQQ
+{
+    Float_t l;
+
+    void addOutputs(TreeWriter* writer, const char* prefix=nullptr);
+    void Write(TLorentzVector* dimuon, float ctau);
+};
+
 struct OniaSimpleMu
 {
     Float_t pT_mi;

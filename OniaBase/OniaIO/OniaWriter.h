@@ -7,12 +7,16 @@
 #include"OniaReader.h"
 #include"OniaDataSimple.h"
 #include"TLorentzVector.h"
+#include"TH2F.h"
 
 double jeuCorr (double jtPt, double z, double jeu);
 double jecCorr(double jtPt, double rawPt, double jpsiPt);
 double zjecCorr(double jtPt, double rawPt, double z);
 float getCorrectedPt(JetCorrector* JEC,const OniaJetInfo* inputJet, int iJet);
 float zTolerance(float z);
+float getJettyCorr(JetCorrector* JEC,const OniaJetInfo* inputJet, int iJet,float recoQQpt);
+TH2F* createTH2Z(const std::string& name,const std::string& title);
+void writeToCanvasZ(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option);
 
 template<typename Reader>
 class OniaWriter
@@ -96,11 +100,12 @@ class OniaWriterJet
     using Reader=OniaJetReaderMC;
     TreeWriter writer;
     OniaSimpleInfo oniaInfoOut;
-    OniaSimpleQQ recoQQOut;
+    OniaSimpleExtraQQ recoQQOut;
     OniaSimpleQQ genQQOut;
     OniaSimpleMu oniaMuOut;
     OniaSimpleJet jetOut;
     OniaSimpleRefJet refJetOut;
+    TH2F* zVsGenZ;
 
     void writeJet(const Reader* input, int index, int iJet, JetCorrector* JEC, JetUncertainty* JEU)
     {
@@ -119,12 +124,7 @@ class OniaWriterJet
         jetOut.jt_pt = jt_pt;
         jetOut.z = z;
 
-        jetOut.jt_pt_jettyCorr = recoQQpt;
-        if ( inputJet->rawpt[iJet] > recoQQpt ) 
-        {
-            JEC->SetJetPT(inputJet->rawpt[iJet]-recoQQpt); 
-            jetOut.jt_pt_jettyCorr = recoQQpt+JEC->GetCorrectedPT();
-        }
+        jetOut.jt_pt_jettyCorr = getJettyCorr(JEC,inputJet,iJet,recoQQpt);
         jetOut.z_jettyCorr = recoQQpt/jetOut.jt_pt_jettyCorr;
 
         JEU->SetJetPT(jt_pt_noZJEC);
@@ -137,15 +137,14 @@ class OniaWriterJet
 
     void writeRefJet(const Reader* input, int index, int iJet, float jt_pt_noZJEC)
     {
-        const OniaJetInfo* inputJet =  &(input->jetInfo);
+        const OniaJetRef* inputJet =  &(input->jetRef);
         const TLorentzVector* genQQmom4 = (TLorentzVector*) input->genQQ.mom4->At(input->which.RecoQQWhichGen[index]);
         refJetOut.jt_ref_eta = inputJet->refeta[iJet];
         refJetOut.jt_ref_phi = inputJet->refphi[iJet];
         refJetOut.jt_ref_rap = inputJet->refy[iJet];
         refJetOut.jt_ref_pt = inputJet->refpt[iJet];
-        refJetOut.gen_z = genQQmom4->Pt()/refJetOut.jt_ref_pt;
-	    if (refJetOut.gen_z >= 1 && refJetOut.gen_z <= 1.0001) refJetOut.gen_z = 0.9999;
-	    refJetOut.jt_pt_genZJEC = zjecCorr(jt_pt_noZJEC, inputJet->rawpt[iJet], refJetOut.gen_z);
+        refJetOut.gen_z = zTolerance(genQQmom4->Pt()/refJetOut.jt_ref_pt);
+	    refJetOut.jt_pt_genZJEC = zjecCorr(jt_pt_noZJEC, input->jetInfo.rawpt[iJet], refJetOut.gen_z);
     }
 
     void writeQQ(const Reader* dataIn, int iQQ,int entry)
@@ -153,7 +152,7 @@ class OniaWriterJet
         TLorentzVector *RecoQQ4mom = (TLorentzVector*) dataIn->recoQQ.mom4->At(iQQ);
         TLorentzVector *GenQQ4mom = (TLorentzVector*) dataIn->genQQ.mom4->At(dataIn->which.RecoQQWhichGen[iQQ]);
         oniaInfoOut.Write(entry,dataIn->genQQ.id[iQQ]);
-        recoQQOut.Write(RecoQQ4mom);
+        recoQQOut.Write(RecoQQ4mom,dataIn->recoQQ.ctau[iQQ]);
         genQQOut.Write(GenQQ4mom);
     }
 
@@ -177,6 +176,7 @@ class OniaWriterJet
         oniaMuOut.addOutputs(&writer, "reco_");
         jetOut.addOutputs(&writer);
         refJetOut.addOutputs(&writer);
+        zVsGenZ = createTH2Z("zVsGenZ","z vs gen_z");
     }
 
     void write(const Reader* dataIn, int iQQ, int iJet, int entry, JetCorrector* JEC, JetUncertainty* JEU)
@@ -185,12 +185,13 @@ class OniaWriterJet
         writeMu(dataIn,iQQ);
         writeJet(dataIn,iQQ,iJet,JEC,JEU);
         writeRefJet(dataIn,iQQ,iJet,jetOut.jt_pt_noZJEC);
-        
+        zVsGenZ->Fill(refJetOut.gen_z,jetOut.z);
         writer.FillEntries(); 
     }
     void Write()
     {
         writer.Write();
+        writeToCanvasZ(zVsGenZ,"gen_z","z","zVsGenz.pdf","COLZ");
     }
 };
 

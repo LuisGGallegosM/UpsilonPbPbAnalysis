@@ -1,1 +1,1 @@
-echo -g -O1
+echo -g -O1 -Wall -pedantic

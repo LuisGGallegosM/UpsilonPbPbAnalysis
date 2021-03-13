@@ -29,6 +29,18 @@ void OniaSimpleQQ::Write(TLorentzVector* dimuon)
     eta = dimuon->Eta();
 }
 
+void OniaSimpleExtraQQ::addOutputs(TreeWriter* writer,const char* prefix)
+{
+    OniaSimpleQQ::addOutputs(writer,prefix);
+    writer->addOutput("l",&l,prefix);
+}
+
+void OniaSimpleExtraQQ::Write(TLorentzVector* dimuon, float ctau)
+{
+    OniaSimpleQQ::Write(dimuon);
+    l = ctau;
+}
+
 //OniaSimpleMu
 
 void OniaSimpleMu::Write(TLorentzVector* muonPl, TLorentzVector* muonMi)

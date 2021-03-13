@@ -2,7 +2,7 @@
 #include"TreeReader.h"
 
 TreeReader::TreeReader(TTree* treeIn) 
-    :inputTree(treeIn) ,inputBranches()
+    :inputBranches(),inputTree(treeIn)
 {
 }
 

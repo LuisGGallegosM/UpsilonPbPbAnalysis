@@ -56,6 +56,7 @@ class OniaJetReaderMC
     OniaGenMu genMu;
     OniaWhich which;
     OniaJetInfo jetInfo;
+    OniaJetRef jetRef;
 
     OniaJetReaderMC(TTree* treeIn);
     const TreeReader* getReader() const {return &reader;} 
