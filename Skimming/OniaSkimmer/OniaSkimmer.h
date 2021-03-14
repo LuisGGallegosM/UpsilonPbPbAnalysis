@@ -11,18 +11,19 @@ template<typename Reader>
 class OniaSkimmerBase : public TreeProcessor, public Skimmer
 {
     private:
-    Reader oniaReader;
+    OniaReader<Reader> oniaReader;
     std::unique_ptr<Cutter<Reader>> oniaCutter;
     OniaWriterRecoQQ oniaWriter;
     void ProcessEvent(Long64_t entry) override
     {
-        Long64_t size=oniaReader.recoQQ.size;
+        auto input= oniaReader.getData();
+        Long64_t size=input->recoQQ.size;
         
         for(Long64_t iQQ=0;iQQ<size;++iQQ)
         {
-            if (oniaCutter->cut(&oniaReader,iQQ,entry))
+            if (oniaCutter->cut(input,iQQ,entry))
             {
-                oniaWriter.writeData(&oniaReader,iQQ,entry);
+                oniaWriter.writeData(input,iQQ,entry);
                 FillEntries();
             }
         }
