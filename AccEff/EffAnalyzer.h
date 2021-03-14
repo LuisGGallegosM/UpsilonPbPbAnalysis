@@ -32,9 +32,9 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
     std::unique_ptr<TEfficiency> ptQQEfficiency;
     std::unique_ptr<TEfficiency> etaVsPtQQEfficiency;
 
-    Reader oniaReader;
+    OniaReader<Reader> oniaReader;
     EffCutter effCutter;
-    OniaWriterReco<Reader> oniaWriter;
+    OniaWriterRecoQQ oniaWriter;
     std::unique_ptr<AccCutter> accCutter;
 
     void Analyze(Int_t index, Long64_t entry);
@@ -46,12 +46,12 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
 
     void Write(const std::string& basename) override;
 
-    void Test() override { Process(oniaReader.getReader()); }
+    void Test() override { Process(); }
     void ProcessEvent(Long64_t entry) override;
 };
 
-using EffAnalyzerRealData = EffAnalyzerBase<OniaReaderRealData>;
-using EffAnalyzerMC = EffAnalyzerBase<OniaReaderMC>;
+using EffAnalyzerRealData = EffAnalyzerBase<OniaRealData>;
+using EffAnalyzerMC = EffAnalyzerBase<OniaMCData>;
 
 std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName );
 

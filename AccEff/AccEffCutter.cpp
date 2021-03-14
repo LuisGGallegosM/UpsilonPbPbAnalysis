@@ -12,7 +12,7 @@ bool AccCutter::cut(const Reader* input,Int_t index,Int_t entry)
 }
 
 template<>
-bool AccCutter::cut<OniaReaderGenOnly>(const OniaReaderGenOnly* input,Int_t index,Int_t entry)
+bool AccCutter::cut<OniaGenOnlyData>(const OniaGenOnlyData* input,Int_t index,Int_t entry)
 {
     if(!isMuonInAcceptance((TLorentzVector*) input->genQQ.mupl_mom4->At(index))) return false;
     if(!isMuonInAcceptance((TLorentzVector*) input->genQQ.mumi_mom4->At(index))) return false;
@@ -31,8 +31,8 @@ bool AccCutter::isMuonInAcceptance(const TLorentzVector* Muon) const
     else return pt >1.5f;                               // 2.1 < eta < 2.4
 }
 
-template bool AccCutter::cut<OniaReaderGenOnly>(const OniaReaderGenOnly* input,Int_t index,Int_t entry);
-template bool AccCutter::cut<OniaReaderMC>(const OniaReaderMC* input,Int_t index,Int_t entry);
+template bool AccCutter::cut<OniaGenOnlyData>(const OniaGenOnlyData* input,Int_t index,Int_t entry);
+template bool AccCutter::cut<OniaMCData>(const OniaMCData* input,Int_t index,Int_t entry);
 
 //EffCutter
 
@@ -53,4 +53,4 @@ bool EffCutter::cut(const Reader* input,Int_t index,Int_t entry)
     return kineCut.cut(input,index,entry);
 }
 
-template bool EffCutter::cut<OniaReaderMC>(const OniaReaderMC* input,Int_t index,Int_t entry);
+template bool EffCutter::cut<OniaMCData>(const OniaMCData* input,Int_t index,Int_t entry);

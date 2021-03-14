@@ -2,54 +2,33 @@
 #ifndef ONIADATA
 #define ONIADATA
 
-#include "../../TreeProcessor/TreeReader.h"
+#include "../../TreeProcessor/TreeProcessor.h"
 #include "OniaDataQQ.h"
 #include "TClonesArray.h"
 
-class OniaReaderRealData
+struct OniaRealData
 {
-    private:
-    TreeReader reader;
-    
-    public:
     OniaRecoQQ recoQQ;
     OniaRecoMu recoMu;
-
-    OniaReaderRealData(TTree* treeIn);
-    const TreeReader* getReader() const {return &reader;}
 };
 
-class OniaReaderMC
+struct OniaMCData
 {
-    private:
-    TreeReader reader;   
-    public:
     OniaRecoQQ recoQQ;
     OniaRecoMu recoMu;
     OniaGenQQ genQQ;
     OniaGenMu genMu;
     OniaWhich which;
-
-    OniaReaderMC(TTree* treeIn);
-    const TreeReader* getReader() const {return &reader;}
 };
 
-class OniaReaderGenOnly
+struct OniaGenOnlyData
 {
-    private:
-    TreeReader reader;
-    public:
     OniaGenQQ2 genQQ;
     OniaGenMu genMu;
-    OniaReaderGenOnly(TTree* treeIn);
-    const TreeReader* getReader() const {return &reader;}
 };
 
-class OniaJetReaderMC
+struct OniaJetMCData
 {
-    private:
-    TreeReader reader;   
-    public:
     OniaRecoQQ recoQQ;
     OniaRecoMu recoMu;
     OniaGenQQ genQQ;
@@ -57,21 +36,33 @@ class OniaJetReaderMC
     OniaWhich which;
     OniaJetInfo jetInfo;
     OniaJetRef jetRef;
-
-    OniaJetReaderMC(TTree* treeIn);
-    const TreeReader* getReader() const {return &reader;} 
 };
 
-class OniaJetReaderRealData
+struct OniaJetRealData
 {
-    private:
-    TreeReader reader;   
-    public:
     OniaRecoQQ recoQQ;
     OniaRecoMu recoMu;
-
-    OniaJetReaderRealData(TTree* treeIn);
-    const TreeReader* getReader() const {return &reader;} 
 };
+
+void addInputs(OniaMCData* data ,TreeReader* reader);
+void addInputs(OniaRealData* data ,TreeReader* reader);
+void addInputs(OniaGenOnlyData* data ,TreeReader* reader);
+void addInputs(OniaJetMCData* data ,TreeReader* reader);
+void addInputs(OniaJetRealData* data ,TreeReader* reader);
+
+template<typename Data>
+class OniaReader : public DataReader
+{
+    Data data;
+    public:
+    OniaReader() = default;
+
+    void registerReader(TreeReader* reader) override
+    {
+        addInputs(&data,reader);
+    }
+    const Data* getData() { return &data;}
+};
+
 
 #endif

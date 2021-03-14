@@ -8,7 +8,7 @@
 
 void writePie(const std::map<int,int>& values, const std::string& name);
 
-int getRecoPdgId(const OniaReaderMC* dataIn, int index)
+int getRecoPdgId(const OniaMCData* dataIn, int index)
 {
   int pdgId=0;
   int genQQindex=dataIn->which.RecoQQWhichGen[index];
@@ -17,15 +17,30 @@ int getRecoPdgId(const OniaReaderMC* dataIn, int index)
   return pdgId;
 }
 
-template<>
-void OniaWriterGen<OniaReaderGenOnly>::writeQQ(const OniaReaderGenOnly* dataIn, int index, int entry)
+void addOutputs(OniaQQ* data,TreeWriter* writer)
 {
-  oniaInfoOut.Write(entry,dataIn->genQQ.id[index]);
-  oniaQQOut.Write((TLorentzVector*) dataIn->genQQ.mom4->At(index));
-  TLorentzVector* mumi = (TLorentzVector*) dataIn->genQQ.mumi_mom4->At(index);
-  TLorentzVector* mupl = (TLorentzVector*) dataIn->genQQ.mupl_mom4->At(index);
-  oniaMuOut.Write(mupl,mumi);
-  writer.FillEntries(); 
+    data->oniaInfoOut.addOutputs(writer);
+    data->oniaQQOut.addOutputs(writer);
+    data->oniaMuOut.addOutputs(writer);
+}
+
+void addOutputs(OniaJetQQ* data,TreeWriter* writer)
+{
+    data->oniaInfoOut.addOutputs(writer);
+    data->recoQQOut.addOutputs(writer,"reco_");
+    data->genQQOut.addOutputs(writer,"gen_");
+    data->oniaMuOut.addOutputs(writer, "reco_");
+    data->jetOut.addOutputs(writer);
+    data->refJetOut.addOutputs(writer);
+}
+
+void OniaWriterGenQQ::writeData(const OniaGenOnlyData* input, int index, int entry)
+{
+  output.oniaInfoOut.Write(entry,input->genQQ.id[index]);
+  output.oniaQQOut.Write((TLorentzVector*) input->genQQ.mom4->At(index));
+  TLorentzVector* mumi = (TLorentzVector*) input->genQQ.mumi_mom4->At(index);
+  TLorentzVector* mupl = (TLorentzVector*) input->genQQ.mupl_mom4->At(index);
+  output.oniaMuOut.Write(mupl,mumi);
 }
 
 float getCorrectedPt(JetCorrector* JEC,const OniaJetInfo* inputJet, int iJet)

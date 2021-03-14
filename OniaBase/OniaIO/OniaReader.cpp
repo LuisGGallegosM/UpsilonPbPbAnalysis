@@ -1,45 +1,40 @@
 
 #include "OniaReader.h"
 
-OniaReaderMC::OniaReaderMC(TTree* treeIn) : 
-    reader(treeIn)
+void addInputs(OniaMCData* data ,TreeReader* reader)
 {
-    recoQQ.addInputs(&reader);
-    recoMu.addInputs(&reader);
-    which.addInputs(&reader);
-    genQQ.addInputs(&reader);
-    genMu.addInputs(&reader);
+    data->recoQQ.addInputs(reader);
+    data->recoMu.addInputs(reader);
+    data->which.addInputs(reader);
+    data->genQQ.addInputs(reader);
+    data->genMu.addInputs(reader);
 }
 
-OniaReaderRealData::OniaReaderRealData(TTree* treeIn) : 
-    reader(treeIn)
+void addInputs(OniaRealData* data ,TreeReader* reader)
 {
-    recoQQ.addInputs(&reader);
-    recoMu.addInputs(&reader);
+    data->recoQQ.addInputs(reader);
+    data->recoMu.addInputs(reader);
 }
 
-OniaReaderGenOnly::OniaReaderGenOnly(TTree* treeIn) : 
-    reader(treeIn)
+void addInputs(OniaGenOnlyData* data ,TreeReader* reader)
 {
-    genQQ.addInputs(&reader);
-    genMu.addInputs(&reader);
+    data->genQQ.addInputs(reader);
+    data->genMu.addInputs(reader);
 }
 
-OniaJetReaderMC::OniaJetReaderMC(TTree* treeIn) : 
-    reader(treeIn)
+void addInputs(OniaJetMCData* data ,TreeReader* reader)
 {
-    recoQQ.addInputs(&reader);
-    recoMu.addInputs(&reader);
-    which.addInputs(&reader);
-    genQQ.addInputs(&reader);
-    genMu.addInputs(&reader);
-    jetInfo.addInputs(&reader);
-    jetRef.addInputs(&reader);
+    data->recoQQ.addInputs(reader);
+    data->recoMu.addInputs(reader);
+    data->which.addInputs(reader);
+    data->genQQ.addInputs(reader);
+    data->genMu.addInputs(reader);
+    data->jetInfo.addInputs(reader);
+    data->jetRef.addInputs(reader);
 }
 
-OniaJetReaderRealData::OniaJetReaderRealData(TTree* treeIn) : 
-    reader(treeIn)
+void addInputs(OniaJetRealData* data ,TreeReader* reader)
 {
-    recoQQ.addInputs(&reader);
-    recoMu.addInputs(&reader);
+    data->recoQQ.addInputs(reader);
+    data->recoMu.addInputs(reader);
 }

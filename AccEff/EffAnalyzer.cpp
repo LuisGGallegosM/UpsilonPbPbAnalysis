@@ -7,8 +7,10 @@
 
 template<typename Reader>
 EffAnalyzerBase<Reader>::EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName ) : 
-    oniaWriter(outTreeName),oniaReader(input),effCutter(effCut)
+    TreeProcessor(input,outTreeName),oniaReader(),oniaWriter(),effCutter(effCut)
 {
+    registerInputs(&oniaReader);
+    registerOutputs(&oniaWriter);
     //initialize Histograms
     etaVsPtQQRecoCut =  createTH2QQ("y vs pt QQ Reco + Cut",    "p^{#mu#mu}_{t} vs |y^{#mu#mu}| QQ Reco + Cut");
     etaVsPtMuRecoCut =  createTH2Mu("eta vs pt Mu Reco + Cut",  "p^{#mu}_{t} vs |#eta^{#mu}| Mu Reco + Cut");
@@ -21,7 +23,7 @@ EffAnalyzerBase<Reader>::EffAnalyzerBase(TTree* input,CutParams* effCut, const c
 template<typename Reader>
 void EffAnalyzerBase<Reader>::ProcessEvent(Long64_t entry)
 {
-    Long64_t size=oniaReader.genQQ.size;
+    Long64_t size=oniaReader.getData()->genQQ.size;
     
     for(Long64_t i=0;i<size;++i)
     {
@@ -32,7 +34,7 @@ void EffAnalyzerBase<Reader>::ProcessEvent(Long64_t entry)
 template<typename Reader>
 void EffAnalyzerBase<Reader>::Write(const std::string& basename)
 {
-    oniaWriter.Write();
+    TreeProcessor::write();
 
     //write 2D plots
     writeToCanvas(etaVsPtQQRecoCut,"|y^{#mu#mu}|","p^{#mu#mu}_{T} ( GeV/c )",basename+"_EtaPtQQ_RecoCut.pdf");
@@ -62,13 +64,14 @@ void EffAnalyzerBase<Reader>::Write(const std::string& basename)
 template<typename Reader>
 void EffAnalyzerBase<Reader>::Analyze(Int_t index, Long64_t entry)
 {
-    if (accCutter->cut(&oniaReader,index,entry))
+    auto input=oniaReader.getData();
+    if (accCutter->cut(input,index,entry))
     {
         CaptureDetQQ(index,entry);
-        int recoQQindex= oniaReader.which.GenQQWhichReco[index];
+        int recoQQindex= input->which.GenQQWhichReco[index];
         if (recoQQindex>=0)
         {
-            if (effCutter.cut(&oniaReader,recoQQindex,entry))
+            if (effCutter.cut(input,recoQQindex,entry))
                 CaptureRecoQQ(recoQQindex,entry);
         }
     }
@@ -77,7 +80,7 @@ void EffAnalyzerBase<Reader>::Analyze(Int_t index, Long64_t entry)
 template<typename Reader>
 void EffAnalyzerBase<Reader>::CaptureDetQQ(Int_t index, Long64_t entry)
 {
-    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader.genQQ.mom4->At(index);
+    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader.getData()->genQQ.mom4->At(index);
     float pT = mom4vec->Pt();
     float y = fabs(mom4vec->Rapidity());
 
@@ -88,13 +91,14 @@ void EffAnalyzerBase<Reader>::CaptureDetQQ(Int_t index, Long64_t entry)
 template<typename Reader>
 void EffAnalyzerBase<Reader>::CaptureRecoQQ(Int_t index, Long64_t entry)
 {
+    auto input = oniaReader.getData();
     //read variables
-    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader.recoQQ.mom4->At(index);
+    TLorentzVector* mom4vec=(TLorentzVector*) input->recoQQ.mom4->At(index);
 
-    int mupl_idx = oniaReader.recoQQ.mupl_idx[index];//plus muon index
-    int mumi_idx = oniaReader.recoQQ.mumi_idx[index];//minus muon index
-    TLorentzVector* mom4vecPl=(TLorentzVector*) oniaReader.recoMu.mom4->At(mupl_idx);
-    TLorentzVector* mom4vecMi=(TLorentzVector*) oniaReader.recoMu.mom4->At(mumi_idx);
+    int mupl_idx = input->recoQQ.mupl_idx[index];//plus muon index
+    int mumi_idx = input->recoQQ.mumi_idx[index];//minus muon index
+    TLorentzVector* mom4vecPl=(TLorentzVector*) input->recoMu.mom4->At(mupl_idx);
+    TLorentzVector* mom4vecMi=(TLorentzVector*) input->recoMu.mom4->At(mumi_idx);
 
     float pT = mom4vec->Pt();
     float y = fabs(mom4vec->Rapidity());
@@ -108,7 +112,8 @@ void EffAnalyzerBase<Reader>::CaptureRecoQQ(Int_t index, Long64_t entry)
     etaVsPtQQRecoCut->Fill(y,pT);
     etaVsPtMuRecoCut->Fill(etaMuPl,ptMuPl);
     etaVsPtMuRecoCut->Fill(etaMuMi,ptMuMi);
-    oniaWriter.writeQQ(&oniaReader,index,entry);
+    oniaWriter.writeData(input,index,entry);
+    FillEntries();
 }
 
 std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName )
@@ -119,4 +124,4 @@ std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, c
         return nullptr;
 } 
 
-template class EffAnalyzerBase<OniaReaderMC>;
+template class EffAnalyzerBase<OniaMCData>;

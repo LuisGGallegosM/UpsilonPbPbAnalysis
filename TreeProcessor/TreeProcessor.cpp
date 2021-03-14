@@ -2,12 +2,12 @@
 #include "TreeProcessor.h"
 #include <iostream>
 
-void TreeProcessor::Process(const TreeReader* treeReader)
+void TreeProcessor::Process()
 {
     int block =0;
-    Long64_t entries= treeReader->getEntriesNumber();
+    Long64_t entries= reader.getEntriesNumber();
 
-    std::cout << "Processing of " << treeReader->getName() <<" tree starting...\n";
+    std::cout << "Processing of " << reader.getName() <<" tree starting...\n";
     std::cout << entries <<" entries in tree\n";
 
     for(Long64_t i=0;i<entries;++i)
@@ -17,10 +17,10 @@ void TreeProcessor::Process(const TreeReader* treeReader)
             std::cout <<"Processing: " << block*5 << "% \n";
             ++block;
         }
-        treeReader->readTree(i);
+        reader.readTree(i);
         ProcessEvent(i);
     }
     std::cout << "Total readed entries " << entries;
-    std::cout << " from '" << treeReader->getName() << "' tree\n";
+    std::cout << " from '" << reader.getName() << "' tree\n";
     return;
 }

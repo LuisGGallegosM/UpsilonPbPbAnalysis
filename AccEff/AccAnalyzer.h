@@ -24,9 +24,9 @@ class AccAnalyzer : public TreeProcessor
     std::unique_ptr<TEfficiency> ptQQAcceptancy;
     std::unique_ptr<TEfficiency> etaVsPtQQAcceptancy;
 
-    OniaReaderGenOnly oniaReader;
+    OniaReader<OniaGenOnlyData> oniaReader;
     AccCutter accCutter;
-    OniaWriterGenOnly oniaWriter;
+    OniaWriterGenQQ oniaWriter;
 
     void Analyze(Int_t index, Long64_t entry);
 
@@ -35,7 +35,7 @@ class AccAnalyzer : public TreeProcessor
 
     void Write(const std::string& basename);
 
-    void Test() { Process(oniaReader.getReader()); }
+    void Test() { Process(); }
     void ProcessEvent(Long64_t entry) override;
 
     TH1F* getPtHistQQDet() {return ptHistQQDet;}

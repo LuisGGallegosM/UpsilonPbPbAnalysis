@@ -27,7 +27,7 @@ class OniaJetCutterBase : public Cutter<Reader>
     };
 };
 
-using OniaJetCutterMC = OniaJetCutterBase<OniaJetReaderMC>;
-using OniaJetCutterRealData = OniaJetCutterBase<OniaJetReaderRealData>;
+using OniaJetCutterMC = OniaJetCutterBase<OniaJetMCData>;
+using OniaJetCutterRealData = OniaJetCutterBase<OniaJetRealData>;
 
 #endif

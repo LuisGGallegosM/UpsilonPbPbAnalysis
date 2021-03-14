@@ -5,8 +5,10 @@
 #include <array>
 
 AccAnalyzer::AccAnalyzer(TTree* input,const char* outTreeName) : 
-    oniaReader(input),oniaWriter(outTreeName)
+    TreeProcessor(input,outTreeName),oniaWriter(), oniaReader()
 {
+    registerInputs(&oniaReader);
+    registerOutputs(&oniaWriter);
     //initialize Histograms
     etaVsPtQQGen = createTH2QQ("y vs pt QQ Generated",  "p^{#mu#mu}_{t} vs |y^{#mu#mu}|");
     etaVsPtQQDet = createTH2QQ("y vs pt QQ Detectable", "p^{#mu#mu}_{t} vs |y^{#mu#mu}| QQ Detected");
@@ -20,7 +22,7 @@ AccAnalyzer::AccAnalyzer(TTree* input,const char* outTreeName) :
 
 void AccAnalyzer::ProcessEvent(Long64_t entry)
 {
-    Long64_t size=oniaReader.genQQ.size;
+    Long64_t size=oniaReader.getData()->genQQ.size;
     
     for(Long64_t i=0;i<size;++i)
     {
@@ -30,7 +32,7 @@ void AccAnalyzer::ProcessEvent(Long64_t entry)
 
 void AccAnalyzer::Write(const std::string& basename)
 {
-    oniaWriter.Write();
+    TreeProcessor::write();
 
     //calculate acceptancy
     ptQQAcceptancy=createTEff(ptHistQQDet,ptHistQQGen,"pt QQ Acceptancy");
@@ -61,10 +63,11 @@ void AccAnalyzer::Write(const std::string& basename)
 
 void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
 {
+    const OniaGenOnlyData* input=oniaReader.getData();
     //read variables
-    TLorentzVector* mom4vec=(TLorentzVector*) oniaReader.genQQ.mom4->At(index);
-    TLorentzVector* mom4vecPl=(TLorentzVector*) oniaReader.genQQ.mupl_mom4->At(index);
-    TLorentzVector* mom4vecMi=(TLorentzVector*) oniaReader.genQQ.mumi_mom4->At(index);
+    TLorentzVector* mom4vec=(TLorentzVector*) input->genQQ.mom4->At(index);
+    TLorentzVector* mom4vecPl=(TLorentzVector*) input->genQQ.mupl_mom4->At(index);
+    TLorentzVector* mom4vecMi=(TLorentzVector*) input->genQQ.mumi_mom4->At(index);
 
     float pT = mom4vec->Pt();
     float y = fabs(mom4vec->Rapidity());
@@ -83,12 +86,13 @@ void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
     etaVsPtMuGen->Fill(etaMuMi,ptMuMi);
 
     //fill data for onia with acceptancy cuts
-    if(accCutter.cut(&oniaReader,index,entry))
+    if(accCutter.cut(input,index,entry))
     {
         ptHistQQDet->Fill(pT);
         etaVsPtQQDet->Fill(y,pT);
         etaVsPtMuDet->Fill(etaMuPl,ptMuPl);
         etaVsPtMuDet->Fill(etaMuMi,ptMuMi);
-        oniaWriter.writeQQ(&oniaReader,index,entry);
+        oniaWriter.writeData(input,index,entry);
+        FillEntries();
     }
 }

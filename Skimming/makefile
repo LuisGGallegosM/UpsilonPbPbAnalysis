@@ -9,7 +9,7 @@ OUTPUT:=skim
 
 skim : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	g++ ${SOURCES} ${STATICLIBS} ${INC} ${LIBS} ${FLAGS} ${OUTPUT}
-	objdump -d -S -Mintel --no-show-raw-insn ${OUTPUT} > ${OUTPUT}.s
+	objdump $(shell ../HelperScripts/objdumpFlags.sh) ${OUTPUT} > ${OUTPUT}.s
 
 ../TreeProcessor/libTreeProcessor.a :
 	$(MAKE) -C ../TreeProcessor

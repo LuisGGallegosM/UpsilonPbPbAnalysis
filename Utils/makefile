@@ -9,7 +9,7 @@ OUTPUT:=libUtils
 libUtils.a : ${SOURCES} ${HEADERS}
 	g++ ${SOURCES} ${INC} ${FLAGS}
 	ar rcs ${OUTPUT}.a *.o
-	objdump -d -S -Mintel --no-show-raw-insn ${OUTPUT}.a > ${OUTPUT}.s
+	objdump $(shell ../HelperScripts/objdumpFlags.sh) ${OUTPUT}.a > ${OUTPUT}.s
 	rm -f *.o
 
 clear :

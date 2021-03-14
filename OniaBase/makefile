@@ -12,7 +12,7 @@ libOniaBase.a : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	ar xv ../Utils/libUtils.a
 	ar xv ../TreeProcessor/libTreeProcessor.a
 	ar rcs ${OUTPUT}.a *.o
-	objdump -d -S -Mintel --no-show-raw-insn ${OUTPUT}.a > ${OUTPUT}.s
+	objdump $(shell ../HelperScripts/objdumpFlags.sh) ${OUTPUT}.a > ${OUTPUT}.s
 	rm -f *.o
 
 ../TreeProcessor/libTreeProcessor.a :

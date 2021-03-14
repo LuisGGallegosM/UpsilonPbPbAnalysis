@@ -72,7 +72,7 @@ bool CutParams::isTriggered(const OniaRecoQQ* recoQQ, int index)
 }
 
 template<>
-bool CutParams::cut<OniaReaderMC>(const OniaReaderMC* input,Int_t index,Int_t entry)
+bool CutParams::cut<OniaMCData>(const OniaMCData* input,Int_t index,Int_t entry)
 {
     if (!isTriggered(&input->recoQQ,index)) return false;
     int mupl_idx = input->recoQQ.mupl_idx[index];//plus muon index
@@ -92,7 +92,7 @@ bool CutParams::cut<OniaReaderMC>(const OniaReaderMC* input,Int_t index,Int_t en
 }
 
 template<>
-bool CutParams::cut<OniaJetReaderMC>(const OniaJetReaderMC* input,Int_t index,Int_t entry)
+bool CutParams::cut<OniaJetMCData>(const OniaJetMCData* input,Int_t index,Int_t entry)
 {
     if (!isTriggered(&input->recoQQ,index)) return false;
     int mupl_idx = input->recoQQ.mupl_idx[index];//plus muon index

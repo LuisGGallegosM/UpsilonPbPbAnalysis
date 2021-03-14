@@ -81,9 +81,9 @@ class CutParams
 };
 
 template<>
-bool CutParams::cut<OniaReaderMC>(const OniaReaderMC* input,Int_t index,Int_t entry);
+bool CutParams::cut<OniaMCData>(const OniaMCData* input,Int_t index,Int_t entry);
 
 template<>
-bool CutParams::cut<OniaJetReaderMC>(const OniaJetReaderMC* input,Int_t index,Int_t entry);
+bool CutParams::cut<OniaJetMCData>(const OniaJetMCData* input,Int_t index,Int_t entry);
 
 #endif
