@@ -1,1 +1,1 @@
-echo -drCS -Mintel --no-show-raw-insn
+echo -drCat -Mintel --no-show-raw-insn
