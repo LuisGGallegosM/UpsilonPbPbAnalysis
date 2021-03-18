@@ -37,4 +37,5 @@ void addInputs(OniaJetRealData* data ,TreeReader* reader)
 {
     data->recoQQ.addInputs(reader);
     data->recoMu.addInputs(reader);
+    data->jetInfo.addInputs(reader);
 }

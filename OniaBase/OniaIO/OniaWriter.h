@@ -10,7 +10,8 @@
 #include"TH2F.h"
 
 struct OniaQQ;
-struct OniaJetQQ;
+struct OniaJetQQMC;
+struct OniaJetQQRealData;
 
 double jeuCorr (double jtPt, double z, double jeu);
 double jecCorr(double jtPt, double rawPt, double jpsiPt);
@@ -22,7 +23,8 @@ TH2F* createTH2Z(const std::string& name,const std::string& title);
 void writeToCanvasZ(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option);
 
 void addOutputs(OniaQQ* data,TreeWriter* writer);
-void addOutputs(OniaJetQQ* data,TreeWriter* writer);
+void addOutputs(OniaJetQQMC* data,TreeWriter* writer);
+void addOutputs(OniaJetQQRealData* data,TreeWriter* writer);
 
 struct OniaQQ
 {
@@ -31,7 +33,15 @@ struct OniaQQ
     OniaSimpleMu oniaMuOut;
 };
 
-struct OniaJetQQ
+struct OniaJetQQRealData
+{
+    OniaSimpleInfo oniaInfoOut;
+    OniaSimpleMu oniaMuOut;
+    OniaSimpleJet jetOut;
+    OniaSimpleExtraQQ recoQQOut;
+};
+
+struct OniaJetQQMC
 {
     OniaSimpleInfo oniaInfoOut;
     OniaSimpleQQ genQQOut;
@@ -89,9 +99,16 @@ class OniaWriterGenQQ : public DataWriter
     void writeData(const OniaGenOnlyData* input, int index, int entry);
 };
 
-class OniaWriterJetQQ : public DataWriter
+template <typename Reader>
+class OniaWriterJet : DataWriter
 {
-    OniaJetQQ output;
+
+};
+
+template <>
+class OniaWriterJet<OniaJetQQMC> : public DataWriter
+{
+    OniaJetQQMC output;
     public:
 
     void registerWriter(TreeWriter* writer) override
@@ -109,8 +126,28 @@ class OniaWriterJetQQ : public DataWriter
     }
 };
 
+template <>
+class OniaWriterJet<OniaJetQQRealData> : public DataWriter
+{
+    OniaJetQQRealData output;
+    public:
+
+    void registerWriter(TreeWriter* writer) override
+    {
+        addOutputs(&output,writer);
+    }
+
+    template<typename Reader>
+    void writeData(const Reader* input, int iQQ, int iJet, int entry, JetCorrector* JEC, JetUncertainty* JEU)
+    {
+        writeQQ(input,&output,iQQ,entry);
+        writeMu(input,&output,iQQ);
+        writeJet(input,&output,iQQ,iJet,JEC,JEU);
+    }
+};
+
 template<typename Reader>
-void writeQQ(const Reader* input, OniaJetQQ* output, int iQQ,int entry)
+void writeQQ(const Reader* input, OniaJetQQMC* output, int iQQ,int entry)
 {
     TLorentzVector *RecoQQ4mom = (TLorentzVector*) input->recoQQ.mom4->At(iQQ);
     TLorentzVector *GenQQ4mom = (TLorentzVector*) input->genQQ.mom4->At(input->which.RecoQQWhichGen[iQQ]);
@@ -120,7 +157,15 @@ void writeQQ(const Reader* input, OniaJetQQ* output, int iQQ,int entry)
 }
 
 template<typename Reader>
-void writeMu(const Reader* dataIn, OniaJetQQ* output, int iQQ)
+void writeQQ(const Reader* input, OniaJetQQRealData* output, int iQQ,int entry)
+{
+    TLorentzVector *RecoQQ4mom = (TLorentzVector*) input->recoQQ.mom4->At(iQQ);
+    output->oniaInfoOut.Write(entry,0);
+    output->recoQQOut.Write(RecoQQ4mom,input->recoQQ.ctau[iQQ]);
+}
+
+template<typename Reader, typename Writer>
+void writeMu(const Reader* dataIn, Writer* output, int iQQ)
 {
     int mumi_idx= dataIn->recoQQ.mumi_idx[iQQ];
     int mupl_idx= dataIn->recoQQ.mupl_idx[iQQ];
@@ -129,8 +174,8 @@ void writeMu(const Reader* dataIn, OniaJetQQ* output, int iQQ)
     output->oniaMuOut.Write(mupl,mumi);
 }
 
-template<typename Reader>
-void writeJet(const Reader* input,OniaJetQQ* output, int index, int iJet, JetCorrector* JEC, JetUncertainty* JEU)
+template<typename Reader, typename Writer>
+void writeJet(const Reader* input,Writer* output, int index, int iJet, JetCorrector* JEC, JetUncertainty* JEU)
 {
     const OniaJetInfo* inputJet =  &(input->jetInfo);
     const TLorentzVector* recoQQmom4 =(TLorentzVector*) input->recoQQ.mom4->At(index);
@@ -159,7 +204,7 @@ void writeJet(const Reader* input,OniaJetQQ* output, int index, int iJet, JetCor
 }
 
 template<typename Reader>
-void writeRefJet(const Reader* input,OniaJetQQ* output, int index, int iJet, float jt_pt_noZJEC)
+void writeRefJet(const Reader* input,OniaJetQQMC* output, int index, int iJet, float jt_pt_noZJEC)
 {
     const OniaJetRef* inputJet =  &(input->jetRef);
     const TLorentzVector* genQQmom4 = (TLorentzVector*) input->genQQ.mom4->At(input->which.RecoQQWhichGen[index]);

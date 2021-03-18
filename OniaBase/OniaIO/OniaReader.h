@@ -42,6 +42,7 @@ struct OniaJetRealData
 {
     OniaRecoQQ recoQQ;
     OniaRecoMu recoMu;
+    OniaJetInfo jetInfo;
 };
 
 void addInputs(OniaMCData* data ,TreeReader* reader);

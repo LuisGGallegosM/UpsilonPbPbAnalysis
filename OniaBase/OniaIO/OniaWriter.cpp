@@ -24,7 +24,15 @@ void addOutputs(OniaQQ* data,TreeWriter* writer)
     data->oniaMuOut.addOutputs(writer);
 }
 
-void addOutputs(OniaJetQQ* data,TreeWriter* writer)
+void addOutputs(OniaJetQQRealData* data,TreeWriter* writer)
+{
+    data->oniaInfoOut.addOutputs(writer);
+    data->recoQQOut.addOutputs(writer,"reco_");
+    data->oniaMuOut.addOutputs(writer, "reco_");
+    data->jetOut.addOutputs(writer);
+}
+
+void addOutputs(OniaJetQQMC* data,TreeWriter* writer)
 {
     data->oniaInfoOut.addOutputs(writer);
     data->recoQQOut.addOutputs(writer,"reco_");
