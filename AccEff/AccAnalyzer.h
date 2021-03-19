@@ -12,9 +12,8 @@
 constexpr const char* accDenName ="pt QQ Generated";
 constexpr const char* accNumName ="pt QQ Detectable Acceptancy";
 
-class AccAnalyzer : public TreeProcessor
+class AccHistografer
 {
-    private:
     TH2F* etaVsPtQQGen;
     TH2F* etaVsPtQQDet;
     TH2F* etaVsPtMuGen;
@@ -24,6 +23,27 @@ class AccAnalyzer : public TreeProcessor
     std::unique_ptr<TEfficiency> ptQQAcceptancy;
     std::unique_ptr<TEfficiency> etaVsPtQQAcceptancy;
 
+    public:
+    struct inputs
+    {
+        float pT;
+        float y;
+        float etaMuPl;
+        float etaMuMi;
+        float ptMuPl;
+        float ptMuMi;
+    };
+
+    AccHistografer();
+    void FillGen(const inputs* in);
+    void FillDet(const inputs* in);
+    void Write(const std::string& basename);
+};
+
+class AccAnalyzer : public TreeProcessor
+{
+    private:
+    AccHistografer hists;
     OniaReader<OniaGenOnlyData> oniaReader;
     AccCutter accCutter;
     OniaWriterGenQQ oniaWriter;
@@ -37,9 +57,6 @@ class AccAnalyzer : public TreeProcessor
 
     void Test() { Process(); }
     void ProcessEvent(Long64_t entry) override;
-
-    TH1F* getPtHistQQDet() {return ptHistQQDet;}
 };
-
 
 #endif
