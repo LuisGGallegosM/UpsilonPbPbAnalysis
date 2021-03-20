@@ -2,28 +2,19 @@
 
 CLING="NO"
 
-WORKDIR="test"
+WORKDIR="test/Fitting/Drawing"
 DEFAULTFILE="merged_HiForestAOD_fit1"
-#file path to root fit file for drawing
-INPUT=${1:-"../rootfiles/${WORKDIR}/${DEFAULTFILE}/${DEFAULTFILE}.root"}
+#directory where fit files are located
+INPUT=${1:-"../rootfiles/${WORKDIR}/${DEFAULTFILE}"}
 #path to draw configuration file
 DRAWFILE=${2:-"../rootfiles/${WORKDIR}/merged_HiForestAOD.drawconf"}
-
-#graphics outputfile named same as input file but with .pdf extension
-OUTPUT="${INPUT%.*}.pdf"
-#path to cut file, one folder up from INPUT file location
-CUTFILE="${INPUT%.*}.cutconf"
-#path to fit configuration file, it has same name as input but with .fitconf extension
-FITFILE="${INPUT%.*}.fitconf"
-#path of file where to save log
-LOGFILE="${INPUT%.*}_Drawing.log"
 
 #execute fit
 if [ $CLING = "YES" ]
 then
 cd Drawing
-root -q 'Drawing.cpp("'../${INPUT}'","'../${OUTPUT}'","'../${DRAWFILE}'","'../${CUTFILE}'","'../${FITFILE}'")' > "../${LOGFILE}" 2>&1 
+root -q 'Drawing.cpp("'../${INPUT}'","'../${DRAWFILE}'")'
 cd ..
 else
-./Fitting/fit -draw "${INPUT}" "${OUTPUT}" "${DRAWFILE}" "${CUTFILE}" "${FITFILE}" > "${LOGFILE}" 2>&1 
+./Fitting/fit -draw "${INPUT}" "${DRAWFILE}"
 fi

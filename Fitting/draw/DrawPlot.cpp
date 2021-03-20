@@ -1,5 +1,5 @@
 
-#include "Drawing.h"
+#include "DrawPlot.h"
 
 using namespace RooFit;
 
@@ -11,17 +11,25 @@ TLegend* drawLegend(RooPlot* plot, bool bkgOn,bool moreUpsilon);
 RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const drawConfig* config);
 RooHist*  drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults,const drawConfig* config);
 
-void Drawing(const char* filename,const char* drawfilename, const char* configfilename, const char* cutfilename, const char* fitfilename)
+void DrawPlot(const char* inputdirectoryname, const char* configfilename  )
 {
-    const std::string fitresultfilename = ReplaceExtension(fitfilename,".fit");
+    const std::string inputdir = inputdirectoryname;
+    //inputs
+    const std::string filename = generateNames(inputdir,".root");
+    const std::string fitresultfilename = generateNames(inputdir,".fit");
+    const std::string cutfilename = generateNames(inputdir,".cutconf");
+    const std::string fitfilename = generateNames(inputdir,".fitconf");
+    //outputs
+    const std::string drawfilename =generateNames(inputdir,".pdf");
 
     std::cout << "\nDRAWING\n";
-    std::cout << "Reading input file: " << filename <<'\n';
-    std::cout << "Drawing output file: " << drawfilename <<'\n';
     std::cout << "Reading draw configuration file: " << configfilename <<'\n';
+    std::cout << "Reading root input file: " << filename <<'\n';
     std::cout << "Reading cut configuration file: " << cutfilename <<'\n';
     std::cout << "Reading fit configuration file: " << fitfilename <<'\n';
     std::cout << "Reading fit result file:" << fitresultfilename  << '\n';
+
+    std::cout << "Drawing output file: " << drawfilename <<'\n';
 
     drawConfig config;
     config.deserialize(configfilename,cutfilename,fitfilename);
@@ -41,7 +49,7 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
         return;
     }
 
-    TFile file(filename,"READ");
+    TFile file(filename.data(),"READ");
 
     if (file.IsZombie())
     {
@@ -49,7 +57,7 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
         return;
     }
 
-    CopyFile(configfilename, ReplaceExtension(drawfilename,".drawconf").data());
+    CopyFile(configfilename, generateNames(inputdir,".drawconf").data());
 
     RooRealVar* massVar = (RooRealVar*) (file.Get("mass"));
     RooAbsPdf* fittedFunc = (RooAbsPdf*) (file.Get("dcb_fit"));
@@ -90,9 +98,9 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
 
         canvas->Update();
         if (isLog)
-            canvas->SaveAs(ReplaceExtension(drawfilename,"_log.pdf").data());
+            canvas->SaveAs(generateNames(inputdir,"_log.pdf").data());
         else
-            canvas->SaveAs(drawfilename);
+            canvas->SaveAs(drawfilename.data());
     }
 
     return;

@@ -20,11 +20,8 @@
 #include "../../Drawing/TextDrawer.h"
 #include "../../OniaBase/DrawParams.h"
 #include "../../Utils/utils.h"
-#include "DrawingCmp.h"
 
 #define FITFUNCNAME "fitFunc"
 #define DATASETNAME "dataset"
-
-void Drawing(const char* filename,const char* drawfilename, const char* configfilename, const char* cutfilename, const char* fitfilename);
 
 #endif

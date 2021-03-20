@@ -37,3 +37,13 @@ TTree* GetTree(TFile* file,const char* name)
     }
     return tree;
 }
+
+std::string getBasename(const std::string& dir)
+{
+    return dir.substr(dir.find_last_of('/')+1);
+}
+
+std::string generateNames(const std::string& dir, const std::string& extension)
+{
+    return dir + "/" + getBasename(dir) + extension;
+}

@@ -1,39 +1,18 @@
 
+#include"DrawCmp.h"
+#include"../../Utils/utils.h"
 
-#include"DrawingCmp.h"
 #include <vector>
 #include<algorithm>
-#include"../../OniaBase/FitParams.h"
-#include"../../Utils/utils.h"
+
 #include"TH1.h"
 #include"TCanvas.h"
-
-struct FitElement
-{
-    fitParamsWithErrors fits;
-    fitConfig configs;
-};
-
-struct fitVal
-{
-    float value;
-    float error;
-};
-
-typedef float (fitParamsNoLimits::*fitGetter)() const;
-
-struct toGet
-{
-    std::string name;
-    fitGetter getter;
-    toGet(const char* name_,fitGetter getter_): name(name_), getter(getter_) {}
-};
 
 void drawCompGraph(fitGetter func, const std::vector<FitElement>& fits,TH1F* graph);
 std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs);
 std::vector<toGet> fillVariables(const fitConfig* fit);
 
-void DrawingCmp(const char* outputfilename,int size,const char** fitfilenames)
+void DrawCmp(const char* outputfilename,int size,const char** fitfilenames)
 {
     std::cout << "\nDRAWING\n";
     std::cout << "Drawing output file: " << outputfilename <<'\n';
