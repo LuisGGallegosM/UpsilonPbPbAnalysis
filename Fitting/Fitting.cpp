@@ -1,81 +1,51 @@
 
-#include "Fitting.h"
 
-void SetFitConfig(fitConfig* fitConf);
+#include <string>
+#include <iostream>
 
-/**
- * @brief Does a invariant mass fit, from a branch in a tree
- * in a root file. Saves the plot in a tree and in pdf file format.
- * 
- * @param filename filename of the root file where to find the tree
- * @param outfilename filename of root file where to store fit results
- * @param config fit configuration parameters
- */
-void Fitting(const char* filename, const char* outfilename, const char* configname)
+void Fit(const char* filename, const char* outfilename, const char* configname);
+void DrawCmp( const char* outputfilename, int size,const char** fitfilenames);
+void DrawPlot(const char* inputdirectoryname, const char* configfilename  );
+
+#if !defined(__CLING__)
+
+int main(int argc, char **argv)
 {
-    std::cout << "\nFITTING\n";
-    std::cout << "Reading input file: " << filename <<'\n';
-    std::cout << "Writing output file: " << outfilename <<'\n';
-    std::cout << "Reading configuration file: " << configname <<'\n';
+    std::string option(argv[1]);
 
-    TFile file(filename, "READ");
-
-    if (file.IsZombie()) 
+    if (option=="-multidraw")
     {
-        std::cerr << "file "<< filename <<" cannot be read\n";
-        return;
+        //enter in multicomparation draw mode
+        int numFiles=(argc -3) ;
+        const char* args[32];
+
+        if (numFiles<=0) return 0;
+        
+        for (int i=0;i<numFiles;i++) args[i]=argv[i+3];
+
+        DrawCmp(argv[2],numFiles,args);
     }
-
-    TFile newfile(outfilename,"CREATE");
-
-    if (newfile.IsZombie()) 
+    else if (option=="-draw")
     {
-        std::cerr << "file "<< outfilename<<" cannot be wrote or already exists\n";
-        return;
+        //normal mode draw
+        if (argc ==4)
+            DrawPlot(argv[2],argv[3]);
+        else
+        {
+            std::cerr << "Error: Incorrect number of parameters\n";  
+        }
     }
-
-    fitConfig config;
-    config.deserialize(configname);
-
-    if(!config.isValid())
+    else
+    if (argc ==4)
     {
-        std::cerr << "Error: Invalid arguments\n";
-        return;
-    }
-
-    TTree *tree_skimmed = (TTree *)file.Get(ONIATTREENAME);
-
-    std::unique_ptr<OniaMassFitter> massFitter;
-
-    //fit with first three Upsilon or only the first
-    if (config.isMoreUpsilon())
-    {
-        massFitter.reset(new OniaMassFitter2(tree_skimmed, &config));
+        Fit(argv[1],argv[2],argv[3]);
     }
     else
     {
-        massFitter.reset(new OniaMassFitter(tree_skimmed, &config));
+        std::cerr << "Incorrect number of parameters\n";  
     }
-
-    //copy fit config file, same filename as output root file but with .cutconf extension
-    CopyFile(configname, ReplaceExtension(outfilename,".fitconf").data());
-    CopyFile(ReplaceExtension(filename,".cutconf").data(),ReplaceExtension(outfilename,".cutconf").data() );
-
-    
-    RooAbsReal* fittedFunc = massFitter->fit();
-    
-    fitParamsWithErrors fParams = massFitter->getFitParams();
-
-    fParams.serialize(ReplaceExtension(outfilename,".fit").data());
-
-     assert(fParams.isValid());
-
-    massFitter->getResults()->Print();
-
-    newfile.cd();
-    massFitter->getDataset()->Write();
-    massFitter->getResults()->Write("fitresults");
-    fittedFunc->Write();
-    massFitter->getVar()->Write();
+        
+    return 0;
 }
 
+#endif
