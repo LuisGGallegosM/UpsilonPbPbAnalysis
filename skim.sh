@@ -9,7 +9,7 @@ FLAGS2=${2:-"-nocmd"}
 INPUTFILE="../rootfiles/datasets/merged_HiForestAOD_DATA.root"
 INPUTFILENAME=$(basename $INPUTFILE)
 #how to folder name skim result file
-OUTPUTFOLDER="../rootfiles/skims/${INPUTFILENAME%.*}_skim_test"
+OUTPUTFOLDER="../rootfiles/skims/${INPUTFILENAME%.*}_skim"
 #cut configuration file
 CONFIG="../rootfiles/confFiles/merged_HiForestAOD_jetskim.cutconf"
 #output skimmed file, put in OUTPUTFOLDER and name based in inputfile

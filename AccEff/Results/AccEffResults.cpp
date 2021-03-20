@@ -12,6 +12,7 @@
 TH1F* toTH1F(const TEfficiency* asym);
 std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile);
 TH1F* calcDN_DpT(TH1F* nSigCorrected);
+TH1F* calcNormalizeddNPt(TH1F* nSigCorrected);
 TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff);
 
 void AccEffResults(const char* accFilename, const char* effFilename, const char* fitFilepath, const char* outputname)
@@ -42,8 +43,12 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","N_{Y1Scorr}",outbasename+"_CorrectYields.pdf");
     nSigCorrected->Write();
 
-    TH1F* dN_dPt = calcDN_DpT(nSigCorrected);
-    writeToCanvas(dN_dPt,"p^{#mu#mu}_{T} GeV/c","B(#Upsilon #rightarrow #mu #mu) #frac{#sigma}{dp_{T} dy} nb^{-1}",outbasename+"_dNdPt.pdf",true);
+    TH1F* dN_dPtdy = calcDN_DpT(nSigCorrected);
+    writeToCanvas(dN_dPtdy,"p^{#mu#mu}_{T} GeV/c","B(#Upsilon #rightarrow #mu #mu) #frac{#sigma}{dp_{T} dy} nb^{-1}",outbasename+"_dNdPtdy.pdf",true);
+    dN_dPtdy->Write();
+
+    TH1F* dN_dPt = calcNormalizeddNPt(nSigCorrected);
+    writeToCanvas(dN_dPt,"p^{#mu#mu}_{T} GeV/c","#frac{#sigma}{dp_{T} dy} nb^{-1}",outbasename+"_dNdPt.pdf");
     dN_dPt->Write();
 
     outFile->Close();
@@ -87,6 +92,22 @@ TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff)
     nSigCorrected->SetName("corrected_nSigY1S");
     nSigCorrected->SetTitle("nSigY1S corrected");
     return nSigCorrected;
+}
+
+TH1F* calcNormalizeddNPt(TH1F* nSigCorrected)
+{
+    TH1F* dN_dPt = new TH1F(*nSigCorrected);
+    int nbins = dN_dPt->GetNbinsX() +2;
+    float sum = 0.0f;
+    for(int i=0;i<nbins;i++)
+    {
+        sum+=dN_dPt->GetBinContent(i);
+    }
+    dN_dPt->Scale(1.0f/sum);
+    dN_dPt->SetName("dN_dpT_norm");
+    dN_dPt->SetTitle("#frac{dN_{Y1Scorr}}{#Delta p_{T}} normalized");
+    dN_dPt->GetYaxis()->SetRangeUser(0.0f,1.0f);
+    return dN_dPt;
 }
 
 TH1F* calcDN_DpT(TH1F* nSigCorrected)
