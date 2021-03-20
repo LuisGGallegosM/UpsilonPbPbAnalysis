@@ -1,5 +1,5 @@
 #include "EffAnalyzer.h"
-#include "AccEffAux.h"
+#include "../Common/AccEffAux.h"
 #include "TCanvas.h"
 #include "TPie.h"
 #include <array>

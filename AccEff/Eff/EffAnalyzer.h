@@ -4,12 +4,9 @@
 #include "TH2.h"
 #include "TEfficiency.h"
 
-#include "../TreeProcessor/TreeProcessor.h"
-#include "../OniaBase/OniaIO/OniaIO.h"
-#include "AccEffCutter.h"
-
-constexpr const char* effDenName= "p_{t} QQ Detectable Efficiency";
-constexpr const char* effNumName= "p_{t} QQ Reco + Cut";
+#include "../../TreeProcessor/TreeProcessor.h"
+#include "../../OniaBase/OniaIO/OniaIO.h"
+#include "EffCutter.h"
 
 class EffAnalyzer
 {

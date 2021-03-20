@@ -4,13 +4,10 @@
 #include "TH2.h"
 #include "TEfficiency.h"
 
-#include "../TreeProcessor/TreeProcessor.h"
-#include "../OniaBase/OniaIO/OniaIO.h"
-#include "AccEffCutter.h"
-#include "AccEffAux.h"
-
-constexpr const char* accDenName ="pt QQ Generated";
-constexpr const char* accNumName ="pt QQ Detectable Acceptancy";
+#include "../../TreeProcessor/TreeProcessor.h"
+#include "../../OniaBase/OniaIO/OniaIO.h"
+#include "../Common/AccEffAux.h"
+#include "../Common/AccCutter.h"
 
 class AccHistografer
 {

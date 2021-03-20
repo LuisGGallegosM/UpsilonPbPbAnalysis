@@ -14,4 +14,10 @@ void writeToCanvas(TH1* hist,const std::string& xname,const std::string& yname, 
 void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname);
 void writeToCanvasEff2D(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname);
 
+
+constexpr const char* accDenName ="pt QQ Generated";
+constexpr const char* accNumName ="pt QQ Detectable Acceptancy";
+constexpr const char* effDenName= "p_{t} QQ Detectable Efficiency";
+constexpr const char* effNumName= "p_{t} QQ Reco + Cut";
+
 #endif

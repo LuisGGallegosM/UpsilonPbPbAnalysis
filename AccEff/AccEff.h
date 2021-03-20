@@ -1,12 +1,8 @@
+#ifndef ACCEFF
+#define ACCEFF
 
-#include "TTree.h"
-#include "TFile.h"
+void AccTest(const char* filename,const char* outputfilename, const char* configname);
+void EffTest(const char* filename,const char* outputfilename, const char* configname);
+void AccEffResults(const char* accFilename, const char* effFilename, const char* fitFilepath, const char* outputname);
 
-#include "../OniaBase/CutParams.h"
-#include "../OniaBase/FitParams.h"
-#include "../Utils/serialize.h"
-#include "../Utils/utils.h"
-#include "../OniaBase/OniaBase.h"
-#include "AccAnalyzer.h"
-#include "EffAnalyzer.h"
-#include "AccEffResults.h"
+#endif
