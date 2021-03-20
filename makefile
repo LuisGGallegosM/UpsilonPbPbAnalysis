@@ -11,18 +11,18 @@ all:
 	$(MAKE) -C Utils
 	$(MAKE) -C TreeProcessor
 	$(MAKE) -C OniaBase
+	$(MAKE) -C Drawing
 	$(MAKE) -C Skimming
 	$(MAKE) -C Fitting
-	$(MAKE) -C Drawing
 	$(MAKE) -C AccEff
 
 clear:
 	$(MAKE) clear -C Utils
 	$(MAKE) clear -C TreeProcessor
 	$(MAKE) clear -C OniaBase
+	$(MAKE) clear -C Drawing
 	$(MAKE) clear -C Skimming
 	$(MAKE) clear -C Fitting
-	$(MAKE) clear -C Drawing
 	$(MAKE) clear -C AccEff
 
 AccEff:
