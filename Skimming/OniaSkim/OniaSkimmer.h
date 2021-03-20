@@ -4,7 +4,7 @@
 
 #include "../../TreeProcessor/TreeProcessor.h"
 #include "../../OniaBase/OniaIO/OniaIO.h"
-#include "../Skimmer.h"
+#include "../Common/Skimmer.h"
 #include "OniaCutter.h"
 
 template<typename Reader>

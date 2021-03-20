@@ -5,7 +5,7 @@
 #include "../../OniaBase/OniaIO/OniaIO.h"
 #include "../../OniaBase/JEC/JetCorrector.h"
 #include "../../OniaBase/JEC/JetUncertainty.h"
-#include "../Skimmer.h"
+#include "../Common/Skimmer.h"
 #include "OniaJetCutter.h"
 
 std::vector<std::string> LoadJECFiles(bool isMC);

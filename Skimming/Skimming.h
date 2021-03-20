@@ -1,14 +1,8 @@
 #ifndef SKIMMING
 #define SKIMMING
 
-#include "TTree.h"
-#include "TFile.h"
+void OniaJetSkim(const char* filename,const char* outputfilename, const char* configname);
 
-#include "../OniaBase/CutParams.h"
-#include "../OniaBase/OniaBase.h"
-#include "../Utils/serialize.h"
-#include "../Utils/utils.h"
-#include "OniaSkimmer/OniaSkimmer.h"
-#include "OniaJetSkimmer/OniaJetSkimmer.h"
+void OniaSkim(const char* filename,const char* outputfilename, const char* configname);
 
 #endif

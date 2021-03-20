@@ -3,7 +3,7 @@
 
 #include "../../OniaBase/OniaIO/OniaIO.h"
 #include "../../OniaBase/CutParams.h"
-#include "../Skimmer.h"
+#include "../Common/Skimmer.h"
 
 template<typename Reader>
 class OniaJetCutterBase : public Cutter<Reader>
