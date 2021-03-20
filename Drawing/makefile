@@ -1,24 +1,15 @@
 
-FLAGS=$(shell ../HelperScripts/compilerFlags.sh ) -o
+FLAGS=$(shell ../HelperScripts/compilerFlags.sh ) -c
 SOURCES:=$(wildcard *.cpp)
 HEADERS:=$(wildcard *.h)
-STATICLIBS:=../Utils/libUtils.a ../TreeProcessor/libTreeProcessor.a ../OniaBase/libOniaBase.a
 INC:=-I $(shell $(ROOTSYS)/bin/root-config --cflags)
-LIBS:=$(shell $(ROOTSYS)/bin/root-config --ldflags --glibs) -lRooFit -lRooFitCore -lMinuit
-OUTPUT:=draw
+OUTPUT:=libDrawing
 
 draw : ${SOURCES} ${HEADERS} ${STATICLIBS}
-	g++ ${SOURCES} ${STATICLIBS} ${INC} ${LIBS} ${FLAGS} ${OUTPUT}
-	objdump $(shell ../HelperScripts/objdumpFlags.sh) ${OUTPUT} > ${OUTPUT}.s
-
-../TreeProcessor/libTreeProcessor.a :
-	$(MAKE) -C ../TreeProcessor
-
-../Utils/libUtils.a :
-	$(MAKE) -C ../Utils
-
-../OniaBase/libOniaBase.a :
-	$(MAKE) -C ../OniaBase
+	g++ ${SOURCES} ${INC} ${FLAGS}
+	ar rcs ${OUTPUT}.a *.o
+	objdump $(shell ../HelperScripts/objdumpFlags.sh) ${OUTPUT}.a > ${OUTPUT}.s
+	rm -f *.o
 
 clear :
-	rm -f draw *.o *.s
+	rm -f ${OUTPUT}.a *.o *.s

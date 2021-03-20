@@ -98,41 +98,6 @@ void Drawing(const char* filename,const char* drawfilename, const char* configfi
     return;
 }
 
-#if !defined(__CLING__)
-
-int main(int argc, char **argv)
-{
-    std::string option(argv[1]);
-
-    if (option=="-m")
-    {
-        //enter in multicomparation draw mode
-        int numFiles=(argc -3) ;
-        const char* args[32];
-
-        if (numFiles<=0) return 0;
-        
-        for (int i=0;i<numFiles;i++) args[i]=argv[i+3];
-
-        DrawingCmp(argv[2],numFiles,args);
-    }
-    else
-    {
-        //normal mode draw
-        if (argc ==6)
-            Drawing(argv[1],argv[2],argv[3],argv[4],argv[5]);
-        else
-        {
-            std::cerr << "Error: Incorrect number of parameters\n";  
-        }
-    }
-
-    return 0;
-}
-
-#endif
-
-
 //DRAW GRAPH
 
 RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const drawConfig* config)

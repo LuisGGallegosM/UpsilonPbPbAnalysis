@@ -1,8 +1,8 @@
 
 FLAGS=$(shell ../HelperScripts/compilerFlags.sh ) -o
-SOURCES:=$(wildcard *.cpp)
-HEADERS:=$(wildcard *.h)
-STATICLIBS:=../Utils/libUtils.a ../TreeProcessor/libTreeProcessor.a ../OniaBase/libOniaBase.a
+SOURCES:=$(shell find . -name  "*.cpp")
+HEADERS:=$(shell find . -name  "*.h")
+STATICLIBS:=../Utils/libUtils.a ../TreeProcessor/libTreeProcessor.a ../OniaBase/libOniaBase.a ../Drawing/libDrawing.a
 INC:=-I $(shell $(ROOTSYS)/bin/root-config --cflags)
 LIBS:=$(shell $(ROOTSYS)/bin/root-config --ldflags --glibs) -lRooFit -lRooFitCore -lMinuit
 OUTPUT:=fit
@@ -19,6 +19,9 @@ fit : ${SOURCES} ${HEADERS} ${STATICLIBS}
 
 ../OniaBase/libOniaBase.a :
 	$(MAKE) -C ../OniaBase
+
+../Drawing/libDrawing.a :
+	$(MAKE) -C ../Drawing
 
 clear :
 	rm -f fit *.o *.s

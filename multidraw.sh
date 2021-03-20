@@ -22,7 +22,7 @@ do
     FITFILENAMES=( ${FITFILENAMES[@]} $INPUTFILE)
 done
 
-./Drawing/draw -m $NAME "${FITFILENAMES[@]}" > "${NAME%.*}_Drawing.log" 2>&1
+./Fitting/fit -multidraw $NAME "${FITFILENAMES[@]}" > "${NAME%.*}_Drawing.log" 2>&1
 
 echo "output to ${OUTDIR}"
 echo "multidraw completed"

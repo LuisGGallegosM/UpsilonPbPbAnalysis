@@ -79,20 +79,3 @@ void Fitting(const char* filename, const char* outfilename, const char* configna
     massFitter->getVar()->Write();
 }
 
-#if !defined(__CLING__)
-
-int main(int argc, char **argv)
-{
-    if (argc ==4)
-    {
-        Fitting(argv[1],argv[2],argv[3]);
-    }
-    else
-    {
-        std::cerr << "Incorrect number of parameters\n";  
-    }
-        
-    return 0;
-}
-
-#endif

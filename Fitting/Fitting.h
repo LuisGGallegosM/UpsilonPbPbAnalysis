@@ -7,11 +7,11 @@
 #include "../Utils/utils.h"
 #include "../OniaBase/FitParams.h"
 #include "../OniaBase/OniaBase.h"
+#include "draw/Drawing.h"
+#include "draw/DrawingCmp.h"
 #include "OniaMassFit.h"
 
 #include "TTree.h"
 #include "TFile.h"
-
-void Fitting(const char* filename, const char* outfilename);
 
 #endif
