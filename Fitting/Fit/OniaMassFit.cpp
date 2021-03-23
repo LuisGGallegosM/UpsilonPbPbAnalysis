@@ -7,13 +7,17 @@
 #include "RooFormulaVar.h"
 #include "RooExtendPdf.h"
 
+const char* const mass_name = "reco_mass";
+const char* const pT_name = "reco_pT";
+const char* const y_name ="reco_y";
+
 //OniaMassFitter member functions.
 
 OniaMassFitter::OniaMassFitter(TTree* tree_,const fitConfig* fitConf):
     config(*fitConf),tree(tree_),
     nSig_Y1S("nSig_Y1S","Upsilon Signal",config.getInitValues()->getNSigY1S(), config.getInitValues()->getLowLimit().getNSigY1S(), config.getInitValues()->getHighLimit().getNSigY1S()),
     nBkg("nBkg","Bkg signal",config.getInitValues()->getNBkg(),config.getInitValues()->getLowLimit().getNBkg(), config.getInitValues()->getHighLimit().getNBkg()),
-    mass("mass","onia mass",config.getMassLow(),config.getMassHigh(),"GeV/c^{2}"),
+    mass(mass_name,"onia mass",config.getMassLow(),config.getMassHigh(),"GeV/c^{2}"),
     dcball1(mass,"Y1S",config.getInitValues()->getDCBParams(),config.getInitValues()->getLowLimit().getDCBParams(),config.getInitValues()->getHighLimit().getDCBParams(),fitConf->getFixAlpha(),fitConf->getFixN()),
     bkg()
 {
@@ -25,8 +29,8 @@ OniaMassFitter::~OniaMassFitter() { }
 
 std::string OniaMassFitter::getKineCutExpr() const
 {
-    std::string str(Form("(pT < %.3f) && (pT > %.3f)",config.getCut()->getPtHigh(),config.getCut()->getPtLow()));
-    str.append(Form(" && (abs(y) < %.3f) && (abs(y) > %.3f)",config.getCut()->getYHigh(),config.getCut()->getYLow()));
+    std::string str(Form("(%s < %.3f) && (%s > %.3f)",pT_name,config.getCut()->getPtHigh(),pT_name,config.getCut()->getPtLow()));
+    str.append(Form(" && (abs(%s) < %.3f) && (abs(%s) > %.3f)",y_name,config.getCut()->getYHigh(),y_name,config.getCut()->getYLow()));
     return str;
 }
 
@@ -51,8 +55,8 @@ void OniaMassFitter::combinePdf()
 
 RooAbsReal* OniaMassFitter::fit()
 {
-    RooRealVar pT("pT","momentum quarkonia",0,100,"GeV/c");
-    RooRealVar y("y","rapidity quarkonia",-5,5);
+    RooRealVar pT(pT_name,"momentum quarkonia",0,100,"GeV/c");
+    RooRealVar y(y_name,"rapidity quarkonia",-5,5);
     RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, RooArgSet(mass,pT,y),getKineCutExpr().data());
     dataset.reset(datas);
     std::cout << "Reduced dataset:\n";

@@ -17,25 +17,26 @@ do
     esac
 done
 
-#directory where files are located
-WORKDIR="../rootfiles/merged_HiForestAOD_MCFix2_skimmed1"
-#directory where to save multifit results, inside WORKDIR
-OUTDIR="output"
-
-#skimmed file is inside WORKDIR
-SKIMFILE="${WORKDIR}/$( basename $WORKDIR ).root"
+#multifit input file
+MULTIFITFILE="../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.multifit"
+INPUTFILENAME="merged_HiForestAOD_MCFix2_skim"
 #drawing configuration file
-DRAWCONFIG="${SKIMFILE%.*}.drawconf"
+DRAWCONFIG="../rootfiles/confFiles/merged_HiForestAOD.drawconf"
+
+SKIMFILE="../rootfiles/analysis/${INPUTFILENAME}/${INPUTFILENAME}.root"
+CUTFILE="../rootfiles/analysis/${INPUTFILENAME}/${INPUTFILENAME}.cutconf"
+#directory where to save multifit results
+OUTDIR="../rootfiles/analysis/${INPUTFILENAME}/multifit"
 
 echo "multiple fitting"
-echo "saving files in '${OUTDIR}' directory"
-mkdir "${WORKDIR}/${OUTDIR}"
+echo "saving files in '${OUTDIR}'"
+mkdir -p "${OUTDIR}"
 
 #fitconf files to read
-./HelperScripts/fitconfGen.sh "$WORKDIR"
-CONFIGFILES=$(find ${WORKDIR} -maxdepth 1 -name "*.fitconf")
-MULTIFITFILE=$(find ${WORKDIR} -maxdepth 1 -name "*.multifit")
-cp "$MULTIFITFILE" "${WORKDIR}/${OUTDIR}"
+./HelperScripts/fitconfGen.sh "${MULTIFITFILE}" "${OUTDIR}"
+CONFIGFILES=$(find ${OUTDIR} -maxdepth 1 -name "*.fitconf")
+
+cp "$MULTIFITFILE" "${OUTDIR}"
 
 #do the fits
 if [ ${DOFIT} = "true" ]
@@ -49,9 +50,10 @@ then
     do
         FITFILE="${CONFIG}"
         FITNAME=$(basename $CONFIG)
-        FITOUTPUTDIR="${WORKDIR}/${OUTDIR}/${FITNAME%.*}"
+        FITOUTPUTDIR="${OUTDIR}/${FITNAME%.*}"
         echo "fitting file: $CONFIG"
-        ./fit.sh "$SKIMFILE" "$FITFILE" "${FITOUTPUTDIR}" &
+        mkdir "${FITOUTPUTDIR}"
+        ./fit.sh "$SKIMFILE" "$CUTFILE" "$FITFILE" "${FITOUTPUTDIR}" > "${FITOUTPUTDIR}/fit.log" &
         JOBS=( $(jobs -p) )
         JOBNUM="${#JOBS[@]}"
         if [ $MAXJOBS = $JOBNUM ]
@@ -63,6 +65,8 @@ then
     echo "all fits done"
 fi
 
+rm ${CONFIGFILES}
+
 #draw graphs
 if [ ${DODRAW} = "true" ]
 then
@@ -71,10 +75,10 @@ then
     echo "reading drawing configuration file: ${DRAWCONFIG}"
     for CONFIG in ${CONFIGFILES[@]}
     do
-    NAME=$(basename $CONFIG)
-    ROOTFILEDRAW="${WORKDIR}/${OUTDIR}/${NAME%.*}/${NAME%.*}.root"
-    echo "drawing ${ROOTFILEDRAW}"
-    ./draw.sh "${ROOTFILEDRAW}" "${DRAWCONFIG}"
+        NAME=$(basename $CONFIG)
+        ROOTFILEDRAW="${OUTDIR}/${NAME%.*}"
+        echo "drawing ${ROOTFILEDRAW}"
+        ./draw.sh "${ROOTFILEDRAW}" "${DRAWCONFIG}" > "${OUTDIR}/draw.log"
     done
 fi
 
@@ -82,20 +86,13 @@ fi
 if [ ${DOCDRAW} = "true" ]
 then
     echo "starting comparative drawings..."
-    COMPCONFFILES=$(find ${WORKDIR} -maxdepth 1 -name "*.drawcomp")
-    for COMP in $COMPCONFFILES
-    do
-        COMPFILES=$( cat ${COMP} )
-        COMPNAME=$( basename ${COMP} )
-        echo "reading file: $COMPNAME"
-        cp "$COMP" "${WORKDIR}/${OUTDIR}"
-        ./multidraw.sh "${WORKDIR}/${OUTDIR}" "${WORKDIR}/${OUTDIR}/${COMPNAME%.*}" "${COMPFILES[@]}"
-    done
+    FITS=$(find ${OUTDIR} -maxdepth 1 -name "fit*")
+    ./Fitting/fit -multidraw "${OUTDIR}" $FITS
 fi
 
-cp -R "${WORKDIR}/report" "${WORKDIR}/${OUTDIR}/report"
-cd "${WORKDIR}/${OUTDIR}/report"
-pdflatex -interaction nonstopmode "report.tex" >/dev/null
+#cp -R "${WORKDIR}/report" "${WORKDIR}/${OUTDIR}/report"
+#cd "${WORKDIR}/${OUTDIR}/report"
+#pdflatex -interaction nonstopmode "report.tex" >/dev/null
 #cd "../../.."
 
 echo "all done"

@@ -2,10 +2,11 @@
 
 echo "generating fitconf files..."
 
-OUTDIR=${1:-"../rootfiles/merged_HiForestAOD_skimmed4"}
+MULTIFITFILE=${1}
+OUTDIR=${2:-"../rootfiles/merged_HiForestAOD_skimmed4"}
 BASENAME="fit"
-MULTIFITFILE="${OUTDIR}/merged_HiForestAOD.multifit"
 
+echo "Reading file: ${1}"
 if [ ! -f "$MULTIFITFILE" ]
 then
     echo "Error: ${MULTIFITFILE} file does not exist!"

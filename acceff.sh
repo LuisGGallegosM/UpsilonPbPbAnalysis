@@ -2,20 +2,22 @@
 
 CLING="NO"
 #input file for acceptancy located in datasets directory
+FLAGS=${1:-"-all"}
 ACCINPUTFILENAME="OniaTree_Ups1SMM_5p02TeV_TuneCUETP8M1_nofilter_pp502Fall15-MCRUN2_71_V1-v1_GENONLY.root"
 EFFINPUTFILENAME="merged_HiForestAOD_MCFix2.root"
-FITINPUTFILENAME="../rootfiles/merged_HiForestAOD_skimmed7/output/merged_HiForestAOD_comp0/fit.root"
-FLAGS=${1:-"-all"}
+MULTIFITINPUTFILENAME="merged_HiForestAOD_MCFix2_skim/multifit0"
+
 #input file with relative path for Acceptancy
 ACCINPUTFILE="../rootfiles/datasets/${ACCINPUTFILENAME}"
 #input file with relative path for Effiency
 EFFINPUTFILE="../rootfiles/datasets/${EFFINPUTFILENAME}"
-#working directory
-WORKDIR="../rootfiles/merged_HiForestAOD_MCFix2_AccEff"
-#folder to output all files
-OUTPUTFOLDER="${WORKDIR}/output"
+#file with multifit results
+FITINPUTFILENAME="../rootfiles/analysis/${MULTIFITINPUTFILENAME}/fit.root"
 #cut configuration file, located in workdir
-CONFIG="${WORKDIR}/merged_HiForestAOD_MC.cutconf"
+CONFIG="../rootfiles/analysis/${MULTIFITINPUTFILENAME}/fit0/fit0.cutconf"
+#folder to output all files
+OUTPUTFOLDER="../rootfiles/analysis/${MULTIFITINPUTFILENAME}/acceff"
+
 #output file, put in OUTPUTFOLDER and same as output folder but with .root extension
 ACCOUTPUTFILE="${OUTPUTFOLDER}/outputAcc.root"
 EFFOUTPUTFILE="${OUTPUTFOLDER}/outputEff.root"

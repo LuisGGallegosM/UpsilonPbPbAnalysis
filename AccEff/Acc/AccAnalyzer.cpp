@@ -90,8 +90,8 @@ void AccHistografer::FillDet(const inputs* in)
 void AccHistografer::Write(const std::string& basename)
 {
     //calculate acceptancy
-    ptQQAcceptancy=createTEff(ptHistQQDet,ptHistQQGen,"pt QQ Acceptancy");
-    etaVsPtQQAcceptancy=createTEff(etaVsPtQQDet,etaVsPtQQGen,"eta vs pt QQ Acceptancy");
+    ptQQAcceptancy=createTEff(ptHistQQDet,ptHistQQGen,"pt QQ Acceptancy", "Acceptancy;p^{#mu#mu}_{T} ( GeV/c );#alpha");
+    etaVsPtQQAcceptancy=createTEff(etaVsPtQQDet,etaVsPtQQGen,"eta vs pt QQ Acceptancy","Acceptancy;|y^{#mu#mu}|;p^{#mu#mu}_{T} ( GeV/c )");
 
     //write 2D plots
     writeToCanvas(etaVsPtQQGen,    "|y^{#mu#mu}|","p^{#mu#mu}_{T} ( GeV/c )",basename+"_EtaPtQQ_Gen.pdf");
@@ -107,8 +107,9 @@ void AccHistografer::Write(const std::string& basename)
     //write 1D plots
     writeToCanvas(ptHistQQGen,       "p^{#mu#mu}_{T} ( GeV/c )", "N_{Gen}^{#mu#mu}",basename+"_PtQQ_Gen.pdf");
     writeToCanvas(ptHistQQDet,       "p^{#mu#mu}_{T} ( GeV/c )", "N_{Det}^{#mu#mu}",basename+"_PtQQ_Det.pdf");
-    writeToCanvasEff(ptQQAcceptancy.get(), "p^{#mu#mu}_{T} ( GeV/c )", "Acc",       basename+"_PtQQ_Acceptancy.pdf");
-    writeToCanvasEff2D(etaVsPtQQAcceptancy.get(), "p^{#mu#mu}_{T} ( GeV/c )", "Acc",  basename+"_EtaPtQQ_Acceptancy.pdf");
+    writeToCanvasEff(ptQQAcceptancy.get(), "p^{#mu#mu}_{T} ( GeV/c )", "#alpha",       basename+"_PtQQ_Acceptancy.pdf");
+
+    writeToCanvasEff2D(etaVsPtQQAcceptancy.get(), "|y^{#mu#mu}|" , "p^{#mu#mu}_{T} ( GeV/c )",  basename+"_EtaPtQQ_Acceptancy.pdf");
 
     ptHistQQGen->Write(0,TObject::kOverwrite);
     ptHistQQDet->Write(0,TObject::kOverwrite);

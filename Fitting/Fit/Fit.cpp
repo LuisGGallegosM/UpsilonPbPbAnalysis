@@ -1,28 +1,28 @@
 
-#include "Fit.h"
 
-void SetFitConfig(fitConfig* fitConf);
+#include "Fit.h"
 
 /**
  * @brief Does a invariant mass fit, from a branch in a tree
  * in a root file. Saves the plot in a tree and in pdf file format.
  * 
- * @param filename filename of the root file where to find the tree
+ * @param inputfilename filename of the root file where to find the tree
  * @param outfilename filename of root file where to store fit results
  * @param config fit configuration parameters
  */
-void Fit(const char* filename, const char* outfilename, const char* configname)
+void Fit(const char* inputfilename, const char* cutfilename, const char* outfilename, const char* configname)
 {
     std::cout << "\nFITTING\n";
-    std::cout << "Reading input file: " << filename <<'\n';
+    std::cout << "Reading input file: " << inputfilename <<'\n';
+    std::cout << "Reading input file: " << cutfilename <<'\n';
+    std::cout << "Reading input file: " << configname <<'\n';
     std::cout << "Writing output file: " << outfilename <<'\n';
-    std::cout << "Reading configuration file: " << configname <<'\n';
 
-    TFile file(filename, "READ");
+    TFile file(inputfilename, "READ");
 
     if (file.IsZombie()) 
     {
-        std::cerr << "file "<< filename <<" cannot be read\n";
+        std::cerr << "file "<< inputfilename <<" cannot be read\n";
         return;
     }
 
@@ -59,7 +59,7 @@ void Fit(const char* filename, const char* outfilename, const char* configname)
 
     //copy fit config file, same filename as output root file but with .cutconf extension
     CopyFile(configname, ReplaceExtension(outfilename,".fitconf").data());
-    CopyFile(ReplaceExtension(filename,".cutconf").data(),ReplaceExtension(outfilename,".cutconf").data() );
+    CopyFile(cutfilename,ReplaceExtension(outfilename,".cutconf").data() );
 
     
     RooAbsReal* fittedFunc = massFitter->fit();
@@ -76,6 +76,6 @@ void Fit(const char* filename, const char* outfilename, const char* configname)
     massFitter->getDataset()->Write();
     massFitter->getResults()->Write("fitresults");
     fittedFunc->Write();
-    massFitter->getVar()->Write();
+    massFitter->getVar()->Write("mass");
 }
 

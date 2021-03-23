@@ -38,6 +38,7 @@ void EffAnalyzerBase<Reader>::Write(const std::string& basename)
 
     //write 2D plots
     writeToCanvas(etaVsPtQQRecoCut,"|y^{#mu#mu}|","p^{#mu#mu}_{T} ( GeV/c )",basename+"_EtaPtQQ_RecoCut.pdf");
+    writeToCanvas(etaVsPtQQDet,"|y^{#mu#mu}|","p^{#mu#mu}_{T} ( GeV/c )",basename+"_EtaPtQQ_Det.pdf");
     writeToCanvas(etaVsPtMuRecoCut,"|#eta^{#mu}|"   ,"p^{#mu}_{T} ( GeV/c )",basename+"_EtaPtMu_RecoCut.pdf");
 
     //write 1D plots
@@ -50,12 +51,13 @@ void EffAnalyzerBase<Reader>::Write(const std::string& basename)
     ptHistQQRecoCut->Write(0,TObject::kOverwrite);
 
     //calculate efficiency
-    ptQQEfficiency = createTEff(ptHistQQRecoCut,ptHistQQDet,"pt QQ Efficiency");
+    ptQQEfficiency = createTEff(ptHistQQRecoCut,ptHistQQDet,"pt QQ Efficiency","Efficiency;p^{#mu#mu}_{T} ( GeV/c );#epsilon");
 
-    etaVsPtQQEfficiency = createTEff(etaVsPtQQRecoCut,etaVsPtQQDet,"eta vs pt QQ Efficiency");
+    etaVsPtQQEfficiency = createTEff(etaVsPtQQRecoCut,etaVsPtQQDet,"eta vs pt QQ Efficiency","Efficiency;|y^{#mu#mu}|;p^{#mu#mu}_{T} ( GeV/c )");
 
-    writeToCanvasEff(ptQQEfficiency.get(), "p^{#mu#mu}_{T} ( GeV/c )", "Eff",    basename+"_PtQQ_Efficiency.pdf");
-    writeToCanvasEff2D(etaVsPtQQEfficiency.get(), "p^{#mu#mu}_{T} ( GeV/c )", "Eff",basename+"_EtaVsPtQQ_Efficiency.pdf");
+    writeToCanvasEff(ptQQEfficiency.get(), "p^{#mu#mu}_{T} ( GeV/c )", "#epsilon",    basename+"_PtQQ_Efficiency.pdf");
+
+    writeToCanvasEff2D(etaVsPtQQEfficiency.get(),"|y^{#mu#mu}|", "p^{#mu#mu}_{T} ( GeV/c )",basename+"_EtaPtQQ_Efficiency.pdf");
 
     ptQQEfficiency->Write(0,TObject::kOverwrite);
     etaVsPtQQEfficiency->Write(0,TObject::kOverwrite);

@@ -2,12 +2,11 @@
 
 CLING="NO"
 
-WORKDIR="test/Fitting/Drawing"
 DEFAULTFILE="merged_HiForestAOD_fit1"
 #directory where fit files are located
-INPUT=${1:-"../rootfiles/${WORKDIR}/${DEFAULTFILE}"}
+INPUT=${1:-"../rootfiles/fits/merged_HiForestAOD_MCFix2_skim_fit"}
 #path to draw configuration file
-DRAWFILE=${2:-"../rootfiles/${WORKDIR}/merged_HiForestAOD.drawconf"}
+DRAWFILE=${2:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
 
 #execute fit
 if [ $CLING = "YES" ]

@@ -4,14 +4,14 @@
 		{
 			"type": "shell",
 			"label": "C++: skim",
-			"command": "./skim.sh;",
+			"command": "./skim.sh -skim",
 			"problemMatcher": [],
 			"group": "build"
 		},
 		{
 			"type": "shell",
 			"label": "C++: skim jet",
-			"command": "./skim.sh -jet;",
+			"command": "./skim.sh -skimjet",
 			"problemMatcher": [],
 			"group": "build"
 		},

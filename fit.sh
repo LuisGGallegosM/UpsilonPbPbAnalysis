@@ -1,21 +1,16 @@
 #!/bin/bash
 
 CLING="NO"
-DEFAULTNAME="merged_HiForestAOD_skimmed4"
-DEFAULTFITFILE="merged_HiForestAOD_fit6"
 #root file to fit from
-INPUTFILE="${1:-../rootfiles/${DEFAULTNAME}/${DEFAULTNAME}.root}"
+INPUTFILE="${1:-../rootfiles/skims/skim/merged_HiForestAOD_MCFix2_skim/SKIM20MAR2021/merged_HiForestAOD_MCFix2_skim.root}"
+CUTCONFIG="${2}"
 #fit configuration file name
-CONFIG="${2:-../rootfiles/${DEFAULTNAME}/${DEFAULTFITFILE}.fitconf}"
+CONFIG="${3:-../rootfiles/confFiles/merged_HiForestAOD_MC_test.fitconf}"
 #directory where to save all files
-OUTPUTDIR="${3:-../rootfiles/${DEFAULTNAME}/${DEFAULTFITFILE}}"
+OUTPUTDIR="${4:-../rootfiles/fits/merged_HiForestAOD_MCFix2_skim_fit}"
 
-#draw configuration file name, must have same name as INPUTFILE but with drawconf extension
-DRAWCONFIG="${INPUTFILE%.*}.drawconf"
 #name of generated file is like CONFIG but with .root extension
 OUTPUTFILE="${OUTPUTDIR}/$( basename $OUTPUTDIR ).root"
-#path of file where to save log
-LOGFILE="${OUTPUTFILE%.*}_Fitting.log"
 
 mkdir -p $OUTPUTDIR
 
@@ -23,8 +18,8 @@ mkdir -p $OUTPUTDIR
 if [ $CLING = "YES" ]
 then
 cd Fitting
-root -q 'Fitting.cpp("'../${INPUTFILE}'","'../${OUTPUTFILE}'","'../${CONFIG}'")' > "../${LOGFILE}" 2>&1
+root -q 'Fitting.cpp("'../${INPUTFILE}'","'../${CUTCONFIG}'","'../${OUTPUTFILE}'","'../${CONFIG}'")'
 cd ..
 else
-./Fitting/fit "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}" > "${LOGFILE}" 2>&1
+./Fitting/fit -fit "${INPUTFILE}" "${CUTCONFIG}" "${OUTPUTFILE}" "${CONFIG}"
 fi

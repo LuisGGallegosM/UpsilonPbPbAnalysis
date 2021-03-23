@@ -67,7 +67,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     TH1F* dens= new TH1F((*acc_den)*(*eff_den));
     TH1F* nums= new TH1F((*acc_num)*(*eff_num));
 
-    std::unique_ptr<TEfficiency> AccXEff = createTEff(nums,dens,"pt QQ AccXEff");
+    std::unique_ptr<TEfficiency> AccXEff = createTEff(nums,dens,"pt QQ AccXEff","#alpha #epsilon;p^{#mu#mu}_{T} GeV/c; #alpha#epsilon;");
     return AccXEff;
  }
 

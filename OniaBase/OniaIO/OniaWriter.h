@@ -22,7 +22,7 @@ float getJettyCorr(JetCorrector* JEC,const OniaJetInfo* inputJet, int iJet,float
 TH2F* createTH2Z(const std::string& name,const std::string& title);
 void writeToCanvasZ(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option);
 
-void addOutputs(OniaQQ* data,TreeWriter* writer);
+void addOutputs(OniaQQ* data,TreeWriter* writer, const char* prefix);
 void addOutputs(OniaJetQQMC* data,TreeWriter* writer);
 void addOutputs(OniaJetQQRealData* data,TreeWriter* writer);
 
@@ -58,7 +58,7 @@ class OniaWriterRecoQQ : public DataWriter
 
     void registerWriter(TreeWriter* writer) override
     {
-        addOutputs(&output,writer);
+        addOutputs(&output,writer,"reco_");
     }
 
     template<typename Reader>
@@ -81,7 +81,7 @@ class OniaWriterGenQQ : public DataWriter
 
     void registerWriter(TreeWriter* writer) override
     {
-        addOutputs(&output,writer);
+        addOutputs(&output,writer,"gen_");
     }
 
     template<typename Reader>

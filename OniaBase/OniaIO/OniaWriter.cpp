@@ -17,11 +17,11 @@ int getRecoPdgId(const OniaMCData* dataIn, int index)
   return pdgId;
 }
 
-void addOutputs(OniaQQ* data,TreeWriter* writer)
+void addOutputs(OniaQQ* data,TreeWriter* writer, const char* prefix)
 {
     data->oniaInfoOut.addOutputs(writer);
-    data->oniaQQOut.addOutputs(writer);
-    data->oniaMuOut.addOutputs(writer);
+    data->oniaQQOut.addOutputs(writer,prefix);
+    data->oniaMuOut.addOutputs(writer,prefix);
 }
 
 void addOutputs(OniaJetQQRealData* data,TreeWriter* writer)

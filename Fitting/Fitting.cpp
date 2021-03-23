@@ -3,8 +3,8 @@
 #include <string>
 #include <iostream>
 
-void Fit(const char* filename, const char* outfilename, const char* configname);
-void DrawCmp( const char* outputfilename, int size,const char** fitfilenames);
+void Fit(const char* filename, const char* cutfilename, const char* outfilename, const char* configname);
+void DrawCmp(const char* outputpath,int size,const char** fitfilepaths);
 void DrawPlot(const char* inputdirectoryname, const char* configfilename  );
 
 #if !defined(__CLING__)
@@ -35,15 +35,22 @@ int main(int argc, char **argv)
             std::cerr << "Error: Incorrect number of parameters\n";  
         }
     }
-    else
-    if (argc ==4)
+    else if (option=="-fit")
     {
-        Fit(argv[1],argv[2],argv[3]);
+        if (argc ==6)
+        {
+            Fit(argv[2],argv[3],argv[4],argv[5]);
+        }
+        else
+        {
+            std::cerr << "Incorrect number of parameters\n";  
+        }
     }
     else
     {
-        std::cerr << "Incorrect number of parameters\n";  
+        std::cerr << "Incorrect option flags\n";  
     }
+
         
     return 0;
 }

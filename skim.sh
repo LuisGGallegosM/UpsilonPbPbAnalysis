@@ -2,16 +2,17 @@
 
 CLING="NO"
 
-FLAGS=${1:-""}
+FLAGS=${1:-"-skimjet"}
 FLAGS2=${2:-"-nocmd"}
 
 #input file to skim
-INPUTFILE="../rootfiles/datasets/merged_HiForestAOD_DATA.root"
+INPUTFILE="../rootfiles/datasets/merged_HiForestAOD_MCFix2.root"
+#cut configuration file
+CONFIG="../rootfiles/confFiles/merged_HiForestAOD_MC.cutconf"
+
 INPUTFILENAME=$(basename $INPUTFILE)
 #how to folder name skim result file
-OUTPUTFOLDER="../rootfiles/skims/${INPUTFILENAME%.*}_skim"
-#cut configuration file
-CONFIG="../rootfiles/confFiles/merged_HiForestAOD_jetskim.cutconf"
+OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_${FLAGS:1}"
 #output skimmed file, put in OUTPUTFOLDER and name based in inputfile
 OUTPUTFILENAME="${INPUTFILENAME%.*}_skim.root"
 OUTPUTFILE="${OUTPUTFOLDER}/${OUTPUTFILENAME}"

@@ -2,14 +2,14 @@
 #include"AccEffAux.h"
 #include<array>
 #include"TCanvas.h"
+#include "TGraphAsymmErrors.h"
 
 constexpr std::array<double,7> pTBins  { 0.0f,2.0f,4.0f,6.0f,9.0f,12.0f,30.0f};
+constexpr std::array<double,6> EtaBins { 0.0f,0.5f,1.0f,1.5f,2.0f,2.4f};
 
 TH2F* createTH2QQ(const std::string& name,const std::string& title)
 {
-    const int binyN = 6;
-    const float yMax = 3.0f;
-    TH2F* result =new TH2F(name.data(),title.data(),binyN,0.0,yMax,pTBins.size()-1,pTBins.data());
+    TH2F* result =new TH2F(name.data(),title.data(),EtaBins.size()-1,EtaBins.data(),pTBins.size()-1,pTBins.data());
     result->SetStats(false);
     result->Sumw2();
     return result;
@@ -87,11 +87,11 @@ void writeToCanvasEff2D(TEfficiency* hist,const std::string& xname,const std::st
     canvas.SaveAs(outname.data());
 }
 
-std::unique_ptr<TEfficiency> createTEff(TH1* num, TH1* den, const std::string& name)
+std::unique_ptr<TEfficiency> createTEff(TH1* num, TH1* den, const std::string& name, const std::string& title)
 {
     TEfficiency* teff=new TEfficiency(*num,*den);
     teff->SetStatisticOption(TEfficiency::EStatOption::kFNormal);
     teff->SetName(name.data());
-    teff->SetTitle(name.data());
+    teff->SetTitle(title.data());
     return std::unique_ptr<TEfficiency>(teff);
 }

@@ -12,24 +12,26 @@ void drawCompGraph(fitGetter func, const std::vector<FitElement>& fits,TH1F* gra
 std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs);
 std::vector<toGet> fillVariables(const fitConfig* fit);
 
-void DrawCmp(const char* outputfilename,int size,const char** fitfilenames)
+void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
 {
     std::cout << "\nDRAWING\n";
-    std::cout << "Drawing output file: " << outputfilename <<'\n';
+    std::cout << "Output to folder : " << outputpath <<'\n';
+    std::vector<std::string> fitpaths;
     for(int i=0;i<size;i++)
     {
-        std::cout << "Reading fit results file: " << fitfilenames[i] <<'\n';
-        std::cout << "Reading fit configuration file: " <<ReplaceExtension(fitfilenames[i], ".fitconf") <<"\n";
+        std::cout << "Reading fit results from: " << fitfilepaths[i] <<'\n';
+        fitpaths.push_back(fitfilepaths[i]);
     }
         
     std::vector<FitElement> fits;
 
-    for(int i=0;i<size;i++)
+    for(const auto& fitpath : fitpaths)
     {
         fits.emplace_back();
         FitElement& fit = fits.back();
-        fit.fits.deserialize(fitfilenames[i]);
-        fit.configs.deserialize( ReplaceExtension(fitfilenames[i], ".fitconf").data()  );
+        std::string basename= getBasename(fitpath);
+        fit.fits.deserialize(fitpath+"/"+basename+".fit");
+        fit.configs.deserialize(fitpath+"/"+basename+".fitconf");
         assert(fit.fits.isValid());
         assert(fit.configs.isValid());
     }
@@ -41,14 +43,14 @@ void DrawCmp(const char* outputfilename,int size,const char** fitfilenames)
     const std::vector<toGet> getters = fillVariables(&(fits[0].configs));
 
     //root output file
-    std::string outfilename= ReplaceExtension(outputfilename,".root");
+    std::string outfilename= std::string(outputpath)+"/fit.root";
     std::cout << "Writing to output file: " << outfilename <<'\n';
     TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
 
     for(const auto& getter : getters)
     {
         const char* name= getter.name.data();
-        std::string outfilename = ReplaceExtension(outputfilename,"_")+name+".pdf";
+        std::string outfilename = std::string(outputpath)+"/"+name+".pdf";
         std::string plotname = std::string(name)+" plot";
 
         TCanvas canvas(plotname.data(),plotname.data(),4,45,550,520);

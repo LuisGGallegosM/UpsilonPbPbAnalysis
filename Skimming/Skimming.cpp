@@ -8,14 +8,16 @@
 
 int main(int argc, char **argv)
 {
-    if (argc == 4)
-        OniaSkim(argv[1],argv[2],argv[3]);
-    else if (argc ==5)
+    if (argc ==5)
     {
         std::string flag= argv[1];
-        if(flag=="-jet")
+        if(flag=="-skimjet")
         {
             OniaJetSkim(argv[2],argv[3],argv[4]);
+        }
+        else if (flag=="-skim")
+        {
+            OniaSkim(argv[2],argv[3],argv[4]);
         }
         else
         {
