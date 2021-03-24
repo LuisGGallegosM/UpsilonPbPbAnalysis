@@ -60,6 +60,6 @@ Most packages are not standalone and depends on another as follows to reuse code
 - acceff.sh : script for acceptancy and efficiency tests.
 - draw.sh : script for drawing fit results.
 - fit.sh : script for fitting.
-- multifit.sh : script for running multiple fits and generating parameter vs pT plots.
+- multifit.sh : script for running multiple fits in parallel and generating parameter vs pT plots.
 - skim.sh : script for skimming.
 

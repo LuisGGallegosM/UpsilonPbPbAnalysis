@@ -43,7 +43,7 @@ case $FLAGS in
     ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
     ;;
     "-all")
-    ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}" "${CONFIG}"
+    ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}"
     ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}"
     ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
     ;;
