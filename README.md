@@ -6,19 +6,21 @@ ROOT library should be present.
 
 Run "make" in the main directory to build/update automatically all packages, should be run if any change to c++ source code is made. Run in root command line will be done in one or two days.
 Repo is divided into Packages and each package into one or more modules.
-The bash scripts
+The bash scripts:
 - acceff.sh
 - draw.sh
 - fit.sh
 - multifit.sh
 - skim.sh
+
 are the most top level entities in the repo, analyses can be run more easily with these.
 
-Packages
+Packages:
 - Skimming
 - Fitting
 - AccEff
-are executable ones and can be run directly in terminal if desired, the associated script serves as a example of its usage.
+
+Are executable ones and can be run directly in terminal if desired, the associated script serves as a example of its usage.
 
 # Dependecy graph:
 Most packages are not standalone and depends on another as follows to reuse code (arrow indicates "depends on"):
