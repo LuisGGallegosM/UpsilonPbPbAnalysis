@@ -2,7 +2,7 @@
 #define ONIAJETCUTTER
 
 #include "../../OniaBase/OniaIO/OniaIO.h"
-#include "../../OniaBase/CutParams.h"
+#include "../../OniaBase/Params/Params.h"
 #include "../Common/Skimmer.h"
 
 template<typename Reader>

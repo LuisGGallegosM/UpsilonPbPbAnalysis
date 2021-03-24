@@ -1,10 +1,12 @@
 
-#include "CutParams.h"
 #include <algorithm>
+
+#include "../../Utils/Serialization/Serialization.h"
+#include "CutParams.h"
 
 void CutParams::deserialize(const std::string& filename)
 {
-    serializer ser(filename);
+    Serializer ser(filename);
     ser.read("isMC",isMC);
     ser.read("trigSelect", trigSelect);
     ser.read("checkSign",checkSign );

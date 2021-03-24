@@ -1,7 +1,7 @@
 
 FLAGS=$(shell ../HelperScripts/compilerFlags.sh ) -c
-SOURCES:=$(wildcard *.cpp)
-HEADERS:=$(wildcard *.h)
+SOURCES:=$(shell find . -name  "*.cpp")
+HEADERS:=$(shell find . -name  "*.h")
 INC:=-I $(shell $(ROOTSYS)/bin/root-config --cflags)
 OUTPUT:=libUtils
 

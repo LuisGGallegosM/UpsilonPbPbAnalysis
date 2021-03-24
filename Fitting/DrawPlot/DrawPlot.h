@@ -18,8 +18,8 @@
 
 #include "../../Drawing/GraphStyle.h"
 #include "../../Drawing/TextDrawer.h"
-#include "../../OniaBase/DrawParams.h"
-#include "../../Utils/utils.h"
+#include "../../OniaBase/Params/Params.h"
+#include "../../Utils/Helpers/Helpers.h"
 
 #define FITFUNCNAME "fitFunc"
 #define DATASETNAME "dataset"

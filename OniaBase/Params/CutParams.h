@@ -1,13 +1,8 @@
 #ifndef SKIMPARAMS
 #define SKIMPARAMS
 
-#include "../Utils/serialize.h"
-#include "OniaIO/OniaIO.h"
+#include "../OniaIO/OniaIO.h"
 #include "TLorentzVector.h"
-
-//changed to Jpsi that is currently hardcoded to Jpsi
-//Upsilon Y1S PDG ID
-#define UPSILON_Y1S_PDGID (553) true PDG
 
 class CutParams
 {

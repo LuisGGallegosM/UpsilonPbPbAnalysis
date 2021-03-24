@@ -1,10 +1,11 @@
 
-#include "TTree.h"
-#include "TFile.h"
 #include <iostream>
 
-#include "../../Utils/utils.h"
-#include "../../OniaBase/CutParams.h"
+#include "TTree.h"
+#include "TFile.h"
+
+#include "../../Utils/Helpers/Helpers.h"
+#include "../../OniaBase/Params/Params.h"
 #include "EffAnalyzer.h"
 
 void EffTest(const char* filename,const char* outputfilename, const char* configname)

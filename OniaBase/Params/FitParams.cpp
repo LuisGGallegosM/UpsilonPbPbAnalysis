@@ -3,7 +3,7 @@
 
 //DCB
 
-void dcbParam::deserialize(serializer& ser)
+void dcbParam::deserialize(Serializer& ser)
 {
     ser.read("mean",mean);
     ser.read("alpha",alpha);
@@ -13,7 +13,7 @@ void dcbParam::deserialize(serializer& ser)
     ser.read("f",f);
 }
 
-void dcbParam::serialize(serializer& ser) const
+void dcbParam::serialize(Serializer& ser) const
 {
     ser.write("mean",mean);
     ser.write("alpha",alpha);
@@ -35,7 +35,7 @@ void dcbParam::setParams(float mean_,float alpha_,float n_,float sigma_, float x
 
 //BkgParams
 
-void BkgParams::deserialize(serializer& ser)
+void BkgParams::deserialize(Serializer& ser)
 {
     std::string str;
     ser.read("bkgType",str);
@@ -61,7 +61,7 @@ void BkgParams::deserialize(serializer& ser)
     }
 }
 
-void BkgParams::serialize(serializer& ser) const
+void BkgParams::serialize(Serializer& ser) const
 {
     ser.write("bkgType", toStr(bkgType));
     switch(bkgType)
@@ -130,7 +130,7 @@ BkgParams::BkgType BkgParams::fromStr(const std::string& str)
 
 //externParams
 
-void externParams::deserialize(serializer& ser)
+void externParams::deserialize(Serializer& ser)
 {
     ser.read("moreUpsilon",moreUpsilon);
     ser.read("nSigY1S",nSigY1S);
@@ -143,7 +143,7 @@ void externParams::deserialize(serializer& ser)
    ser.read("nBkg",nBkg);
 }
 
-void externParams::serialize(serializer& ser) const
+void externParams::serialize(Serializer& ser) const
 {
     ser.write("moreUpsilon",moreUpsilon);
     ser.write("nSigY1S",nSigY1S);
@@ -167,7 +167,7 @@ bool externParams::isValid() const
 
 //fitParamsNoLimits
 
-void fitParamsNoLimits::deserialize(serializer& ser)
+void fitParamsNoLimits::deserialize(Serializer& ser)
 {
     extParam.deserialize(ser);
 
@@ -180,7 +180,7 @@ void fitParamsNoLimits::deserialize(serializer& ser)
     ser.removePrefix();
 }
 
-void fitParamsNoLimits::serialize(serializer& ser) const
+void fitParamsNoLimits::serialize(Serializer& ser) const
 {
     extParam.serialize(ser);
 
@@ -195,7 +195,7 @@ void fitParamsNoLimits::serialize(serializer& ser) const
 
 //fitParams
 
-void fitParams::deserialize(serializer& ser)
+void fitParams::deserialize(Serializer& ser)
 {
     fitParamsNoLimits::deserialize(ser);
 
@@ -210,17 +210,17 @@ void fitParams::deserialize(serializer& ser)
 
 void fitParams::deserialize(const std::string& filename)
 {
-    serializer ser(filename);
+    Serializer ser(filename);
     deserialize(ser);
 }
 
 void fitParams::serialize(const std::string& filename) const
 {
-    serializer ser(filename,serializer::iotype::write);
+    Serializer ser(filename,Serializer::iotype::write);
     serialize(ser);
 }
 
-void fitParams::serialize(serializer& ser) const
+void fitParams::serialize(Serializer& ser) const
 {
     fitParamsNoLimits::serialize(ser);
 
@@ -234,7 +234,7 @@ void fitParams::serialize(serializer& ser) const
 }
 
 //fitParamsWithErrors
-void fitParamsWithErrors::deserialize(serializer& ser)
+void fitParamsWithErrors::deserialize(Serializer& ser)
 {
     fitParams::deserialize(ser);
 
@@ -245,13 +245,13 @@ void fitParamsWithErrors::deserialize(serializer& ser)
 
 void fitParamsWithErrors::deserialize(const std::string& filename)
 {
-    serializer ser(filename);
+    Serializer ser(filename);
     deserialize(ser);
 }
 
 void fitParamsWithErrors::serialize(const std::string& filename) const
 {
-    serializer ser(filename,serializer::iotype::write);
+    Serializer ser(filename,Serializer::iotype::write);
     fitParams::serialize(ser);
 
     ser.addPrefix("error");
@@ -262,7 +262,7 @@ void fitParamsWithErrors::serialize(const std::string& filename) const
 
 //kinecutParams
 
-void kinecutParams::deserialize(serializer& ser)
+void kinecutParams::deserialize(Serializer& ser)
 {
     ser.read("ptLow",ptLow);
     ser.read("ptHigh",ptHigh);
@@ -274,7 +274,7 @@ void kinecutParams::deserialize(serializer& ser)
 
 void fitConfig::deserialize(const std::string& filename)
 {
-    serializer ser(filename);
+    Serializer ser(filename);
     //set background and fit range
     ser.read("massHigh",massHigh);
     ser.read("massLow",massLow);

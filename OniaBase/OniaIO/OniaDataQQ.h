@@ -4,7 +4,7 @@
 #define maxBranchSize (64)
 
 #include "TClonesArray.h"
-#include "../../TreeProcessor/TreeReader.h"
+#include "../TreeProcessor/TreeProcessor.h"
 
 struct OniaGenQQ
 {

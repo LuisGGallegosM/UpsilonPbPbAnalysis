@@ -2,7 +2,7 @@
 #define ONIADATASIMPLE
 
 #include"TLorentzVector.h"
-#include "../../TreeProcessor/TreeWriter.h"
+#include "../TreeProcessor/TreeProcessor.h"
 
 struct OniaSimpleInfo
 {

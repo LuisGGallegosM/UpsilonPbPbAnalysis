@@ -1,9 +1,12 @@
+
 #include "EffAnalyzer.h"
-#include "../Common/AccEffAux.h"
-#include "TCanvas.h"
-#include "TPie.h"
+
 #include <array>
 
+#include "TCanvas.h"
+#include "TPie.h"
+
+#include "../Common/AccEffAux.h"
 
 template<typename Reader>
 EffAnalyzerBase<Reader>::EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName ) : 

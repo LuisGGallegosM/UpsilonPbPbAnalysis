@@ -1,10 +1,9 @@
 #ifndef ONIAJETSKIMMER
 #define ONIAJETSKIMMER
 
-#include "../../TreeProcessor/TreeProcessor.h"
+#include "../../OniaBase/TreeProcessor/TreeProcessor.h"
 #include "../../OniaBase/OniaIO/OniaIO.h"
-#include "../../OniaBase/JEC/JetCorrector.h"
-#include "../../OniaBase/JEC/JetUncertainty.h"
+#include "../../OniaBase/JetCorrections/JetCorrections.h"
 #include "../Common/Skimmer.h"
 #include "OniaJetCutter.h"
 

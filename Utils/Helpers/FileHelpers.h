@@ -2,8 +2,8 @@
 #define UTILS
 
 #include <string>
-#include "RooRealVar.h"
-#include "RooAbsReal.h"
+
+#include "TTree.h"
 #include "TFile.h"
 
 std::string ReplaceExtension(const char* outfilename,const char* newextension);

@@ -2,7 +2,7 @@
 FLAGS=$(shell ../HelperScripts/compilerFlags.sh ) -c
 SOURCES:=$(shell find . -name  "*.cpp")
 HEADERS:=$(shell find . -name  "*.h")
-STATICLIBS:=../Utils/libUtils.a ../TreeProcessor/libTreeProcessor.a
+STATICLIBS:=../Utils/libUtils.a
 INC:=-I $(shell $(ROOTSYS)/bin/root-config --cflags)
 ROOTLIBS:=$(shell $(ROOTSYS)/bin/root-config --ldflags --glibs) -lRooFit -lRooFitCore -lMinuit
 OUTPUT:=libOniaBase
@@ -10,13 +10,9 @@ OUTPUT:=libOniaBase
 libOniaBase.a : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	g++ ${SOURCES} ${INC} ${ROOTLIBS} ${LIBS} ${FLAGS}
 	ar xv ../Utils/libUtils.a
-	ar xv ../TreeProcessor/libTreeProcessor.a
 	ar rcs ${OUTPUT}.a *.o
 	objdump $(shell ../HelperScripts/objdumpFlags.sh) ${OUTPUT}.a > ${OUTPUT}.s
 	rm -f *.o
-
-../TreeProcessor/libTreeProcessor.a :
-	$(MAKE) -C ../TreeProcessor
 
 ../Utils/libUtils.a :
 	$(MAKE) -C ../Utils

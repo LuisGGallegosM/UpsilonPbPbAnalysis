@@ -1,7 +1,7 @@
 #ifndef DRAWINGCMP
 #define DRAWINGCMP
 
-#include"../../OniaBase/FitParams.h"
+#include"../../OniaBase/Params/Params.h"
     
 struct FitElement
 {

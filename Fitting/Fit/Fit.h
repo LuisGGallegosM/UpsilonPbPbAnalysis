@@ -4,9 +4,9 @@
 #include <iostream>
 #include <fstream>
 
-#include "../../Utils/utils.h"
-#include "../../OniaBase/FitParams.h"
-#include "../../OniaBase/OniaBase.h"
+#include "../../Utils/Helpers/Helpers.h"
+#include "../../OniaBase/Params/Params.h"
+#include "../../OniaBase/Common/Common.h"
 #include "OniaMassFit.h"
 
 #include "TTree.h"

@@ -1,7 +1,7 @@
 #ifndef FITPARAMS
 #define FITPARAMS
 
-#include "../Utils/serialize.h"
+#include "../../Utils/Serialization/Serialization.h"
 
 #define RATIO_Y2S (10.023/9.460)
 #define RATIO_Y3S (10.355/9.460)
@@ -35,8 +35,8 @@ class dcbParam
     float getX()     const {return x;}
     float getF()     const {return f;}
 
-    void deserialize(serializer& ser);
-    void serialize(serializer& ser) const;
+    void deserialize(Serializer& ser);
+    void serialize(Serializer& ser) const;
 };
 
 class BkgParams
@@ -78,8 +78,8 @@ class BkgParams
     float getLambda() const {return lambda;}
     BkgType getBkgType() const {return bkgType;}
 
-    void deserialize(serializer& ser);
-    void serialize(serializer& ser) const;
+    void deserialize(Serializer& ser);
+    void serialize(Serializer& ser) const;
 
     static std::string toStr(BkgType type);
     static BkgType fromStr(const std::string& str);
@@ -111,9 +111,9 @@ class externParams
     void setNBkg(float value) {nBkg=value;}
     void setMoreUpsilon(bool more) { moreUpsilon=more; }
 
-    void deserialize(serializer& ser);
+    void deserialize(Serializer& ser);
 
-    void serialize(serializer& ser) const;
+    void serialize(Serializer& ser) const;
 
 };
 
@@ -162,9 +162,9 @@ class fitParamsNoLimits
     float getMeanY2S() const {return dcb.getMean()*RATIO_Y2S;}
     float getMeanY3S() const {return dcb.getMean()*RATIO_Y3S;}
 
-    void deserialize(serializer& ser);
+    void deserialize(Serializer& ser);
 
-    void serialize(serializer& ser) const;
+    void serialize(Serializer& ser) const;
 };
 
 class fitParams : public fitParamsNoLimits
@@ -185,11 +185,11 @@ class fitParams : public fitParamsNoLimits
     fitParamsNoLimits& getHighLimit() {return high;}
     fitParamsNoLimits& getLowLimit() {return low;}
 
-    void deserialize(serializer& ser);
+    void deserialize(Serializer& ser);
     void deserialize(const std::string& filename);
 
     void serialize(const std::string& filename) const;
-    void serialize(serializer& ser) const;
+    void serialize(Serializer& ser) const;
 };
 
 class fitParamsWithErrors : public fitParams
@@ -208,7 +208,7 @@ class fitParamsWithErrors : public fitParams
     fitParamsNoLimits& getErrors() {return errors;}
     const fitParamsNoLimits& getErrors() const {return errors;}
 
-    void deserialize(serializer& ser);
+    void deserialize(Serializer& ser);
     void deserialize(const std::string& filename);
 
     void serialize(const std::string& filename) const;
@@ -236,7 +236,7 @@ class kinecutParams
         return (ptLow>=0.0f) && (ptHigh>0.0f) && (yLow>=0.0f) && (yHigh>0.0f);
     }
 
-    void deserialize(serializer& ser);
+    void deserialize(Serializer& ser);
 };
 
 class fitConfig

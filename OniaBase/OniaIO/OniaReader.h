@@ -2,7 +2,7 @@
 #ifndef ONIADATA
 #define ONIADATA
 
-#include "../../TreeProcessor/TreeProcessor.h"
+#include "../TreeProcessor/TreeProcessor.h"
 #include "OniaDataQQ.h"
 #include "TClonesArray.h"
 

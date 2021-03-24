@@ -1,6 +1,11 @@
-#include "serialize.h"
+#include "Serializer.h"
 
-serializer::serializer(const std::string& filename, serializer::iotype iot) : filename_(filename), type(iot)
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+
+Serializer::Serializer(const std::string& filename, Serializer::iotype iot) : filename_(filename), type(iot)
 {
     if (!(iot==iotype::read) || (iot==iotype::update))
         return;
@@ -27,7 +32,7 @@ serializer::serializer(const std::string& filename, serializer::iotype iot) : fi
     };
 }
 
-serializer::~serializer()
+Serializer::~Serializer()
 {
     if ((type== iotype::write) || (type==iotype::update))
     {
@@ -39,14 +44,14 @@ serializer::~serializer()
     }
 }
 
-void serializer::addPrefix(const std::string& prefix)
+void Serializer::addPrefix(const std::string& prefix)
 {
     prefixes.push_back(prefix);
     currentPrefix.clear();
     for(const auto& str : prefixes) currentPrefix.append(str+'.');
 }
 
-void serializer::removePrefix()
+void Serializer::removePrefix()
 {
     prefixes.pop_back();
     currentPrefix.clear();
@@ -54,7 +59,7 @@ void serializer::removePrefix()
 }
 
 template <typename T>
-void serializer::write(const std::string& varname, T input)
+void Serializer::write(const std::string& varname, T input)
 {
     std::string var = currentPrefix + varname;
     if (type==iotype::read)
@@ -66,7 +71,7 @@ void serializer::write(const std::string& varname, T input)
 }
 
 template <typename T>
-void serializer::read(const std::string& varname, T& output)
+void Serializer::read(const std::string& varname, T& output)
 {
     std::string var = currentPrefix + varname;
     if (vars.find(var) != vars.end())
@@ -79,7 +84,7 @@ void serializer::read(const std::string& varname, T& output)
 }
 
 template <typename T>
-void serializer::read(const std::string& varname, T& output, T defaultValue)
+void Serializer::read(const std::string& varname, T& output, T defaultValue)
 {
     std::string var = currentPrefix + varname;
     if (vars.find(var) != vars.end())
@@ -91,7 +96,7 @@ void serializer::read(const std::string& varname, T& output, T defaultValue)
     }     
 }
 
-void serializer::write(const std::string& varname, bool input)
+void Serializer::write(const std::string& varname, bool input)
 {
     std::string var = currentPrefix + varname;
     if (type==iotype::read)
@@ -103,7 +108,7 @@ void serializer::write(const std::string& varname, bool input)
         vars[var] = "false";
 }
 
-void serializer::read(const std::string& varname, bool& output)
+void Serializer::read(const std::string& varname, bool& output)
 {
     std::string var = currentPrefix + varname;
     if (vars.find(var) != vars.end())
@@ -122,7 +127,7 @@ void serializer::read(const std::string& varname, bool& output)
     }  
 }
 
-void serializer::read(const std::string& varname, bool& output, bool defaultValue)
+void Serializer::read(const std::string& varname, bool& output, bool defaultValue)
 {
     std::string var = currentPrefix + varname;
     if (vars.find(var) != vars.end())
@@ -142,17 +147,17 @@ void serializer::read(const std::string& varname, bool& output, bool defaultValu
     }  
 }
 
-template void serializer::read(const std::string& var, int& output);
-template void serializer::read(const std::string& var, float& output);
-template void serializer::read(const std::string& var, unsigned long long& output);
-template void serializer::read(const std::string& var, std::string& output);
+template void Serializer::read(const std::string& var, int& output);
+template void Serializer::read(const std::string& var, float& output);
+template void Serializer::read(const std::string& var, unsigned long long& output);
+template void Serializer::read(const std::string& var, std::string& output);
 
-template void serializer::read(const std::string& var, int& output, int defaultValue);
-template void serializer::read(const std::string& var, float& output, float defaultValue);
-template void serializer::read(const std::string& var, unsigned long long& output, unsigned long long defaultValue);
-template void serializer::read(const std::string& var, std::string& output, std::string defaultValue );
+template void Serializer::read(const std::string& var, int& output, int defaultValue);
+template void Serializer::read(const std::string& var, float& output, float defaultValue);
+template void Serializer::read(const std::string& var, unsigned long long& output, unsigned long long defaultValue);
+template void Serializer::read(const std::string& var, std::string& output, std::string defaultValue );
 
-template void serializer::write(const std::string& var, int output);
-template void serializer::write(const std::string& var, float output);
-template void serializer::write(const std::string& var, unsigned long long output);
-template void serializer::write(const std::string& var, const std::string output);
+template void Serializer::write(const std::string& var, int output);
+template void Serializer::write(const std::string& var, float output);
+template void Serializer::write(const std::string& var, unsigned long long output);
+template void Serializer::write(const std::string& var, const std::string output);

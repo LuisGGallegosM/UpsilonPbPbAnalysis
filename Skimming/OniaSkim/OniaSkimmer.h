@@ -2,8 +2,8 @@
 #ifndef ONIASKIMMER
 #define ONIASKIMMER
 
-#include "../../TreeProcessor/TreeProcessor.h"
 #include "../../OniaBase/OniaIO/OniaIO.h"
+#include "../../OniaBase/TreeProcessor/TreeProcessor.h"
 #include "../Common/Skimmer.h"
 #include "OniaCutter.h"
 

@@ -4,7 +4,7 @@
 #include "TH2.h"
 #include "TEfficiency.h"
 
-#include "../../TreeProcessor/TreeProcessor.h"
+#include "../../OniaBase/TreeProcessor/TreeProcessor.h"
 #include "../../OniaBase/OniaIO/OniaIO.h"
 #include "../Common/AccEffAux.h"
 #include "../Common/AccCutter.h"

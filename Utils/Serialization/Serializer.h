@@ -1,13 +1,11 @@
-#ifndef SERIALIZE
-#define SERIALIZE
+#ifndef SERIALIZER
+#define SERIALIZER
 
-#include <iostream>
-#include <vector>
-#include <fstream>
-#include <sstream>
+#include <string>
 #include <map>
+#include <vector>
 
-class serializer
+class Serializer
 {
     public:
     enum class iotype { read, write, update};
@@ -20,9 +18,9 @@ class serializer
     std::string currentPrefix;
     
     public:
-    serializer(const std::string& filename, serializer::iotype iot= serializer::iotype::read);
+    Serializer(const std::string& filename, Serializer::iotype iot= Serializer::iotype::read);
 
-    ~serializer();
+    ~Serializer();
 
     void addPrefix(const std::string& prefix);
     void removePrefix();

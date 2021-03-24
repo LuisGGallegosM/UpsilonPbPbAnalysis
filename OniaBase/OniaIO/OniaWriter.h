@@ -1,9 +1,8 @@
 #ifndef ONIAWRITER
 #define ONIAWRITER
 
-#include"../../TreeProcessor/TreeProcessor.h"
-#include"../JEC/JetCorrector.h"
-#include"../JEC/JetUncertainty.h"
+#include"../TreeProcessor/TreeProcessor.h"
+#include"../JetCorrections/JetCorrections.h"
 #include"OniaReader.h"
 #include"OniaDataSimple.h"
 #include"TLorentzVector.h"
