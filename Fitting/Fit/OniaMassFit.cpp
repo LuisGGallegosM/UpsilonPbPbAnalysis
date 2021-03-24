@@ -168,3 +168,19 @@ void OniaMassFitter2::combinePdf()
         output.reset(dcball);
     }
 }
+
+std::unique_ptr<OniaMassFitter> createMassFitter(TTree* input, const fitConfig* config)
+{
+    std::unique_ptr<OniaMassFitter> massFitter;
+    if (config->isMoreUpsilon())
+    {
+        //fit with 1S,2S and 3S Upsilon 
+        massFitter.reset(new OniaMassFitter2(input, config));
+    }
+    else
+    {
+        //fit only 1S Upsilon
+        massFitter.reset(new OniaMassFitter(input, config));
+    }
+    return massFitter;
+}

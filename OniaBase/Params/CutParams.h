@@ -4,6 +4,10 @@
 #include "../OniaIO/OniaIO.h"
 #include "TLorentzVector.h"
 
+/**
+ * @brief stores the information for cut in skimming, such as
+ * pt and y ranges and if is MC or Real Data.
+ */
 class CutParams
 {
     private:

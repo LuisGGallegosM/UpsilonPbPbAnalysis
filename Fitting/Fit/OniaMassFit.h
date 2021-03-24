@@ -106,6 +106,8 @@ class OniaMassFitter2 : public OniaMassFitter
     fitParamsWithErrors getFitParams() override;
 };
 
+std::unique_ptr<OniaMassFitter> createMassFitter(TTree* input, const fitConfig* config);
+
 #if defined(__CLING__)
 #include "OniaMassFit.cpp"
 #endif

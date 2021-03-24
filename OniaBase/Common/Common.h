@@ -1,7 +1,6 @@
 #ifndef ONIABASE
 #define ONIABASE
 
-#define ONIATTREENAME ("onia_skimmed")
-#define JETTTREENAME ("jet_skimmed")
+constexpr char oniaTreeName[] = "onia_skimmed";
 
 #endif

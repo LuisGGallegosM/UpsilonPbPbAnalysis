@@ -8,6 +8,13 @@
 #include "../../OniaBase/Params/Params.h"
 #include "EffAnalyzer.h"
 
+/**
+ * @brief Efficiency test
+ * 
+ * @param filename input path to root file for efficiency test
+ * @param outputfilename output path to root file name
+ * @param configname cut configuration file used for quality cuts.
+ */
 void EffTest(const char* filename,const char* outputfilename, const char* configname)
 {
     std::cout << "\nEFFICIENCY TEST\n";
@@ -23,6 +30,7 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
 
     TTree *myTree = GetTree(file,"hionia/myTree");
 
+    //read cut parameters
     CutParams cut;
     cut.deserialize(configname);
     if(!cut.isValid())
@@ -40,6 +48,7 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
     std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
     effAnalyzer->Write(outputfilesBasename);
 
+    //clean up
     outputfile->Close();
     file->Close();
     delete file;

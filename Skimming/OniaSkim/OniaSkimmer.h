@@ -49,6 +49,14 @@ class OniaSkimmerBase : public TreeProcessor, public Skimmer
 using OniaSkimmerMC = OniaSkimmerBase<OniaMCData>;
 using OniaSkimmerReadData = OniaSkimmerBase<OniaRealData>;
 
+/**
+ * @brief Create a Onia Skimmer object
+ * 
+ * @param tree Tree to read
+ * @param cutter Quality cut parameters
+ * @param outTreeName Root output file name where to save skim.
+ * @return std::unique_ptr<Skimmer>
+ */
 std::unique_ptr<Skimmer> createOniaSkimmer(TTree* tree ,const CutParams* cutter, const char* outTreeName);
 
 #if defined(__CLING__)

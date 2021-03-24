@@ -4,6 +4,10 @@
 #include "CutParams.h"
 #include "FitParams.h"
 
+/**
+ * @brief stores the information needed to produce a plot, including
+ * drawing configurations and cuts done.
+ */
 struct drawConfig
 {
     int nBins;

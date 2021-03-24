@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-void Fit(const char* filename, const char* cutfilename, const char* outfilename, const char* configname);
+void Fit(const char* filename, const char* cutfilename, const char* outfilename, const char* fitconfigname);
 void DrawCmp(const char* outputpath,int size,const char** fitfilepaths);
 void DrawPlot(const char* inputdirectoryname, const char* configfilename  );
 

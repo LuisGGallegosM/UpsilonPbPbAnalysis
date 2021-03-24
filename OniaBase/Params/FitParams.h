@@ -6,6 +6,9 @@
 #define RATIO_Y2S (10.023/9.460)
 #define RATIO_Y3S (10.355/9.460)
 
+/**
+ * @brief stores the values of double crystal ball function parameters.
+ */
 class dcbParam
 {
     float mean;
@@ -39,6 +42,9 @@ class dcbParam
     void serialize(Serializer& ser) const;
 };
 
+/**
+ * @brief stores the values of background parameters.
+ */
 class BkgParams
 {
     public:
@@ -85,6 +91,9 @@ class BkgParams
     static BkgType fromStr(const std::string& str);
 };
 
+/**
+ * @brief stores the values for signal yields and background parameters.
+ */
 class externParams
 {
     float nSigY1S;
@@ -117,6 +126,9 @@ class externParams
 
 };
 
+/**
+ * @brief stores values of the parameters of a fit.
+ */
 class fitParamsNoLimits
 {
     dcbParam dcb;
@@ -167,6 +179,10 @@ class fitParamsNoLimits
     void serialize(Serializer& ser) const;
 };
 
+/**
+ * @brief stores the values of parameters of a fit and also
+ * the corresponding parameter limits.
+ */
 class fitParams : public fitParamsNoLimits
 {
     fitParamsNoLimits low;
@@ -192,6 +208,10 @@ class fitParams : public fitParamsNoLimits
     void serialize(Serializer& ser) const;
 };
 
+/**
+ * @brief stores the values,limits and also the error
+ * for each parameter of a fit. 
+ */
 class fitParamsWithErrors : public fitParams
 {
     fitParamsNoLimits errors;
@@ -214,6 +234,9 @@ class fitParamsWithErrors : public fitParams
     void serialize(const std::string& filename) const;
 };
 
+/**
+ * @brief stores the cut variables for fitting.
+ */
 class kinecutParams
 {
     float ptLow;
@@ -239,6 +262,11 @@ class kinecutParams
     void deserialize(Serializer& ser);
 };
 
+/**
+ * @brief stores the configuration for do a fit, including mass ranges,
+ * initial values, parameter fixed and cuts for fitting.
+ * 
+ */
 class fitConfig
 {
     float massLow;

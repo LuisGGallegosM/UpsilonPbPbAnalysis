@@ -5,6 +5,10 @@
 #include <map>
 #include <vector>
 
+/**
+ * @brief class used to serialize objects
+ * (transform a c++ object variables into a human readable text file)
+ */
 class Serializer
 {
     public:

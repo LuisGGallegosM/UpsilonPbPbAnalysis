@@ -9,13 +9,13 @@
 #include <iostream>
 
 /**
- * @brief Acceptancy test
+ * @brief Acceptancy test function
  * 
- * @param file File where to get the tree to acceptancy test.
- * @param wroteTreeName Name of the acceptancy tree to write
- * @return Output data.
+ * @param filename root file path for input.
+ * @param outputfilename output root file path with passing onia.
+ * @param configname 
  */
-void AccTest(const char* filename,const char* outputfilename, const char* configname)
+void AccTest(const char* filename,const char* outputfilename)
 {
     std::cout << "\nACCEPTANCY TEST\n";
 
@@ -35,7 +35,7 @@ void AccTest(const char* filename,const char* outputfilename, const char* config
     //Run acceptancy test
     accAnalyzer.Test();
 
-    //write results to same folder as outputfilename
+    //write plots to same folder as outputfilename and prefixed with outputfilename
     std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
     accAnalyzer.Write(outputfilesBasename);
 

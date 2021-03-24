@@ -10,18 +10,18 @@
 #include "OniaSkimmer.h"
 
 /**
- * @brief Execute Upsilon 1S skimming: Onia and Jets.
+ * @brief Execute Upsilon skimming
  * 
- * @param filename Name of file where to find the tree to skim.
- * @param outputfilename Name of the root output file to save skimmed data.
- * @param cut Cut parameters
+ * @param filename Path to the root input file.
+ * @param outputfilename Path to the root output file to save skimmed data.
+ * @param configname Path to the cutconf file containing Cut parameters.
  */
 void OniaSkim(const char* filename,const char* outputfilename, const char* configname)
 {
     std::cout << "\nSKIMMING ONIA\n";
     std::cout << "Reading input file: " << filename <<'\n';
-    std::cout << "Writing to output file: " << outputfilename <<'\n';
-    std::cout << "Cut configuration file: " << configname <<'\n';
+    std::cout << "Reading Cut configuration file: " << configname <<'\n';
+    std::cout << "Writing output file: " << outputfilename <<'\n';
 
     //input file
     TFile* file = OpenFile(filename,"READ");
@@ -29,6 +29,7 @@ void OniaSkim(const char* filename,const char* outputfilename, const char* confi
     //output file
     TFile* outputfile = OpenFile(outputfilename, "CREATE");
 
+    //cut params
     CutParams cut;
     cut.deserialize(configname);
 
@@ -38,22 +39,25 @@ void OniaSkim(const char* filename,const char* outputfilename, const char* confi
         return;
     }
 
-    //copy cut config file
+    //copy cut config file to same directory as outputfile with output file same name but .cutconf
     CopyFile(configname,ReplaceExtension(outputfilename,".cutconf").data());
 
     //get tree to skim
     TTree *myTree = GetTree(file,"hionia/myTree");
 
     //execute skim
-    std::unique_ptr<Skimmer> skimmer = createOniaSkimmer(myTree,&cut,ONIATTREENAME);
+    std::unique_ptr<Skimmer> skimmer = createOniaSkimmer(myTree,&cut,oniaTreeName);
     skimmer->Skim();
 
-    if (skimmer==nullptr) return;
+    //write tree
     skimmer->Write();
+    std::cout << "Success.\n TTrees wrote to '" << outputfilename<< "' root file\n";
 
+    //clean up
     outputfile->Close();
     file->Close();
+    delete outputfile;
     delete file;
-    std::cout << "Success.\n TTrees wrote to '" << outputfilename<< "' root file\n";
+    
     return;
 }

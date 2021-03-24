@@ -9,21 +9,29 @@ void drawPullText(RooHist* hist, RooFitResult* fitResults);
 TLegend* drawLegend(RooPlot* plot, bool bkgOn,bool moreUpsilon);
 
 RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const drawConfig* config);
-RooHist*  drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults,const drawConfig* config);
+RooHist*  drawPull(RooPlot* plot, RooRealVar* var, const drawConfig* config);
 
-void DrawPlot(const char* inputdirectoryname, const char* configfilename  )
+/**
+ * @brief Generate the plots for a Fit output
+ * 
+ * @param inputdirectoryname path to the directory where fit results saved.
+ * @param drawconfigfilename path to the draw configuration file.
+ */
+void DrawPlot(const char* inputdirectoryname, const char* drawconfigfilename  )
 {
     const std::string inputdir = inputdirectoryname;
-    //inputs
+
+    //inputs reading from directory with same name as directory but with corresponding extension.
     const std::string filename = generateNames(inputdir,".root");
     const std::string fitresultfilename = generateNames(inputdir,".fit");
     const std::string cutfilename = generateNames(inputdir,".cutconf");
     const std::string fitfilename = generateNames(inputdir,".fitconf");
-    //outputs
+
+    //output pdf file draw placed in the same input directory.
     const std::string drawfilename =generateNames(inputdir,".pdf");
 
     std::cout << "\nDRAWING\n";
-    std::cout << "Reading draw configuration file: " << configfilename <<'\n';
+    std::cout << "Reading draw configuration file: " << drawconfigfilename <<'\n';
     std::cout << "Reading root input file: " << filename <<'\n';
     std::cout << "Reading cut configuration file: " << cutfilename <<'\n';
     std::cout << "Reading fit configuration file: " << fitfilename <<'\n';
@@ -31,8 +39,9 @@ void DrawPlot(const char* inputdirectoryname, const char* configfilename  )
 
     std::cout << "Drawing output file: " << drawfilename <<'\n';
 
+    //read draw configuration file (.drawconf)
     drawConfig config;
-    config.deserialize(configfilename,cutfilename,fitfilename);
+    config.deserialize(drawconfigfilename,cutfilename,fitfilename);
 
     if (!config.isValid())
     {
@@ -40,6 +49,7 @@ void DrawPlot(const char* inputdirectoryname, const char* configfilename  )
         return;
     }
 
+    //read fit result file (.fit)
     fitParamsWithErrors fParams;
     fParams.deserialize(fitresultfilename);
 
@@ -49,20 +59,13 @@ void DrawPlot(const char* inputdirectoryname, const char* configfilename  )
         return;
     }
 
-    TFile file(filename.data(),"READ");
+    //read root result file (.root)
+    TFile* fittedfile = OpenFile(filename.data(),"READ");
 
-    if (file.IsZombie())
-    {
-        std::cerr << "Error: File " << filename << " not found.\n";
-        return;
-    }
-
-    CopyFile(configfilename, generateNames(inputdir,".drawconf").data());
-
-    RooRealVar* massVar = (RooRealVar*) (file.Get("mass"));
-    RooAbsPdf* fittedFunc = (RooAbsPdf*) (file.Get("dcb_fit"));
-    RooDataSet* dataset = (RooDataSet*) (file.Get("dataset"));
-    RooFitResult* fitResults = (RooFitResult*) (file.Get("fitresults"));
+    RooRealVar* massVar = (RooRealVar*) (fittedfile->Get("mass"));
+    RooAbsPdf* fittedFunc = (RooAbsPdf*) (fittedfile->Get("dcb_fit"));
+    RooDataSet* dataset = (RooDataSet*) (fittedfile->Get("dataset"));
+    RooFitResult* fitResults = (RooFitResult*) (fittedfile->Get("fitresults"));
 
     if ((massVar==nullptr) || (fittedFunc==nullptr) || (dataset==nullptr) || (fitResults==nullptr))
     {
@@ -70,7 +73,10 @@ void DrawPlot(const char* inputdirectoryname, const char* configfilename  )
         return;
     }
 
-    //DRAWING START
+    //copy draw configuration used to the input/output directory
+    CopyFile(drawconfigfilename, generateNames(inputdir,".drawconf").data());
+
+    //DRAWING START, draw two plots, one linear scale and one log scale
     for (bool isLog : { false,true })
     {
         TCanvas* canvas = getStyledCanvas();
@@ -93,9 +99,10 @@ void DrawPlot(const char* inputdirectoryname, const char* configfilename  )
         drawGraphText(&fParams,&config);
 
         pull->cd();
-        RooHist* pullHist = drawPull(graphPlot,massVar,fitResults,&config);
+        RooHist* pullHist = drawPull(graphPlot,massVar,&config);
         drawPullText(pullHist,fitResults);
 
+        //output to pdf file, log scale file with _log.pdf suffix
         canvas->Update();
         if (isLog)
             canvas->SaveAs(generateNames(inputdir,"_log.pdf").data());
@@ -106,43 +113,60 @@ void DrawPlot(const char* inputdirectoryname, const char* configfilename  )
     return;
 }
 
-//DRAW GRAPH
-
+/**
+ * @brief Draw the main plot
+ * 
+ * @param var variable for x axis (mass)
+ * @param dataset dataset to draw in plot
+ * @param fittedFunc result fit function to draw
+ * @param config draw configuration
+ * @return RooPlot* result plot
+ */
 RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const drawConfig* config)
 {
-        //draw fitted and dataset function
     RooPlot* plot = var->frame(config->nBins);
-    fittedFunc->plotOn(plot,Name(FITFUNCNAME),LineColor(kOrange+7),Normalization(1.0,RooAbsReal::RelativeExpected));
+    fittedFunc->plotOn(plot,Name(fitFuncName),LineColor(kOrange+7),Normalization(1.0,RooAbsReal::RelativeExpected));
 
     if (config->fitConf.isMoreUpsilon())
     {
+        //draw 1S 2S and 3S Upsilon mass
         fittedFunc->plotOn(plot,Name("dcb1"),Components("dcb_Y1S"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
         fittedFunc->plotOn(plot,Name("dcb2"),Components("dcb_Y2S"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
         fittedFunc->plotOn(plot,Name("dcb3"),Components("dcb_Y3S"),LineStyle(7),LineColor(kMagenta+2),Normalization(1.0,RooAbsReal::RelativeExpected));
     }
     else
     {
+        //draw just 1S Upsilon with corresponding crystal balls
         fittedFunc->plotOn(plot,Name("dcb"),Components("dcb_Y1S"),LineStyle(9),LineColor(13),Normalization(1.0,RooAbsReal::RelativeExpected));
         fittedFunc->plotOn(plot,Name("cb1"),Components("cball_Y1S_1"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
         fittedFunc->plotOn(plot,Name("cb2"),Components("cball_Y1S_2"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
     }
     
+    //draw background
     if (config->fitConf.isBkgOn())
       fittedFunc->plotOn(plot,Name("bkg"),Components("bkg"),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
-    dataset->plotOn(plot,Name(DATASETNAME), MarkerSize(0.4), XErrorSize(0));
+    dataset->plotOn(plot,Name(datasetName), MarkerSize(0.4), XErrorSize(0));
     plot->Draw("same");
 
     return plot;
 }
 
+/**
+ * @brief Draw plot legend
+ * 
+ * @param plot rooPlot from where to draw legend
+ * @param bkgOn is there any background signal?
+ * @param moreUpsilon is there more than 1S upsilon?
+ * @return TLegend* 
+ */
 TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
 {
     TLegend* fitleg = new TLegend(0.70,0.65,0.85,0.85);
     fitleg->SetTextSize(12);
     fitleg->SetTextFont(43);
     fitleg->SetBorderSize(0);
-    fitleg->AddEntry(plot->findObject(DATASETNAME),"Data","pe");
-    fitleg->AddEntry(plot->findObject(FITFUNCNAME),"Total fit","l");
+    fitleg->AddEntry(plot->findObject(datasetName),"Data","pe");
+    fitleg->AddEntry(plot->findObject(fitFuncName),"Total fit","l");
     if(moreUpsilon)
     {
         fitleg->AddEntry(plot->findObject("dcb1"),"Signal Y1S","l");
@@ -164,6 +188,12 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
     return fitleg;
 }
 
+/**
+ * @brief Draw the texts over the plots corresponding to fit parameters and cuts used.
+ * 
+ * @param fParams Fit parameters results of the fit.
+ * @param config Draw configurations.
+ */
 void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
 {
     TextDrawer tdrawer(0.22f,0.8f,9.0f);
@@ -202,13 +232,20 @@ void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
     tdrawer2.drawText(Form("p_{T}^{#mu} > %.1f GeV/c", singleMuPtLow));
     tdrawer2.drawText(Form("|#eta^{#mu}| < %.2f",singleMuEtaHigh));
 }
-//DRAW PULL
 
-RooHist* drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults,const drawConfig* config)
+/**
+ * @brief Draw the pull
+ * 
+ * @param plot plot where to get the pull
+ * @param var variable used as x (mass variable)
+ * @param config draw configuration.
+ * @return RooHist* with output plot
+ */
+RooHist* drawPull(RooPlot* plot, RooRealVar* var,const drawConfig* config)
 {
     //draw pull
     RooPlot* pullPlot = var->frame(Title("Pull Distribution"));
-    RooHist* pullHist = plot->pullHist(DATASETNAME,FITFUNCNAME);
+    RooHist* pullHist = plot->pullHist(datasetName,fitFuncName);
     pullHist->SetMarkerSize(0.7f);
     
     pullPlot->addPlotable(pullHist,"PSAME");
@@ -221,6 +258,12 @@ RooHist* drawPull(RooPlot* plot, RooRealVar* var, RooFitResult* fitResults,const
     return pullHist;
 }
 
+/**
+ * @brief Draw the text over the pull (Chi-sqr and DOF)
+ * 
+ * @param hist plot where to get the pull
+ * @param fitResults RooFitResult object to get DOF info.
+ */
 void drawPullText(RooHist* hist,RooFitResult* fitResults)
 {
     double* pullVal = hist->GetY();

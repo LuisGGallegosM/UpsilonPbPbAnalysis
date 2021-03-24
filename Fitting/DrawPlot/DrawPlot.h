@@ -21,7 +21,7 @@
 #include "../../OniaBase/Params/Params.h"
 #include "../../Utils/Helpers/Helpers.h"
 
-#define FITFUNCNAME "fitFunc"
-#define DATASETNAME "dataset"
+constexpr char fitFuncName[] = "fitFunc";
+constexpr char datasetName[] = "dataset";
 
 #endif

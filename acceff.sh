@@ -34,7 +34,7 @@ cd ..
 else
 case $FLAGS in
     "-acc")
-    ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}" "${CONFIG}"
+    ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}"
     ;;
     "-eff")
     ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}"

@@ -10,11 +10,11 @@
 #include "OniaJetSkimmer.h"
 
 /**
- * @brief Execute Upsilon 1S skimming: Onia and Jets.
+ * @brief Execute Upsilon skimming: Onia and Jets.
  * 
- * @param filename Name of file where to find the tree to skim.
- * @param outputfilename Name of the root output file to save skimmed data.
- * @param cut Cut parameters
+ * @param filename Path of file where to find the tree to skim.
+ * @param outputfilename Path of the root output file to save skimmed data.
+ * @param configname Path to cut parameters file. 
  */
 void OniaJetSkim(const char* filename,const char* outputfilename, const char* configname)
 {
@@ -50,7 +50,7 @@ void OniaJetSkim(const char* filename,const char* outputfilename, const char* co
     oniaTree->AddFriend(skimTree);
 
     //execute skim
-    std::unique_ptr<Skimmer> skimmer = createJetSkimmer(oniaTree,&cut,ONIATTREENAME);
+    std::unique_ptr<Skimmer> skimmer = createJetSkimmer(oniaTree,&cut,oniaTreeName);
     skimmer->Skim();
     skimmer->Write();
 

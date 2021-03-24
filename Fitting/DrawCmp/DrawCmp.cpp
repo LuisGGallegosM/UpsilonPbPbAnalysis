@@ -12,6 +12,13 @@ void drawCompGraph(fitGetter func, const std::vector<FitElement>& fits,TH1F* gra
 std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs);
 std::vector<toGet> fillVariables(const fitConfig* fit);
 
+/**
+ * @brief Recopile multiple fit results and generate drawings of parameters as function of pT
+ * 
+ * @param outputpath path to where place output plots and root file
+ * @param size number of pT bins to draw
+ * @param fitfilepaths array of paths to fit results, each corresponding to a different pT bin
+ */
 void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
 {
     std::cout << "\nDRAWING\n";
@@ -36,6 +43,7 @@ void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
         assert(fit.configs.isValid());
     }
 
+    //sort fit bins in case they are unordered
     std::sort(fits.begin(),fits.end(),
             [](FitElement& l,FitElement& r) {return l.configs.getCut()->getPtLow() < r.configs.getCut()->getPtHigh();});
 
@@ -79,6 +87,12 @@ void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
     return;
 }
 
+/**
+ * @brief configure which variables will be plotted and how to get them from fitParams
+ * 
+ * @param fit 
+ * @return std::vector<toGet> 
+ */
 std::vector<toGet> fillVariables(const fitConfig* fit)
 {
     std::vector<toGet> getters;
@@ -89,7 +103,6 @@ std::vector<toGet> fillVariables(const fitConfig* fit)
     getters.push_back(toGet{"x",&fitParams::getX});
     getters.push_back(toGet{"nSigY1S",&fitParams::getNSigY1S});
     getters.push_back(toGet{"mass_Y1S",&fitParams::getMeanY1S});
-
 
     if (fit->isMoreUpsilon())
     {
@@ -131,6 +144,12 @@ std::vector<toGet> fillVariables(const fitConfig* fit)
     return getters;
 }
 
+/**
+ * @brief Generate the bins ranges from fits readed
+ * 
+ * @param configs vector of fits
+ * @return std::vector<double> sequence of bins boundaries locations
+ */
 std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs)
 {
     std::vector<double> xbins;
@@ -142,6 +161,13 @@ std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs
     return xbins;
 }
 
+/**
+ * @brief draw the plot corresponding to a parameter
+ * 
+ * @param func pointer to member function that obtains the parameter from the fit result object.
+ * @param fits the vector of fit results objects.
+ * @param graph histogram to fill with data.
+ */
 void drawCompGraph(fitGetter func, const std::vector<FitElement>& fits,TH1F* graph)
 {
     int i=0;
