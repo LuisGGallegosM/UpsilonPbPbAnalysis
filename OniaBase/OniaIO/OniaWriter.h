@@ -75,8 +75,8 @@ class OniaWriterRecoQQ : public DataWriter
         addOutputs(&output,writer,"reco_");
     }
 
-    template<typename Reader>
-    void writeData(const Reader* input, SimpleSelector sel)
+    template<typename Data>
+    void writeData(const Data* input, SimpleSelector sel)
     {
         output.oniaInfoOut.Write(sel.entry,0.0f);
         output.oniaQQOut.Write((TLorentzVector*) input->recoQQ.mom4->At(sel.index));
@@ -98,8 +98,8 @@ class OniaWriterGenQQ : public DataWriter
         addOutputs(&output,writer,"gen_");
     }
 
-    template<typename Reader>
-    void writeData(const Reader* input, SimpleSelector sel)
+    template<typename Data>
+    void writeData(const Data* input, SimpleSelector sel)
     {
         output.oniaInfoOut.Write(sel.entry,input->genQQ.id[sel.index]);
         output.oniaQQOut.Write((TLorentzVector*) input->genQQ.mom4->At(sel.index));
@@ -113,7 +113,7 @@ class OniaWriterGenQQ : public DataWriter
     void writeData(const OniaGenOnlyData* input, SimpleSelector sel);
 };
 
-template <typename Reader>
+template <typename Data>
 class OniaWriterJet : DataWriter
 {
 
@@ -130,8 +130,8 @@ class OniaWriterJet<OniaJetQQMC> : public DataWriter
         addOutputs(&output,writer);
     }
 
-    template<typename Reader>
-    void writeData(const Reader* input, JetSelector sel)
+    template<typename Data>
+    void writeData(const Data* input, JetSelector sel)
     {
         writeQQ(input,&output,sel.iQQ,sel.entry);
         writeMu(input,&output,sel.iQQ);
@@ -151,8 +151,8 @@ class OniaWriterJet<OniaJetQQRealData> : public DataWriter
         addOutputs(&output,writer);
     }
 
-    template<typename Reader>
-    void writeData(const Reader* input, JetSelector sel)
+    template<typename Data>
+    void writeData(const Data* input, JetSelector sel)
     {
         writeQQ(input,&output,sel.iQQ,sel.entry);
         writeMu(input,&output,sel.iQQ);
@@ -160,8 +160,8 @@ class OniaWriterJet<OniaJetQQRealData> : public DataWriter
     }
 };
 
-template<typename Reader>
-void writeQQ(const Reader* input, OniaJetQQMC* output, int iQQ,int entry)
+template<typename Data>
+void writeQQ(const Data* input, OniaJetQQMC* output, int iQQ,int entry)
 {
     TLorentzVector *RecoQQ4mom = (TLorentzVector*) input->recoQQ.mom4->At(iQQ);
     TLorentzVector *GenQQ4mom = (TLorentzVector*) input->genQQ.mom4->At(input->which.RecoQQWhichGen[iQQ]);
@@ -170,16 +170,16 @@ void writeQQ(const Reader* input, OniaJetQQMC* output, int iQQ,int entry)
     output->genQQOut.Write(GenQQ4mom);
 }
 
-template<typename Reader>
-void writeQQ(const Reader* input, OniaJetQQRealData* output, int iQQ,int entry)
+template<typename Data>
+void writeQQ(const Data* input, OniaJetQQRealData* output, int iQQ,int entry)
 {
     TLorentzVector *RecoQQ4mom = (TLorentzVector*) input->recoQQ.mom4->At(iQQ);
     output->oniaInfoOut.Write(entry,0);
     output->recoQQOut.Write(RecoQQ4mom,input->recoQQ.ctau[iQQ]);
 }
 
-template<typename Reader, typename Writer>
-void writeMu(const Reader* dataIn, Writer* output, int iQQ)
+template<typename Data, typename Writer>
+void writeMu(const Data* dataIn, Writer* output, int iQQ)
 {
     int mumi_idx= dataIn->recoQQ.mumi_idx[iQQ];
     int mupl_idx= dataIn->recoQQ.mupl_idx[iQQ];
@@ -188,8 +188,8 @@ void writeMu(const Reader* dataIn, Writer* output, int iQQ)
     output->oniaMuOut.Write(mupl,mumi);
 }
 
-template<typename Reader, typename Writer>
-void writeJet(const Reader* input,Writer* output, int index, int iJet, JetCorrector* JEC, JetUncertainty* JEU)
+template<typename Data, typename Writer>
+void writeJet(const Data* input,Writer* output, int index, int iJet, JetCorrector* JEC, JetUncertainty* JEU)
 {
     const OniaJetInfo* inputJet =  &(input->jetInfo);
     const TLorentzVector* recoQQmom4 =(TLorentzVector*) input->recoQQ.mom4->At(index);
@@ -217,8 +217,8 @@ void writeJet(const Reader* input,Writer* output, int index, int iJet, JetCorrec
     output->jetOut.jt_pt_JEU_Up = jeuCorr(jt_pt, z, JEU->GetUncertainty().second);
 }
 
-template<typename Reader>
-void writeRefJet(const Reader* input,OniaJetQQMC* output, int index, int iJet, float jt_pt_noZJEC)
+template<typename Data>
+void writeRefJet(const Data* input,OniaJetQQMC* output, int index, int iJet, float jt_pt_noZJEC)
 {
     const OniaJetRef* inputJet =  &(input->jetRef);
     const TLorentzVector* genQQmom4 = (TLorentzVector*) input->genQQ.mom4->At(input->which.RecoQQWhichGen[index]);
