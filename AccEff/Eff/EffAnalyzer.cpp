@@ -26,9 +26,9 @@ EffAnalyzerBase<Reader>::EffAnalyzerBase(TTree* input,CutParams* effCut, const c
 template<typename Reader>
 void EffAnalyzerBase<Reader>::ProcessEvent(Long64_t entry)
 {
-    Long64_t size=oniaReader.getData()->genQQ.size;
+    int size=oniaReader.getData()->genQQ.size;
     
-    for(Long64_t i=0;i<size;++i)
+    for(int i=0;i<size;++i)
     {
         Analyze(i,entry);
     }
@@ -117,7 +117,7 @@ void EffAnalyzerBase<Reader>::CaptureRecoQQ(Int_t index, Long64_t entry)
     etaVsPtQQRecoCut->Fill(y,pT);
     etaVsPtMuRecoCut->Fill(etaMuPl,ptMuPl);
     etaVsPtMuRecoCut->Fill(etaMuMi,ptMuMi);
-    oniaWriter.writeData(input,index,entry);
+    oniaWriter.writeData(input,SimpleSelector{entry,index});
     FillEntries();
 }
 

@@ -42,12 +42,12 @@ void addOutputs(OniaJetQQMC* data,TreeWriter* writer)
     data->refJetOut.addOutputs(writer);
 }
 
-void OniaWriterGenQQ::writeData(const OniaGenOnlyData* input, int index, int entry)
+void OniaWriterGenQQ::writeData(const OniaGenOnlyData* input, SimpleSelector sel)
 {
-  output.oniaInfoOut.Write(entry,input->genQQ.id[index]);
-  output.oniaQQOut.Write((TLorentzVector*) input->genQQ.mom4->At(index));
-  TLorentzVector* mumi = (TLorentzVector*) input->genQQ.mumi_mom4->At(index);
-  TLorentzVector* mupl = (TLorentzVector*) input->genQQ.mupl_mom4->At(index);
+  output.oniaInfoOut.Write(sel.entry,input->genQQ.id[sel.index]);
+  output.oniaQQOut.Write((TLorentzVector*) input->genQQ.mom4->At(sel.index));
+  TLorentzVector* mumi = (TLorentzVector*) input->genQQ.mumi_mom4->At(sel.index);
+  TLorentzVector* mupl = (TLorentzVector*) input->genQQ.mupl_mom4->At(sel.index);
   output.oniaMuOut.Write(mupl,mumi);
 }
 

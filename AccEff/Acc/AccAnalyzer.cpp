@@ -13,9 +13,9 @@ AccAnalyzer::AccAnalyzer(TTree* input,const char* outTreeName) :
 
 void AccAnalyzer::ProcessEvent(Long64_t entry)
 {
-    Long64_t size=oniaReader.getData()->genQQ.size;
+    int size=oniaReader.getData()->genQQ.size;
     
-    for(Long64_t i=0;i<size;++i)
+    for(int i=0;i<size;++i)
     {
         Analyze(i,entry);
     }
@@ -51,7 +51,7 @@ void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
     if(accCutter.cut(input,index,entry))
     {
         hists.FillDet(&data);
-        oniaWriter.writeData(input,index,entry);
+        oniaWriter.writeData(input,SimpleSelector{entry,index});
         FillEntries();
     }
 }

@@ -50,6 +50,21 @@ struct OniaJetQQMC
     OniaSimpleExtraQQ recoQQOut;
 };
 
+struct SimpleSelector
+{
+    long long int entry;
+    int index;
+};
+
+struct JetSelector
+{
+    long long int entry;
+    int iQQ;
+    int iJet;
+    JetCorrector* JEC;
+    JetUncertainty* JEU;
+};
+
 class OniaWriterRecoQQ : public DataWriter
 {
     OniaQQ output;
@@ -61,12 +76,12 @@ class OniaWriterRecoQQ : public DataWriter
     }
 
     template<typename Reader>
-    void writeData(const Reader* input, int index, int entry)
+    void writeData(const Reader* input, SimpleSelector sel)
     {
-        output.oniaInfoOut.Write(entry,0.0f);
-        output.oniaQQOut.Write((TLorentzVector*) input->recoQQ.mom4->At(index));
-        int mumi_idx= input->recoQQ.mumi_idx[index];
-        int mupl_idx= input->recoQQ.mupl_idx[index];
+        output.oniaInfoOut.Write(sel.entry,0.0f);
+        output.oniaQQOut.Write((TLorentzVector*) input->recoQQ.mom4->At(sel.index));
+        int mumi_idx= input->recoQQ.mumi_idx[sel.index];
+        int mupl_idx= input->recoQQ.mupl_idx[sel.index];
         TLorentzVector* mumi = (TLorentzVector*) input->recoMu.mom4->At(mumi_idx);
         TLorentzVector* mupl = (TLorentzVector*) input->recoMu.mom4->At(mupl_idx);
         output.oniaMuOut.Write(mupl,mumi);
@@ -84,18 +99,18 @@ class OniaWriterGenQQ : public DataWriter
     }
 
     template<typename Reader>
-    void writeData(const Reader* input, int index, int entry)
+    void writeData(const Reader* input, SimpleSelector sel)
     {
-        output.oniaInfoOut.Write(entry,input->genQQ.id[index]);
-        output.oniaQQOut.Write((TLorentzVector*) input->genQQ.mom4->At(index));
-        int mumi_idx= input->genQQ.mumi_idx[index];
-        int mupl_idx= input->genQQ.mupl_idx[index];
+        output.oniaInfoOut.Write(sel.entry,input->genQQ.id[sel.index]);
+        output.oniaQQOut.Write((TLorentzVector*) input->genQQ.mom4->At(sel.index));
+        int mumi_idx= input->genQQ.mumi_idx[sel.index];
+        int mupl_idx= input->genQQ.mupl_idx[sel.index];
         TLorentzVector* mumi = (TLorentzVector*) input->genMu.mom4->At(mumi_idx);
         TLorentzVector* mupl = (TLorentzVector*) input->genMu.mom4->At(mupl_idx);
         output.oniaMuOut.Write(mupl,mumi);
     }
 
-    void writeData(const OniaGenOnlyData* input, int index, int entry);
+    void writeData(const OniaGenOnlyData* input, SimpleSelector sel);
 };
 
 template <typename Reader>
@@ -116,12 +131,12 @@ class OniaWriterJet<OniaJetQQMC> : public DataWriter
     }
 
     template<typename Reader>
-    void writeData(const Reader* input, int iQQ, int iJet, int entry, JetCorrector* JEC, JetUncertainty* JEU)
+    void writeData(const Reader* input, JetSelector sel)
     {
-        writeQQ(input,&output,iQQ,entry);
-        writeMu(input,&output,iQQ);
-        writeJet(input,&output,iQQ,iJet,JEC,JEU);
-        writeRefJet(input,&output,iQQ,iJet,output.jetOut.jt_pt_noZJEC);
+        writeQQ(input,&output,sel.iQQ,sel.entry);
+        writeMu(input,&output,sel.iQQ);
+        writeJet(input,&output,sel.iQQ,sel.iJet,sel.JEC,sel.JEU);
+        writeRefJet(input,&output,sel.iQQ,sel.iJet,output.jetOut.jt_pt_noZJEC);
     }
 };
 
@@ -137,11 +152,11 @@ class OniaWriterJet<OniaJetQQRealData> : public DataWriter
     }
 
     template<typename Reader>
-    void writeData(const Reader* input, int iQQ, int iJet, int entry, JetCorrector* JEC, JetUncertainty* JEU)
+    void writeData(const Reader* input, JetSelector sel)
     {
-        writeQQ(input,&output,iQQ,entry);
-        writeMu(input,&output,iQQ);
-        writeJet(input,&output,iQQ,iJet,JEC,JEU);
+        writeQQ(input,&output,sel.iQQ,sel.entry);
+        writeMu(input,&output,sel.iQQ);
+        writeJet(input,&output,sel.iQQ,sel.iJet,sel.JEC,sel.JEU);
     }
 };
 

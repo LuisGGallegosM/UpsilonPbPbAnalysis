@@ -17,13 +17,13 @@ class OniaSkimmerBase : public TreeProcessor, public Skimmer
     void ProcessEvent(Long64_t entry) override
     {
         auto input= oniaReader.getData();
-        Long64_t size=input->recoQQ.size;
+        int size=input->recoQQ.size;
         
-        for(Long64_t iQQ=0;iQQ<size;++iQQ)
+        for(int iQQ=0;iQQ<size;++iQQ)
         {
             if (oniaCutter->cut(input,iQQ,entry))
             {
-                oniaWriter.writeData(input,iQQ,entry);
+                oniaWriter.writeData(input,SimpleSelector{entry,iQQ});
                 FillEntries();
             }
         }
