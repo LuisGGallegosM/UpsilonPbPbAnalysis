@@ -23,11 +23,13 @@ OUTPUTFOLDER="../rootfiles/analysis/${DATA_MULTIFITINPUTFILENAME}/acceff"
 ACCOUTPUTFILE="${OUTPUTFOLDER}/Acc/outputAcc.root"
 EFFOUTPUTFILE="${OUTPUTFOLDER}/Eff/outputEff.root"
 FINALOUTPUTFILE="${OUTPUTFOLDER}/AccEff/outputAccXEff.root"
+YIELDFITOUTPUTFILE="${OUTPUTFOLDER}/YieldFit/yieldFit.root"
 
 mkdir -p "$OUTPUTFOLDER"
 mkdir "${OUTPUTFOLDER}/Acc"
 mkdir "${OUTPUTFOLDER}/Eff"
 mkdir "${OUTPUTFOLDER}/AccEff"
+mkdir "${OUTPUTFOLDER}/YieldFit"
 
 #execute skim
 if [ $CLING = "YES" ]
@@ -46,10 +48,14 @@ case $FLAGS in
     "-final")
     ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
     ;;
+    "-fit")
+    ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}"
+    ;;
     "-all")
     ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}"
     ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}"
     ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
+    ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}"
     ;;
 esac
 fi

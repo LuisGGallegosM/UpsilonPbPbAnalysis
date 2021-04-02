@@ -20,6 +20,8 @@ int main(int argc, char **argv)
     {
         if(flags=="-acc")
             AccTest(argv[2],argv[3]);
+        else if (flags=="-fit")
+            YieldFit(argv[2],argv[3]);
         else
             std::cerr << "Incorrect number of parameters\n";
 
