@@ -14,6 +14,7 @@ void writeToCanvas(TH1* hist,const std::string& xname,const std::string& yname, 
 void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname);
 void writeToCanvasEff2D(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname);
 
+void writeToCanvas(std::vector<TH1*>& hists,const std::string& xname,const std::string& yname, const std::string& outname, bool yLog=false);
 
 constexpr const char* accDenName ="pt QQ Generated";
 constexpr const char* accNumName ="pt QQ Detectable Acceptancy";

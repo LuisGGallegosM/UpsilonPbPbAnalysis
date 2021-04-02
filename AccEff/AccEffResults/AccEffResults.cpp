@@ -13,10 +13,10 @@
 TH1F* toTH1F(const TEfficiency* asym);
 std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile);
 TH1F* calcDN_DpT(TH1F* nSigCorrected);
-TH1F* calcNormalizeddNPt(TH1F* nSigCorrected);
+TH1F* Normalize(TH1F* nSigCorrected);
 TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff);
 
-void AccEffResults(const char* accFilename, const char* effFilename, const char* fitFilepath, const char* outputname)
+void AccEffResults(const char* accFilename, const char* effFilename, const char* fitFileRealDataPath, const char* fitFileMCPath, const char* outputname)
 {
     std::cout << "\nACCEPTANCY EFFICIENCY RESULT TEST\n";
 
@@ -27,9 +27,12 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     std::cout << "Reading effiency input file: " << effFilename <<'\n';
     TFile* effFile = OpenFile(effFilename,"READ");
     //input file
-    std::cout << "Reading multifit file: " << fitFilepath <<'\n';
-    TFile* fitFile = OpenFile(fitFilepath,"READ");
-    //reading file
+    std::cout << "Reading Real Data multifit file: " << fitFileRealDataPath <<'\n';
+    TFile* fitFileRealData = OpenFile(fitFileRealDataPath,"READ");
+    //input file
+    std::cout << "Reading MC multifit file: " << fitFileMCPath <<'\n';
+    TFile* fitFileMC = OpenFile(fitFileMCPath,"READ");
+    //output file
     std::cout << "Writing to file: " << outputname <<'\n';
     TFile* outFile = OpenFile(outputname,"RECREATE");
 
@@ -38,24 +41,44 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     std::string outbasename= ReplaceExtension(outputname,"");
     writeToCanvasEff(AccXEff.get(),"p_{T}","Acc x Eff",outbasename+"_AccXEff.pdf");
     
-    TH1F* nSig = (TH1F*) fitFile->Get("nSigY1S");
+    TH1F* nSigRealData = (TH1F*) fitFileRealData->Get("nSigY1S");
 
-    TH1F* nSigCorrected = calcCorrectedYields(nSig,AccXEff.get());
+    TH1F* nSigCorrected = calcCorrectedYields(nSigRealData,AccXEff.get());
     writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","N_{Y1Scorr}",outbasename+"_CorrectYields.pdf");
     nSigCorrected->Write();
 
-    TH1F* dN_dPtdy = calcDN_DpT(nSigCorrected);
-    writeToCanvas(dN_dPtdy,"p^{#mu#mu}_{T} GeV/c","B(#Upsilon #rightarrow #mu #mu) #frac{#sigma}{dp_{T} dy} nb^{-1}",outbasename+"_dNdPtdy.pdf",true);
-    dN_dPtdy->Write();
+    TH1F* DATA_dN_dPt = Normalize(nSigCorrected);
+    DATA_dN_dPt->SetName("DATA_dN_dpT_norm");
+    DATA_dN_dPt->SetTitle("DATA dN/dp_{T} normalized");
+    DATA_dN_dPt->SetFillColor(3);
+    DATA_dN_dPt->SetLineColor(3);
+    DATA_dN_dPt->GetYaxis()->SetRangeUser(0.0,1.0);
 
-    TH1F* dN_dPt = calcNormalizeddNPt(nSigCorrected);
-    writeToCanvas(dN_dPt,"p^{#mu#mu}_{T} GeV/c","#frac{#sigma}{dp_{T} dy} nb^{-1}",outbasename+"_dNdPt.pdf");
-    dN_dPt->Write();
+    TH1F* nSigMC = (TH1F*) fitFileMC->Get("nSigY1S");
+    TH1F* MC_dN_dPt =Normalize(nSigMC);
+    MC_dN_dPt->SetName("MC_dN_dpT_norm");
+    MC_dN_dPt->SetTitle("MC dN/dp_{T} normalized");
+    MC_dN_dPt->SetFillColor(1);
+    MC_dN_dPt->SetLineColor(1);
+    MC_dN_dPt->GetYaxis()->SetRangeUser(0.0,1.0);
+
+    std::vector<TH1*> hists ={DATA_dN_dPt,MC_dN_dPt};
+    writeToCanvas(hists,"p^{#mu#mu}_{T} GeV/c","#frac{#sigma}{dp_{T}} nb^{-1}",outbasename+"_dNdPt.pdf");
+    DATA_dN_dPt->Write();
+    MC_dN_dPt->Write();
+
+    TH1F* ratio= new TH1F((*MC_dN_dPt)/(*DATA_dN_dPt));
+    ratio->SetName("ratio_dN_dpT_norm");
+    ratio->SetTitle("#frac{MC dN/dp_{T}}{DATA dN/dp_{T}}");
+    ratio->GetYaxis()->SetRangeUser(0.0,3.0);
+    ratio->SetFillColor(4);
+    writeToCanvas(ratio,"p^{#mu#mu}_{T} GeV/c","ratio", outbasename+"_dNdPtRatio.pdf");
+    ratio->Write();
 
     outFile->Close();
     accFile->Close();
     effFile->Close();
-    fitFile->Close();
+    fitFileRealData->Close();
 }
 
  std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile)
@@ -92,10 +115,11 @@ TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff)
     TH1F* nSigCorrected = new TH1F((*nSig)/(*AccXEffth1f));
     nSigCorrected->SetName("corrected_nSigY1S");
     nSigCorrected->SetTitle("nSigY1S corrected");
+    nSigCorrected->SetStats(false);
     return nSigCorrected;
 }
 
-TH1F* calcNormalizeddNPt(TH1F* nSigCorrected)
+TH1F* Normalize(TH1F* nSigCorrected)
 {
     TH1F* dN_dPt = new TH1F(*nSigCorrected);
     int nbins = dN_dPt->GetNbinsX() +2;
@@ -105,9 +129,6 @@ TH1F* calcNormalizeddNPt(TH1F* nSigCorrected)
         sum+=dN_dPt->GetBinContent(i);
     }
     dN_dPt->Scale(1.0f/sum);
-    dN_dPt->SetName("dN_dpT_norm");
-    dN_dPt->SetTitle("#frac{dN_{Y1Scorr}}{#Delta p_{T}} normalized");
-    dN_dPt->GetYaxis()->SetRangeUser(0.0f,1.0f);
     return dN_dPt;
 }
 

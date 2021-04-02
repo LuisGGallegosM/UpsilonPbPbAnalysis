@@ -11,5 +11,5 @@ bool AccCutter::cut(const OniaGenOnlyData* input,Int_t index,Int_t entry)
 
 bool isMuonInAcceptance(const TLorentzVector* Muon)
 {
-    return (Muon->Pt() > 3.5f) && (Muon->Eta() < 2.4f);
+    return (Muon->Pt() > 3.5f) && ( fabs(Muon->Eta()) < 2.4f);
 }

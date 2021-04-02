@@ -5,25 +5,29 @@ CLING="NO"
 FLAGS=${1:-"-all"}
 ACCINPUTFILENAME="OniaTree_Ups1SMM_5p02TeV_TuneCUETP8M1_nofilter_pp502Fall15-MCRUN2_71_V1-v1_GENONLY.root"
 EFFINPUTFILENAME="merged_HiForestAOD_MCFix2.root"
-MULTIFITINPUTFILENAME="merged_HiForestAOD_MCFix2_skim/multifit0"
+CONFIG="../rootfiles/confFiles/merged_HiForestAOD_MC.cutconf"
+DATA_MULTIFITINPUTFILENAME="merged_HiForestAOD_DATA_skim_01ABR2021/multifit0"
+MC_MULTIFITINPUTFILENAME="merged_HiForestAOD_MCFix2_skim/multifit0"
 
 #input file with relative path for Acceptancy
 ACCINPUTFILE="../rootfiles/datasets/${ACCINPUTFILENAME}"
 #input file with relative path for Effiency
 EFFINPUTFILE="../rootfiles/datasets/${EFFINPUTFILENAME}"
-#file with multifit results
-FITINPUTFILENAME="../rootfiles/analysis/${MULTIFITINPUTFILENAME}/fit.root"
-#cut configuration file, located in workdir
-CONFIG="../rootfiles/analysis/${MULTIFITINPUTFILENAME}/fit0/fit0.cutconf"
+#files with multifit results
+DATA_FITINPUTFILENAME="../rootfiles/analysis/${DATA_MULTIFITINPUTFILENAME}/fit.root"
+MC_FITINPUTFILENAME="../rootfiles/analysis/${MC_MULTIFITINPUTFILENAME}/fit.root"
 #folder to output all files
-OUTPUTFOLDER="../rootfiles/analysis/${MULTIFITINPUTFILENAME}/acceff"
+OUTPUTFOLDER="../rootfiles/analysis/${DATA_MULTIFITINPUTFILENAME}/acceff"
 
 #output file, put in OUTPUTFOLDER and same as output folder but with .root extension
-ACCOUTPUTFILE="${OUTPUTFOLDER}/outputAcc.root"
-EFFOUTPUTFILE="${OUTPUTFOLDER}/outputEff.root"
-FINALOUTPUTFILE="${OUTPUTFOLDER}/outputAccXEff.root"
+ACCOUTPUTFILE="${OUTPUTFOLDER}/Acc/outputAcc.root"
+EFFOUTPUTFILE="${OUTPUTFOLDER}/Eff/outputEff.root"
+FINALOUTPUTFILE="${OUTPUTFOLDER}/AccEff/outputAccXEff.root"
 
-mkdir -p $OUTPUTFOLDER
+mkdir -p "$OUTPUTFOLDER"
+mkdir "${OUTPUTFOLDER}/Acc"
+mkdir "${OUTPUTFOLDER}/Eff"
+mkdir "${OUTPUTFOLDER}/AccEff"
 
 #execute skim
 if [ $CLING = "YES" ]
@@ -40,12 +44,12 @@ case $FLAGS in
     ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}"
     ;;
     "-final")
-    ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
+    ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
     ;;
     "-all")
     ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}"
     ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}"
-    ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
+    ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
     ;;
 esac
 fi

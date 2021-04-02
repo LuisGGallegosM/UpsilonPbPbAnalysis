@@ -22,14 +22,8 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
     //input file
     std::cout << "Reading input file: " << filename <<'\n';
     TFile* file = OpenFile(filename,"READ");
-    
-    //output file
-    std::string outfilename= outputfilename;
-    std::cout << "Writing to output file: " << outfilename <<'\n';
-    TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
 
-    TTree *myTree = GetTree(file,"hionia/myTree");
-
+    std::cout << "Reading cutconf file: " << configname <<'\n';
     //read cut parameters
     CutParams cut;
     cut.deserialize(configname);
@@ -38,6 +32,13 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
         std::cerr << "Error: Invalid cut parameters.\n";
         return;
     }
+    
+    //output file
+    std::string outfilename= outputfilename;
+    std::cout << "Writing to output file: " << outfilename <<'\n';
+    TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
+
+    TTree *myTree = GetTree(file,"hionia/myTree");
 
     std::unique_ptr<EffAnalyzer> effAnalyzer = createEffAnalyzer(myTree,&cut,"RecoCutOnia");
 

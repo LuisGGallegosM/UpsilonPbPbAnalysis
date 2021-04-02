@@ -24,10 +24,10 @@ int main(int argc, char **argv)
             std::cerr << "Incorrect number of parameters\n";
 
     }
-    else if (argc == 6)
+    else if (argc == 7)
     {
         if (flags=="-final")
-            AccEffResults(argv[2],argv[3],argv[4],argv[5]);
+            AccEffResults(argv[2],argv[3],argv[4],argv[5],argv[6]);
     }
     else
     {

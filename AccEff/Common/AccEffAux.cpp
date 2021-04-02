@@ -53,6 +53,26 @@ void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yna
     canvas.SaveAs(outname.data());
 }
 
+void writeToCanvas(std::vector<TH1*>& hists,const std::string& xname,const std::string& yname, const std::string& outname, bool yLog)
+{
+    const std::string canvasName=std::string(hists[0]->GetName())+" plot";
+    TCanvas canvas(canvasName.data(),canvasName.data(),4,45,600,600);
+    canvas.cd();
+    TPad pad("pad","fit", 0.08, 0.08, 0.92, 0.92);
+    pad.Draw();
+    pad.cd();
+    if (yLog) pad.SetLogy();
+    for(auto hist : hists)
+    {
+        hist->GetYaxis()->SetTitle(yname.data());
+        hist->GetXaxis()->SetTitle(xname.data());
+        hist->Draw("same");
+    }
+    pad.BuildLegend();
+    canvas.Write();
+    canvas.SaveAs(outname.data());
+}
+
 void writeToCanvas(TH2* hist,const std::string& xname,const std::string& yname, const std::string& outname)
 {
     writeToCanvasBase(hist,xname,yname,outname,"COLZ",false);
