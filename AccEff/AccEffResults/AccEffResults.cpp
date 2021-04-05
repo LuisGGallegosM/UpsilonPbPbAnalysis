@@ -48,30 +48,33 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     nSigCorrected->Write();
 
     TH1F* DATA_dN_dPt = Normalize(nSigCorrected);
-    DATA_dN_dPt->SetName("DATA_dN_dpT_norm");
-    DATA_dN_dPt->SetTitle("DATA dN/dp_{T} normalized");
-    DATA_dN_dPt->SetFillColor(3);
-    DATA_dN_dPt->SetLineColor(3);
-    DATA_dN_dPt->GetYaxis()->SetRangeUser(0.0,1.0);
+    DATA_dN_dPt->SetName("DATA_nSigCorrected_norm");
+    DATA_dN_dPt->SetTitle("DATA N_{Y1Scorr} normalized");
+    DATA_dN_dPt->SetFillColor(1);
+    DATA_dN_dPt->SetLineColor(1);
+    DATA_dN_dPt->GetYaxis()->SetRangeUser(0.0,0.5);
 
     TH1F* nSigMC = (TH1F*) fitFileMC->Get("nSigY1S");
     TH1F* MC_dN_dPt =Normalize(nSigMC);
-    MC_dN_dPt->SetName("MC_dN_dpT_norm");
-    MC_dN_dPt->SetTitle("MC dN/dp_{T} normalized");
-    MC_dN_dPt->SetFillColor(1);
-    MC_dN_dPt->SetLineColor(1);
-    MC_dN_dPt->GetYaxis()->SetRangeUser(0.0,1.0);
+    MC_dN_dPt->SetName("MC_nSigMC_norm");
+    MC_dN_dPt->SetTitle("MC N_{Y1SMC} normalized");
+    MC_dN_dPt->SetFillColor(3);
+    MC_dN_dPt->SetLineColor(3);
+    MC_dN_dPt->GetYaxis()->SetRangeUser(0.0,0.5);
 
     std::vector<TH1*> hists ={DATA_dN_dPt,MC_dN_dPt};
-    writeToCanvas(hists,"p^{#mu#mu}_{T} GeV/c","#frac{#sigma}{dp_{T}} nb^{-1}",outbasename+"_dNdPt.pdf");
+    writeToCanvas(hists,"DATA corrected and MC N_{Y1S} Normalized","p^{#mu#mu}_{T} GeV/c","N_{Y1S}",outbasename+"_dNdPt.pdf");
     DATA_dN_dPt->Write();
     MC_dN_dPt->Write();
 
     TH1F* ratio= new TH1F((*MC_dN_dPt)/(*DATA_dN_dPt));
-    ratio->SetName("ratio_dN_dpT_norm");
-    ratio->SetTitle("#frac{MC dN/dp_{T}}{DATA dN/dp_{T}}");
+    ratio->SetName(yieldFitName);
+    ratio->SetTitle("#frac{MC N_{Y1SMC} norm}{DATA N_{Y1Scorr} norm}");
+    ratio->SetTitleSize(0.004);
     ratio->GetYaxis()->SetRangeUser(0.0,3.0);
-    ratio->SetFillColor(4);
+    ratio->SetFillColor(1);
+    ratio->SetLineColor(1);
+    ratio->SetStats(false);
     writeToCanvas(ratio,"p^{#mu#mu}_{T} GeV/c","ratio", outbasename+"_dNdPtRatio.pdf");
     ratio->Write();
 

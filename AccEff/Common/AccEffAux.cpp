@@ -40,9 +40,9 @@ TH1F* createTH1(const std::string& name,const std::string& title)
 void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option, bool yLog)
 {
     const std::string canvasName=std::string(hist->GetName())+" plot";
-    TCanvas canvas(canvasName.data(),canvasName.data(),4,45,600,600);
+    TCanvas canvas(canvasName.data(),canvasName.data(),canvasWidth,canvasHeight);
     canvas.cd();
-    TPad pad("pad","fit", 0.08, 0.08, 0.92, 0.92);
+    TPad pad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);
     pad.Draw();
     pad.cd();
     if (yLog) pad.SetLogy();
@@ -53,12 +53,11 @@ void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yna
     canvas.SaveAs(outname.data());
 }
 
-void writeToCanvas(std::vector<TH1*>& hists,const std::string& xname,const std::string& yname, const std::string& outname, bool yLog)
+void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::string& xname,const std::string& yname, const std::string& outname, bool yLog)
 {
-    const std::string canvasName=std::string(hists[0]->GetName())+" plot";
-    TCanvas canvas(canvasName.data(),canvasName.data(),4,45,600,600);
+    TCanvas canvas((title+"_plot").data(),(title+" plot").data(),canvasWidth,canvasHeight);
     canvas.cd();
-    TPad pad("pad","fit", 0.08, 0.08, 0.92, 0.92);
+    TPad pad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);
     pad.Draw();
     pad.cd();
     if (yLog) pad.SetLogy();
@@ -68,7 +67,7 @@ void writeToCanvas(std::vector<TH1*>& hists,const std::string& xname,const std::
         hist->GetXaxis()->SetTitle(xname.data());
         hist->Draw("same");
     }
-    pad.BuildLegend();
+    pad.BuildLegend(0.7,0.8,1.0,1.0);
     canvas.Write();
     canvas.SaveAs(outname.data());
 }
@@ -86,9 +85,9 @@ void writeToCanvas(TH1* hist,const std::string& xname,const std::string& yname, 
 void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname)
 {
     const std::string canvasName=std::string(hist->GetName())+" plot";
-    TCanvas canvas(canvasName.data(),canvasName.data(),4,45,550,520);
+    TCanvas canvas(canvasName.data(),canvasName.data(),canvasWidth,canvasHeight);
     canvas.cd();
-    TPad pad("pad","fit", 0.02, 0.02, 0.98, 0.98);
+    TPad pad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);
     pad.Draw();
     pad.cd();
     hist->Draw();
@@ -99,9 +98,9 @@ void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::stri
 void writeToCanvasEff2D(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname)
 {
     const std::string canvasName=std::string(hist->GetName())+" plot";
-    TCanvas canvas(canvasName.data(),canvasName.data(),4,45,550,520);
+    TCanvas canvas(canvasName.data(),canvasName.data(),canvasWidth,canvasHeight);
     canvas.cd();
-    TPad pad("pad","fit", 0.02, 0.02, 0.98, 0.98);
+    TPad pad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);
     pad.Draw();
     pad.cd();
     hist->Draw("COLZ");

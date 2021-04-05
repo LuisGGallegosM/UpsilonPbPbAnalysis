@@ -5,6 +5,7 @@
 
 #include"../../Utils/Helpers/Helpers.h"
 #include"YieldFitter.h"
+#include"../Common/AccEffAux.h"
 
 #include"RooRealVar.h"
 #include"RooGenericPdf.h"
@@ -27,7 +28,7 @@ void YieldFit(const char* inputRatiosFile, const char* outputFile)
     std::cout << "Writing to file: " << outputFile <<'\n';
     TFile* outFile = OpenFile(outputFile,"RECREATE");
 
-    TH1F* ratios = (TH1F*) ratiosFile->Get("ratio_dN_dpT_norm");
+    TH1F* ratios = (TH1F*) ratiosFile->Get(yieldFitName);
 
     YieldFitter fitter(ratios);
     RooAbsReal* fitFunc = fitter.fit();
@@ -44,15 +45,17 @@ void YieldFit(const char* inputRatiosFile, const char* outputFile)
 
 RooPlot* plotFit(RooAbsReal* fitFunc,RooDataHist* data, RooRealVar* var,const std::string& outname)
 {
-    TCanvas* canvas= new TCanvas("yield_fit","fitting of yield ratios",4,45,600,600);
+    TCanvas* canvas= new TCanvas("yield_fit","fitting of yield ratios", canvasWidth ,canvasHeight);
     canvas->cd();
-    TPad* pad = new TPad("pad","fit", 0.08, 0.08, 0.92, 0.92);
+    TPad* pad = new TPad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);;
     pad->Draw();
     pad->cd();
     RooPlot* plot = var->frame();
     fitFunc->plotOn(plot,Name("fit Func"),LineColor(kOrange+7));
     data->plotOn(plot,Name("data"),LineColor(kBlue));
     plot->SetAxisRange(0.0,3.0,"Y");
+    plot->SetYTitle("ratio");
+    plot->SetTitle("Fit of ratio of yields");
     plot->Draw();
     canvas->Write();
     canvas->SaveAs(outname.data());
