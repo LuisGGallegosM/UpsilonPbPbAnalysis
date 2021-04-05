@@ -2,7 +2,7 @@
 
 CLING="NO"
 
-FLAGS=${1:-"-skim"}
+FLAGS=${1:-"-skimjet"}
 FLAGS2=${2:-"-nocmd"}
 
 #input file to skim
@@ -14,7 +14,7 @@ INPUTFILENAME=$(basename $INPUTFILE)
 #how to folder name skim result file
 OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_${FLAGS:1}"
 #output skimmed file, put in OUTPUTFOLDER and name based in inputfile
-OUTPUTFILENAME="${INPUTFILENAME%.*}_skim.root"
+OUTPUTFILENAME="${INPUTFILENAME%.*}_${FLAGS:1}.root"
 OUTPUTFILE="${OUTPUTFOLDER}/${OUTPUTFILENAME}"
 
 mkdir -p $OUTPUTFOLDER

@@ -7,9 +7,9 @@
 #include "RooFormulaVar.h"
 #include "RooExtendPdf.h"
 
-const char* const mass_name = "reco_mass";
-const char* const pT_name = "reco_pT";
-const char* const y_name ="reco_y";
+const char mass_name[] = "reco_mass";
+const char pT_name[] = "z";
+const char y_name[] ="reco_y";
 
 //OniaMassFitter member functions.
 
@@ -29,8 +29,13 @@ OniaMassFitter::~OniaMassFitter() { }
 
 std::string OniaMassFitter::getKineCutExpr() const
 {
-    std::string str(Form("(%s < %.3f) && (%s > %.3f)",pT_name,config.getCut()->getPtHigh(),pT_name,config.getCut()->getPtLow()));
+    std::string str(Form("((%s)^2 < %.3f) && ((%s)^2 > %.3f)",pT_name,config.getCut()->getPtHigh(),pT_name,config.getCut()->getPtLow()));
     str.append(Form(" && (abs(%s) < %.3f) && (abs(%s) > %.3f)",y_name,config.getCut()->getYHigh(),y_name,config.getCut()->getYLow()));
+    if(1)
+    {
+        str.append(" && (jt_pt < 35) && (jt_pt > 25) ");
+        str.append(" && (abs(jt_eta) < 2.0 )");
+    }
     return str;
 }
 
@@ -57,7 +62,11 @@ RooAbsReal* OniaMassFitter::fit()
 {
     RooRealVar pT(pT_name,"momentum quarkonia",0,100,"GeV/c");
     RooRealVar y(y_name,"rapidity quarkonia",-5,5);
-    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, RooArgSet(mass,pT,y),getKineCutExpr().data());
+    RooRealVar z("z", "z",0.0,1.0);
+    RooRealVar jt_pt("jt_pt","jet momentum",0,100,"GeV/c");
+    RooRealVar jt_eta("jt_eta","jet psedorapidity",0.0,4.0);
+
+    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, RooArgSet(mass,y,z,jt_pt,jt_eta),getKineCutExpr().data());
     dataset.reset(datas);
     std::cout << "Reduced dataset:\n";
     dataset->Print();
