@@ -18,8 +18,8 @@ do
 done
 
 #multifit input file
-MULTIFITFILE="../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline_z.multifit"
-INPUTFILENAME="merged_HiForestAOD_DATA_skimjet/merged_HiForestAOD_DATA_skim.root"
+MULTIFITFILE="../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.multifit"
+INPUTFILENAME="merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.root"
 #drawing configuration file
 DRAWCONFIG="../rootfiles/confFiles/merged_HiForestAOD.drawconf"
 

@@ -6,8 +6,8 @@ FLAGS=${1:-"-all"}
 ACCINPUTFILENAME="OniaTree_Ups1SMM_5p02TeV_TuneCUETP8M1_nofilter_pp502Fall15-MCRUN2_71_V1-v1_GENONLY.root"
 EFFINPUTFILENAME="merged_HiForestAOD_MCFix2.root"
 CONFIG="../rootfiles/confFiles/merged_HiForestAOD_MC.cutconf"
-DATA_MULTIFITINPUTFILENAME="merged_HiForestAOD_DATA_skim_01ABR2021/multifit0"
-MC_MULTIFITINPUTFILENAME="merged_HiForestAOD_MCFix2_skim/multifit0"
+DATA_MULTIFITINPUTFILENAME="merged_HiForestAOD_DATA_skim_01ABR2021/multifit1"
+MC_MULTIFITINPUTFILENAME="merged_HiForestAOD_MCFix2_skim/multifit1"
 
 #input file with relative path for Acceptancy
 ACCINPUTFILE="../rootfiles/datasets/${ACCINPUTFILENAME}"

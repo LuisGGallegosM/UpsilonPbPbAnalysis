@@ -223,7 +223,7 @@ void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
 
     TextDrawer tdrawer2(0.45,0.8);
     
-    tdrawer2.drawText(Form("%.2f < z^{2} < %.2f",ptLow, ptHigh));
+    tdrawer2.drawText(Form("%.2f < p_{T}^{#mu#mu} < %.2f",ptLow, ptHigh));
     
     if (yLow == 0.0f)
         tdrawer2.drawText(Form("|y^{#mu#mu}| < %.2f", yHigh));
@@ -231,8 +231,8 @@ void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
         tdrawer2.drawText(Form("%.2f < |y^{#mu#mu}| < %.2f",yLow, yHigh));
     tdrawer2.drawText(Form("p_{T}^{#mu} > %.1f GeV/c", singleMuPtLow));
     tdrawer2.drawText(Form("|#eta^{#mu}| < %.2f",singleMuEtaHigh));
-    tdrawer2.drawText(" 25.0 < jet p_{T} < 35.0");
-    tdrawer2.drawText(" |jet #eta| < 2.0");
+    //tdrawer2.drawText(" 25.0 < jet p_{T} < 35.0");
+    //tdrawer2.drawText(" |jet #eta| < 2.0");
 }
 
 /**
