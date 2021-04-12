@@ -4,22 +4,23 @@
 #include <fstream>
 #include <sstream>
 
-
-Serializer::Serializer(const std::string& filename, Serializer::iotype iot) : filename_(filename), type(iot)
+Serializer::Serializer()
 {
-    if (!(iot==iotype::read) || (iot==iotype::update))
-        return;
+}
 
-    std::ifstream file(filename_);
+
+Serializer::Serializer(const std::string& filename)
+{
+    std::ifstream file(filename);
     if(!file.is_open())
     {
-        std::string error ="Error: file '"+filename+"' not open/found.\n";
+        std::string error ="Error: cannot open file '"+filename+"'.\n";
         throw std::runtime_error(error);
     }
 
     std::string str;
-    char varName[42];
-    char varValue[42];
+    char varName[64];
+    char varValue[64];
     while (std::getline(file,str))
     {
         if(str.empty()) continue;
@@ -32,132 +33,32 @@ Serializer::Serializer(const std::string& filename, Serializer::iotype iot) : fi
     };
 }
 
-Serializer::~Serializer()
+void Serializer::serialize(const std::string& filename) const
 {
-    if ((type== iotype::write) || (type==iotype::update))
+    std::ofstream file(filename,std::ios_base::trunc);
+    for (const auto &i : vars)
     {
-        std::ofstream file(filename_,std::ios_base::trunc);
-        for (const auto &i : vars)
-        {
-            file << i.first << " = " << i.second << "\n";
-        }
+        file << i.first << " = " << i.second << "\n";
     }
 }
 
-void Serializer::addPrefix(const std::string& prefix)
+void Serializer::write(const std::string& name, const std::string& var)
 {
-    prefixes.push_back(prefix);
-    currentPrefix.clear();
-    for(const auto& str : prefixes) currentPrefix.append(str+'.');
+    vars[name] = var;
 }
 
-void Serializer::removePrefix()
+const std::string& Serializer::read(const std::string& name) const
 {
-    prefixes.pop_back();
-    currentPrefix.clear();
-    for(const auto& str : prefixes) currentPrefix.append(str+'.');
+    return vars.at(name);
 }
 
-template <typename T>
-void Serializer::write(const std::string& varname, T input)
+std::vector<std::string> Serializer::getNames() const
 {
-    std::string var = currentPrefix + varname;
-    if (type==iotype::read)
-        throw std::runtime_error("Error: File not open for writing");
-
-    std::stringstream str;
-    str << input;
-    vars[var] = str.str();
-}
-
-template <typename T>
-void Serializer::read(const std::string& varname, T& output)
-{
-    std::string var = currentPrefix + varname;
-    if (vars.find(var) != vars.end())
-        std::stringstream(vars[var]) >> output;
-    else
+    std::vector<std::string> names;
+    names.reserve(vars.size());
+    for(const auto& var : vars)
     {
-        std::string error ="Error: Variable '"+var+"' not found in configuration file.\n";
-        throw std::invalid_argument(error);
-    }     
-}
-
-template <typename T>
-void Serializer::read(const std::string& varname, T& output, T defaultValue)
-{
-    std::string var = currentPrefix + varname;
-    if (vars.find(var) != vars.end())
-        std::stringstream(vars[var]) >> output;
-    else
-    {
-        output = defaultValue;
-        std::cout << "WARNING: No value found for "<< varname << " default value " << defaultValue <<" used.\n";
-    }     
-}
-
-void Serializer::write(const std::string& varname, bool input)
-{
-    std::string var = currentPrefix + varname;
-    if (type==iotype::read)
-        throw std::runtime_error("Error: File not open for writing");
-
-    if (input)
-        vars[var] = "true";
-    else
-        vars[var] = "false";
-}
-
-void Serializer::read(const std::string& varname, bool& output)
-{
-    std::string var = currentPrefix + varname;
-    if (vars.find(var) != vars.end())
-    {
-        if(vars[var] == "true")
-            output=true;
-        else if (vars[var] == "false")
-            output=false;
-        else
-            throw std::invalid_argument(std::string("Variable '")+var+" not bool");
+        names.push_back(var.first);
     }
-    else
-    {
-        std::string error ="Error: Variable '" +var+"' not found in configuration file.\n";
-        throw std::invalid_argument(error);
-    }  
+    return names;
 }
-
-void Serializer::read(const std::string& varname, bool& output, bool defaultValue)
-{
-    std::string var = currentPrefix + varname;
-    if (vars.find(var) != vars.end())
-    {
-        if(vars[var] == "true")
-            output=true;
-        else if (vars[var] == "false")
-            output=false;
-        else
-            throw std::invalid_argument(std::string("Variable '")+var+" not bool");
-    }
-    else
-    {
-        output=defaultValue;
-        std::string def= defaultValue? "true" :"false";
-        std::cout << "WARNING: No value found for "<<varname << " default value " << def << " used.\n";
-    }  
-}
-
-template void Serializer::read(const std::string& var, int& output);
-template void Serializer::read(const std::string& var, float& output);
-template void Serializer::read(const std::string& var, unsigned long long& output);
-template void Serializer::read(const std::string& var, std::string& output);
-
-template void Serializer::read(const std::string& var, int& output, int defaultValue);
-template void Serializer::read(const std::string& var, float& output, float defaultValue);
-template void Serializer::read(const std::string& var, unsigned long long& output, unsigned long long defaultValue);
-template void Serializer::read(const std::string& var, std::string& output, std::string defaultValue );
-
-template void Serializer::write(const std::string& var, int output);
-template void Serializer::write(const std::string& var, float output);
-template void Serializer::write(const std::string& var, unsigned long long output);
-template void Serializer::write(const std::string& var, const std::string output);

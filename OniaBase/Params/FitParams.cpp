@@ -216,7 +216,7 @@ void fitParams::deserialize(const std::string& filename)
 
 void fitParams::serialize(const std::string& filename) const
 {
-    Serializer ser(filename,Serializer::iotype::write);
+    Serializer ser(filename);
     serialize(ser);
 }
 
@@ -251,7 +251,7 @@ void fitParamsWithErrors::deserialize(const std::string& filename)
 
 void fitParamsWithErrors::serialize(const std::string& filename) const
 {
-    Serializer ser(filename,Serializer::iotype::write);
+    Serializer ser(filename);
     fitParams::serialize(ser);
 
     ser.addPrefix("error");
