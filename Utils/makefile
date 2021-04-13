@@ -8,6 +8,7 @@ LIBS:=$(shell $(ROOTSYS)/bin/root-config --ldflags --glibs) -lRooFit -lRooFitCor
 OUTPUT:=libUtils
 
 all : libUtils.a test
+	./test
 
 libUtils.a : ${SOURCES} ${HEADERS}
 	g++ ${SOURCES} ${INC} ${FLAGS}

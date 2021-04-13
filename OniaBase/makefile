@@ -9,6 +9,7 @@ LIBS:=$(shell $(ROOTSYS)/bin/root-config --ldflags --glibs) -lRooFit -lRooFitCor
 OUTPUT:=libOniaBase
 
 all : libOniaBase.a test
+	./test
 
 libOniaBase.a : ${SOURCES} ${HEADERS} ${STATICLIBS}
 	g++ ${SOURCES} ${INC} ${LIBS} ${FLAGS}

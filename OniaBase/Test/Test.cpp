@@ -6,7 +6,7 @@
 void CutParamTest(Tester* tester)
 {
     CutParams cut;
-    cut.deserialize("./OniaBase/Test/Files/sampleCut.cutconf");
+    cut.deserialize("./Test/Files/sampleCut.cutconf");
     
     tester->assert_eq( cut.isMC,false,"isMC deserialized");
     tester->assert_eq( cut.checkSign, true,"checkSign deserialized");
