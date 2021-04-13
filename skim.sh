@@ -12,7 +12,7 @@ CONFIG="../rootfiles/confFiles/merged_HiForestAOD_DATA_v2.cutconf"
 
 INPUTFILENAME=$(basename $INPUTFILE)
 #how to folder name skim result file
-OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_${FLAGS:1}"
+OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_${FLAGS:1}_test"
 #output skimmed file, put in OUTPUTFOLDER and name based in inputfile
 OUTPUTFILENAME="${INPUTFILENAME%.*}_${FLAGS:1}.root"
 OUTPUTFILE="${OUTPUTFOLDER}/${OUTPUTFILENAME}"

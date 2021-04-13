@@ -3,7 +3,7 @@
 #include<string>
 
 
-ParameterGroup::ParameterGroup(Serializer* ser,const std::string& groupName) :
+ParameterGroup::ParameterGroup(const Serializer* ser,const std::string& groupName) :
     ParameterGroup(groupName)
 {
     auto vars = ser->getNames();
@@ -13,7 +13,7 @@ ParameterGroup::ParameterGroup(Serializer* ser,const std::string& groupName) :
     }
 }
 
-ParameterGroup::ParameterGroup(Serializer* ser,const std::string& groupName, const std::string& prefix) :
+ParameterGroup::ParameterGroup(const Serializer* ser,const std::string& groupName, const std::string& prefix) :
     ParameterGroup(groupName)
 {
     const std::string prefixWithDot=prefix+"."+groupName+".";
@@ -45,7 +45,17 @@ float ParameterGroup::getValue(const std::string& name) const
 void ParameterGroup::setValue(const std::string& name, float value)
 {
     data[name] = std::to_string(value);
-} 
+}
+
+int ParameterGroup::getInt(const std::string& name) const
+{
+    return std::stoi(data.at(name));
+}
+
+void ParameterGroup::setInt(const std::string& name, int value)
+{
+    data[name] = std::to_string(value);
+}
 
 bool ParameterGroup::getBool(const std::string& name) const
 {

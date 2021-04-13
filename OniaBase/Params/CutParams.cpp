@@ -6,27 +6,30 @@
 
 void CutParams::deserialize(const std::string& filename)
 {
-    Serializer ser(filename);
-    ser.read("isMC",isMC);
-    ser.read("trigSelect", trigSelect);
-    ser.read("checkSign",checkSign );
-    ser.read("sign",sign);
-    ser.read("prescale",prescale);
+    const Serializer ser(filename);
+    ParameterGroup g(&ser,"cut");
 
-    ser.read("selectionBits",selectionBits);
-    ser.read("minTracks",minTracks);
-    ser.read("minPixels",minPixels);
+    isMC=g.getBool("isMC");
+    trigSelect=g.getInt("trigSelect");
 
-    ser.read("maxDxy",maxDxy);
-    ser.read("maxDz",maxDz);
-    ser.read("minVtxProb",minVtxProb);
+    checkSign = g.getBool("checkSign");
+    sign = g.getInt("sign");
+    prescale =g.getInt("prescale");
 
-    ser.read("ptLow",ptLow);
-    ser.read("ptHigh",ptHigh);
-    ser.read("yLow",yLow);
-    ser.read("yHigh",yHigh);
-    ser.read("singleMuPtLow",singleMuPtLow);
-    ser.read("singleMuEtaHigh",singleMuEtaHigh);
+    selectionBits = g.getInt("selectionBits");
+    minTracks = g.getInt("minTracks");
+    minPixels = g.getInt("minPixels");
+
+    maxDxy = g.getValue("maxDxy");
+    maxDz = g.getValue("maxDz");
+    minVtxProb = g.getValue("minVtxProb");
+
+    ptLow = g.getValue("ptLow");
+    ptHigh = g.getValue("ptHigh");
+    yLow = g.getValue("yLow");
+    yHigh = g.getValue("yHigh");
+    singleMuPtLow = g.getValue("singleMuPtLow");
+    singleMuEtaHigh = g.getValue("singleMuEtaHigh");
 }
 
 bool CutParams::isMatchedQQ(const OniaWhich* which,int mupl_idx, int mumi_idx, int index) const

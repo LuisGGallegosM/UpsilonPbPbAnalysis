@@ -2,54 +2,40 @@
 #include<iostream>
 
 #include"../Serialization/Serialization.h"
+#include"../Tester/Tester.h"
 //#include"../Helpers/Helpers.h"
 
 using std::cout;
+using std::string;
 
-void Assert(bool predicate,const char* behavor, const char* name)
-{
-    if(predicate)
-    {
-        cout << "test :"<< name <<" : " << behavor << " \t: passed\n";
-    }
-    else
-    {
-        cout << "test :"<< name <<" : " << behavor << " \t: FAILED\n";
-    }
-}
-
-void testStorage(const char* name)
+void testStorage(Tester* test)
 {
     ParameterGroup group("group");
     group.setString("sub1.value1","hello");
-    group.setValue("sub1.value2",42);
+    group.setValue("sub1.value2",42.0f);
 
-    Assert(group.getString("sub1.value1")=="hello","must store string value",name);
-    Assert(group.getValue("sub1.value2")==42,"must store float value",name);
+    test->assert_eq(group.getString("sub1.value1"),"hello","must store string value");
+    test->assert_eq(group.getValue("sub1.value2"),42.0f,"must store float value");
 }
 
-void testGroupExtraction(const char* name)
+void testGroupExtraction(Tester* test)
 {
     ParameterGroup group("group");
     group.setString("sub1.value1","23");
     group.setString("sub2.trig.cos","cosine");
-    group.setValue("sub2.trig.sin",23);
+    group.setValue("sub2.trig.sin",23.0f);
 
     ParameterGroup subgroup = group.get("sub2.trig","sub2.trig");
 
-    Assert(subgroup.getString("cos")=="cosine", "must have subgroup string variable",name);
-    Assert(subgroup.getValue("sin")==23, "must have subgroup float variable",name);
+    test->assert_eq(subgroup.getString("cos"),"cosine", "must have subgroup string variable");
+    test->assert_eq(subgroup.getValue("sin"),23.0f, "must have subgroup float variable");
 }
 
 int main()
 {
-    std::cout << "start testing\n";
-
-    testStorage("variable storage");
-    testGroupExtraction("group extraction");
-
-    std::cout << "end testing\n";
-
+    Tester test("Utils test");
+    test.test(testStorage,"variable storage");
+    test.test(testGroupExtraction,"group extraction");
     return 0;
 }
 
