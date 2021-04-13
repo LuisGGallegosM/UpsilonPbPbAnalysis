@@ -3,32 +3,35 @@
 
 #include<iostream>
 
-std::string redText(const std::string& text);
-std::string greenText(const std::string& text);
+enum class textColor { red=31, green, orange, blue, purple,cyan };
+
+std::string colorText(const std::string& text, textColor color);
 
 class Tester
 {
     std::string suitName;
+    int numOfTestSuits;
+    int numOfTestSuitsSuccess;
+    int numOfTest;
+    int numOfTestSuccess;
+    int numOfTotalTest;
+    int numOfTotalTestSuccess;
+    
     public:
-    Tester(const char* name) : suitName(name) {}
+    Tester(const char* name);
 
     void test(void (*func)(Tester*), const char* testName);
 
-    void assert(bool predicate,const std::string& behavor);
-    template<typename T1,typename T2>
-    void assert_eq(T1 value,T2 expected,std::string behavor)
-    {
-        if(value==expected)
-        {
-            std::cout << "\ttest :"<< behavor << " \t: "<< greenText("passed") <<"\n";
-        }
-        else
-        {
-            std::cout << "\ttest :"<< behavor << " \t: "<< redText("FAILED");
-            std::cout << " - Expected: '"<< expected << "' Result: '" << value <<"'\n";
-        }
-    }
+    void assert_true(bool predicate,const std::string& behavor);
 
+    void assert_eq(bool value, bool expected, const std::string& behavor);
+    void assert_eq(int value, int expected, const std::string& behavor);
+    void assert_eq(float value, float expected, const std::string& behavor);
+    void assert_eq(const std::string& value, const std::string& expected, const std::string& behavor);
+
+    void showPassed(const std::string& behavor);
+    void showFailed(const std::string& behavor, const std::string& info);
+    ~Tester();
 };
 
 #endif

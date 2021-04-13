@@ -1,0 +1,17 @@
+isMC = false
+checkSign = true
+trigSelect = 8
+sign = 0
+prescale = 1
+selectionBits = 10
+minTracks = 6
+minPixels = 1
+maxDxy = 0.3
+maxDz = 20
+minVtxProb = 0.01
+ptLow = 0
+ptHigh = 100
+yLow = 0
+yHigh = 2.4
+singleMuPtLow = 3.5
+singleMuEtaHigh = 2.4

@@ -8,9 +8,8 @@
  * @brief stores the information for cut in skimming, such as
  * pt and y ranges and if is MC or Real Data.
  */
-class CutParams
+struct CutParams
 {
-    private:
     bool isMC;
     bool checkSign;
     unsigned long long trigSelect;
@@ -31,7 +30,6 @@ class CutParams
     float singleMuPtLow;
     float singleMuEtaHigh;
 
-    public:
     CutParams() : isMC(false), checkSign(false), trigSelect(0LL), prescale(0),
     sign(0), selectionBits(0), minPixels(-1),minTracks(-1), maxDxy(-1.0f),maxDz(-1.0f),
     minVtxProb(-1.0f),ptHigh(-1.0f),ptLow(-1.0f),yLow(-1.0f),yHigh(-1.0f),

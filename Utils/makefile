@@ -1,8 +1,8 @@
 
 FLAGS:=$(shell ../HelperScripts/compilerFlags.sh ) -c
 TESTFLAGS:=$(shell ../HelperScripts/compilerFlags.sh ) -o
-SOURCES:=$(shell find ./Helpers ./Serialization ./Tester -name  "*.cpp")
-HEADERS:=$(shell find ./Helpers ./Serialization -name  "*.h")
+SOURCES:=$(shell find . -name  "*.cpp" ! -path "./Test/*")
+HEADERS:=$(shell find . -name  "*.h" ! -path "./Test/*")
 INC:=-I $(shell $(ROOTSYS)/bin/root-config --cflags)
 LIBS:=$(shell $(ROOTSYS)/bin/root-config --ldflags --glibs) -lRooFit -lRooFitCore -lMinuit
 OUTPUT:=libUtils
@@ -19,5 +19,5 @@ clear :
 	rm -f libUtils.a *.o *.s
 	rm test
 
-test : Test/Test.cpp ${SOURCES} ${HEADERS}
-	g++ Test/Test.cpp ${SOURCES} ${INC} ${LIBS} ${TESTFLAGS} test
+test : Test/Test.cpp libUtils.a
+	g++ Test/Test.cpp libUtils.a ${INC} ${LIBS} ${TESTFLAGS} test
