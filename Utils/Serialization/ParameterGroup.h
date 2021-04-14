@@ -21,9 +21,13 @@ class IParameterGroup
 
 class ParameterGroup : public IParameterGroup
 {
+    std::map<std::string,ParameterGroup> subgroups;
     std::map<std::string,std::string> data;
     std::string name;
     std::string basePrefix;
+
+    const std::string& read(const std::string& name) const;
+    void write(const std::string& name, const std::string& value);
 
     public:
     ParameterGroup(const std::string& groupName) :
@@ -45,7 +49,7 @@ class ParameterGroup : public IParameterGroup
     void setInt(const std::string& name, int value);
 
     std::vector<std::string> getNames() const;
-    ParameterGroup get(const std::string& name, const std::string& prefix) const;
+    ParameterGroup* get(const std::string& name);
     void save(Serializer* ser) const;
 };
 

@@ -9,8 +9,37 @@ ParameterGroup::ParameterGroup(const Serializer* ser,const std::string& groupNam
     auto vars = ser->getNames();
     for( const auto& var : vars)
     {
-        data[var] = ser->read(var);
+        write(var,ser->read(var));
     }
+}
+
+const std::string& ParameterGroup::read(const std::string& name) const
+{
+    int index= name.find_first_of('.');
+    if (index==std::string::npos)
+    {
+        return data.at(name);
+    }
+    else
+    {
+        return subgroups.at(name.substr(0,index)).read(name.substr(index+1));
+    }
+}
+
+void ParameterGroup::write(const std::string& name, const std::string& value)
+{
+    int index= name.find_first_of('.');
+    if (index==std::string::npos)
+    {
+        data[name]=value;
+    }
+    else
+    {
+        const std::string subg= name.substr(0,index);
+        const std::string subsubg= name.substr(index+1);
+        auto it =subgroups.emplace(subg,subg);
+        it.first->second.write(subsubg,value);
+    }   
 }
 
 ParameterGroup::ParameterGroup(const Serializer* ser,const std::string& groupName, const std::string& prefix) :
@@ -22,44 +51,44 @@ ParameterGroup::ParameterGroup(const Serializer* ser,const std::string& groupNam
     {
         if( var.compare(0,prefixWithDot.length(), prefixWithDot)==0)
         {
-            data[var.substr(prefixWithDot.length())] = ser->read(var);
+            write(var.substr(prefixWithDot.length()),ser->read(var));
         }
     }
 }
 
 std::string ParameterGroup::getString(const std::string& name) const
 {
-    return data.at(name);
+    return read(name);
 }
 
 void ParameterGroup::setString(const std::string& name, const std::string& str)
 {
-    data[name]=str;
+    write(name,str);
 }
 
 float ParameterGroup::getValue(const std::string& name) const
 {
-    return std::stof(data.at(name));
+    return std::stof(read(name));
 }
 
 void ParameterGroup::setValue(const std::string& name, float value)
 {
-    data[name] = std::to_string(value);
+    write(name, std::to_string(value));
 }
 
 int ParameterGroup::getInt(const std::string& name) const
 {
-    return std::stoi(data.at(name));
+    return std::stoi(read(name));
 }
 
 void ParameterGroup::setInt(const std::string& name, int value)
 {
-    data[name] = std::to_string(value);
+    write(name,std::to_string(value));
 }
 
 bool ParameterGroup::getBool(const std::string& name) const
 {
-    const std::string& var= data.at(name);
+    const std::string& var= read(name);
     if (var=="true") return true;
     else if (var=="false") return false;
     throw std::invalid_argument(std::string("Variable '")+var+" not bool");
@@ -67,21 +96,30 @@ bool ParameterGroup::getBool(const std::string& name) const
 
 void ParameterGroup::setBool(const std::string& name, bool value)
 {
-    data[name] = value ? "true" : "false";
+    write(name,value ? "true" : "false");
 }
 
-ParameterGroup ParameterGroup::get(const std::string& name, const std::string& prefix) const
+ParameterGroup* ParameterGroup::get(const std::string& name)
 {
-    ParameterGroup g(name);
-    const std::string prefixAndDot=prefix+".";
-    for( const auto& var : data)
+    int index= name.find_first_of('.');
+
+    if (index==std::string::npos)
     {
-        if (var.first.compare(0,prefixAndDot.length(),prefixAndDot)==0)
-        {
-            g.setString(var.first.substr(prefixAndDot.length()),var.second);
-        }
+        auto found=subgroups.find(name);
+        if (found != subgroups.end())
+            return &(found->second);
+        else
+            throw std::invalid_argument("subgroup "+name+" not found.");
     }
-    return g;
+    else
+    {
+        auto found=subgroups.find(name.substr(0,index));
+        const std::string sub=name.substr(index+1);
+        if (found!= subgroups.end())
+            return found->second.get(sub);
+        else
+            throw std::invalid_argument("subgroup '"+sub+"' in '"+ name +"' not found.");
+    }
 }
 
 std::vector<std::string> ParameterGroup::getNames() const

@@ -1,5 +1,6 @@
 
 #include "Tester.h"
+#include<iomanip>
 
 Tester::Tester(const char* name) : suitName(name)
 {
@@ -34,7 +35,7 @@ void Tester::test(void (*func)(Tester*), const char* testName)
 
 void Tester::showPassed(const std::string& behavor)
 {
-    std::cout << "\ttest :"<< behavor << " \t: "<< colorText("passed",textColor::green) <<"\n";
+    std::cout << "\ttest :"<< behavor << std::setw(60-behavor.length())<< colorText("passed",textColor::green) <<"\n";
     ++numOfTestSuccess;
     ++numOfTest;
     ++numOfTotalTest;
@@ -43,7 +44,7 @@ void Tester::showPassed(const std::string& behavor)
 
 void Tester::showFailed(const std::string& behavor, const std::string& info)
 {
-    std::cout << "\ttest :"<< behavor << " \t: "<< colorText("FAILED",textColor::red) << " - " << info << "\n";
+    std::cout << "\ttest :"<< behavor << std::setw(60-behavor.length()) << colorText("FAILED",textColor::red) << " - " << info << "\n";
     ++numOfTestSuits;
     ++numOfTotalTest;
 }
