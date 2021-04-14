@@ -3,8 +3,7 @@
 #include<string>
 
 
-ParameterGroup::ParameterGroup(const Serializer* ser,const std::string& groupName) :
-    ParameterGroup(groupName)
+ParameterGroup::ParameterGroup(const Serializer* ser)
 {
     auto vars = ser->getNames();
     for( const auto& var : vars)
@@ -13,16 +12,34 @@ ParameterGroup::ParameterGroup(const Serializer* ser,const std::string& groupNam
     }
 }
 
+ParameterGroup::ParameterGroup(const Serializer* ser,const std::string& prefix)
+{
+    const std::string prefixWithDot=prefix+".";
+    const auto vars = ser->getNames();
+    for( const auto& var : vars)
+    {
+        if( var.compare(0,prefixWithDot.length(), prefixWithDot)==0)
+        {
+            write(var.substr(prefixWithDot.length()),ser->read(var));
+        }
+    }
+}
+
 const std::string& ParameterGroup::read(const std::string& name) const
 {
     int index= name.find_first_of('.');
     if (index==std::string::npos)
     {
+        auto found= data.find(name);
+        if (found==data.end()) throw std::invalid_argument("Error: variable '"+name+"' not found.");
         return data.at(name);
     }
     else
     {
-        return subgroups.at(name.substr(0,index)).read(name.substr(index+1));
+        const std::string str=name.substr(0,index);
+        auto found= subgroups.find(str);
+        if (found==subgroups.end()) throw std::invalid_argument("Error: subgroup '"+name+"' not found.");
+        return found->second.read(name.substr(index+1));
     }
 }
 
@@ -37,23 +54,9 @@ void ParameterGroup::write(const std::string& name, const std::string& value)
     {
         const std::string subg= name.substr(0,index);
         const std::string subsubg= name.substr(index+1);
-        auto it =subgroups.emplace(subg,subg);
+        auto it =subgroups.emplace(subg,ParameterGroup());
         it.first->second.write(subsubg,value);
     }   
-}
-
-ParameterGroup::ParameterGroup(const Serializer* ser,const std::string& groupName, const std::string& prefix) :
-    ParameterGroup(groupName)
-{
-    const std::string prefixWithDot=prefix+"."+groupName+".";
-    const auto vars = ser->getNames();
-    for( const auto& var : vars)
-    {
-        if( var.compare(0,prefixWithDot.length(), prefixWithDot)==0)
-        {
-            write(var.substr(prefixWithDot.length()),ser->read(var));
-        }
-    }
 }
 
 std::string ParameterGroup::getString(const std::string& name) const

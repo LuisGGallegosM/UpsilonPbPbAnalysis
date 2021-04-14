@@ -10,7 +10,7 @@ using std::string;
 
 void testStorage(Tester* test)
 {
-    ParameterGroup group("group");
+    ParameterGroup group;
 
     int i=0;
     for (const std::string& p : { "", ".sub1",".sub2", ".sub3" })
@@ -35,7 +35,7 @@ void testStorage(Tester* test)
 
 void testGroupExtraction(Tester* test)
 {
-    ParameterGroup group("group");
+    ParameterGroup group;
     group.setString("sub1.value1","23");
     group.setString("sub2.trig.cos","cosine");
     group.setFloat("sub2.trig.sin",23.0f);
