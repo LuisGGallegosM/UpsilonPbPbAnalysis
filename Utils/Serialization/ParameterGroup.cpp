@@ -66,12 +66,12 @@ void ParameterGroup::setString(const std::string& name, const std::string& str)
     write(name,str);
 }
 
-float ParameterGroup::getValue(const std::string& name) const
+float ParameterGroup::getFloat(const std::string& name) const
 {
     return std::stof(read(name));
 }
 
-void ParameterGroup::setValue(const std::string& name, float value)
+void ParameterGroup::setFloat(const std::string& name, float value)
 {
     write(name, std::to_string(value));
 }

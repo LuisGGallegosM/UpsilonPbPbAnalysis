@@ -20,16 +20,16 @@ void CutParams::deserialize(const std::string& filename)
     minTracks = g.getInt("minTracks");
     minPixels = g.getInt("minPixels");
 
-    maxDxy = g.getValue("maxDxy");
-    maxDz = g.getValue("maxDz");
-    minVtxProb = g.getValue("minVtxProb");
+    maxDxy = g.getFloat("maxDxy");
+    maxDz = g.getFloat("maxDz");
+    minVtxProb = g.getFloat("minVtxProb");
 
-    ptLow = g.getValue("ptLow");
-    ptHigh = g.getValue("ptHigh");
-    yLow = g.getValue("yLow");
-    yHigh = g.getValue("yHigh");
-    singleMuPtLow = g.getValue("singleMuPtLow");
-    singleMuEtaHigh = g.getValue("singleMuEtaHigh");
+    ptLow = g.getFloat("ptLow");
+    ptHigh = g.getFloat("ptHigh");
+    yLow = g.getFloat("yLow");
+    yHigh = g.getFloat("yHigh");
+    singleMuPtLow = g.getFloat("singleMuPtLow");
+    singleMuEtaHigh = g.getFloat("singleMuEtaHigh");
 }
 
 bool CutParams::isMatchedQQ(const OniaWhich* which,int mupl_idx, int mumi_idx, int index) const
