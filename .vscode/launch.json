@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
     
         {
             "name": "g++ skim debug",
@@ -77,6 +78,26 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Utils/test",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Habilitar la impresión con sangría para gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "g++ OniaBase test debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/OniaBase/test",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
