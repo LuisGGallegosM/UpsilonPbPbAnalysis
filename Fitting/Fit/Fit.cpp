@@ -25,14 +25,8 @@ void Fit(const char* inputfilename, const char* cutfilename, const char* outfile
     TFile* outputfile = OpenFile(outfilename,"CREATE");
 
     //fit configuration file
-    fitConfig config;
+    ParameterGroup config;
     config.deserialize(fitconfigname);
-
-    if(!config.isValid())
-    {
-        std::cerr << "Error: Invalid arguments\n";
-        return;
-    }
 
     //read tree
     TTree *tree_skimmed = (TTree *)inputfile->Get(oniaTreeName);
@@ -45,11 +39,10 @@ void Fit(const char* inputfilename, const char* cutfilename, const char* outfile
     //Fit
     RooAbsReal* fittedFunc = massFitter->fit();
     
-    fitParamsWithErrors fParams = massFitter->getFitParams();
+    ParameterGroup fParams = massFitter->getFitParams();
 
     //output fit result file
     fParams.serialize(ReplaceExtension(outfilename,".fit").data());
-    assert(fParams.isValid());
 
     massFitter->getResults()->Print();
 

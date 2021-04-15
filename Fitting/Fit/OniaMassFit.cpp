@@ -13,15 +13,18 @@ const char y_name[] ="reco_y";
 
 //OniaMassFitter member functions.
 
-OniaMassFitter::OniaMassFitter(TTree* tree_,const fitConfig* fitConf):
+OniaMassFitter::OniaMassFitter(TTree* tree_,const ParameterGroup* fitConf):
     config(*fitConf),tree(tree_),
-    nSig_Y1S("nSig_Y1S","Upsilon Signal",config.getInitValues()->getNSigY1S(), config.getInitValues()->getLowLimit().getNSigY1S(), config.getInitValues()->getHighLimit().getNSigY1S()),
-    nBkg("nBkg","Bkg signal",config.getInitValues()->getNBkg(),config.getInitValues()->getLowLimit().getNBkg(), config.getInitValues()->getHighLimit().getNBkg()),
-    mass(mass_name,"onia mass",config.getMassLow(),config.getMassHigh(),"GeV/c^{2}"),
-    dcball1(mass,"Y1S",config.getInitValues()->getDCBParams(),config.getInitValues()->getLowLimit().getDCBParams(),config.getInitValues()->getHighLimit().getDCBParams(),fitConf->getFixAlpha(),fitConf->getFixN()),
+    nSig_Y1S("nSig_Y1S","Upsilon Signal",
+        config.getFloat("nSigY1S.value"), config.getFloat("nSigY1S.low"), config.getFloat("nSigY1S.high")),
+    nBkg("nBkg","Bkg signal",
+        config.getFloat("nBkg.value"), config.getFloat("nBkg.low"), config.getFloat("nBkg.high")),
+    mass(mass_name,"onia mass",
+        config.getFloat("mass.low"),config.getFloat("mass.high"),"GeV/c^{2}"),
+    dcball1(mass,"Y1S",config.get("dcb")),
     bkg()
 {
-    BkgFunc* b =BkgFactory(mass,config);
+    BkgFunc* b =BkgFactory(mass,&config);
     bkg.reset(b);
 }
 
@@ -29,8 +32,9 @@ OniaMassFitter::~OniaMassFitter() { }
 
 std::string OniaMassFitter::getKineCutExpr() const
 {
-    std::string str(Form("((%s) < %.3f) && ((%s) > %.3f)",pT_name,config.getCut()->getPtHigh(),pT_name,config.getCut()->getPtLow()));
-    str.append(Form(" && (abs(%s) < %.3f) && (abs(%s) > %.3f)",y_name,config.getCut()->getYHigh(),y_name,config.getCut()->getYLow()));
+    const ParameterGroup* cut = config.get("cut");
+    std::string str(Form("((%s) < %.3f) && ((%s) > %.3f)",pT_name,cut->getFloat("pt.high"),pT_name,cut->getFloat("pt.low")));
+    str.append(Form(" && (abs(%s) < %.3f) && (abs(%s) > %.3f)",y_name,cut->getFloat("y.high"),y_name,cut->getFloat("y.low")));
     if(0)
     {
         str.append(" && (jt_pt < 35) && (jt_pt > 25) ");
@@ -41,7 +45,7 @@ std::string OniaMassFitter::getKineCutExpr() const
 
 void OniaMassFitter::combinePdf()
 {
-    if (config.isBkgOn())
+    if (config.getString("bkg.type")!="none")
     {
         RooAddPdf* dcballbkg = 
             new RooAddPdf(  "dcb_fit",
@@ -75,8 +79,7 @@ RooAbsReal* OniaMassFitter::fit()
 
     RooFitResult* res=
         output->fitTo(  *dataset,RooFit::Save(),
-                        RooFit::Range(config.getMassLow(),
-                        config.getMassHigh()), 
+                        RooFit::Range(config.getFloat("mass.low"),config.getFloat("mass.high")), 
                         RooFit::Hesse(),
                         RooFit::Timer(),
                         RooFit::Extended());
@@ -86,81 +89,47 @@ RooAbsReal* OniaMassFitter::fit()
     
 }
 
-fitParamsWithErrors OniaMassFitter::getFitParams()
+ParameterGroup OniaMassFitter::getFitParams() const
 {
-    fitParamsWithErrors output;
-    dcbParam dcb;
-    BkgParams bkgParams;
+    ParameterGroup output;
 
-    //values
-    output.setMoreUpsilon(false);
-    output.setNSig(nSig_Y1S.getVal());
-    output.setNBkg(nBkg.getVal());
-    bkgParams=bkg->getBkgParams();
-    output.setBkgParams(bkgParams);
-    dcb = dcball1.getFitParams();
-    output.setDCBParams(dcb);
-
-    //high
-    output.getHighLimit().setMoreUpsilon(false);
-    output.getHighLimit().setNSig(nSig_Y1S.getMax());
-    output.getHighLimit().setNBkg(nBkg.getMax());
-    bkgParams=bkg->getBkgParamsHigh();
-    output.getHighLimit().setBkgParams(bkgParams);
-    dcb= dcball1.getFitParamsHigh();
-    output.getHighLimit().setDCBParams(dcb);
-
-    //low
-    output.getLowLimit().setMoreUpsilon(false);
-    output.getLowLimit().setNSig(nSig_Y1S.getMin());
-    output.getLowLimit().setNBkg(nBkg.getMin());
-    bkgParams=bkg->getBkgParamsLow();
-    output.getLowLimit().setBkgParams(bkgParams);
-    dcb= dcball1.getFitParamsLow();
-    output.getLowLimit().setDCBParams(dcb);
-
-    //errors
-    output.getErrors().setMoreUpsilon(false);
-    output.getErrors().setNSig(nSig_Y1S.getError());
-    output.getErrors().setNBkg(nBkg.getError());
-    bkgParams= bkg->getBkgParamsErrors();
-    output.getErrors().setBkgParams(bkgParams);
-    dcb = dcball1.getFitParamsErrors();
-    output.getErrors().setDCBParams(dcb);
+    output.setBool("moreUpsilon",false);
+    ParameterWrite(output,nSig_Y1S,"nSigY1S");
+    ParameterWrite(output,nBkg,"nBkg");
+    output.addGroup(bkg->getBkgParams(),"bkg");
+    output.addGroup(dcball1.getFitParams(),"dcb");
 
     return output;
 }
 
 //OniaMassFitter2
 
-OniaMassFitter2::OniaMassFitter2(TTree* tree_,const fitConfig* fitConf):
+OniaMassFitter2::OniaMassFitter2(TTree* tree_,const ParameterGroup* fitConf):
     OniaMassFitter(tree_,fitConf),
     
-    nSig_Y2S("nSig_Y2S","Upsilon Signal Y2S",config.getInitValues()->getNSigY2S(), 
-    config.getInitValues()->getLowLimit().getNSigY2S(), config.getInitValues()->getHighLimit().getNSigY2S()),
-
-    nSig_Y3S("nSig_Y3S","Upsilon Signal Y3S",config.getInitValues()->getNSigY3S(), 
-    config.getInitValues()->getLowLimit().getNSigY3S(), config.getInitValues()->getHighLimit().getNSigY3S()),
-
+    nSig_Y2S("nSig_Y2S","Upsilon Signal Y2S",
+        config.getFloat("nSigY2S.value"), config.getFloat("nSigY2S.low"), config.getFloat("nSigY2S.high")),
+    nSig_Y3S("nSig_Y3S","Upsilon Signal Y3S",
+        config.getFloat("nSigY3S.value"), config.getFloat("nSigY3S.low"), config.getFloat("nSigY3S.high")),
     dcball2(mass,"Y2S",dcball1,RATIO_Y2S),
     dcball3(mass,"Y3S",dcball1,RATIO_Y3S)
 {
 }
 
-fitParamsWithErrors OniaMassFitter2::getFitParams()
+ParameterGroup OniaMassFitter2::getFitParams() const
 {
-    fitParamsWithErrors output = OniaMassFitter::getFitParams();
-    output.setMoreUpsilon(true);
-    output.setNSig(nSig_Y1S.getVal(),nSig_Y2S.getVal(),nSig_Y3S.getVal());
-    output.getErrors().setNSig(nSig_Y1S.getError(),nSig_Y2S.getError(),nSig_Y3S.getError());
-    output.getHighLimit().setNSig(nSig_Y1S.getMax(),nSig_Y2S.getMax(),nSig_Y3S.getMax());
-    output.getLowLimit().setNSig(nSig_Y1S.getMin(),nSig_Y2S.getMin(),nSig_Y3S.getMin());
+    ParameterGroup output = OniaMassFitter::getFitParams();
+
+    output.setBool("moreUpsilon",true);
+    ParameterWrite(output,nSig_Y2S,"nSigY1S");
+    ParameterWrite(output,nSig_Y3S,"nSigY1S");
+
     return output;
 }
 
 void OniaMassFitter2::combinePdf()
 {
-    if (config.isBkgOn())
+    if (config.getString("bkg.type")!="none")
     {
         RooAddPdf* dcballbkg = 
             new RooAddPdf("dcb_fit","3 double crystal ball + Bkg", 
@@ -178,10 +147,10 @@ void OniaMassFitter2::combinePdf()
     }
 }
 
-std::unique_ptr<OniaMassFitter> createMassFitter(TTree* input, const fitConfig* config)
+std::unique_ptr<OniaMassFitter> createMassFitter(TTree* input, const ParameterGroup* config)
 {
     std::unique_ptr<OniaMassFitter> massFitter;
-    if (config->isMoreUpsilon())
+    if (config->getBool("moreUpsilon"))
     {
         //fit with 1S,2S and 3S Upsilon 
         massFitter.reset(new OniaMassFitter2(input, config));

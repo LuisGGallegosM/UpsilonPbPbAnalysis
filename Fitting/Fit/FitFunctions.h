@@ -35,14 +35,13 @@
 #define BKG_SIGMA_MAX  (4.0f)
 #define BKG_MU_MAX     (20.0f)
 
+void ParameterWrite( ParameterGroup& p, const RooRealVar& var, const std::string& name);
+
 class BkgFunc
 {
     public:
     virtual RooAbsReal* getFunc() { throw std::runtime_error("Error: accesing no bkg funcion"); }
-    virtual BkgParams getBkgParams();
-    virtual BkgParams getBkgParamsErrors();
-    virtual BkgParams getBkgParamsHigh();
-    virtual BkgParams getBkgParamsLow();
+    virtual ParameterGroup getBkgParams() const;
 };
 
 class Chevychev2 : public BkgFunc
@@ -58,10 +57,7 @@ class Chevychev2 : public BkgFunc
     RooAbsReal* getFunc() override {return &chev;}
     RooRealVar* getCh4_k1() {return &ch4_k1;}
     RooRealVar* getCh4_k2() {return &ch4_k2;}
-    BkgParams getBkgParams() override;
-    BkgParams getBkgParamsErrors() override;
-    BkgParams getBkgParamsHigh() override;
-    BkgParams getBkgParamsLow() override;
+    ParameterGroup getBkgParams() const override;
 };
 
 class SpecialBkg : public BkgFunc
@@ -78,10 +74,7 @@ class SpecialBkg : public BkgFunc
     RooRealVar* getMu()  {return &mu;}
     RooRealVar* getSigma() {return &sigma;}
     RooRealVar* getLambda() {return &lambda;}
-    BkgParams getBkgParams() override;
-    BkgParams getBkgParamsErrors() override;
-    BkgParams getBkgParamsHigh() override;
-    BkgParams getBkgParamsLow() override;
+    ParameterGroup getBkgParams() const override;
 };
 
 class ExponentialBkg : public BkgFunc
@@ -93,10 +86,7 @@ class ExponentialBkg : public BkgFunc
 
     RooAbsReal* getFunc() override {return bkgPdf.get();}
     RooRealVar* getLambda() {return &lambda;}
-    BkgParams getBkgParams() override;
-    BkgParams getBkgParamsErrors() override;
-    BkgParams getBkgParamsHigh() override;
-    BkgParams getBkgParamsLow() override;
+    ParameterGroup getBkgParams() const override;
 };
 
 class ExpChev2Bkg : public BkgFunc
@@ -111,10 +101,7 @@ class ExpChev2Bkg : public BkgFunc
     RooRealVar* getCh4_k2() {return &ch4_k2;}
 
     RooAbsReal* getFunc() override {return bkgPdf.get();}
-    BkgParams getBkgParams() override;
-    BkgParams getBkgParamsErrors() override;
-    BkgParams getBkgParamsHigh() override;
-    BkgParams getBkgParamsLow() override;
+    ParameterGroup getBkgParams() const override;
 };
 
 class CrystalBall
@@ -137,14 +124,14 @@ class CrystalBall
      * @param var observable variable in x axis.
      * @param name a unique name to identify this crystal ball and its variables.
      */
-    CrystalBall(RooRealVar& var, const char* name, const dcbParam* initial, const dcbParam* low, const dcbParam* high,bool fixAlpha, bool fixN);
+    CrystalBall(RooRealVar& var, const char* name, const ParameterGroup* g);
 
     /**
      * @brief Get the crystal ball function.
      * 
      * @return RooCBShape* The interally saved crystal ball function.
      */
-    RooCBShape* getCB();
+    RooCBShape* getCB() {return &cBall;};
 };
 
 class CrystalBallSlave
@@ -172,7 +159,7 @@ class CrystalBallSlave
      * 
      * @return RooCBShape* The interally saved crystal ball function.
      */
-    RooCBShape* getCB();
+    RooCBShape* getCB() {return &cBall;}
 };
 
 class DoubleCrystalBall : public CrystalBall
@@ -187,15 +174,11 @@ class DoubleCrystalBall : public CrystalBall
     RooAddPdf dcball;
 
     public:
-    DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial, const dcbParam* low, const dcbParam* high,bool fixAlpha, bool fixN);
+    DoubleCrystalBall(RooRealVar& var,const char* name, const ParameterGroup* g);
 
     //getters
     RooAbsPdf* getDCB() {return &dcball;}
-    dcbParam getFitParams() const;
-    dcbParam getFitParamsErrors() const;
-    dcbParam getFitParamsHigh() const;
-    dcbParam getFitParamsLow() const;
-    void getFitParamsErrors(dcbParam* params);
+    ParameterGroup getFitParams() const;
 
     friend class DoubleCrystalBallSlave;
 };
@@ -215,10 +198,10 @@ class DoubleCrystalBallSlave : protected CrystalBallSlave
     DoubleCrystalBallSlave(RooRealVar& var,const char* name,DoubleCrystalBall& doublecb,float ratio);
 
     //getter
-    RooAbsPdf* getDCB();
+    RooAbsPdf* getDCB() { return &dcball;}
 };
 
-BkgFunc* BkgFactory(RooRealVar& var, const fitConfig& config);
+BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config);
 
 #if defined(__CLING__)
 #include "FitFunctions.cpp"

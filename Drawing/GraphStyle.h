@@ -6,8 +6,8 @@
 #include "RooPlot.h"
 #include "../OniaBase/Params/Params.h"
 
-void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue ,float bottomValue , bool isLog);
-void setPullStyle(RooPlot* pullPlot, const drawConfig* config);
+void setGraphStyle(RooPlot* plot, const ParameterGroup* config, float topValue ,float bottomValue , bool isLog);
+void setPullStyle(RooPlot* pullPlot, const ParameterGroup* config);
 
 TPad* getStyledGraphPad(bool isLog);
 TCanvas* getStyledCanvas();

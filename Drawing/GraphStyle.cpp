@@ -3,11 +3,11 @@
 #include "GraphStyle.h"
 #include "TH1.h"
 
-void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue, float bottomValue, bool isLog)
+void setGraphStyle(RooPlot* plot, const ParameterGroup* config, float topValue, float bottomValue, bool isLog)
 {
-    float massHigh = config->fitConf.getMassHigh();
-    float massLow = config->fitConf.getMassLow();
-    float div= (massHigh - massLow)/(config->nBins);
+    float massHigh = config->getFloat("mass.high");
+    float massLow = config->getFloat("mass.low");
+    float div= (massHigh - massLow)/(config->getInt("mass.nBins"));
     float maxValue = topValue*div;
     float minValue = bottomValue*div;
 
@@ -27,7 +27,7 @@ void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue, floa
         maxValue *=2.00f;
     }
 
-    if (config->cut.getIsMC())
+    if (config->getBool("isMC"))
         plot->SetTitle(" ");
     else
         plot->SetTitle(" ");
@@ -49,7 +49,7 @@ void setGraphStyle(RooPlot* plot, const drawConfig* config, float topValue, floa
   return;
 }
 
-void setPullStyle(RooPlot* pullPlot, const drawConfig* config)
+void setPullStyle(RooPlot* pullPlot, const ParameterGroup* config)
 {
     pullPlot->SetTitleSize(0);
     pullPlot->SetMarkerStyle(2);
@@ -71,7 +71,7 @@ void setPullStyle(RooPlot* pullPlot, const drawConfig* config)
     pullPlot->GetXaxis()->SetLabelSize(0.06) ;
     pullPlot->GetXaxis()->SetTitleSize(0.06) ;
     pullPlot->GetXaxis()->CenterTitle();
-    pullPlot->GetXaxis()->SetRangeUser(config->fitConf.getMassLow(),config->fitConf.getMassHigh());
+    pullPlot->GetXaxis()->SetRangeUser(config->getFloat("mass.low"),config->getFloat("mass.high"));
     pullPlot->GetXaxis()->SetTickSize(0.03);
     return;
 }

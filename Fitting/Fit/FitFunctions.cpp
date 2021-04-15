@@ -2,69 +2,50 @@
 
 #include"FitFunctions.h"
 
+void ParameterWrite( ParameterGroup& p, const RooRealVar& var, const std::string& name)
+{
+    p.setFloat(name+".value",var.getVal());
+    p.setFloat(name+".low",var.getMin());
+    p.setFloat(name+".high", var.getMax());
+    p.setFloat(name+".error", var.getError());
+    p.setBool(name+".fixed",var.isConstant());
+}
+
 //Crystal ball member functions.
 
-CrystalBall::CrystalBall(RooRealVar& var, const char* name, const dcbParam* initial, 
-        const dcbParam* low, const dcbParam* high,bool fixAlpha, bool fixN):
-    mean(   Form("mean_%s",name),"mean of gaussian PDF",initial->getMean(),low->getMean(),high->getMean()),
-    sigma(  Form("sigma_%s",name),"width of gaussian",initial->getSigma(), low->getSigma(), high->getSigma()),
-    alpha(  Form("alpha_%s",name),"tail shift", initial->getAlpha(),low->getAlpha(),high->getAlpha()),
-    n(      Form("n_%s",name),"power order",initial->getN(), low->getN(), high->getN()),
+CrystalBall::CrystalBall(RooRealVar& var, const char* name, const ParameterGroup* g):
+    mean(   Form("mean_%s",name),"mean of gaussian PDF",g->getFloat("mean.value"),g->getFloat("mean.low"),g->getFloat("mean.high")),
+    sigma(  Form("sigma_%s",name),"width of gaussian",g->getFloat("sigma.value"),g->getFloat("sigma.low"),g->getFloat("sigma.high")),
+    alpha(  Form("alpha_%s",name),"tail shift", g->getFloat("alpha.value"),g->getFloat("alpha.low"),g->getFloat("alpha.high")),
+    n(      Form("n_%s",name),"power order",g->getFloat("n.value"),g->getFloat("n.low"),g->getFloat("n.high")),
     cBall(  Form("cball_%s",name),"crystalBall",var,mean,sigma,alpha,n)
 {
-    if (fixAlpha)
-        alpha.setConstant(kTRUE);
-    if (fixN)
-        n.setConstant(kTRUE);
+    mean.setConstant(g->getBool("mean.fixed"));
+    sigma.setConstant(g->getBool("sigma.fixed"));
+    alpha.setConstant(g->getBool("alpha.fixed"));
+    n.setConstant(g->getBool("n.fixed"));
 }
-
-RooCBShape* CrystalBall::getCB()
-{
-    return &cBall;
-}
-
 //Double CrystalBall
 
-DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var,const char* name, const dcbParam* initial, 
-        const dcbParam* low, const dcbParam* high,bool fixAlpha, bool fixN):
-    CrystalBall(var,Form("%s_1",name),initial,low,high,fixAlpha,fixN),
+DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var,const char* name, const ParameterGroup* g):
+    CrystalBall(var,Form("%s_1",name),g),
     mean_2(   Form("mean_%s_2",name), "1.0*@0",RooArgList(mean)),
-    x(        Form("x_%s",name),"sigma ratio",initial->getX(),low->getX(),high->getX()),
+    x(        Form("x_%s",name),"sigma ratio",g->getFloat("x.value"),g->getFloat("x.low"),g->getFloat("x.high")),
     sigma_2(  Form("sigma_%s_2",name),"@0*@1",RooArgList(x,sigma)),
     alpha_2(  Form("alpha_%s_2",name),"1.0*@0",RooArgList(alpha)),
     n_2(      Form("n_%s_2",name),    "1.0*@0",RooArgList(n)),
-    f(        Form("f_%s",name),     "Crystal ball ratio", initial->getF(), low->getF(), high->getF()),
+    f(        Form("f_%s",name),     "Crystal ball ratio", g->getFloat("f.value"),g->getFloat("f.low"),g->getFloat("f.high")),
     cBall_2(  Form("cball_%s_2",name),"crystalBall",var,mean_2,sigma_2,alpha_2,n_2),
     dcball(   Form("dcb_%s",name),    "double crystal ball", RooArgList(cBall,cBall_2),RooArgList(f) )
 {
 
 }
 
-dcbParam DoubleCrystalBall::getFitParams() const
+ParameterGroup DoubleCrystalBall::getFitParams() const
 {
-    dcbParam p;
-    p.setParams(mean.getVal(),alpha.getVal(),n.getVal(),sigma.getVal(),x.getVal(),f.getVal());
-    return p;
-}
-
-dcbParam DoubleCrystalBall::getFitParamsErrors() const
-{
-    dcbParam p;
-    p.setParams(mean.getError(),alpha.getError(),n.getError(),sigma.getError(),x.getError(),f.getError());
-    return p;
-}
-
-dcbParam DoubleCrystalBall::getFitParamsHigh() const
-{
-    dcbParam p;
-    p.setParams(mean.getMax(),alpha.getMax(),n.getMax(),sigma.getMax(),x.getMax(),f.getMax());
-    return p;
-}
-
-dcbParam DoubleCrystalBall::getFitParamsLow() const
-{
-    dcbParam p;
-    p.setParams(mean.getMin(),alpha.getMin(),n.getMin(),sigma.getMin(),x.getMin(),f.getMin());
+    ParameterGroup p;
+    ParameterWrite(p,x,"x");
+    ParameterWrite(p,f,"f");
     return p;
 }
 
@@ -78,11 +59,6 @@ CrystalBallSlave::CrystalBallSlave(RooRealVar& var, CrystalBall& cball, const ch
     cBall(  Form("cball_%s",name),      "crystalBall",var,mean,sigma,alpha,n)
 {
 
-}
-
-RooCBShape* CrystalBallSlave::getCB()
-{
-    return &cBall;
 }
 
 //Double CrystalBall Slave
@@ -101,38 +77,12 @@ DoubleCrystalBallSlave::DoubleCrystalBallSlave(RooRealVar& var,const char* name,
 
 }
 
-RooAbsPdf* DoubleCrystalBallSlave::getDCB()
-{
-    return &dcball;
-}
-
 //BkgFunc
 
-BkgParams BkgFunc::getBkgParams()
+ParameterGroup BkgFunc::getBkgParams() const
 {
-    BkgParams p;
-    p.setBkgType(BkgParams::BkgType::none);
-    return p;
-}
-
-BkgParams BkgFunc::getBkgParamsErrors()
-{
-    BkgParams p;
-    p.setBkgType(BkgParams::BkgType::none);
-    return p;
-}
-
-BkgParams BkgFunc::getBkgParamsHigh()
-{
-    BkgParams p;
-    p.setBkgType(BkgParams::BkgType::none);
-    return p;
-}
-
-BkgParams BkgFunc::getBkgParamsLow()
-{
-    BkgParams p;
-    p.setBkgType(BkgParams::BkgType::none);
+    ParameterGroup p;
+    p.setString("type","none");
     return p;
 }
 
@@ -146,35 +96,12 @@ Chevychev2::Chevychev2(RooRealVar& var,const char* name,float* k, float* low, fl
 
 }
 
-BkgParams Chevychev2::getBkgParams()
+ParameterGroup Chevychev2::getBkgParams() const
 {
-    BkgParams p;
-    p.setChk4(ch4_k1.getVal(),ch4_k2.getVal());
-    p.setBkgType(BkgParams::BkgType::chev);
-    return p;
-}
-
-BkgParams Chevychev2::getBkgParamsErrors()
-{
-    BkgParams p;
-    p.setChk4(ch4_k1.getError(),ch4_k2.getError());
-    p.setBkgType(BkgParams::BkgType::chev);
-    return p;
-}
-
-BkgParams Chevychev2::getBkgParamsHigh()
-{
-    BkgParams p;
-    p.setChk4(ch4_k1.getMax(),ch4_k2.getMax());
-    p.setBkgType(BkgParams::BkgType::chev);
-    return p;
-}
-
-BkgParams Chevychev2::getBkgParamsLow()
-{
-    BkgParams p;
-    p.setChk4(ch4_k1.getMin(),ch4_k2.getMin());
-    p.setBkgType(BkgParams::BkgType::chev);
+    ParameterGroup p;
+    ParameterWrite(p,ch4_k1,"chk4_k1");
+    ParameterWrite(p,ch4_k2,"chk4_k2");
+    p.setString("type","chev");
     return p;
 }
 
@@ -192,35 +119,13 @@ SpecialBkg::SpecialBkg(RooRealVar& var,const char* name,float* initial,float* lo
     bkgPdf.reset(pdf);
 }
 
-BkgParams SpecialBkg::getBkgParams()
+ParameterGroup SpecialBkg::getBkgParams() const
 {
-    BkgParams p;
-    p.setSpBkg(mu.getVal(),sigma.getVal(),lambda.getVal());
-    p.setBkgType(BkgParams::BkgType::special);
-    return p;
-}
-
-BkgParams SpecialBkg::getBkgParamsErrors()
-{
-    BkgParams p;
-    p.setSpBkg(mu.getError(),sigma.getError(),lambda.getError());
-    p.setBkgType(BkgParams::BkgType::special);
-    return p;
-}
-
-BkgParams SpecialBkg::getBkgParamsHigh()
-{
-    BkgParams p;
-    p.setSpBkg(mu.getMax(),sigma.getMax(),lambda.getMax());
-    p.setBkgType(BkgParams::BkgType::special);
-    return p;
-}
-
-BkgParams SpecialBkg::getBkgParamsLow()
-{
-    BkgParams p;
-    p.setSpBkg(mu.getMin(),sigma.getMin(),lambda.getMin());
-    p.setBkgType(BkgParams::BkgType::special);
+    ParameterGroup p;
+    ParameterWrite(p,mu,"mu");
+    ParameterWrite(p,sigma,"sigma");
+    ParameterWrite(p,lambda,"lambda");
+    p.setString("type","special");
     return p;
 }
 
@@ -236,35 +141,11 @@ bkgPdf()
     bkgPdf.reset(pdf);
 }
 
-BkgParams ExponentialBkg::getBkgParams()
+ParameterGroup ExponentialBkg::getBkgParams() const
 {
-    BkgParams p;
-    p.setLambda(lambda.getVal());
-    p.setBkgType(BkgParams::BkgType::exponential);
-    return p;
-}
-
-BkgParams ExponentialBkg::getBkgParamsErrors()
-{
-    BkgParams p;
-    p.setLambda(lambda.getError());
-    p.setBkgType(BkgParams::BkgType::exponential);
-    return p;
-}
-
-BkgParams ExponentialBkg::getBkgParamsHigh()
-{
-    BkgParams p;
-    p.setLambda(lambda.getMax());
-    p.setBkgType(BkgParams::BkgType::exponential);
-    return p;
-}
-
-BkgParams ExponentialBkg::getBkgParamsLow()
-{
-    BkgParams p;
-    p.setLambda(lambda.getMin());
-    p.setBkgType(BkgParams::BkgType::exponential);
+    ParameterGroup p;
+    ParameterWrite(p,lambda,"lambda");
+    p.setString("type","exp");
     return p;
 }
 
@@ -280,91 +161,69 @@ ExpChev2Bkg::ExpChev2Bkg(RooRealVar& var,const char* name,float* initial, float*
                            RooArgList(var, ch4_k1,ch4_k2));
     bkgPdf.reset(pdf);
 }
-BkgParams ExpChev2Bkg::getBkgParams()
+ParameterGroup ExpChev2Bkg::getBkgParams() const
 {
-    BkgParams p;
-    p.setChk4(ch4_k1.getVal(),ch4_k2.getVal());
-    p.setBkgType(BkgParams::BkgType::expChev2);
+    ParameterGroup p;
+    ParameterWrite(p,ch4_k1,"chk4_k1");
+    ParameterWrite(p,ch4_k2,"chk4_k2");
+    p.setString("type","chev");
     return p;
 }
 
-BkgParams ExpChev2Bkg::getBkgParamsErrors()
+enum class BkgType {error, none, chev, special,exponential,expChev2 };
+
+const std::map<std::string,BkgType> bkgNames =
 {
-    BkgParams p;
-    p.setChk4(ch4_k1.getError(),ch4_k2.getError());
-    p.setBkgType(BkgParams::BkgType::expChev2);
-    return p;
+    {"none",BkgType::none},
+     {"chev",BkgType::chev},
+    {"special",BkgType::special},
+    {"exponential",BkgType::exponential},
+    {"expChev2",BkgType::expChev2}
+};
+
+void setArray(float* initials, float* low, float* high,const std::string& name, int index,const ParameterGroup& config)
+{
+    initials[index]=config.getFloat(name+".value");
+    low[index]=config.getFloat(name+".low");
+    high[index]=config.getFloat(name+".high");
 }
 
-BkgParams ExpChev2Bkg::getBkgParamsHigh()
+BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup& config)
 {
-    BkgParams p;
-    p.setChk4(ch4_k1.getMax(),ch4_k2.getMax());
-    p.setBkgType(BkgParams::BkgType::expChev2);
-    return p;
-}
-
-BkgParams ExpChev2Bkg::getBkgParamsLow()
-{
-    BkgParams p;
-    p.setChk4(ch4_k1.getMin(),ch4_k2.getMin());
-    p.setBkgType(BkgParams::BkgType::expChev2);
-    return p;
-}
-
-
-BkgFunc* BkgFactory(RooRealVar& var, const fitConfig& config)
-{
+    
     BkgFunc* b= nullptr;
-    BkgParams::BkgType bkgType = config.getBkgType();
+    BkgType bkgType = bkgNames.at(config.getString("type"));
     float initials[3];
     float low[3];
     float high[3];
     switch (bkgType)
     {
-        case BkgParams::BkgType::chev:
-        initials[0]=config.getInitValues()->getChk4_k1();
-        initials[1]=config.getInitValues()->getChk4_k2();
-        low[0]=config.getInitValues()->getLowLimit().getChk4_k1();
-        low[1]=config.getInitValues()->getLowLimit().getChk4_k2();
-        high[0]=config.getInitValues()->getHighLimit().getChk4_k1();
-        high[1]=config.getInitValues()->getHighLimit().getChk4_k2();
+        case BkgType::chev:
+        setArray(initials,low,high,"chk4_k1",0,config);
+        setArray(initials,low,high,"chk4_k2",1,config);
         b = new Chevychev2(var,"bkg",initials,low,high);
         break;
 
-        case BkgParams::BkgType::expChev2:
-        initials[0]=config.getInitValues()->getChk4_k1();
-        initials[1]=config.getInitValues()->getChk4_k2();
-        low[0]=config.getInitValues()->getLowLimit().getChk4_k1();
-        low[1]=config.getInitValues()->getLowLimit().getChk4_k2();
-        high[0]=config.getInitValues()->getHighLimit().getChk4_k1();
-        high[1]=config.getInitValues()->getHighLimit().getChk4_k2();
+        case BkgType::expChev2:
+        setArray(initials,low,high,"chk4_k1",0,config);
+        setArray(initials,low,high,"chk4_k2",1,config);
         b = new ExpChev2Bkg(var,"bkg",initials,low,high);
         break;
 
-        case BkgParams::BkgType::special:
-        initials[0]=config.getInitValues()->getLambda();
-        initials[1]=config.getInitValues()->getSigmaBkg();
-        initials[2]=config.getInitValues()->getMu();
-        low[0]=config.getInitValues()->getLowLimit().getLambda();
-        low[1]=config.getInitValues()->getLowLimit().getSigmaBkg();
-        low[2]=config.getInitValues()->getLowLimit().getMu();
-        high[0]=config.getInitValues()->getHighLimit().getLambda();
-        high[1]=config.getInitValues()->getHighLimit().getSigmaBkg();
-        high[2]=config.getInitValues()->getHighLimit().getMu();
-
+        case BkgType::special:
+        setArray(initials,low,high,"lambda",0,config);
+        setArray(initials,low,high,"sigma",1,config);
+        setArray(initials,low,high,"mu",2,config);
         b = new SpecialBkg(var,"bkg",initials,low,high);
         break;
 
-        case BkgParams::BkgType::exponential:
-        initials[0]=config.getInitValues()->getLambda();
-        low[0]=config.getInitValues()->getLowLimit().getLambda();
-        high[0]=config.getInitValues()->getHighLimit().getLambda();
+        case BkgType::exponential:
+        setArray(initials,low,high,"lambda",0,config);
         b = new ExponentialBkg(var,"bkg",initials,low,high);
 
         break;
 
-        case BkgParams::BkgType::none:
+        case BkgType::none:
         b = new BkgFunc();
         break;
 

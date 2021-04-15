@@ -15,7 +15,7 @@
 class OniaMassFitter
 {
     protected:
-    fitConfig config;
+    ParameterGroup config;
     TTree* tree;
     RooRealVar mass;
     RooRealVar nSig_Y1S;
@@ -45,7 +45,7 @@ class OniaMassFitter
      * @param kineCut Kinect cut for parameters
      * @param initialGuess Initial value (first guess) for the fitting process
      */
-    OniaMassFitter(TTree* tree_,const fitConfig* fitConfig);
+    OniaMassFitter(TTree* tree_,const ParameterGroup * fitConfig);
 
     virtual ~OniaMassFitter();
 
@@ -83,7 +83,7 @@ class OniaMassFitter
      * 
      * @param paramOut fitParams where to fill the got values
      */
-    virtual fitParamsWithErrors getFitParams();
+    virtual ParameterGroup getFitParams() const;
 };
 
 class OniaMassFitter2 : public OniaMassFitter
@@ -101,12 +101,12 @@ class OniaMassFitter2 : public OniaMassFitter
     void combinePdf() override;
 
     public:
-    OniaMassFitter2(TTree* tree_,const fitConfig* fitConf);
+    OniaMassFitter2(TTree* tree_,const ParameterGroup* fitConf);
 
-    fitParamsWithErrors getFitParams() override;
+    ParameterGroup getFitParams() const override;
 };
 
-std::unique_ptr<OniaMassFitter> createMassFitter(TTree* input, const fitConfig* config);
+std::unique_ptr<OniaMassFitter> createMassFitter(TTree* input, const ParameterGroup* config);
 
 #if defined(__CLING__)
 #include "OniaMassFit.cpp"

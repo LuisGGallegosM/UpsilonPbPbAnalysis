@@ -6,8 +6,8 @@
 
 void CutParams::deserialize(const std::string& filename)
 {
-    const Serializer ser(filename);
-    ParameterGroup g(&ser);
+    ParameterGroup g;
+    g.deserialize(filename);
 
     isMC=g.getBool("isMC");
     trigSelect=g.getInt("trigSelect");

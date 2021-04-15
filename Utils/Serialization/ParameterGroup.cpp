@@ -2,29 +2,6 @@
 #include"ParameterGroup.h"
 #include<string>
 
-
-ParameterGroup::ParameterGroup(const Serializer* ser)
-{
-    auto vars = ser->getNames();
-    for( const auto& var : vars)
-    {
-        write(var,ser->read(var));
-    }
-}
-
-ParameterGroup::ParameterGroup(const Serializer* ser,const std::string& prefix)
-{
-    const std::string prefixWithDot=prefix+".";
-    const auto vars = ser->getNames();
-    for( const auto& var : vars)
-    {
-        if( var.compare(0,prefixWithDot.length(), prefixWithDot)==0)
-        {
-            write(var.substr(prefixWithDot.length()),ser->read(var));
-        }
-    }
-}
-
 const std::string& ParameterGroup::read(const std::string& name) const
 {
     int index= name.find_first_of('.');
@@ -102,6 +79,29 @@ void ParameterGroup::setBool(const std::string& name, bool value)
     write(name,value ? "true" : "false");
 }
 
+const ParameterGroup* ParameterGroup::get(const std::string& name) const
+{
+    int index= name.find_first_of('.');
+
+    if (index==std::string::npos)
+    {
+        auto found=subgroups.find(name);
+        if (found != subgroups.end())
+            return &(found->second);
+        else
+            throw std::invalid_argument("subgroup "+name+" not found.");
+    }
+    else
+    {
+        auto found=subgroups.find(name.substr(0,index));
+        const std::string sub=name.substr(index+1);
+        if (found!= subgroups.end())
+            return found->second.get(sub);
+        else
+            throw std::invalid_argument("subgroup '"+sub+"' in '"+ name +"' not found.");
+    }
+}
+
 ParameterGroup* ParameterGroup::get(const std::string& name)
 {
     int index= name.find_first_of('.');
@@ -125,6 +125,11 @@ ParameterGroup* ParameterGroup::get(const std::string& name)
     }
 }
 
+void ParameterGroup::addGroup(const ParameterGroup& g,const std::string& name)
+{
+    subgroups[name]=g;
+}
+
 std::vector<std::string> ParameterGroup::getNames() const
 {
     std::vector<std::string> names;
@@ -136,17 +141,34 @@ std::vector<std::string> ParameterGroup::getNames() const
     return names;
 }
 
-void ParameterGroup::save(Serializer* ser) const
+void ParameterGroup::serialize(const std::string& filename,const std::string& prefix) const
 {
+    Serializer ser;
+    serialize(&ser,prefix);
+    ser.serialize(filename);
+}
+
+void ParameterGroup::deserialize(const std::string& filename,const std::string& prefix)
+{
+    Serializer ser(filename);
+    deserialize(&ser,prefix);
+}
+
+void ParameterGroup::serialize(Serializer* ser,const std::string& prefix) const
+{
+    const std::string prefixWithDot= prefix.empty() ? "" : prefix+".";
     for (const auto& var : data)
     {
-        ser->write(var.first,var.second);
+        ser->write(prefixWithDot+ var.first,var.second);
     }
 }
 
-void serialize(const ParameterGroup& g, const std::string& filename)
+void ParameterGroup::deserialize(const Serializer* ser,const std::string& prefix)
 {
-    Serializer ser;
-    g.save(&ser);
-    ser.serialize(filename);
+    const std::string prefixWithDot= prefix.empty() ? "" : prefix+".";
+    auto vars = ser->getNames();
+    for( const auto& var : vars)
+    {
+        write(prefixWithDot+var,ser->read(var));
+    }
 }

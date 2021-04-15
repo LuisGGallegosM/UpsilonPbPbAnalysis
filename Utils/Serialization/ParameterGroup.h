@@ -13,8 +13,6 @@ class ParameterGroup
 
     public:
     ParameterGroup() = default;
-    ParameterGroup(const Serializer* ser);
-    ParameterGroup(const Serializer* ser, const std::string& prefix);
 
     std::string getString(const std::string& name) const;
     float getFloat(const std::string& name) const;
@@ -28,9 +26,13 @@ class ParameterGroup
 
     std::vector<std::string> getNames() const;
     ParameterGroup* get(const std::string& name);
-    void save(Serializer* ser) const;
-};
+    const ParameterGroup* get(const std::string& name) const;
+    void addGroup(const ParameterGroup&,const std::string& name);
 
-void serialize(const ParameterGroup& g, const std::string& filename);
+    void deserialize(const std::string& filename,const std::string& prefix="");
+    void deserialize(const Serializer* ser,const std::string& prefix="");
+    void serialize(const std::string& filename,const std::string& prefix="") const;
+    void serialize(Serializer* ser,const std::string& prefix="") const;
+};
 
 #endif
