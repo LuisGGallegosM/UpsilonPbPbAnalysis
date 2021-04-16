@@ -40,6 +40,7 @@ TH1F* createTH1(const std::string& name,const std::string& title)
 void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option, bool yLog)
 {
     const std::string canvasName=std::string(hist->GetName())+" plot";
+    const std::string outputFilename=outname+"_"+hist->GetName()+".pdf";
     TCanvas canvas(canvasName.data(),canvasName.data(),canvasWidth,canvasHeight);
     canvas.cd();
     TPad pad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);
@@ -50,7 +51,7 @@ void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yna
     hist->GetXaxis()->SetTitle(xname.data());
     hist->Draw(option.data());
     canvas.Write();
-    canvas.SaveAs(outname.data());
+    canvas.SaveAs(outputFilename.data());
 }
 
 void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::string& xname,const std::string& yname, const std::string& outname, bool yLog)
@@ -85,6 +86,7 @@ void writeToCanvas(TH1* hist,const std::string& xname,const std::string& yname, 
 void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname)
 {
     const std::string canvasName=std::string(hist->GetName())+" plot";
+    const std::string outputFilename=outname+"_"+hist->GetName()+".pdf";
     TCanvas canvas(canvasName.data(),canvasName.data(),canvasWidth,canvasHeight);
     canvas.cd();
     TPad pad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);
@@ -92,12 +94,13 @@ void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::stri
     pad.cd();
     hist->Draw();
     canvas.Write();
-    canvas.SaveAs(outname.data());
+    canvas.SaveAs(outputFilename.data());
 }
 
 void writeToCanvasEff2D(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname)
 {
     const std::string canvasName=std::string(hist->GetName())+" plot";
+    const std::string outputFilename=outname+"_"+hist->GetName()+".pdf";
     TCanvas canvas(canvasName.data(),canvasName.data(),canvasWidth,canvasHeight);
     canvas.cd();
     TPad pad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);
@@ -105,7 +108,7 @@ void writeToCanvasEff2D(TEfficiency* hist,const std::string& xname,const std::st
     pad.cd();
     hist->Draw("COLZ");
     canvas.Write();
-    canvas.SaveAs(outname.data());
+    canvas.SaveAs(outputFilename.data());
 }
 
 std::unique_ptr<TEfficiency> createTEff(TH1* num, TH1* den, const std::string& name, const std::string& title)
