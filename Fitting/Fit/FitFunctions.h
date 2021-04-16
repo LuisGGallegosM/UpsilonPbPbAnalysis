@@ -201,7 +201,7 @@ class DoubleCrystalBallSlave : protected CrystalBallSlave
     RooAbsPdf* getDCB() { return &dcball;}
 };
 
-BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config);
+BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup& config);
 
 #if defined(__CLING__)
 #include "FitFunctions.cpp"

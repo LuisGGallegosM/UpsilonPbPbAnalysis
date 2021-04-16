@@ -3,13 +3,13 @@
 
 using namespace RooFit;
 
-void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config);
+void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config);
 void drawPullText(RooHist* hist, RooFitResult* fitResults);
 
 TLegend* drawLegend(RooPlot* plot, bool bkgOn,bool moreUpsilon);
 
-RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const drawConfig* config);
-RooHist*  drawPull(RooPlot* plot, RooRealVar* var, const drawConfig* config);
+RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const ParameterGroup* config);
+RooHist*  drawPull(RooPlot* plot, RooRealVar* var, const ParameterGroup* config);
 
 /**
  * @brief Generate the plots for a Fit output
@@ -40,24 +40,14 @@ void DrawPlot(const char* inputdirectoryname, const char* drawconfigfilename  )
     std::cout << "Drawing output file: " << drawfilename <<'\n';
 
     //read draw configuration file (.drawconf)
-    drawConfig config;
-    config.deserialize(drawconfigfilename,cutfilename,fitfilename);
-
-    if (!config.isValid())
-    {
-        std::cerr << "Error: Invalid arguments\n";
-        return;
-    }
+    ParameterGroup config;
+    config.deserialize(drawconfigfilename);
+    config.deserialize(cutfilename);
+    config.deserialize(fitfilename);
 
     //read fit result file (.fit)
-    fitParamsWithErrors fParams;
+    ParameterGroup fParams;
     fParams.deserialize(fitresultfilename);
-
-    if (!fParams.isValid())
-    {
-        std::cerr << "Error: incorrect fit result file\n" ;
-        return;
-    }
 
     //read root result file (.root)
     TFile* fittedfile = OpenFile(filename.data(),"READ");
@@ -92,10 +82,10 @@ void DrawPlot(const char* inputdirectoryname, const char* drawconfigfilename  )
 
         graph->cd();
         RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
-        float maxVal=fParams.getNSigY1S()/( fParams.getSigmaY1S() * 1.4142*1.7724 );
-        float minVal=fParams.getNBkg()/( config.fitConf.getMassHigh() - config.fitConf.getMassLow() );
+        float maxVal=fParams.getFloat("nSigY1S")/( fParams.getFloat("sigma_Y1S") * 1.4142*1.7724 );
+        float minVal=fParams.getFloat("nBkg")/( config.getFloat("mass.high") - config.getFloat("mass.low") );
         setGraphStyle(graphPlot,&config,maxVal,minVal,isLog);
-        drawLegend(graphPlot,config.fitConf.isBkgOn(),config.fitConf.isMoreUpsilon());
+        drawLegend(graphPlot,config.getString("bkg.type")!="none",config.getBool("moreUpsilon"));
         drawGraphText(&fParams,&config);
 
         pull->cd();
@@ -122,12 +112,12 @@ void DrawPlot(const char* inputdirectoryname, const char* drawconfigfilename  )
  * @param config draw configuration
  * @return RooPlot* result plot
  */
-RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const drawConfig* config)
+RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const ParameterGroup* config)
 {
-    RooPlot* plot = var->frame(config->nBins);
+    RooPlot* plot = var->frame(config->getInt("nBins"));
     fittedFunc->plotOn(plot,Name(fitFuncName),LineColor(kOrange+7),Normalization(1.0,RooAbsReal::RelativeExpected));
 
-    if (config->fitConf.isMoreUpsilon())
+    if (config->getBool("moreUpsilon"))
     {
         //draw 1S 2S and 3S Upsilon mass
         fittedFunc->plotOn(plot,Name("dcb1"),Components("dcb_Y1S"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
@@ -143,7 +133,7 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,
     }
     
     //draw background
-    if (config->fitConf.isBkgOn())
+    if (config->getString("bkg.type")!="none")
       fittedFunc->plotOn(plot,Name("bkg"),Components("bkg"),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
     dataset->plotOn(plot,Name(datasetName), MarkerSize(0.4), XErrorSize(0));
     plot->Draw("same");
@@ -188,38 +178,41 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
     return fitleg;
 }
 
+void drawWithError(TextDrawer& tdrawer,const ParameterGroup* fParams,const std::string& var)
+{
+    tdrawer.drawText( Form("m_{Y1S}=%.3f #pm %.3f",fParams->getFloat(var+".value"),fParams->getFloat(var+".error")));
+}
+
 /**
  * @brief Draw the texts over the plots corresponding to fit parameters and cuts used.
  * 
  * @param fParams Fit parameters results of the fit.
  * @param config Draw configurations.
  */
-void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
+void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config)
 {
     TextDrawer tdrawer(0.22f,0.8f,9.0f);
     
     tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
-    tdrawer.drawText( Form("m_{Y1S}=%.3f #pm %.3f",fParams->getMeanY1S(),fParams->getErrors().getMeanY1S()));
-    if (!config->fitConf.getFixAlpha())
-        tdrawer.drawText( Form("#alpha=%.3f #pm %.3f",fParams->getAlpha(),fParams->getErrors().getAlpha()));
-    if (!config->fitConf.getFixN())
-        tdrawer.drawText( Form("n=%.3f #pm %.3f",fParams->getN(),fParams->getErrors().getN()));
-    tdrawer.drawText( Form("#sigma_{1}^{Y1S}=%.4f #pm %.4f",fParams->getSigmaY1S(),fParams->getErrors().getSigmaY1S()));
-    tdrawer.drawText( Form("#frac{#sigma_{2}}{#sigma_{1}}=%.4f #pm %.4f",fParams->getX(),fParams->getErrors().getX()));
-    tdrawer.drawText( Form("f=%.4f #pm %.4f",fParams->getF(),fParams->getErrors().getF()));
+    drawWithError(tdrawer,fParams,"mean");
+    drawWithError(tdrawer,fParams,"alpha");
+    drawWithError(tdrawer,fParams,"n");
+    drawWithError(tdrawer,fParams,"sigma");
+    drawWithError(tdrawer,fParams,"x");
+    drawWithError(tdrawer,fParams,"f");
     
-    if (config->fitConf.getBkgType() == BkgParams::BkgType::chev)
-    {
-        tdrawer.drawText( Form("chk_k1=%.4f #pm %.4f",fParams->getChk4_k1(),fParams->getErrors().getChk4_k1()));
-        tdrawer.drawText( Form("chk_k2=%.4f #pm %.4f",fParams->getChk4_k2(),fParams->getErrors().getChk4_k2()));
-    }
+    // if (config->fitConf.getBkgType() == BkgParams::BkgType::chev)
+    // {
+    //     tdrawer.drawText( Form("chk_k1=%.4f #pm %.4f",fParams->getChk4_k1(),fParams->getErrors().getChk4_k1()));
+    //     tdrawer.drawText( Form("chk_k2=%.4f #pm %.4f",fParams->getChk4_k2(),fParams->getErrors().getChk4_k2()));
+    // }
 
-    float ptLow=config->fitConf.getCut()->getPtLow();
-    float ptHigh=config->fitConf.getCut()->getPtHigh();
-    float yLow=config->fitConf.getCut()->getYLow();
-    float yHigh=config->fitConf.getCut()->getYHigh();
-    float singleMuPtLow=config->cut.getMuPtLow();
-    float singleMuEtaHigh=config->cut.getMuEtaHigh();
+    float ptLow=config->getFloat("cut.pt.low");
+    float ptHigh=config->getFloat("cut.pt.high");
+    float yLow=config->getFloat("cut.y.low");
+    float yHigh=config->getFloat("cut.pt.high");
+    float singleMuPtLow=config->getFloat("cut.singleMuPtLow");;
+    float singleMuEtaHigh=config->getFloat("cut.singleMuEta.High");;
 
     TextDrawer tdrawer2(0.45,0.8);
     
@@ -243,7 +236,7 @@ void drawGraphText(const fitParamsWithErrors* fParams,const drawConfig* config)
  * @param config draw configuration.
  * @return RooHist* with output plot
  */
-RooHist* drawPull(RooPlot* plot, RooRealVar* var,const drawConfig* config)
+RooHist* drawPull(RooPlot* plot, RooRealVar* var,const ParameterGroup* config)
 {
     //draw pull
     RooPlot* pullPlot = var->frame(Title("Pull Distribution"));
@@ -254,7 +247,7 @@ RooHist* drawPull(RooPlot* plot, RooRealVar* var,const drawConfig* config)
     
     setPullStyle(pullPlot,config);  
     pullPlot->Draw("same");
-    TLine *l1 = new TLine(config->fitConf.getMassLow(),0,config->fitConf.getMassHigh(),0.0);
+    TLine *l1 = new TLine(config->getFloat("mass.low"),0,config->getFloat("mass.high"),0.0);
     l1->SetLineColor(4);
     l1->Draw("same");
     return pullHist;

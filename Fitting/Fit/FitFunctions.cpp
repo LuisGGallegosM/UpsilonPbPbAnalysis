@@ -170,17 +170,6 @@ ParameterGroup ExpChev2Bkg::getBkgParams() const
     return p;
 }
 
-enum class BkgType {error, none, chev, special,exponential,expChev2 };
-
-const std::map<std::string,BkgType> bkgNames =
-{
-    {"none",BkgType::none},
-     {"chev",BkgType::chev},
-    {"special",BkgType::special},
-    {"exponential",BkgType::exponential},
-    {"expChev2",BkgType::expChev2}
-};
-
 void setArray(float* initials, float* low, float* high,const std::string& name, int index,const ParameterGroup& config)
 {
     initials[index]=config.getFloat(name+".value");
@@ -190,9 +179,8 @@ void setArray(float* initials, float* low, float* high,const std::string& name, 
 
 BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup& config)
 {
-    
     BkgFunc* b= nullptr;
-    BkgType bkgType = bkgNames.at(config.getString("type"));
+    BkgType bkgType = getBkgByName(config.getString("type"));
     float initials[3];
     float low[3];
     float high[3];

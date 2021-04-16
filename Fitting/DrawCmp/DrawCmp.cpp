@@ -8,9 +8,9 @@
 #include"TH1.h"
 #include"TCanvas.h"
 
-void drawCompGraph(fitGetter func, const std::vector<FitElement>& fits,TH1F* graph);
+void drawCompGraph(const std::string& func, const std::vector<FitElement>& fits,TH1F* graph);
 std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs);
-std::vector<toGet> fillVariables(const fitConfig* fit);
+std::vector<toGet> fillVariables(const ParameterGroup* fit);
 
 /**
  * @brief Recopile multiple fit results and generate drawings of parameters as function of pT
@@ -39,13 +39,11 @@ void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
         std::string basename= getBasename(fitpath);
         fit.fits.deserialize(fitpath+"/"+basename+".fit");
         fit.configs.deserialize(fitpath+"/"+basename+".fitconf");
-        assert(fit.fits.isValid());
-        assert(fit.configs.isValid());
     }
 
     //sort fit bins in case they are unordered
     std::sort(fits.begin(),fits.end(),
-            [](FitElement& l,FitElement& r) {return l.configs.getCut()->getPtLow() < r.configs.getCut()->getPtHigh();});
+            [](FitElement& l,FitElement& r) {return l.configs.getFloat("pt.low") < r.configs.getFloat("pt.high");});
 
     const std::vector<double> xbins = generateBinBoundaries(fits);
     const std::vector<toGet> getters = fillVariables(&(fits[0].configs));
@@ -93,52 +91,54 @@ void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
  * @param fit 
  * @return std::vector<toGet> 
  */
-std::vector<toGet> fillVariables(const fitConfig* fit)
+std::vector<toGet> fillVariables(const ParameterGroup* fit)
 {
     std::vector<toGet> getters;
-    getters.push_back(toGet{"alpha", &fitParams::getAlpha});
-    getters.push_back(toGet{"n",&fitParams::getN});
-    getters.push_back(toGet{"f",&fitParams::getF});
-    getters.push_back(toGet{"sigma_Y1S",&fitParams::getSigmaY1S});
-    getters.push_back(toGet{"x",&fitParams::getX});
-    getters.push_back(toGet{"nSigY1S",&fitParams::getNSigY1S});
-    getters.push_back(toGet{"mass_Y1S",&fitParams::getMeanY1S});
+    getters.push_back(toGet{"alpha", "alpha"});
+    getters.push_back(toGet{"n","n"});
+    getters.push_back(toGet{"f","f"});
+    getters.push_back(toGet{"sigma_Y1S","sigma_Y1S"});
+    getters.push_back(toGet{"x","x"});
+    getters.push_back(toGet{"nSigY1S","nSigY1S"});
+    getters.push_back(toGet{"mass_Y1S","mass_Y1S"});
 
-    if (fit->isMoreUpsilon())
+    if (fit->getBool("moreUpsilon"))
     {
-        getters.push_back(toGet{"nSigY2S",&fitParams::getNSigY2S});
-        getters.push_back(toGet{"nSigY3S",&fitParams::getNSigY3S});
+        getters.push_back(toGet{"nSigY2S","nSigY2S"});
+        getters.push_back(toGet{"nSigY3S","nSigY3S"});
 
-        getters.push_back(toGet{"mass_Y2S",&fitParams::getMeanY2S});
-        getters.push_back(toGet{"mass_Y3S",&fitParams::getMeanY3S});
+        getters.push_back(toGet{"mass_Y2S","mass_Y2S"});
+        getters.push_back(toGet{"mass_Y3S","mass_Y3S"});
 
-        getters.push_back(toGet{"sigma_Y2S",&fitParams::getSigmaY2S});
-        getters.push_back(toGet{"sigma_Y3S",&fitParams::getSigmaY3S});
+        getters.push_back(toGet{"sigma_Y2S","sigma_Y2S"});
+        getters.push_back(toGet{"sigma_Y3S","sigma_Y3S"});
     }
+
+    BkgType type=getBkgByName(fit->getString("bkg.type"));
  
-    if (fit->isBkgOn())
+    if (type!= BkgType::none)
     {
-        getters.push_back(toGet{"nBkg",&fitParams::getNBkg});
+        getters.push_back(toGet{"nBkg","nBkg"});
     }
 
-    switch (fit->getBkgType())
+    switch (type)
     {
-        case BkgParams::BkgType::chev:
-        getters.push_back(toGet{"chk4_k1",&fitParams::getChk4_k1});
-        getters.push_back(toGet{"chk4_k2",&fitParams::getChk4_k2});
+        case BkgType::chev:
+        getters.push_back(toGet{"chk4_k1","chk4_k1"});
+        getters.push_back(toGet{"chk4_k2","chk4_k2"});
         break;
-        case BkgParams::BkgType::expChev2:
-        getters.push_back(toGet{"chk4_k1",&fitParams::getChk4_k1});
-        getters.push_back(toGet{"chk4_k2",&fitParams::getChk4_k2});
+        case BkgType::expChev2:
+        getters.push_back(toGet{"chk4_k1","chk4_k1"});
+        getters.push_back(toGet{"chk4_k2","chk4_k2"});
         break;
-        case BkgParams::BkgType::special:
-        getters.push_back(toGet{"lambda_bkg",&fitParams::getLambda});
-        getters.push_back(toGet{"sigma_bkg",&fitParams::getSigmaBkg});
-        getters.push_back(toGet{"mu_bkg",&fitParams::getMu});
+        case BkgType::special:
+        getters.push_back(toGet{"lambda_bkg","lambda_bkg"});
+        getters.push_back(toGet{"sigma_bkg","sigma_bkg"});
+        getters.push_back(toGet{"mu_bkg","mu_bkg"});
         break;
 
-        case BkgParams::BkgType::exponential:
-        getters.push_back(toGet{"lambda_bkg",&fitParams::getLambda});
+        case BkgType::exponential:
+        getters.push_back(toGet{"lambda_bkg","lambda_bkg"});
         break;
     }
     return getters;
@@ -153,10 +153,10 @@ std::vector<toGet> fillVariables(const fitConfig* fit)
 std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs)
 {
     std::vector<double> xbins;
-    xbins.push_back(configs[0].configs.getCut()->getPtLow());
+    xbins.push_back(configs[0].configs.getFloat("cut.pt.low"));
     for(const auto& config : configs)
     {
-        xbins.push_back(config.configs.getCut()->getPtHigh());
+        xbins.push_back(config.configs.getFloat("cut.pt.high"));
     }
     return xbins;
 }
@@ -168,16 +168,16 @@ std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs
  * @param fits the vector of fit results objects.
  * @param graph histogram to fill with data.
  */
-void drawCompGraph(fitGetter func, const std::vector<FitElement>& fits,TH1F* graph)
+void drawCompGraph(const std::string& func, const std::vector<FitElement>& fits,TH1F* graph)
 {
     int i=0;
     for (const auto& fit : fits)
     {
-        float value = (fit.fits.*func)();
+        float value = fit.fits.getFloat(func+".value");
         if (value == -1.0f) continue;
-        float pt =0.5f*(fit.configs.getCut()->getPtHigh() + fit.configs.getCut()->getPtLow());
+        float pt =0.5f*(fit.configs.getFloat("cut.pt.high") + fit.configs.getFloat("cut.pt.low"));
         graph->Fill(pt,value);
-        graph->SetBinError(i+1,(fit.fits.getErrors().*func)());
+        graph->SetBinError(i+1,fit.fits.getFloat(func+".error"));
         i++;
     }
 

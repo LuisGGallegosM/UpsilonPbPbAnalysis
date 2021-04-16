@@ -1,7 +1,8 @@
 
 FLAGS=$(shell ../HelperScripts/compilerFlags.sh ) -o
-SOURCES:=$(shell find . -name  "*.cpp")
-HEADERS:=$(shell find . -name  "*.h")
+SOURCES:=$(shell find . -name  "*.cpp" ! -path "./Test/*")
+TESTSOURCES:=$(shell find . -name  "*.cpp" ! -name "Fitting.cpp")
+HEADERS:=$(shell find . -name  "*.h" ! -path "./Test/*")
 STATICLIBS:=../Utils/libUtils.a ../OniaBase/libOniaBase.a ../Drawing/libDrawing.a
 INC:=-I $(shell $(ROOTSYS)/bin/root-config --cflags)
 LIBS:=$(shell $(ROOTSYS)/bin/root-config --ldflags --glibs) -lRooFit -lRooFitCore -lMinuit
@@ -19,6 +20,9 @@ fit : ${SOURCES} ${HEADERS} ${STATICLIBS}
 
 ../Drawing/libDrawing.a :
 	$(MAKE) -C ../Drawing
+
+test : ${TESTSOURCES} ${HEADERS} ${STATICLIBS}
+	g++ ${TESTSOURCES} ${STATICLIBS} ${INC} ${LIBS} ${FLAGS} test
 
 clear :
 	rm -f fit *.o *.s

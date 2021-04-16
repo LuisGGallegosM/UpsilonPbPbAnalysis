@@ -7,7 +7,7 @@ CUTCONFIG="${2}"
 #fit configuration file name
 CONFIG="${3:-../rootfiles/confFiles/merged_HiForestAOD_MC_test.fitconf}"
 #directory where to save all files
-OUTPUTDIR="${4:-../rootfiles/fits/merged_HiForestAOD_MCFix2_skim_fit}"
+OUTPUTDIR="${4:-../rootfiles/fits/merged_HiForestAOD_MCFix2_skim/test_fit}"
 
 #name of generated file is like CONFIG but with .root extension
 OUTPUTFILE="${OUTPUTDIR}/$( basename $OUTPUTDIR ).root"

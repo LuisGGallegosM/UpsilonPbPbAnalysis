@@ -10,11 +10,9 @@
  */
 struct FitElement
 {
-    fitParamsWithErrors fits;
-    fitConfig configs;
+    ParameterGroup fits;
+    ParameterGroup configs;
 };
-
-typedef float (fitParamsNoLimits::*fitGetter)() const;
 
 /**
  * @brief Describes the name of a parameter and what function to use
@@ -24,8 +22,8 @@ typedef float (fitParamsNoLimits::*fitGetter)() const;
 struct toGet
 {
     std::string name;
-    fitGetter getter;
-    toGet(const char* name_,fitGetter getter_): name(name_), getter(getter_) {}
+    std::string getter;
+    toGet(const char* name_,const char* getter_): name(name_), getter(getter_) {}
 };
 
 #if defined(__CLING__)
