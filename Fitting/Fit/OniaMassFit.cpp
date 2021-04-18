@@ -21,10 +21,10 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const ParameterGroup* fitConf):
         config.getFloat("nBkg.value"), config.getFloat("nBkg.low"), config.getFloat("nBkg.high")),
     mass(mass_name,"onia mass",
         config.getFloat("mass.low"),config.getFloat("mass.high"),"GeV/c^{2}"),
-    dcball1(mass,"Y1S",config.get("dcb")),
+    dcball1(mass,"Y1S",config.get("signal")),
     bkg()
 {
-    BkgFunc* b =BkgFactory(mass,config);
+    BkgFunc* b =BkgFactory(mass,config.get("bkg"));
     bkg.reset(b);
 }
 

@@ -35,8 +35,6 @@
 #define BKG_SIGMA_MAX  (4.0f)
 #define BKG_MU_MAX     (20.0f)
 
-void ParameterWrite( ParameterGroup& p, const RooRealVar& var, const std::string& name);
-
 class BkgFunc
 {
     public:
@@ -201,7 +199,8 @@ class DoubleCrystalBallSlave : protected CrystalBallSlave
     RooAbsPdf* getDCB() { return &dcball;}
 };
 
-BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup& config);
+void ParameterWrite( ParameterGroup& p, const RooRealVar& var, const std::string& name);
+BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config);
 
 #if defined(__CLING__)
 #include "FitFunctions.cpp"

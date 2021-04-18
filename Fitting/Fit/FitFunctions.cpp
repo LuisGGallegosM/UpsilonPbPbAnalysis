@@ -170,17 +170,17 @@ ParameterGroup ExpChev2Bkg::getBkgParams() const
     return p;
 }
 
-void setArray(float* initials, float* low, float* high,const std::string& name, int index,const ParameterGroup& config)
+void setArray(float* initials, float* low, float* high,const std::string& name, int index,const ParameterGroup* config)
 {
-    initials[index]=config.getFloat(name+".value");
-    low[index]=config.getFloat(name+".low");
-    high[index]=config.getFloat(name+".high");
+    initials[index]=config->getFloat(name+".value");
+    low[index]=config->getFloat(name+".low");
+    high[index]=config->getFloat(name+".high");
 }
 
-BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup& config)
+BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config)
 {
     BkgFunc* b= nullptr;
-    BkgType bkgType = getBkgByName(config.getString("type"));
+    BkgType bkgType = getBkgByName(config->getString("type"));
     float initials[3];
     float low[3];
     float high[3];
