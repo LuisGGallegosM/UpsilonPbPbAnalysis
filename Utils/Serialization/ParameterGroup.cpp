@@ -2,6 +2,23 @@
 #include"ParameterGroup.h"
 #include<string>
 
+bool ParameterGroup::exists(const std::string& name) const
+{
+    int index= name.find_first_of('.');
+    if (index==std::string::npos)
+    {
+        if (data.find(name)!=data.end()) return true;
+        return subgroups.find(name)!=subgroups.end();
+    }
+    else
+    {
+        const std::string str=name.substr(0,index);
+        auto found= subgroups.find(str);
+        if (found==subgroups.end()) return false;
+        return found->second.exists(name.substr(index+1));
+    }
+}
+
 const std::string& ParameterGroup::read(const std::string& name) const
 {
     int index= name.find_first_of('.');
@@ -130,11 +147,22 @@ void ParameterGroup::addGroup(const ParameterGroup& g,const std::string& name)
     subgroups[name]=g;
 }
 
-std::vector<std::string> ParameterGroup::getNames() const
+std::vector<std::string> ParameterGroup::getVarNames() const
 {
     std::vector<std::string> names;
     names.reserve(data.size());
     for(const auto& name : data)
+    {
+        names.push_back(name.first);
+    }
+    return names;
+}
+
+std::vector<std::string> ParameterGroup::getSubgroupNames() const
+{
+    std::vector<std::string> names;
+    names.reserve(subgroups.size());
+    for(const auto& name : subgroups)
     {
         names.push_back(name.first);
     }

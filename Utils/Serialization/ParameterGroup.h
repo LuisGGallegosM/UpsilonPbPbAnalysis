@@ -14,6 +14,8 @@ class ParameterGroup
     public:
     ParameterGroup() = default;
 
+    bool exists(const std::string& name) const;
+
     std::string getString(const std::string& name) const;
     float getFloat(const std::string& name) const;
     bool getBool(const std::string& name) const;
@@ -24,7 +26,8 @@ class ParameterGroup
     void setBool(const std::string& name, bool value);
     void setInt(const std::string& name, int value);
 
-    std::vector<std::string> getNames() const;
+    std::vector<std::string> getVarNames() const;
+    std::vector<std::string> getSubgroupNames() const;
     ParameterGroup* get(const std::string& name);
     const ParameterGroup* get(const std::string& name) const;
     void addGroup(const ParameterGroup&,const std::string& name);

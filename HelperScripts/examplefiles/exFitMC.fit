@@ -1,0 +1,14 @@
+
+mass.high = 11.0
+mass.low = 8.5
+pt.low = 0.0
+pt.high = 2.0
+y.low = 0.0
+y.high = 2.4
+bkg.type = chev
+bkg.chk4_k1.value = -0.1
+bkg.chk4_k1.low = -6.0
+bkg.chk4_k1.high = 6.0
+bkg.chk4_k2.value = -0.05
+bkg.chk4_k2.low = -6.0
+bkg.chk4_k2.high = 6.0

@@ -2,8 +2,8 @@
 
 echo "generating fitconf files..."
 
-MULTIFITFILE=${1}
-OUTDIR=${2}
+MULTIFITFILE=${1:-../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.multifit}
+OUTDIR=${2:-.}
 BASENAME="fit"
 
 echo "Reading file: ${1}"
