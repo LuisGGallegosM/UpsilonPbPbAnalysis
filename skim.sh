@@ -1,35 +1,29 @@
 #!/bin/bash
 
-CLING="NO"
-
-FLAGS=${1:-"-skimjet"}
-FLAGS2=${2:-"-nocmd"}
-
+#configuration flags
+FLAGS=${1:-"-skim"}
 #input file to skim
-INPUTFILE="../rootfiles/datasets/merged_HiForestAOD_DATA.root"
+INPUTFILE=${2:-"../rootfiles/datasets/merged_HiForestAOD_MCFix2.root"}
 #cut configuration file
-CONFIG="../rootfiles/confFiles/merged_HiForestAOD_DATA_v2.cutconf"
+CONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.cutconf"}
 
 INPUTFILENAME=$(basename $INPUTFILE)
-#how to folder name skim result file
-OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_${FLAGS:1}_test"
+#folder name skim result file
+OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_${FLAGS:1}"
+
+CLING="NO"
 #output skimmed file, put in OUTPUTFOLDER and name based in inputfile
 OUTPUTFILENAME="${INPUTFILENAME%.*}_${FLAGS:1}.root"
 OUTPUTFILE="${OUTPUTFOLDER}/${OUTPUTFILENAME}"
 
 mkdir -p $OUTPUTFOLDER
 
-if [ $FLAGS2 = "-cmd" ]
+#execute skim
+if [ $CLING = "YES" ]
 then
-    echo ${FLAGS} "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}"
+    cd Skimming
+    root -q 'Skimming.cpp("'../${INPUTFILE}'","'../${OUTPUTFILE}'","'../${CONFIG}'")'
+    cd ..
 else
-        #execute skim
-    if [ $CLING = "YES" ]
-    then
-        cd Skimming
-        root -q 'Skimming.cpp("'../${INPUTFILE}'","'../${OUTPUTFILE}'","'../${CONFIG}'")'
-        cd ..
-    else
-        ./Skimming/skim ${FLAGS} "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}"
-    fi
+    ./Skimming/skim ${FLAGS} "${INPUTFILE}" "${OUTPUTFILE}" "${CONFIG}"
 fi

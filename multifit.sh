@@ -1,10 +1,12 @@
 #!/bin/bash
+MAXJOBS=12
 DOFIT="true"
 DODRAW="true"
 DOCDRAW="true"
-for FLAG in "$@"
+
+while : do
 do
-    case $FLAG in
+    case $1 in
     "-nofit")
     DOFIT="false"
     ;;
@@ -14,14 +16,18 @@ do
     "-nocomp")
     DOCDRAW="false"
     ;;
+    *)
+    break
+    ;;
     esac
+    shift
 done
 
 #multifit input file
-MULTIFITFILE="../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.multifit"
-INPUTFILENAME="merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.root"
+MULTIFITFILE=${1:-"../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.multifit"}
+INPUTFILENAME=${2:-"merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.root"}
 #drawing configuration file
-DRAWCONFIG="../rootfiles/confFiles/merged_HiForestAOD.drawconf"
+DRAWCONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
 
 SKIMFILE="../rootfiles/analysis/${INPUTFILENAME}"
 CUTFILE="../rootfiles/analysis/${INPUTFILENAME%.*}.cutconf"
@@ -45,7 +51,6 @@ then
     
     echo "reading skim file '${SKIMFILE}'"
     #do the fitting jobs
-    MAXJOBS=6
     for CONFIG in ${CONFIGFILES[@]}
     do
         FITFILE="${CONFIG}"
