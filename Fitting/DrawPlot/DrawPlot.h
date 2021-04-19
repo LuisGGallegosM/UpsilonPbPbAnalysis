@@ -16,7 +16,6 @@
 #include "TLine.h"
 #include "TStyle.h"
 
-#include "../../Drawing/GraphStyle.h"
 #include "../../Drawing/TextDrawer.h"
 #include "../../OniaBase/Params/Params.h"
 #include "../../Utils/Helpers/Helpers.h"

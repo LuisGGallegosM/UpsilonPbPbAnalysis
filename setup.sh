@@ -21,3 +21,4 @@ mkdir -p ../rootfiles/analysis
 ./HelperScripts/cutconfGen.sh -MC
 ./HelperScripts/cutconfGen.sh -DATA
 ./HelperScripts/drawconfGen.sh
+cp 

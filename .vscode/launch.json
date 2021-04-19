@@ -52,13 +52,38 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
-            "name": "g++ fit debug",
+            "name": "g++ fit-draw debug",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Fitting/fit",
-            "args": ["files/merged_HiForestAOD_skimmed.root", 
-                "files/test/merged_HiForestAOD_skimmed.root",
-                "files/test/merged_HiForestAOD_fit.txt"],
+            "args": [ "-draw",
+                "../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/fit", 
+                "../rootfiles/confFiles/merged_HiForestAOD.drawconf"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Habilitar la impresión con sangría para gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "g++ fit-fit debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Fitting/fit",
+            "args": [ "-fit",
+                "../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.root", 
+                "../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.cutconf",
+                "../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/fit",
+                "../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.fitconf"
+                ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

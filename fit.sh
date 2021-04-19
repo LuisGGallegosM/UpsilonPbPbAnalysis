@@ -2,12 +2,12 @@
 
 CLING="NO"
 #root file to fit from
-INPUTFILE="${1:-../rootfiles/skims/skim/merged_HiForestAOD_MCFix2_skim/SKIM20MAR2021/merged_HiForestAOD_MCFix2_skim.root}"
-CUTCONFIG="${2}"
+INPUTFILE="${1:-../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.root}"
+CUTCONFIG="${2:-../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.cutconf}"
 #fit configuration file name
-CONFIG="${3:-../rootfiles/confFiles/merged_HiForestAOD_MC_test.fitconf}"
+CONFIG="${3:-../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.fitconf}"
 #directory where to save all files
-OUTPUTDIR="${4:-../rootfiles/fits/merged_HiForestAOD_MCFix2_skim/test_fit}"
+OUTPUTDIR="${4:-../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/fit}"
 
 #name of generated file is like CONFIG but with .root extension
 OUTPUTFILE="${OUTPUTDIR}/$( basename $OUTPUTDIR ).root"

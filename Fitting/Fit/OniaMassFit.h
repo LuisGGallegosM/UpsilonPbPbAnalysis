@@ -26,8 +26,6 @@ class OniaMassFitter
     std::unique_ptr<RooFitResult> results;
     std::unique_ptr<RooAbsPdf> output;
 
-    std::string getKineCutExpr() const;
-
     /**
      * @brief this function makes the total fitting function by combining correctly its components
      * including bkg if bkgOn is enabled.
@@ -107,6 +105,7 @@ class OniaMassFitter2 : public OniaMassFitter
 };
 
 std::unique_ptr<OniaMassFitter> createMassFitter(TTree* input, const ParameterGroup* config);
+std::string getKineCutExpr(const ParameterGroup* cut);
 
 #if defined(__CLING__)
 #include "OniaMassFit.cpp"

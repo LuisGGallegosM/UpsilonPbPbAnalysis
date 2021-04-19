@@ -5,17 +5,15 @@
 
 void setGraphStyle(RooPlot* plot, const ParameterGroup* config, float topValue, float bottomValue, bool isLog)
 {
-    float massHigh = config->getFloat("mass.high");
-    float massLow = config->getFloat("mass.low");
-    float div= (massHigh - massLow)/(config->getInt("mass.nBins"));
+    float massHigh = config->getFloat("cut.mass.high");
+    float massLow = config->getFloat("cut.mass.low");
+    float div= (massHigh - massLow)/(config->getInt("nBins"));
     float maxValue = topValue*div;
     float minValue = bottomValue*div;
 
     //round to 
     maxValue = ceil(maxValue/1000.0f)*1000.0+1000.0f;
     minValue = ceil(minValue);
-    //maxValue = 125.0f;
-    //minValue = 1.0f;
     if (isLog)
     {
         minValue *= 0.7f;
@@ -71,7 +69,7 @@ void setPullStyle(RooPlot* pullPlot, const ParameterGroup* config)
     pullPlot->GetXaxis()->SetLabelSize(0.06) ;
     pullPlot->GetXaxis()->SetTitleSize(0.06) ;
     pullPlot->GetXaxis()->CenterTitle();
-    pullPlot->GetXaxis()->SetRangeUser(config->getFloat("mass.low"),config->getFloat("mass.high"));
+    pullPlot->GetXaxis()->SetRangeUser(config->getFloat("cut.mass.low"),config->getFloat("cut.mass.high"));
     pullPlot->GetXaxis()->SetTickSize(0.03);
     return;
 }

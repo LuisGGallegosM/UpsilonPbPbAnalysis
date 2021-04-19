@@ -1,5 +1,7 @@
 
 #include "DrawPlot.h"
+#include "DrawPlotHelpers.h"
+#include "GraphStyle.h"
 
 using namespace RooFit;
 
@@ -82,8 +84,8 @@ void DrawPlot(const char* inputdirectoryname, const char* drawconfigfilename  )
 
         graph->cd();
         RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
-        float maxVal=fParams.getFloat("nSigY1S")/( fParams.getFloat("sigma_Y1S") * 1.4142*1.7724 );
-        float minVal=fParams.getFloat("nBkg")/( config.getFloat("mass.high") - config.getFloat("mass.low") );
+        float maxVal=fParams.getFloat("nSigY1S.value")/( fParams.getFloat("signal.sigma.value") * 1.4142*1.7724 );
+        float minVal=fParams.getFloat("nBkg.value")/( config.getFloat("cut.mass.high") - config.getFloat("cut.mass.low") );
         setGraphStyle(graphPlot,&config,maxVal,minVal,isLog);
         drawLegend(graphPlot,config.getString("bkg.type")!="none",config.getBool("moreUpsilon"));
         drawGraphText(&fParams,&config);
@@ -178,10 +180,6 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
     return fitleg;
 }
 
-void drawWithError(TextDrawer& tdrawer,const ParameterGroup* fParams,const std::string& var)
-{
-    tdrawer.drawText( Form("m_{Y1S}=%.3f #pm %.3f",fParams->getFloat(var+".value"),fParams->getFloat(var+".error")));
-}
 
 /**
  * @brief Draw the texts over the plots corresponding to fit parameters and cuts used.
@@ -194,38 +192,17 @@ void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config)
     TextDrawer tdrawer(0.22f,0.8f,9.0f);
     
     tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
-    drawWithError(tdrawer,fParams,"mean");
-    drawWithError(tdrawer,fParams,"alpha");
-    drawWithError(tdrawer,fParams,"n");
-    drawWithError(tdrawer,fParams,"sigma");
-    drawWithError(tdrawer,fParams,"x");
-    drawWithError(tdrawer,fParams,"f");
-    
-    // if (config->fitConf.getBkgType() == BkgParams::BkgType::chev)
-    // {
-    //     tdrawer.drawText( Form("chk_k1=%.4f #pm %.4f",fParams->getChk4_k1(),fParams->getErrors().getChk4_k1()));
-    //     tdrawer.drawText( Form("chk_k2=%.4f #pm %.4f",fParams->getChk4_k2(),fParams->getErrors().getChk4_k2()));
-    // }
 
-    float ptLow=config->getFloat("cut.pt.low");
-    float ptHigh=config->getFloat("cut.pt.high");
-    float yLow=config->getFloat("cut.y.low");
-    float yHigh=config->getFloat("cut.pt.high");
-    float singleMuPtLow=config->getFloat("cut.singleMuPtLow");;
-    float singleMuEtaHigh=config->getFloat("cut.singleMuEta.High");;
+    drawParams(fParams->get("signal"),&tdrawer);
+    drawParams(fParams->get("bkg"),&tdrawer);
 
     TextDrawer tdrawer2(0.45,0.8);
-    
-    tdrawer2.drawText(Form("%.2f < p_{T}^{#mu#mu} < %.2f",ptLow, ptHigh));
-    
-    if (yLow == 0.0f)
-        tdrawer2.drawText(Form("|y^{#mu#mu}| < %.2f", yHigh));
-    else 
-        tdrawer2.drawText(Form("%.2f < |y^{#mu#mu}| < %.2f",yLow, yHigh));
-    tdrawer2.drawText(Form("p_{T}^{#mu} > %.1f GeV/c", singleMuPtLow));
-    tdrawer2.drawText(Form("|#eta^{#mu}| < %.2f",singleMuEtaHigh));
-    //tdrawer2.drawText(" 25.0 < jet p_{T} < 35.0");
-    //tdrawer2.drawText(" |jet #eta| < 2.0");
+
+    drawCut(config->get("cut"),&tdrawer2);
+    ParameterGroup extraCuts;
+    extraCuts.setFloat("p_{T}^{#mu}.low",config->getFloat("singleMuPtLow"));
+    extraCuts.setFloat("#eta^{#mu}.high",config->getFloat("singleMuEtaHigh"));
+    drawCut(&extraCuts,&tdrawer2);
 }
 
 /**
@@ -247,7 +224,7 @@ RooHist* drawPull(RooPlot* plot, RooRealVar* var,const ParameterGroup* config)
     
     setPullStyle(pullPlot,config);  
     pullPlot->Draw("same");
-    TLine *l1 = new TLine(config->getFloat("mass.low"),0,config->getFloat("mass.high"),0.0);
+    TLine *l1 = new TLine(config->getFloat("cut.mass.low"),0,config->getFloat("cut.mass.high"),0.0);
     l1->SetLineColor(4);
     l1->Draw("same");
     return pullHist;

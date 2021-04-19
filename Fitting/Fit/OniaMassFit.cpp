@@ -7,9 +7,41 @@
 #include "RooFormulaVar.h"
 #include "RooExtendPdf.h"
 
-const char mass_name[] = "reco_mass";
-const char pT_name[] = "reco_pT";
-const char y_name[] ="reco_y";
+std::string toInternalName(const std::string& name)
+{
+    if (name=="pt") return "reco_pT";
+    if (name=="y") return "reco_y";
+    if (name=="mass") return "reco_mass";
+    return name;
+}
+
+std::vector<RooRealVar> getVars()
+{
+    return std::vector<RooRealVar>
+    {
+        RooRealVar ("reco_y","rapidity quarkonia",-5,5),
+        RooRealVar ("reco_pT","momentum quarkonia",0,100,"GeV/c"),
+        RooRealVar ("z", "z",0.0,1.0),
+        RooRealVar ("jt_pt","jet momentum",0,100,"GeV/c"),
+        RooRealVar ("jt_eta","jet psedorapidity",0.0,4.0)
+    };
+}
+
+std::string getKineCutExpr(const ParameterGroup* cut)
+{
+    const auto subg = cut->getSubgroupNames();
+    std::string str;
+    for(const auto& name : subg)
+    {
+        if (name=="mass") continue;
+        if ( cut->exists( name+ ".low"))
+            str+= "(("+ toInternalName(name) +") > "+std::to_string(cut->getFloat(name+ ".low"))+") && ";
+        if ( cut->exists( name+ ".high"))
+            str+= "(("+ toInternalName(name) +") < "+std::to_string(cut->getFloat(name+ ".high")) + ") && ";
+    }
+    str.erase(str.end()-4,str.end());
+    return str;
+}
 
 //OniaMassFitter member functions.
 
@@ -19,8 +51,8 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const ParameterGroup* fitConf):
         config.getFloat("nSigY1S.value"), config.getFloat("nSigY1S.low"), config.getFloat("nSigY1S.high")),
     nBkg("nBkg","Bkg signal",
         config.getFloat("nBkg.value"), config.getFloat("nBkg.low"), config.getFloat("nBkg.high")),
-    mass(mass_name,"onia mass",
-        config.getFloat("mass.low"),config.getFloat("mass.high"),"GeV/c^{2}"),
+    mass( toInternalName("mass").data(),"onia mass",
+        config.getFloat("cut.mass.low"),config.getFloat("cut.mass.high"),"GeV/c^{2}"),
     dcball1(mass,"Y1S",config.get("signal")),
     bkg()
 {
@@ -29,19 +61,6 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const ParameterGroup* fitConf):
 }
 
 OniaMassFitter::~OniaMassFitter() { }
-
-std::string OniaMassFitter::getKineCutExpr() const
-{
-    const ParameterGroup* cut = config.get("cut");
-    std::string str(Form("((%s) < %.3f) && ((%s) > %.3f)",pT_name,cut->getFloat("pt.high"),pT_name,cut->getFloat("pt.low")));
-    str.append(Form(" && (abs(%s) < %.3f) && (abs(%s) > %.3f)",y_name,cut->getFloat("y.high"),y_name,cut->getFloat("y.low")));
-    if(0)
-    {
-        str.append(" && (jt_pt < 35) && (jt_pt > 25) ");
-        str.append(" && (abs(jt_eta) < 2.0 )");
-    }
-    return str;
-}
 
 void OniaMassFitter::combinePdf()
 {
@@ -64,13 +83,17 @@ void OniaMassFitter::combinePdf()
 
 RooAbsReal* OniaMassFitter::fit()
 {
-    RooRealVar pT(pT_name,"momentum quarkonia",0,100,"GeV/c");
-    RooRealVar y(y_name,"rapidity quarkonia",-5,5);
-    //RooRealVar z("z", "z",0.0,1.0);
-    //RooRealVar jt_pt("jt_pt","jet momentum",0,100,"GeV/c");
-    //RooRealVar jt_eta("jt_eta","jet psedorapidity",0.0,4.0);
+    auto vars= getVars();
+    RooArgSet set;
+    set.add(mass);
+    for(const auto& var : vars)
+    {
+        if( tree->GetBranch(var.GetName()) != nullptr )
+            set.add(var);
+    }
+        
 
-    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, RooArgSet(mass,y,pT),getKineCutExpr().data());
+    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, set,getKineCutExpr(config.get("cut")).data());
     dataset.reset(datas);
     std::cout << "Reduced dataset:\n";
     dataset->Print();
@@ -79,7 +102,7 @@ RooAbsReal* OniaMassFitter::fit()
 
     RooFitResult* res=
         output->fitTo(  *dataset,RooFit::Save(),
-                        RooFit::Range(config.getFloat("mass.low"),config.getFloat("mass.high")), 
+                        RooFit::Range(config.getFloat("cut.mass.low"),config.getFloat("cut.mass.high")), 
                         RooFit::Hesse(),
                         RooFit::Timer(),
                         RooFit::Extended());
@@ -97,7 +120,7 @@ ParameterGroup OniaMassFitter::getFitParams() const
     ParameterWrite(output,nSig_Y1S,"nSigY1S");
     ParameterWrite(output,nBkg,"nBkg");
     output.addGroup(bkg->getBkgParams(),"bkg");
-    output.addGroup(dcball1.getFitParams(),"dcb");
+    output.addGroup(dcball1.getParams(),"signal");
 
     return output;
 }

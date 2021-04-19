@@ -130,6 +130,8 @@ class CrystalBall
      * @return RooCBShape* The interally saved crystal ball function.
      */
     RooCBShape* getCB() {return &cBall;};
+
+    ParameterGroup getParams() const;
 };
 
 class CrystalBallSlave
@@ -176,7 +178,7 @@ class DoubleCrystalBall : public CrystalBall
 
     //getters
     RooAbsPdf* getDCB() {return &dcball;}
-    ParameterGroup getFitParams() const;
+    ParameterGroup getParams() const;
 
     friend class DoubleCrystalBallSlave;
 };

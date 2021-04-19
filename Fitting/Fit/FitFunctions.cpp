@@ -25,6 +25,16 @@ CrystalBall::CrystalBall(RooRealVar& var, const char* name, const ParameterGroup
     alpha.setConstant(g->getBool("alpha.fixed"));
     n.setConstant(g->getBool("n.fixed"));
 }
+
+ParameterGroup CrystalBall::getParams() const
+{
+    ParameterGroup p;
+    ParameterWrite(p,mean,"mean");
+    ParameterWrite(p,sigma,"sigma");
+    ParameterWrite(p,alpha,"alpha");
+    ParameterWrite(p,n,"n");
+    return p;
+}
 //Double CrystalBall
 
 DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var,const char* name, const ParameterGroup* g):
@@ -41,11 +51,12 @@ DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var,const char* name, const Par
 
 }
 
-ParameterGroup DoubleCrystalBall::getFitParams() const
+ParameterGroup DoubleCrystalBall::getParams() const
 {
     ParameterGroup p;
     ParameterWrite(p,x,"x");
     ParameterWrite(p,f,"f");
+    p.addGroup( CrystalBall::getParams() );
     return p;
 }
 

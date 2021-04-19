@@ -42,7 +42,7 @@ void testFitFunctionsDCB(Tester* t)
     RooRealVar mass("mass","mass",0.0);
     DoubleCrystalBall dcb(mass,"dcb",dcbParams);
 
-    auto dcbOut= dcb.getFitParams();
+    auto dcbOut= dcb.getParams();
 
     testParams(t,dcbParams,&dcbOut);
 }
@@ -56,6 +56,9 @@ void testOniaMassFit(Tester* t, const std::string& file)
     const ParameterGroup out= massFitter->getFitParams();
 
     testParams(t,&p,&out);
+
+    getKineCutExpr(&p);
+
 }
 
 void testFit(Tester* t)

@@ -144,7 +144,13 @@ ParameterGroup* ParameterGroup::get(const std::string& name)
 
 void ParameterGroup::addGroup(const ParameterGroup& g,const std::string& name)
 {
-    subgroups[name]=g;
+    if (!name.empty())
+        subgroups[name]=g;
+    else
+    {
+        data.insert(g.data.begin(),g.data.end());
+        subgroups.insert(g.subgroups.begin(),g.subgroups.end());
+    }
 }
 
 std::vector<std::string> ParameterGroup::getVarNames() const
@@ -188,6 +194,10 @@ void ParameterGroup::serialize(Serializer* ser,const std::string& prefix) const
     for (const auto& var : data)
     {
         ser->write(prefixWithDot+ var.first,var.second);
+    }
+    for(const auto& subg : subgroups)
+    {
+        subg.second.serialize(ser,prefixWithDot+subg.first);
     }
 }
 
