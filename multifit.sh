@@ -58,7 +58,7 @@ then
         FITOUTPUTDIR="${OUTDIR}/${FITNAME%.*}"
         echo "fitting file: $CONFIG"
         mkdir "${FITOUTPUTDIR}"
-        ./fit.sh "$SKIMFILE" "$CUTFILE" "$FITFILE" "${FITOUTPUTDIR}" > "${FITOUTPUTDIR}/fit.log" &
+        ./fit.sh "$SKIMFILE" "$CUTFILE" "$FITFILE" "${FITOUTPUTDIR}" &
         JOBS=( $(jobs -p) )
         JOBNUM="${#JOBS[@]}"
         if [ $MAXJOBS = $JOBNUM ]

@@ -84,8 +84,8 @@ void DrawPlot(const char* inputdirectoryname, const char* drawconfigfilename  )
 
         graph->cd();
         RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
-        float maxVal=fParams.getFloat("nSigY1S.value")/( fParams.getFloat("signal.sigma.value") * 1.4142*1.7724 );
-        float minVal=fParams.getFloat("nBkg.value")/( config.getFloat("cut.mass.high") - config.getFloat("cut.mass.low") );
+        float maxVal=fParams.getFloat("signal.nSigY1S.value")/( fParams.getFloat("signal.sigma.value") * 1.4142*1.7724 );
+        float minVal=fParams.getFloat("bkg.nBkg.value")/( config.getFloat("cut.mass.high") - config.getFloat("cut.mass.low") );
         setGraphStyle(graphPlot,&config,maxVal,minVal,isLog);
         drawLegend(graphPlot,config.getString("bkg.type")!="none",config.getBool("moreUpsilon"));
         drawGraphText(&fParams,&config);
@@ -201,7 +201,7 @@ void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config)
     drawCut(config->get("cut"),&tdrawer2);
     ParameterGroup extraCuts;
     extraCuts.setFloat("p_{T}^{#mu}.low",config->getFloat("singleMuPtLow"));
-    extraCuts.setFloat("#eta^{#mu}.high",config->getFloat("singleMuEtaHigh"));
+    extraCuts.setFloat("|#eta^{#mu}|.high",config->getFloat("singleMuEtaHigh"));
     drawCut(&extraCuts,&tdrawer2);
 }
 

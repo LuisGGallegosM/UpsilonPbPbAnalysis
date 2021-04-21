@@ -10,7 +10,7 @@
 std::string toInternalName(const std::string& name)
 {
     if (name=="pt") return "reco_pT";
-    if (name=="y") return "reco_y";
+    if (name=="y") return "abs(reco_y)";
     if (name=="mass") return "reco_mass";
     return name;
 }
@@ -48,9 +48,9 @@ std::string getKineCutExpr(const ParameterGroup* cut)
 OniaMassFitter::OniaMassFitter(TTree* tree_,const ParameterGroup* fitConf):
     config(*fitConf),tree(tree_),
     nSig_Y1S("nSig_Y1S","Upsilon Signal",
-        config.getFloat("nSigY1S.value"), config.getFloat("nSigY1S.low"), config.getFloat("nSigY1S.high")),
+        config.getFloat("signal.nSigY1S.value"), config.getFloat("signal.nSigY1S.low"), config.getFloat("signal.nSigY1S.high")),
     nBkg("nBkg","Bkg signal",
-        config.getFloat("nBkg.value"), config.getFloat("nBkg.low"), config.getFloat("nBkg.high")),
+        config.getFloat("bkg.nBkg.value"), config.getFloat("bkg.nBkg.low"), config.getFloat("bkg.nBkg.high")),
     mass( toInternalName("mass").data(),"onia mass",
         config.getFloat("cut.mass.low"),config.getFloat("cut.mass.high"),"GeV/c^{2}"),
     dcball1(mass,"Y1S",config.get("signal")),
@@ -117,8 +117,8 @@ ParameterGroup OniaMassFitter::getFitParams() const
     ParameterGroup output;
 
     output.setBool("moreUpsilon",false);
-    ParameterWrite(output,nSig_Y1S,"nSigY1S");
-    ParameterWrite(output,nBkg,"nBkg");
+    ParameterWrite(output,nSig_Y1S,"signal.nSigY1S");
+    ParameterWrite(output,nBkg,"bkg.nBkg");
     output.addGroup(bkg->getBkgParams(),"bkg");
     output.addGroup(dcball1.getParams(),"signal");
 
@@ -131,9 +131,9 @@ OniaMassFitter2::OniaMassFitter2(TTree* tree_,const ParameterGroup* fitConf):
     OniaMassFitter(tree_,fitConf),
     
     nSig_Y2S("nSig_Y2S","Upsilon Signal Y2S",
-        config.getFloat("nSigY2S.value"), config.getFloat("nSigY2S.low"), config.getFloat("nSigY2S.high")),
+        config.getFloat("signal.nSigY2S.value"), config.getFloat("signal.nSigY2S.low"), config.getFloat("signal.nSigY2S.high")),
     nSig_Y3S("nSig_Y3S","Upsilon Signal Y3S",
-        config.getFloat("nSigY3S.value"), config.getFloat("nSigY3S.low"), config.getFloat("nSigY3S.high")),
+        config.getFloat("signal.nSigY3S.value"), config.getFloat("signal.nSigY3S.low"), config.getFloat("signal.nSigY3S.high")),
     dcball2(mass,"Y2S",dcball1,RATIO_Y2S),
     dcball3(mass,"Y3S",dcball1,RATIO_Y3S)
 {
@@ -144,8 +144,8 @@ ParameterGroup OniaMassFitter2::getFitParams() const
     ParameterGroup output = OniaMassFitter::getFitParams();
 
     output.setBool("moreUpsilon",true);
-    ParameterWrite(output,nSig_Y2S,"nSigY1S");
-    ParameterWrite(output,nSig_Y3S,"nSigY1S");
+    ParameterWrite(output,nSig_Y2S,"signal.nSigY2S");
+    ParameterWrite(output,nSig_Y3S,"signal.nSigY3S");
 
     return output;
 }

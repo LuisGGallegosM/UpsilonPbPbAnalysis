@@ -10,7 +10,7 @@
  * @param outfilename path to a directory where to save results (4 files).
  * @param fitconfigname path to fit configuration file (.fitconf).
  */
-void Fit(const char* inputfilename, const char* cutfilename, const char* outfilename, const char* fitconfigname)
+void Fit(const char* inputfilename, const char* cutfilename, const char* fitconfigname, const char* outfilename)
 {
     std::cout << "\nFITTING\n";
     std::cout << "Reading input file: " << inputfilename <<'\n';

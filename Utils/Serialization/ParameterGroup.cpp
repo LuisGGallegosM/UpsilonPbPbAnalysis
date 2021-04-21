@@ -142,15 +142,17 @@ ParameterGroup* ParameterGroup::get(const std::string& name)
     }
 }
 
+void ParameterGroup::addGroup(const ParameterGroup& g)
+{
+    for(const auto& var : g.data)
+        data[var.first]=var.second;
+    for(const auto& subg : g.subgroups)
+        addGroup(subg.second,subg.first);
+}
+
 void ParameterGroup::addGroup(const ParameterGroup& g,const std::string& name)
 {
-    if (!name.empty())
-        subgroups[name]=g;
-    else
-    {
-        data.insert(g.data.begin(),g.data.end());
-        subgroups.insert(g.subgroups.begin(),g.subgroups.end());
-    }
+    subgroups[name].addGroup(g);
 }
 
 std::vector<std::string> ParameterGroup::getVarNames() const

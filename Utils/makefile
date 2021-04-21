@@ -18,7 +18,7 @@ libUtils.a : ${SOURCES} ${HEADERS}
 
 clear :
 	rm -f libUtils.a *.o *.s
-	rm test
+	rm -f test
 
 test : Test/Test.cpp libUtils.a
 	g++ Test/Test.cpp libUtils.a ${INC} ${LIBS} ${TESTFLAGS} test

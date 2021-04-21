@@ -21,5 +21,5 @@ cd Fitting
 root -q 'Fitting.cpp("'../${INPUTFILE}'","'../${CUTCONFIG}'","'../${OUTPUTFILE}'","'../${CONFIG}'")'
 cd ..
 else
-./Fitting/fit -fit "${INPUTFILE}" "${CUTCONFIG}" "${OUTPUTFILE}" "${CONFIG}"
+./Fitting/fit -fit "${INPUTFILE}" "${CUTCONFIG}" "${CONFIG}" "${OUTPUTFILE}" > "${OUTPUTFILE%.*}.log"
 fi

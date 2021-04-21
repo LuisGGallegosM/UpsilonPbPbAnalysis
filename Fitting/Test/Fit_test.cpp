@@ -20,7 +20,7 @@ void testParams(Tester* t, const ParameterGroup* p1, const ParameterGroup* p2)
 void testFitFunctionsBkg(Tester* t)
 {
     ParameterGroup p;
-    p.deserialize(exPath+"/exFitMC.fit");
+    p.deserialize(exPath+"/exFitMC.fitconf");
 
     const ParameterGroup* bkgParam=p.get("bkg");
     std::unique_ptr<BkgFunc> bkg;
@@ -35,7 +35,7 @@ void testFitFunctionsBkg(Tester* t)
 void testFitFunctionsDCB(Tester* t)
 {
     ParameterGroup p;
-    p.deserialize(exPath+"/exFitMC.fit");
+    p.deserialize(exPath+"/exFitMC.fitconf");
 
     const ParameterGroup* dcbParams= p.get("signal");
 
@@ -65,6 +65,6 @@ void testFit(Tester* t)
 {
     t->test(testFitFunctionsBkg,"FitFunctions bkg");
     t->test(testFitFunctionsDCB,"FitFunctions dcb");
-    t->test( [](Tester* t){testOniaMassFit(t,exPath+"/exFitMC.fit");},"oniaMassFit MC");
-    t->test( [](Tester* t){testOniaMassFit(t,exPath+"/exFitDATA.fit");},"oniaMassFit DATA");
+    t->test( [](Tester* t){testOniaMassFit(t,exPath+"/exFitMC.fitconf");},"oniaMassFit MC");
+    t->test( [](Tester* t){testOniaMassFit(t,exPath+"/exFitDATA.fitconf");},"oniaMassFit DATA");
 }

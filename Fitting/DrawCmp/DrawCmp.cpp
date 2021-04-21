@@ -8,7 +8,7 @@
 #include"TH1.h"
 #include"TCanvas.h"
 
-void drawCompGraph(const std::string& func, const std::vector<FitElement>& fits,TH1F* graph);
+void drawCompGraph(const std::string& varname, const std::vector<FitElement>& fits,TH1F* graph);
 std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs);
 std::vector<toGet> fillVariables(const ParameterGroup* fit);
 
@@ -43,7 +43,7 @@ void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
 
     //sort fit bins in case they are unordered
     std::sort(fits.begin(),fits.end(),
-            [](FitElement& l,FitElement& r) {return l.configs.getFloat("pt.low") < r.configs.getFloat("pt.high");});
+            [](FitElement& l,FitElement& r) {return l.configs.getFloat("cut.pt.low") < r.configs.getFloat("cut.pt.high");});
 
     const std::vector<double> xbins = generateBinBoundaries(fits);
     const std::vector<toGet> getters = fillVariables(&(fits[0].configs));
@@ -94,53 +94,17 @@ void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
 std::vector<toGet> fillVariables(const ParameterGroup* fit)
 {
     std::vector<toGet> getters;
-    getters.push_back(toGet{"alpha", "alpha"});
-    getters.push_back(toGet{"n","n"});
-    getters.push_back(toGet{"f","f"});
-    getters.push_back(toGet{"sigma_Y1S","sigma_Y1S"});
-    getters.push_back(toGet{"x","x"});
-    getters.push_back(toGet{"nSigY1S","nSigY1S"});
-    getters.push_back(toGet{"mass_Y1S","mass_Y1S"});
-
-    if (fit->getBool("moreUpsilon"))
+    const std::vector<std::string> subgroups= {"signal","bkg"};
+    for(auto subgroup : subgroups )
     {
-        getters.push_back(toGet{"nSigY2S","nSigY2S"});
-        getters.push_back(toGet{"nSigY3S","nSigY3S"});
-
-        getters.push_back(toGet{"mass_Y2S","mass_Y2S"});
-        getters.push_back(toGet{"mass_Y3S","mass_Y3S"});
-
-        getters.push_back(toGet{"sigma_Y2S","sigma_Y2S"});
-        getters.push_back(toGet{"sigma_Y3S","sigma_Y3S"});
+        const auto vars=fit->get(subgroup)->getSubgroupNames();
+        for(auto& var : vars)
+        {
+            if ( !fit->getBool(subgroup+"."+var+".fixed")  )
+                getters.push_back(toGet(subgroup+"."+var, subgroup+"_"+var));
+        }
     }
 
-    BkgType type=getBkgByName(fit->getString("bkg.type"));
- 
-    if (type!= BkgType::none)
-    {
-        getters.push_back(toGet{"nBkg","nBkg"});
-    }
-
-    switch (type)
-    {
-        case BkgType::chev:
-        getters.push_back(toGet{"chk4_k1","chk4_k1"});
-        getters.push_back(toGet{"chk4_k2","chk4_k2"});
-        break;
-        case BkgType::expChev2:
-        getters.push_back(toGet{"chk4_k1","chk4_k1"});
-        getters.push_back(toGet{"chk4_k2","chk4_k2"});
-        break;
-        case BkgType::special:
-        getters.push_back(toGet{"lambda_bkg","lambda_bkg"});
-        getters.push_back(toGet{"sigma_bkg","sigma_bkg"});
-        getters.push_back(toGet{"mu_bkg","mu_bkg"});
-        break;
-
-        case BkgType::exponential:
-        getters.push_back(toGet{"lambda_bkg","lambda_bkg"});
-        break;
-    }
     return getters;
 }
 
@@ -164,20 +128,20 @@ std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs
 /**
  * @brief draw the plot corresponding to a parameter
  * 
- * @param func pointer to member function that obtains the parameter from the fit result object.
+ * @param varname pointer to member function that obtains the parameter from the fit result object.
  * @param fits the vector of fit results objects.
  * @param graph histogram to fill with data.
  */
-void drawCompGraph(const std::string& func, const std::vector<FitElement>& fits,TH1F* graph)
+void drawCompGraph(const std::string& varname, const std::vector<FitElement>& fits,TH1F* graph)
 {
     int i=0;
     for (const auto& fit : fits)
     {
-        float value = fit.fits.getFloat(func+".value");
+        float value = fit.fits.getFloat(varname+".value");
         if (value == -1.0f) continue;
         float pt =0.5f*(fit.configs.getFloat("cut.pt.high") + fit.configs.getFloat("cut.pt.low"));
         graph->Fill(pt,value);
-        graph->SetBinError(i+1,fit.fits.getFloat(func+".error"));
+        graph->SetBinError(i+1,fit.fits.getFloat(varname+".error"));
         i++;
     }
 

@@ -30,7 +30,8 @@ class ParameterGroup
     std::vector<std::string> getSubgroupNames() const;
     ParameterGroup* get(const std::string& name);
     const ParameterGroup* get(const std::string& name) const;
-    void addGroup(const ParameterGroup&,const std::string& name="");
+    void addGroup(const ParameterGroup&);
+    void addGroup(const ParameterGroup&,const std::string& name);
 
     void deserialize(const std::string& filename,const std::string& prefix="");
     void deserialize(const Serializer* ser,const std::string& prefix="");

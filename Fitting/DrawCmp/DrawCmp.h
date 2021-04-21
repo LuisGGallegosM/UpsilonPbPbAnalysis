@@ -23,7 +23,7 @@ struct toGet
 {
     std::string name;
     std::string getter;
-    toGet(const char* name_,const char* getter_): name(name_), getter(getter_) {}
+    toGet(std::string name_,std::string getter_): name(name_), getter(getter_) {}
 };
 
 #if defined(__CLING__)

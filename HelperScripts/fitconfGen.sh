@@ -3,7 +3,8 @@
 echo "generating fitconf files..."
 
 MULTIFITFILE=${1:-../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.multifit}
-OUTDIR=${2:-.}
+OUTDIR=${2:-../rootfiles/confFiles/multifitmc}
+mkdir $OUTDIR
 BASENAME="fit"
 
 echo "Reading file: ${1}"
@@ -52,110 +53,100 @@ num=$((${#ptLow[@]} -1 ))
  
 for i in $(seq 0 $num )
 do
-    OUTPUT="massHigh = ${MASSHIGH}\n"
-    OUTPUT+="massLow = ${MASSLOW}\n"
-    OUTPUT+="cut.ptLow = ${ptLow[$i]}\n"
-    OUTPUT+="cut.ptHigh = ${ptHigh[$i]}\n"
-    OUTPUT+="cut.yLow = 0.0\n"
-    OUTPUT+="cut.yHigh = 2.4\n"
-
-    OUTPUT+="initialValues.moreUpsilon = ${MOREUPSILON}\n"
-    OUTPUT+="initialValues.limits.low.moreUpsilon = ${MOREUPSILON}\n"
-    OUTPUT+="initialValues.limits.high.moreUpsilon = ${MOREUPSILON}\n"
-
-    OUTPUT+="initialValues.nSigY1S = ${NSIG1S}\n"
-    OUTPUT+="initialValues.limits.low.nSigY1S = 0.0\n"
-    OUTPUT+="initialValues.limits.high.nSigY1S = 10000000.0\n"
+    OUTPUT="moreUpsilon = ${MOREUPSILON}\n"
+    OUTPUT+="cut.mass.high = ${MASSHIGH}\n"
+    OUTPUT+="cut.mass.low = ${MASSLOW}\n"
+    OUTPUT+="cut.pt.low = ${ptLow[$i]}\n"
+    OUTPUT+="cut.pt.high = ${ptHigh[$i]}\n"
+    OUTPUT+="cut.y.low = 0.0\n"
+    OUTPUT+="cut.y.high = 2.4\n"
+    OUTPUT+="signal.nSigY1S.high = 10000000.0\n"
+    OUTPUT+="signal.nSigY1S.value = ${NSIG1S}\n"
+    OUTPUT+="signal.nSigY1S.low = 0.0\n"
 
     if [ $MOREUPSILON = "true" ]
     then
-    OUTPUT+="initialValues.nSigY2S = ${NSIG2S}\n"
-    OUTPUT+="initialValues.limits.low.nSigY2S = 0.0\n"
-    OUTPUT+="initialValues.limits.high.nSigY2S = 10000000.0\n"
+        OUTPUT+="signal.nSigY2S.high = 10000000.0\n"
+        OUTPUT+="signal.nSigY2S.value = ${NSIG2S}\n"
+        OUTPUT+="signal.nSigY2S.low = 0.0\n"
 
-    OUTPUT+="initialValues.nSigY3S = ${NSIG3S}\n"
-    OUTPUT+="initialValues.limits.low.nSigY3S = 0.0\n"
-    OUTPUT+="initialValues.limits.high.nSigY3S = 10000000.0\n"
+        OUTPUT+="signal.nSigY3S.high = 10000000.0\n"
+        OUTPUT+="signal.nSigY3S.value = ${NSIG3S}\n"
+        OUTPUT+="signal.nSigY3S.low = 0.0\n"
     fi
 
-    OUTPUT+="initialValues.nBkg = ${NBKG}\n"
-    OUTPUT+="initialValues.limits.low.nBkg = 0.0\n"
-    OUTPUT+="initialValues.limits.high.nBkg = 1000000\n"
-    
-    OUTPUT+="initialValues.bkg.bkgType = ${BKGTYPE[$i]}\n"
-    OUTPUT+="initialValues.limits.low.bkg.bkgType = ${BKGTYPE[$i]}\n"
-    OUTPUT+="initialValues.limits.high.bkg.bkgType = ${BKGTYPE[$i]}\n"
+    OUTPUT+="bkg.nBkg.high = 1000000.0\n"
+    OUTPUT+="bkg.nBkg.value = ${NBKG}\n"
+    OUTPUT+="bkg.nBkg.low = 0.0\n"
 
+    OUTPUT+="bkg.type = ${BKGTYPE[$i]}\n"
     case ${BKGTYPE[$i]} in
-        "chev")
-            OUTPUT+="initialValues.bkg.chk4_k1 = ${CH1}\n"
-            OUTPUT+="initialValues.limits.low.bkg.chk4_k1 = -6.0\n"
-            OUTPUT+="initialValues.limits.high.bkg.chk4_k1 = 6.0\n"
+        "chev" | "expChev2")
+            OUTPUT+="bkg.chk4_k1.high = 6.0\n"
+            OUTPUT+="bkg.chk4_k1.value = ${CH1}\n"
+            OUTPUT+="bkg.chk4_k1.low = -6.0\n"
 
-            OUTPUT+="initialValues.bkg.chk4_k2 = ${CH2}\n"
-            OUTPUT+="initialValues.limits.low.bkg.chk4_k2 = -6.0\n"
-            OUTPUT+="initialValues.limits.high.bkg.chk4_k2 = 6.0\n"
-        ;;
-        "expChev2")
-            OUTPUT+="initialValues.bkg.chk4_k1 = ${CH1}\n"
-            OUTPUT+="initialValues.limits.low.bkg.chk4_k1 = -6.0\n"
-            OUTPUT+="initialValues.limits.high.bkg.chk4_k1 = 6.0\n"
-
-            OUTPUT+="initialValues.bkg.chk4_k2 = ${CH2}\n"
-            OUTPUT+="initialValues.limits.low.bkg.chk4_k2 = -6.0\n"
-            OUTPUT+="initialValues.limits.high.bkg.chk4_k2 = 6.0\n"
+            OUTPUT+="bkg.chk4_k2.high = 6.0\n"
+            OUTPUT+="bkg.chk4_k2.value = ${CH2}\n"
+            OUTPUT+="bkg.chk4_k2.low = -6.0\n"
         ;;
         "special")
-            OUTPUT+="initialValues.bkg.mu = ${MU_BKG}\n"
-            OUTPUT+="initialValues.limits.low.bkg.mu = 0.0\n"
-            OUTPUT+="initialValues.limits.high.bkg.mu = 30.0\n"
+            OUTPUT="bkg.mu.high = 30.0\n"
+            OUTPUT="bkg.mu.value = ${MU_BKG}\n"
+            OUTPUT="bkg.mu.low = 0.0\n"
 
-            OUTPUT+="initialValues.bkg.sigma = ${SIGMA_BKG}\n"
-            OUTPUT+="initialValues.limits.low.bkg.sigma = 0.0\n"
-            OUTPUT+="initialValues.limits.high.bkg.sigma = 4.0\n"
-
-            OUTPUT+="initialValues.bkg.lambda = ${LAMBDA_BKG}\n"
-            OUTPUT+="initialValues.limits.low.bkg.lambda = 0.0\n"
-            OUTPUT+="initialValues.limits.high.bkg.lambda = 30.0\n"
+            OUTPUT="bkg.sigma.high = 4.0\n"
+            OUTPUT="bkg.sigma.value = ${SIGMA_BKG}\n"
+            OUTPUT="bkg.sigma.low = 0.0\n"
+            
+            OUTPUT="bkg.lambda.high = 30.0\n"
+            OUTPUT="bkg.lambda.value = ${LAMBDA_BKG}\n"
+            OUTPUT="bkg.lambda.low = 0.0\n"
         ;;
         "exponential")
-            OUTPUT+="initialValues.bkg.lambda = ${LAMBDA_BKG}\n"
-            OUTPUT+="initialValues.limits.low.bkg.lambda = 0\n"
-            OUTPUT+="initialValues.limits.high.bkg.lambda = 30.0\n"
+            OUTPUT="bkg.lambda.high = 30.0\n"
+            OUTPUT="bkg.lambda.value = ${LAMBDA_BKG}\n"
+            OUTPUT="bkg.lambda.low = 0.0\n"
         ;;
         "none")
         ;;
         *)
-            echo "incorrect bkgType in ${OUTDIR}/${BASENAME}${i}.fitconf"
-            echo "bkgType= ${BKGTYPE[$i]}"
+            echo "\nError : incorrect bkgType in ${OUTDIR}/${BASENAME}${i}.fitconf\n"
+            echo "bkgType= ${BKGTYPE[$i]}\n"
             exit
         ;;
     esac
 
-    OUTPUT+="initialValues.dcb.mean = 9.46\n"
-    OUTPUT+="initialValues.dcb.alpha = ${initialAlpha[$i]}\n"
-    OUTPUT+="initialValues.dcb.n = ${initialN[$i]}\n"
-    OUTPUT+="initialValues.dcb.sigma = ${initialSigma[$i]}\n"
-    OUTPUT+="initialValues.dcb.x = 0.5\n"
-    OUTPUT+="initialValues.dcb.f = 0.5\n"
+    OUTPUT+="signal.mean.high = 9.56 \n"
+    OUTPUT+="signal.mean.value = 9.46 \n"
+    OUTPUT+="signal.mean.low = 9.36 \n"
+    OUTPUT+="signal.mean.fixed = false \n"
 
-    OUTPUT+="initialValues.limits.low.dcb.mean = 9.36\n"
-    OUTPUT+="initialValues.limits.low.dcb.alpha = 0.5\n"
-    OUTPUT+="initialValues.limits.low.dcb.n = 0.05\n"
-    OUTPUT+="initialValues.limits.low.dcb.sigma = 0.01\n"
-    OUTPUT+="initialValues.limits.low.dcb.x = 0.0\n"
-    OUTPUT+="initialValues.limits.low.dcb.f = 0.0\n"
+    OUTPUT+="signal.alpha.high = 5.5 \n"
+    OUTPUT+="signal.alpha.value = ${initialAlpha[$i]} \n"
+    OUTPUT+="signal.alpha.low = 0.5 \n"
+    OUTPUT+="signal.alpha.fixed = ${FIXALPHA} \n"
 
-    OUTPUT+="initialValues.limits.high.dcb.mean = 9.56\n"
-    OUTPUT+="initialValues.limits.high.dcb.alpha = 5.5\n"
-    OUTPUT+="initialValues.limits.high.dcb.n = 15.0\n"
-    OUTPUT+="initialValues.limits.high.dcb.sigma = 0.6\n"
-    OUTPUT+="initialValues.limits.high.dcb.x = 1.0\n"
-    OUTPUT+="initialValues.limits.high.dcb.f = 1.0\n"
+    OUTPUT+="signal.sigma.high = 0.6 \n"
+    OUTPUT+="signal.sigma.value = ${initialSigma[$i]} \n"
+    OUTPUT+="signal.sigma.low = 0.01 \n"
+    OUTPUT+="signal.sigma.fixed = false \n"
 
-    OUTPUT+="fix.dcb.alpha = ${FIXALPHA}\n"
-    OUTPUT+="fix.dcb.n = ${FIXN}\n"
+    OUTPUT+="signal.n.high = 15.0 \n"
+    OUTPUT+="signal.n.value = ${initialN[$i]} \n"
+    OUTPUT+="signal.n.low = 0.05 \n"
+    OUTPUT+="signal.n.fixed = ${FIXN} \n"
 
+    OUTPUT+="signal.x.high = 1.0 \n"
+    OUTPUT+="signal.x.value = 0.5 \n"
+    OUTPUT+="signal.x.low = 0.0 \n"
+    OUTPUT+="signal.x.fixed = false \n"
+
+    OUTPUT+="signal.f.high = 1.0 \n"
+    OUTPUT+="signal.f.value = 0.5 \n"
+    OUTPUT+="signal.f.low = 0.0 \n"
+    OUTPUT+="signal.f.fixed = false \n"
+    
     FILENAME="${OUTDIR}/${BASENAME}${i}.fitconf"
 
     printf "$OUTPUT" > $FILENAME

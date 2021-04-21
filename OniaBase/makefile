@@ -23,7 +23,7 @@ libOniaBase.a : ${SOURCES} ${HEADERS} ${STATICLIBS}
 
 clear :
 	rm -f libOniaBase.a *.o *.s
-	rm test
+	rm -f test
 
 test : Test/Test.cpp libOniaBase.a
 	g++ Test/Test.cpp libOniaBase.a ${INC} ${LIBS} ${TESTFLAGS} test
