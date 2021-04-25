@@ -9,31 +9,41 @@
 int main(int argc, char **argv)
 {
     std::string flags(argv[1]);
-    if ( argc == 5 )
+
+    switch (argc)
     {
+        case 5:
         if (flags=="-eff")
             EffTest(argv[2],argv[3],argv[4]);
         else
             std::cerr << "Incorrect number of parameters\n";
-    }
-    else if (argc == 4)
-    {
+        break;
+
+        case 6:
+        if (flags=="-closure")
+            ClosureTest(argv[2],argv[3],argv[4],argv[5]);
+        else
+            std::cerr << "Incorrect number of parameters\n";
+        break;
+
+        case 4:
         if(flags=="-acc")
             AccTest(argv[2],argv[3]);
         else if (flags=="-fit")
             YieldFit(argv[2],argv[3]);
         else
             std::cerr << "Incorrect number of parameters\n";
+        break;
 
-    }
-    else if (argc == 7)
-    {
+        case 7:
         if (flags=="-final")
             AccEffResults(argv[2],argv[3],argv[4],argv[5],argv[6]);
-    }
-    else
-    {
+        break;
+
+        default:
         std::cerr << "Incorrect number of parameters\n";
+        break;
+
     }
     return 0;
 }

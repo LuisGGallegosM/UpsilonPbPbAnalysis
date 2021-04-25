@@ -96,65 +96,6 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     TH1F* dens= new TH1F((*acc_den)*(*eff_den));
     TH1F* nums= new TH1F((*acc_num)*(*eff_num));
 
-    std::unique_ptr<TEfficiency> AccXEff = createTEff(nums,dens,"ptQQ_AccXEff","#alpha #epsilon;p^{#mu#mu}_{T} GeV/c; #alpha#epsilon;");
+    std::unique_ptr<TEfficiency> AccXEff = createTEff(nums,dens,accXEffName,"#alpha #epsilon;p^{#mu#mu}_{T} GeV/c; #alpha#epsilon;");
     return AccXEff;
  }
-
-TH1F* toTH1F(const TEfficiency* asym)
-{
-    int nBins= asym->GetPassedHistogram()->GetNbinsX()+2;
-    TH1F* result = new TH1F(*dynamic_cast<TH1F*>(asym->GetPassedHistogram()->Clone()));
-    for(int i=0;i< nBins;i++)
-    {
-        result->SetBinContent(i,asym->GetEfficiency(i));
-        float upErr= asym->GetEfficiencyErrorUp(i);
-        float downErr = asym->GetEfficiencyErrorLow(i);
-        result->SetBinError(i, (upErr > downErr) ? upErr : downErr );
-    }
-    return result;
-}
-
-TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff)
-{
-    TH1F* AccXEffth1f=toTH1F(AccXEff);
-    TH1F* nSigCorrected = new TH1F((*nSig)/(*AccXEffth1f));
-    std::string newname=nSigCorrected->GetName();
-    newname+="_corr";
-    nSigCorrected->SetName(newname.data());
-    nSigCorrected->SetStats(false);
-    return nSigCorrected;
-}
-
-TH1F* Normalize(TH1F* nSigCorrected)
-{
-    TH1F* dN_dPt = new TH1F(*nSigCorrected);
-    int nbins = dN_dPt->GetNbinsX() +2;
-    float sum = 0.0f;
-    for(int i=0;i<nbins;i++)
-    {
-        sum+=dN_dPt->GetBinContent(i);
-    }
-    dN_dPt->Scale(1.0f/sum);
-    std::string newname=nSigCorrected->GetName();
-    newname+="_norm";
-    dN_dPt->SetName(newname.data());
-    return dN_dPt;
-}
-
-TH1F* calcDN_DpT(TH1F* nSigCorrected)
-{
-    TH1F* dN_dPt = new TH1F(*nSigCorrected);
-    int nbins = dN_dPt->GetNbinsX() +2;
-    for(int i=0;i<nbins;i++)
-    {
-        float dPt= dN_dPt->GetBinWidth(i);
-        float factor=1.0f/dPt;
-        dN_dPt->SetBinContent(i, dN_dPt->GetBinContent(i)*factor);
-        dN_dPt->SetBinError(i, nSigCorrected->GetBinError(i)*factor );
-    }
-    std::string newname=nSigCorrected->GetName();
-    newname+="_dN_dpT";
-    dN_dPt->SetName(newname.data());
-    dN_dPt->SetTitle("#frac{dN}{p_{T}}");
-    return dN_dPt;
-}
