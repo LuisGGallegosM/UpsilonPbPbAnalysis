@@ -39,43 +39,45 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     std::unique_ptr<TEfficiency> AccXEff = getAccXEff(accFile,effFile);
     AccXEff->Write();
     std::string outbasename= ReplaceExtension(outputname,"");
-    writeToCanvasEff(AccXEff.get(),"p_{T}","Acc x Eff",outbasename+"_AccXEff.pdf");
+    writeToCanvasEff(AccXEff.get(),"p_{T}","Acc x Eff",outbasename);
     
     TH1F* nSigRealData = (TH1F*) fitFileRealData->Get("nSigY1S");
+    nSigRealData->SetName("DATA_nSigY1S");
 
     TH1F* nSigCorrected = calcCorrectedYields(nSigRealData,AccXEff.get());
-    writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","N_{Y1Scorr}",outbasename+"_CorrectYields.pdf");
+    writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","N_{Y1Scorr}",outbasename);
     nSigCorrected->Write();
 
-    TH1F* DATA_dN_dPt = Normalize(nSigCorrected);
-    DATA_dN_dPt->SetName("DATA_nSigCorrected_norm");
-    DATA_dN_dPt->SetTitle("DATA N_{Y1Scorr} normalized");
-    DATA_dN_dPt->SetFillColor(1);
-    DATA_dN_dPt->SetLineColor(1);
-    DATA_dN_dPt->GetYaxis()->SetRangeUser(0.0,0.5);
+    TH1F* DATA_dN_dPt = calcDN_DpT(nSigCorrected);
+
+    TH1F* DATA_dN_dPt_norm = Normalize(DATA_dN_dPt);
+    DATA_dN_dPt_norm->SetLineColor(1);
 
     TH1F* nSigMC = (TH1F*) fitFileMC->Get("nSigY1S");
-    TH1F* MC_dN_dPt =Normalize(nSigMC);
-    MC_dN_dPt->SetName("MC_nSigMC_norm");
-    MC_dN_dPt->SetTitle("MC N_{Y1SMC} normalized");
-    MC_dN_dPt->SetFillColor(3);
-    MC_dN_dPt->SetLineColor(3);
-    MC_dN_dPt->GetYaxis()->SetRangeUser(0.0,0.5);
+    nSigMC->SetName("MC_nSigY1S");
 
-    std::vector<TH1*> hists ={DATA_dN_dPt,MC_dN_dPt};
+    TH1F* nSigCorrected_MC=calcCorrectedYields(nSigMC,AccXEff.get());
+    writeToCanvas(nSigCorrected_MC,"p^{#mu#mu}_{T} GeV/c","N_{Y1Scorr}",outbasename);
+    nSigCorrected_MC->Write();
+
+    TH1F* MC_dN_dPt= calcDN_DpT(nSigMC);
+    TH1F* MC_dN_dPt_norm =Normalize(MC_dN_dPt);
+    MC_dN_dPt_norm->SetLineColor(3);
+
+    std::vector<TH1*> hists ={DATA_dN_dPt_norm,MC_dN_dPt_norm};
     writeToCanvas(hists,"DATA corrected and MC N_{Y1S} Normalized","p^{#mu#mu}_{T} GeV/c","N_{Y1S}",outbasename+"_dNdPt.pdf");
-    DATA_dN_dPt->Write();
-    MC_dN_dPt->Write();
+    DATA_dN_dPt_norm->Write();
+    MC_dN_dPt_norm->Write();
 
-    TH1F* ratio= new TH1F((*MC_dN_dPt)/(*DATA_dN_dPt));
+    TH1F* ratio= new TH1F((*MC_dN_dPt_norm)/(*DATA_dN_dPt_norm));
     ratio->SetName(yieldFitName);
     ratio->SetTitle("#frac{MC N_{Y1SMC} norm}{DATA N_{Y1Scorr} norm}");
     ratio->SetTitleSize(0.004);
-    ratio->GetYaxis()->SetRangeUser(0.0,3.0);
+    ratio->GetYaxis()->SetRangeUser(0.0,3.5);
     ratio->SetFillColor(1);
     ratio->SetLineColor(1);
     ratio->SetStats(false);
-    writeToCanvas(ratio,"p^{#mu#mu}_{T} GeV/c","ratio", outbasename+"_dNdPtRatio.pdf");
+    writeToCanvas(ratio,"p^{#mu#mu}_{T} GeV/c","ratio", outbasename);
     ratio->Write();
 
     outFile->Close();
@@ -94,7 +96,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     TH1F* dens= new TH1F((*acc_den)*(*eff_den));
     TH1F* nums= new TH1F((*acc_num)*(*eff_num));
 
-    std::unique_ptr<TEfficiency> AccXEff = createTEff(nums,dens,"pt QQ AccXEff","#alpha #epsilon;p^{#mu#mu}_{T} GeV/c; #alpha#epsilon;");
+    std::unique_ptr<TEfficiency> AccXEff = createTEff(nums,dens,"ptQQ_AccXEff","#alpha #epsilon;p^{#mu#mu}_{T} GeV/c; #alpha#epsilon;");
     return AccXEff;
  }
 
@@ -116,8 +118,9 @@ TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff)
 {
     TH1F* AccXEffth1f=toTH1F(AccXEff);
     TH1F* nSigCorrected = new TH1F((*nSig)/(*AccXEffth1f));
-    nSigCorrected->SetName("corrected_nSigY1S");
-    nSigCorrected->SetTitle("nSigY1S corrected");
+    std::string newname=nSigCorrected->GetName();
+    newname+="_corr";
+    nSigCorrected->SetName(newname.data());
     nSigCorrected->SetStats(false);
     return nSigCorrected;
 }
@@ -132,27 +135,26 @@ TH1F* Normalize(TH1F* nSigCorrected)
         sum+=dN_dPt->GetBinContent(i);
     }
     dN_dPt->Scale(1.0f/sum);
+    std::string newname=nSigCorrected->GetName();
+    newname+="_norm";
+    dN_dPt->SetName(newname.data());
     return dN_dPt;
 }
 
 TH1F* calcDN_DpT(TH1F* nSigCorrected)
 {
-    const float dy= 4.8f;
-    const float L=28000.0f;//in nb^-1
     TH1F* dN_dPt = new TH1F(*nSigCorrected);
     int nbins = dN_dPt->GetNbinsX() +2;
     for(int i=0;i<nbins;i++)
     {
         float dPt= dN_dPt->GetBinWidth(i);
-        float dN= dN_dPt->GetBinContent(i);
-        float factor=1.0f/(dPt*dy);
-        float value=dN*factor;
-        dN_dPt->SetBinContent(i, value);
+        float factor=1.0f/dPt;
+        dN_dPt->SetBinContent(i, dN_dPt->GetBinContent(i)*factor);
         dN_dPt->SetBinError(i, nSigCorrected->GetBinError(i)*factor );
     }
-    dN_dPt->Scale(1.0f/L);
-    dN_dPt->SetName("dN_dpTdy");
-    dN_dPt->SetTitle("#frac{dN_{Y1Scorr}}{L #Delta p_{T} #Delta y}");
-    dN_dPt->GetYaxis()->SetRangeUser(0.0001f,10.0f);
+    std::string newname=nSigCorrected->GetName();
+    newname+="_dN_dpT";
+    dN_dPt->SetName(newname.data());
+    dN_dPt->SetTitle("#frac{dN}{p_{T}}");
     return dN_dPt;
 }
