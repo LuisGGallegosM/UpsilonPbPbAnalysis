@@ -160,14 +160,7 @@ TH1F* Normalize(TH1F* nSigCorrected)
 TH1F* calcDN_DpT(TH1F* nSigCorrected)
 {
     TH1F* dN_dPt = new TH1F(*nSigCorrected);
-    int nbins = dN_dPt->GetNbinsX() +2;
-    for(int i=0;i<nbins;i++)
-    {
-        float dPt= dN_dPt->GetBinWidth(i);
-        float factor=1.0f/dPt;
-        dN_dPt->SetBinContent(i, dN_dPt->GetBinContent(i)*factor);
-        dN_dPt->SetBinError(i, nSigCorrected->GetBinError(i)*factor );
-    }
+    dN_dPt->Scale(1.0f/dN_dPt->Integral());
     std::string newname=nSigCorrected->GetName();
     newname+="_dN_dpT";
     dN_dPt->SetName(newname.data());

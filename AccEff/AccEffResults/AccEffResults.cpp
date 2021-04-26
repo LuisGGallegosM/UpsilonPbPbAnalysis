@@ -53,25 +53,25 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     TH1F* DATA_dN_dPt_norm = Normalize(DATA_dN_dPt);
     DATA_dN_dPt_norm->SetLineColor(1);
 
-    TH1F* nSigMC = (TH1F*) fitFileMC->Get("nSigY1S");
-    nSigMC->SetName("MC_nSigY1S");
+    TH1F* nSigMC_gen = (TH1F*) accFile->Get(accDenName);
+    nSigMC_gen->SetName("MC_nSigY1S_gen");
 
-    TH1F* nSigCorrected_MC=calcCorrectedYields(nSigMC,AccXEff.get());
-    writeToCanvas(nSigCorrected_MC,"p^{#mu#mu}_{T} GeV/c","N_{Y1Scorr}",outbasename);
-    nSigCorrected_MC->Write();
+    writeToCanvas(nSigMC_gen,"p^{#mu#mu}_{T} GeV/c","N_{Y1S}",outbasename);
+    nSigMC_gen->Write();
 
-    TH1F* MC_dN_dPt= calcDN_DpT(nSigMC);
+    TH1F* MC_dN_dPt= calcDN_DpT(nSigMC_gen);
     TH1F* MC_dN_dPt_norm =Normalize(MC_dN_dPt);
     MC_dN_dPt_norm->SetLineColor(3);
 
     std::vector<TH1*> hists ={DATA_dN_dPt_norm,MC_dN_dPt_norm};
-    writeToCanvas(hists,"DATA corrected and MC N_{Y1S} Normalized","p^{#mu#mu}_{T} GeV/c","N_{Y1S}",outbasename+"_dNdPt.pdf");
+    writeToCanvas(hists,"DATA corrected and MC N_{Y1S} gen Normalized","p^{#mu#mu}_{T} GeV/c"," ",outbasename+"_dNdPt.pdf");
     DATA_dN_dPt_norm->Write();
     MC_dN_dPt_norm->Write();
 
-    TH1F* ratio= new TH1F((*MC_dN_dPt_norm)/(*DATA_dN_dPt_norm));
+    TH1F* ratio= new TH1F((*DATA_dN_dPt_norm)/(*MC_dN_dPt_norm));
     ratio->SetName(yieldFitName);
-    ratio->SetTitle("#frac{MC N_{Y1SMC} norm}{DATA N_{Y1Scorr} norm}");
+    ratio->SetTitle("#frac{DATA N_{Y1Scorr} norm}{MC N_{Y1SMC} norm}");
+    ratio->SetTitleSize(0.004);
     ratio->SetTitleSize(0.004);
     ratio->GetYaxis()->SetRangeUser(0.0,3.5);
     ratio->SetFillColor(1);
