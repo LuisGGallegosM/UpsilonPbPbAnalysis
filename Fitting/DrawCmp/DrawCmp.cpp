@@ -100,8 +100,10 @@ std::vector<toGet> fillVariables(const ParameterGroup* fit)
         const auto vars=fit->get(subgroup)->getSubgroupNames();
         for(auto& var : vars)
         {
-            if ( !fit->getBool(subgroup+"."+var+".fixed")  )
-                getters.push_back(toGet(subgroup+"."+var, subgroup+"_"+var));
+            if (!(fit->exists(subgroup+"."+var+".fixed") && fit->getBool(subgroup+"."+var+".fixed")))
+            {
+                getters.push_back(toGet(subgroup+"_"+var, subgroup+"."+var));
+            }
         }
     }
 

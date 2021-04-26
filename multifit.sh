@@ -91,7 +91,7 @@ fi
 if [ ${DOCDRAW} = "true" ]
 then
     echo "starting comparative drawings..."
-    FITS=$(find ${OUTDIR} -maxdepth 1 -name "fit*")
+    FITS=$(find ${OUTDIR} -maxdepth 1 -type d -name "fit*")
     ./Fitting/fit -multidraw "${OUTDIR}" $FITS
 fi
 
