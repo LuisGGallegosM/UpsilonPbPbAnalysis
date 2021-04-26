@@ -41,7 +41,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     std::string outbasename= ReplaceExtension(outputname,"");
     writeToCanvasEff(AccXEff.get(),"p_{T}","Acc x Eff",outbasename);
     
-    TH1F* nSigRealData = (TH1F*) fitFileRealData->Get("nSigY1S");
+    TH1F* nSigRealData = (TH1F*) fitFileRealData->Get(nSigY1SName);
     nSigRealData->SetName("DATA_nSigY1S");
 
     TH1F* nSigCorrected = calcCorrectedYields(nSigRealData,AccXEff.get());

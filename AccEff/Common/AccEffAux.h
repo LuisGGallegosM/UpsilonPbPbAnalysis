@@ -31,5 +31,6 @@ constexpr const char* accNumName ="PtQQ_Det_acc";
 constexpr const char* effDenName= "PtQQ_Det_eff";
 constexpr const char* effNumName= "PtQQ_RecoCut";
 constexpr const char* accXEffName= "ptQQ_AccXEff";
+constexpr const char* nSigY1SName= "signal_nSigY1S";
 
 #endif

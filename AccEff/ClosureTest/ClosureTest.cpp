@@ -33,7 +33,7 @@ void ClosureTest(const char* accxeffFilename,const char* accFilename, const char
 
     TEfficiency* accXEff = (TEfficiency*) accXEffFile->Get(accXEffName);
     TH1F* MC_gen_yields = (TH1F*) accFile->Get(accDenName);
-    TH1F* MC_reco_yields = (TH1F*) fitFile->Get("nSigY1S");
+    TH1F* MC_reco_yields = (TH1F*) fitFile->Get(nSigY1SName);
 
     MC_gen_yields->SetLineColor(3);
     MC_gen_yields->SetLineWidth(2);
