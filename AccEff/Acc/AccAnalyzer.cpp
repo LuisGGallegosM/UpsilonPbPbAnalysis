@@ -4,8 +4,8 @@
 #include "TPie.h"
 #include <array>
 
-AccAnalyzer::AccAnalyzer(TTree* input,const char* outTreeName) : 
-    TreeProcessor(input,outTreeName),oniaWriter(), oniaReader()
+AccAnalyzer::AccAnalyzer(TTree* input,const char* outTreeName, RooAbsReal* weights) : 
+    TreeProcessor(input,outTreeName),oniaWriter(), oniaReader(), weightFunc(weights)
 {
     registerInputs(&oniaReader);
     registerOutputs(&oniaWriter);
@@ -37,6 +37,13 @@ void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
     data.pT = mom4vec->Pt();
     data.y = fabs(mom4vec->Rapidity());
     if(data.y > 2.4f) return;
+    
+    float weight=1.0f;
+    if(weightFunc!=nullptr)
+    {
+        weightFunc->getVariables()->setRealValue("pt",data.pT);
+        weight=weightFunc->getVal();
+    }
 
     TLorentzVector* mom4vecPl=(TLorentzVector*) input->genQQ.mupl_mom4->At(index);
     TLorentzVector* mom4vecMi=(TLorentzVector*) input->genQQ.mumi_mom4->At(index);
@@ -46,11 +53,11 @@ void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
     data.ptMuPl=mom4vecPl->Pt();
     data.ptMuMi=mom4vecMi->Pt();
 
-    hists.FillGen(&data);
+    hists.FillGen(&data,weight);
 
     if(accCutter.cut(input,index,entry))
     {
-        hists.FillDet(&data);
+        hists.FillDet(&data,weight);
         oniaWriter.writeData(input,SimpleSelector{entry,index});
         FillEntries();
     }
@@ -71,20 +78,20 @@ AccHistografer::AccHistografer()
     ptHistQQDet= createTH1(accNumName ,"p^{#mu#mu}_{t} QQ Detectable");
 }
 
-void AccHistografer::FillGen(const inputs* in)
+void AccHistografer::FillGen(const inputs* in,float weight)
 {
-    ptHistQQGen->Fill(in->pT);
-    etaVsPtQQGen->Fill(in->y,in->pT);
-    etaVsPtMuGen->Fill(in->etaMuPl,in->ptMuPl);
-    etaVsPtMuGen->Fill(in->etaMuMi,in->ptMuMi);
+    ptHistQQGen->Fill(in->pT,weight);
+    etaVsPtQQGen->Fill(in->y,in->pT,weight);
+    etaVsPtMuGen->Fill(in->etaMuPl,in->ptMuPl,weight);
+    etaVsPtMuGen->Fill(in->etaMuMi,in->ptMuMi,weight);
 }
 
-void AccHistografer::FillDet(const inputs* in)
+void AccHistografer::FillDet(const inputs* in,float weight)
 {
-    ptHistQQDet->Fill(in->pT);
-    etaVsPtQQDet->Fill(in->y,in->pT);
-    etaVsPtMuDet->Fill(in->etaMuPl,in->ptMuPl);
-    etaVsPtMuDet->Fill(in->etaMuMi,in->ptMuMi);
+    ptHistQQDet->Fill(in->pT,weight);
+    etaVsPtQQDet->Fill(in->y,in->pT,weight);
+    etaVsPtMuDet->Fill(in->etaMuPl,in->ptMuPl,weight);
+    etaVsPtMuDet->Fill(in->etaMuMi,in->ptMuMi,weight);
 }
 
 void AccHistografer::Write(const std::string& basename)

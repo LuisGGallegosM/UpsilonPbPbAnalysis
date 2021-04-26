@@ -3,6 +3,7 @@
 
 #include "TH2.h"
 #include "TEfficiency.h"
+#include "RooAbsReal.h"
 
 #include "../../OniaBase/TreeProcessor/TreeProcessor.h"
 #include "../../OniaBase/OniaIO/OniaIO.h"
@@ -32,8 +33,8 @@ class AccHistografer
     };
 
     AccHistografer();
-    void FillGen(const inputs* in);
-    void FillDet(const inputs* in);
+    void FillGen(const inputs* in,float weight=1.0f);
+    void FillDet(const inputs* in,float weight=1.0f);
     void Write(const std::string& basename);
 };
 
@@ -44,11 +45,12 @@ class AccAnalyzer : public TreeProcessor
     OniaReader<OniaGenOnlyData> oniaReader;
     AccCutter accCutter;
     OniaWriterGenQQ oniaWriter;
+    RooAbsReal* weightFunc;
 
     void Analyze(Int_t index, Long64_t entry);
 
     public:
-    AccAnalyzer(TTree* input,const char* outTreeName);
+    AccAnalyzer(TTree* input,const char* outTreeName, RooAbsReal* weightFunc=nullptr);
 
     void Write(const std::string& basename);
 

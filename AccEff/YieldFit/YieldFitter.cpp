@@ -1,5 +1,6 @@
 
 #include"YieldFitter.h"
+#include"../Common/AccEffAux.h"
 
 #include"RooDataSet.h"
 
@@ -13,7 +14,7 @@ YieldFitter::YieldFitter(TH1F* yieldRatio):
     pt("pt","p_{T}",0.0,30.0),
     dataHist("ratioRooHist","ratio of yields rooHist",RooArgList(pt),Import(*yieldRatio,kTRUE)),
     dataHist2("ratioRooHist","ratio of yields rooHist",RooArgList(pt),Import(*yieldRatio,kFALSE)),
-    fitFunc("ratio_fit","fit of ratios","(@1+@2*@0+@3*(@0*@0))/((@0 - @4)^3)",RooArgList(pt,A,B,C,D))
+    fitFunc(yieldFitFuncName,"fit of ratios","(@1+@2*@0+@3*(@0*@0))/((@0 - @4)^3)",RooArgList(pt,A,B,C,D))
 {
 
 }

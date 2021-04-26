@@ -15,13 +15,21 @@
  * @param outputfilename output root file path with passing onia.
  * @param configname 
  */
-void AccTest(const char* filename,const char* outputfilename)
+void AccTest(const char* filename,const char* outputfilename, const char* yieldfitfuncFilename)
 {
     std::cout << "\nACCEPTANCY TEST\n";
 
     //input file
     std::cout << "Reading input file: " << filename <<'\n';
     TFile* file = OpenFile(filename,"READ");
+
+    RooAbsReal* yieldfitFunc=nullptr;
+    if(yieldfitfuncFilename!=nullptr)
+    {
+        std::cout << "Reading yield weight function input file: " << yieldfitfuncFilename <<'\n';
+        TFile* yieldFitFile = OpenFile(yieldfitfuncFilename,"READ");
+        yieldfitFunc = dynamic_cast<RooAbsReal*>( yieldFitFile->Get(yieldFitFuncName) );
+    }
     
     //output file
     std::string outfilename=outputfilename;
@@ -30,7 +38,7 @@ void AccTest(const char* filename,const char* outputfilename)
 
     TTree *myTree = GetTree(file,"hionia/myTree");
 
-    AccAnalyzer accAnalyzer(myTree,"DetectableOnia");
+    AccAnalyzer accAnalyzer(myTree,"DetectableOnia",yieldfitFunc);
 
     //Run acceptancy test
     accAnalyzer.Test();

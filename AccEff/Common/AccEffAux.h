@@ -32,5 +32,6 @@ constexpr const char* effDenName= "PtQQ_Det_eff";
 constexpr const char* effNumName= "PtQQ_RecoCut";
 constexpr const char* accXEffName= "ptQQ_AccXEff";
 constexpr const char* nSigY1SName= "signal_nSigY1S";
+constexpr const char* yieldFitFuncName= "ratio_fit";
 
 #endif

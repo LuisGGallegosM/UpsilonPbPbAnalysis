@@ -25,6 +25,7 @@ EFFOUTPUTFILE="${OUTPUTFOLDER}/Eff/outputEff.root"
 FINALOUTPUTFILE="${OUTPUTFOLDER}/AccEff/outputAccXEff.root"
 YIELDFITOUTPUTFILE="${OUTPUTFOLDER}/YieldFit/yieldFit.root"
 CLOSUREOUTPUTFILE="${OUTPUTFOLDER}/ClosureTest/closureTest.root"
+ACCCORROUTPUTFILE="${OUTPUTFOLDER}/AccCorr/outputAccCorr.root"
 
 mkdir -p "$OUTPUTFOLDER"
 mkdir "${OUTPUTFOLDER}/Acc"
@@ -32,6 +33,7 @@ mkdir "${OUTPUTFOLDER}/Eff"
 mkdir "${OUTPUTFOLDER}/AccEff"
 mkdir "${OUTPUTFOLDER}/YieldFit"
 mkdir "${OUTPUTFOLDER}/ClosureTest"
+mkdir "${OUTPUTFOLDER}/AccCorr"
 
 #execute skim
 if [ $CLING = "YES" ]
@@ -56,12 +58,16 @@ case $FLAGS in
     "-fit")
     ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}"
     ;;
+    "-acccorr")
+    ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCCORROUTPUTFILE}" "${YIELDFITOUTPUTFILE}"
+    ;;
     "-all")
     ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}"
     ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}"
     ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
     ./AccEff/acceff -closure "${FINALOUTPUTFILE}" "${ACCOUTPUTFILE}" "${MC_FITINPUTFILENAME}" "${CLOSUREOUTPUTFILE}"
     ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}"
+    ./AccEff/acceff -acc "${ACCINPUTFILE}"  "${ACCCORROUTPUTFILE}" "${YIELDFITOUTPUTFILE}"
     ;;
 esac
 fi
