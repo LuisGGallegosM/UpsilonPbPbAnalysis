@@ -3,7 +3,7 @@
 
 if [ ${1} = "-DATA" ]
 then
-    cp HelperScripts/examplefiles/exMultifitDATA.multifit ${2:-../rootfiles/confFiles/merged_HiForestAOD_baseline.multifit}
+    cp HelperScripts/examplefiles/exMultifitDATA.multifit ${2:-../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline.multifit}
 fi
 
 if [ ${1} = "-MC" ]
