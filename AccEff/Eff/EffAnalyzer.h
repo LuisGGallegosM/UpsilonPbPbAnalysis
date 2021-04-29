@@ -6,6 +6,8 @@
 #include "EffCutter.h"
 #include "EffHistografer.h"
 
+float calculateTnp(float muplPt, float mumiPt, float muplY, float mumiY);
+
 class EffAnalyzer
 {
     public:
@@ -23,13 +25,18 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
     EffCutter effCutter;
     OniaWriterRecoQQ oniaWriter;
     std::unique_ptr<AccCutter> accCutter;
+    bool corrected;
 
     void CaptureRecoQQ(Int_t index, Long64_t entry)
     {
         auto input = oniaReader.getData();
         EffHistografer::inputs data = extractRecoCut(input,index);
 
-        hists.FillRecoCut(&data);
+        float weight=1.0f;
+        if (corrected)
+            weight=calculateTnp(data.ptMuPl,data.ptMuMi,data.yMuPl,data.yMuMi);
+
+        hists.FillRecoCut(&data,weight);
         oniaWriter.writeData(input,SimpleSelector{entry,index});
         FillEntries();
     }
@@ -43,8 +50,8 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
     }
 
     public:
-    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName ): 
-        TreeProcessor(input,outTreeName),oniaReader(),oniaWriter(),effCutter(effCut)
+    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName, bool corr=false ): 
+        TreeProcessor(input,outTreeName),oniaReader(),oniaWriter(),effCutter(effCut),corrected(corr)
     {
         registerInputs(&oniaReader);
         registerOutputs(&oniaWriter);
@@ -85,6 +92,6 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
 using EffAnalyzerRealData = EffAnalyzerBase<OniaRealData>;
 using EffAnalyzerMC = EffAnalyzerBase<OniaMCData>;
 
-std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName );
+std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, bool corr=false );
 
 #endif

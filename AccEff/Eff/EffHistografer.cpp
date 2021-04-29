@@ -49,10 +49,10 @@ void EffHistografer::FillDet(float y, float pT)
     ptHistQQDet->Fill(pT);
 }
 
-void EffHistografer::FillRecoCut(const inputs* input)
+void EffHistografer::FillRecoCut(const inputs* input, float weight)
 {
-    ptHistQQRecoCut->Fill(input->pT);
-    etaVsPtQQRecoCut->Fill(input->y,input->pT);
-    etaVsPtMuRecoCut->Fill(input->etaMuPl,input->ptMuPl);
-    etaVsPtMuRecoCut->Fill(input->etaMuMi,input->ptMuMi);
+    ptHistQQRecoCut->Fill(input->pT,weight);
+    etaVsPtQQRecoCut->Fill(input->y,input->pT,weight);
+    etaVsPtMuRecoCut->Fill(input->etaMuPl,input->ptMuPl,weight);
+    etaVsPtMuRecoCut->Fill(input->etaMuMi,input->ptMuMi,weight);
 }

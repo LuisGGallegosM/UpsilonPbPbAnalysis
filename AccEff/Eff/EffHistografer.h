@@ -24,11 +24,13 @@ class EffHistografer
         float etaMuMi;
         float ptMuPl;
         float ptMuMi;
+        float yMuPl;
+        float yMuMi;
     };
     EffHistografer();
 
     void FillDet(float y, float pT);
-    void FillRecoCut(const inputs* input);
+    void FillRecoCut(const inputs* input, float weight=1.0f);
     void Write(const std::string& basename);
 };
 
@@ -50,6 +52,8 @@ EffHistografer::inputs extractRecoCut( const Data* input ,int index)
     data.etaMuMi=fabs(mom4vecMi->Eta());
     data.ptMuPl=mom4vecPl->Pt();
     data.ptMuMi=mom4vecMi->Pt();
+    data.yMuPl=mom4vecPl->Rapidity();
+    data.yMuMi=mom4vecMi->Rapidity();
     return data;
 }
 

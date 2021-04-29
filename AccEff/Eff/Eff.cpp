@@ -15,7 +15,7 @@
  * @param outputfilename output path to root file name
  * @param configname cut configuration file used for quality cuts.
  */
-void EffTest(const char* filename,const char* outputfilename, const char* configname)
+void EffTest(const char* filename,const char* outputfilename, const char* configname, bool corr)
 {
     std::cout << "\nEFFICIENCY TEST\n";
 
@@ -24,6 +24,9 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
     TFile* file = OpenFile(filename,"READ");
 
     std::cout << "Reading cutconf file: " << configname <<'\n';
+
+    if(corr)
+        std::cout << "TNP correction enabled\n";
     //read cut parameters
     CutParams cut;
     cut.deserialize(configname);
@@ -40,7 +43,7 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
 
     TTree *myTree = GetTree(file,"hionia/myTree");
 
-    std::unique_ptr<EffAnalyzer> effAnalyzer = createEffAnalyzer(myTree,&cut,"RecoCutOnia");
+    std::unique_ptr<EffAnalyzer> effAnalyzer = createEffAnalyzer(myTree,&cut,"RecoCutOnia",corr);
 
     //Run efficiency test
     effAnalyzer->Test();
