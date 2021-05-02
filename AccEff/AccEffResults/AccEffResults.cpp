@@ -16,6 +16,7 @@ std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile);
 TH1F* calcDN_DpT(TH1F* nSigCorrected);
 TH1F* Normalize(TH1F* nSigCorrected);
 TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff);
+ TH1F* generateRefCrossSection();
 
 void AccEffResults(const char* accFilename, const char* effFilename, const char* fitFileRealDataPath, const char* fitFileMCPath, const char* outputname)
 {
@@ -50,6 +51,19 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     nSigCorrected->Write();
 
     TH1F* DATA_dN_dPt = calcDN_DpT(nSigCorrected);
+
+    TH1F* cross_section = new TH1F(*DATA_dN_dPt);
+    cross_section->SetName("cross_section");
+    cross_section->Scale((1.0f)/(yRange*integratedLum));
+    cross_section->SetTitle("calculated");
+
+    TH1F* ref_cross_section = generateRefCrossSection();
+    ref_cross_section->SetLineColor(1);
+    ref_cross_section->SetTitle("CMS AN -2016/354");
+    
+    std::vector<TH1*> cross_sec = { cross_section,ref_cross_section};
+
+    writeToCanvas(cross_sec,"#frac{d#sigma}{dp_{T}dy}","p^{#mu#mu}_{T} GeV/c", "B #frac{d#sigma}{dp_{T}dy}", outbasename+"_cross_sections.pdf" );
 
     TH1F* DATA_dN_dPt_norm = Normalize(DATA_dN_dPt);
     DATA_dN_dPt_norm->SetLineColor(1);
@@ -99,4 +113,16 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
 
     std::unique_ptr<TEfficiency> AccXEff = createTEff(nums,dens,accXEffName,"#alpha #epsilon;p^{#mu#mu}_{T} GeV/c; #alpha#epsilon;");
     return AccXEff;
+ }
+
+ TH1F* generateRefCrossSection()
+ {
+     int nbins=pt_bins.size()-1;
+     TH1F* ref_cross= new TH1F("ref_cross_section","ref_cross_section",nbins,pt_bins.data());
+     for(int i=0;i< nbins;i++)
+     {
+         ref_cross->SetBinContent(i+1,ref_cross_section_value[i]);
+         ref_cross->SetBinError(i+1,ref_cross_section_error[i]);
+     }
+     return ref_cross;
  }
