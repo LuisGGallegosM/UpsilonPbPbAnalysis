@@ -23,8 +23,10 @@ const float yRange = 4.8f;
 
 constexpr std::array<float,6> ref_cross_section_value=
 { 0.102f, 0.193f , 0.176f, 0.093f, 0.039f, 0.0046f};
-constexpr std::array<float,6> ref_cross_section_error=
-{ 0.002f+0.016f, 0.006f+0.012f, 0.004f+0.011f, 0.002f+0.005f, 0.001f+0.001f, 0.0001f+0.0002f};
+constexpr std::array<float,6> ref_cross_section_error_stat=
+{ 0.002f, 0.006f, 0.004f, 0.002f, 0.001f, 0.0001f};
+constexpr std::array<float,6> ref_cross_section_error_sys=
+{ 0.016f, 0.012f, 0.011f, 0.005f, 0.001f, 0.0002f};
 
 constexpr std::array<double,7> pt_bins  
 { 0.0f,2.0f,4.0f,6.0f,9.0f,12.0f,30.0f};

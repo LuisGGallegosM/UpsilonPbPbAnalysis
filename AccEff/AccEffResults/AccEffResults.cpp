@@ -16,7 +16,7 @@ std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile);
 TH1F* calcDN_DpT(TH1F* nSigCorrected);
 TH1F* Normalize(TH1F* nSigCorrected);
 TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff);
- TH1F* generateRefCrossSection();
+TH1F* generateRefCrossSection(const float* error);
 
 void AccEffResults(const char* accFilename, const char* effFilename, const char* fitFileRealDataPath, const char* fitFileMCPath, const char* outputname)
 {
@@ -47,7 +47,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     nSigRealData->SetName("DATA_nSigY1S");
 
     TH1F* nSigCorrected = calcCorrectedYields(nSigRealData,AccXEff.get());
-    writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","N_{Y1Scorr}",outbasename);
+    writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","dN",outbasename);
     nSigCorrected->Write();
 
     TH1F* DATA_dN_dPt = calcDN_DpT(nSigCorrected);
@@ -57,13 +57,19 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     cross_section->Scale((1.0f)/(yRange*integratedLum));
     cross_section->SetTitle("calculated");
 
-    TH1F* ref_cross_section = generateRefCrossSection();
-    ref_cross_section->SetLineColor(1);
-    ref_cross_section->SetTitle("CMS AN -2016/354");
-    
-    std::vector<TH1*> cross_sec = { cross_section,ref_cross_section};
+    TH1F* ref_cross_section_sys = generateRefCrossSection(ref_cross_section_error_sys.data());
+    ref_cross_section_sys->SetLineColor(1);
+    ref_cross_section_sys->SetTitle("CMS AN -2016/354 sys error");
 
-    writeToCanvas(cross_sec,"#frac{d#sigma}{dp_{T}dy}","p^{#mu#mu}_{T} GeV/c", "B #frac{d#sigma}{dp_{T}dy}", outbasename+"_cross_sections.pdf" );
+    TH1F* ref_cross_section_stat = generateRefCrossSection(ref_cross_section_error_stat.data());
+    ref_cross_section_stat->SetLineColor(1);
+    ref_cross_section_stat->SetTitle("CMS AN -2016/354 stat error");
+    
+    std::vector<TH1*> cross_sec_sys = { cross_section,ref_cross_section_sys};
+    std::vector<TH1*> cross_sec_stat = { cross_section,ref_cross_section_stat};
+
+    writeToCanvas(cross_sec_sys,"B #frac{d#sigma}{dp_{T}dy}","p^{#mu#mu}_{T} GeV/c", "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_sys.pdf" );
+    writeToCanvas(cross_sec_stat,"B #frac{d#sigma}{dp_{T}dy}","p^{#mu#mu}_{T} GeV/c", "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_stat.pdf" );
 
     TH1F* DATA_dN_dPt_norm = Normalize(DATA_dN_dPt);
     DATA_dN_dPt_norm->SetLineColor(1);
@@ -71,7 +77,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     TH1F* nSigMC_gen = (TH1F*) accFile->Get(accDenName);
     nSigMC_gen->SetName("MC_nSigY1S_gen");
 
-    writeToCanvas(nSigMC_gen,"p^{#mu#mu}_{T} GeV/c","N_{Y1S}",outbasename);
+    writeToCanvas(nSigMC_gen,"p^{#mu#mu}_{T} GeV/c","dN",outbasename);
     nSigMC_gen->Write();
 
     TH1F* MC_dN_dPt= calcDN_DpT(nSigMC_gen);
@@ -79,13 +85,15 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     MC_dN_dPt_norm->SetLineColor(3);
 
     std::vector<TH1*> hists ={DATA_dN_dPt_norm,MC_dN_dPt_norm};
-    writeToCanvas(hists,"DATA corrected and MC N_{Y1S} gen Normalized","p^{#mu#mu}_{T} GeV/c"," ",outbasename+"_dNdPt.pdf");
+    DATA_dN_dPt_norm->SetTitle("DATA reco");
+    MC_dN_dPt_norm->SetTitle("MC gen");
+    writeToCanvas(hists,"#frac{dN}{dp_{T}} normalized","p^{#mu#mu}_{T} GeV/c"," ",outbasename+"_dNdPt.pdf");
     DATA_dN_dPt_norm->Write();
     MC_dN_dPt_norm->Write();
 
     TH1F* ratio= new TH1F((*DATA_dN_dPt_norm)/(*MC_dN_dPt_norm));
     ratio->SetName(yieldFitName);
-    ratio->SetTitle("#frac{DATA N_{Y1Scorr} norm}{MC N_{Y1SMC} norm}");
+    ratio->SetTitle("#frac{DATA dN_{DATAcorr}/dp_{T} norm}{MC dN_{MC}/dp_{T} norm}");
     ratio->SetTitleSize(0.004);
     ratio->SetTitleSize(0.004);
     ratio->GetYaxis()->SetRangeUser(0.0,3.5);
@@ -115,14 +123,14 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     return AccXEff;
  }
 
- TH1F* generateRefCrossSection()
+ TH1F* generateRefCrossSection(const float* error)
  {
      int nbins=pt_bins.size()-1;
      TH1F* ref_cross= new TH1F("ref_cross_section","ref_cross_section",nbins,pt_bins.data());
      for(int i=0;i< nbins;i++)
      {
          ref_cross->SetBinContent(i+1,ref_cross_section_value[i]);
-         ref_cross->SetBinError(i+1,ref_cross_section_error[i]);
+         ref_cross->SetBinError(i+1,error[i]);
      }
      return ref_cross;
  }
