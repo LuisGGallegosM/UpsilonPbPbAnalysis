@@ -30,14 +30,26 @@ EFFCORROUTPUTFILE="${OUTPUTFOLDER}/EffCorr/outputEffCorr.root"
 FINALCORROUTPUTFILE="${OUTPUTFOLDER}/AccEffCorr/outputAccXEffCorr.root"
 
 mkdir -p "$OUTPUTFOLDER"
-mkdir "${OUTPUTFOLDER}/Acc"
-mkdir "${OUTPUTFOLDER}/Eff"
-mkdir "${OUTPUTFOLDER}/AccEff"
-mkdir "${OUTPUTFOLDER}/YieldFit"
-mkdir "${OUTPUTFOLDER}/ClosureTest"
-mkdir "${OUTPUTFOLDER}/AccCorr"
-mkdir "${OUTPUTFOLDER}/EffCorr"
-mkdir "${OUTPUTFOLDER}/AccEffCorr"
+mkdir -p "${OUTPUTFOLDER}/Acc"
+mkdir -p "${OUTPUTFOLDER}/Eff"
+mkdir -p "${OUTPUTFOLDER}/AccEff"
+mkdir -p "${OUTPUTFOLDER}/YieldFit"
+mkdir -p "${OUTPUTFOLDER}/ClosureTest"
+mkdir -p "${OUTPUTFOLDER}/AccCorr"
+mkdir -p "${OUTPUTFOLDER}/EffCorr"
+mkdir -p "${OUTPUTFOLDER}/AccEffCorr"
+
+TIMECMD=/usr/bin/time
+TIMEARGS=-v
+
+acc () { $TIMECMD $TIMEARGS ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}" |& tee "${ACCOUTPUTFILE%.*}.log"; }
+eff () { $TIMECMD $TIMEARGS ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}" |& tee "${EFFOUTPUTFILE%.*}.log";}
+final () { $TIMECMD $TIMEARGS ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALOUTPUTFILE}" |& tee "${FINALOUTPUTFILE%.*}.log";}
+closure () { $TIMECMD $TIMEARGS ./AccEff/acceff -closure "${FINALOUTPUTFILE}" "${ACCOUTPUTFILE}" "${MC_FITINPUTFILENAME}" "${CLOSUREOUTPUTFILE}" |& tee "${CLOSUREOUTPUTFILE%.*}.log"; }
+fit () { $TIMECMD $TIMEARGS ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}" |& tee "${YIELDFITOUTPUTFILE%.*}.log";}
+acccorr () { $TIMECMD $TIMEARGS ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCCORROUTPUTFILE}" "${YIELDFITOUTPUTFILE}" |& tee  "${ACCCORROUTPUTFILE%.*}.log"; }
+effcorr () { $TIMECMD $TIMEARGS ./AccEff/acceff -effcorr "${EFFINPUTFILE}" "${EFFCORROUTPUTFILE}" "${CONFIG}" |& tee  "${EFFCORROUTPUTFILE%.*}.log"; }
+finalcorr () { $TIMECMD $TIMEARGS ./AccEff/acceff -final "${ACCCORROUTPUTFILE}" "${EFFCORROUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALCORROUTPUTFILE}" |& tee  "${FINALCORROUTPUTFILE%.*}.log"; }
 
 #execute skim
 if [ $CLING = "YES" ]
@@ -48,38 +60,38 @@ cd ..
 else
 case $FLAGS in
     "-acc")
-    ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}"
+    acc
     ;;
     "-eff")
-    ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}"
+    eff
     ;;
     "-final")
-    ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
+    final
     ;;
     "-closure")
-    ./AccEff/acceff -closure "${FINALOUTPUTFILE}" "${ACCOUTPUTFILE}" "${MC_FITINPUTFILENAME}" "${CLOSUREOUTPUTFILE}"
+    closure
     ;;
     "-fit")
-    ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}"
+    fit
     ;;
     "-acccorr")
-    ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCCORROUTPUTFILE}" "${YIELDFITOUTPUTFILE}"
+    acccorr
     ;;
     "-effcorr")
-    ./AccEff/acceff -effcorr "${EFFINPUTFILE}" "${EFFCORROUTPUTFILE}" "${CONFIG}"
+    effcorr
     ;;
     "-finalcorr")
-    ./AccEff/acceff -final "${ACCCORROUTPUTFILE}" "${EFFCORROUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALCORROUTPUTFILE}"
+    finalcorr
     ;;
     "-all")
-    ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}"
-    ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}"
-    ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALOUTPUTFILE}"
-    ./AccEff/acceff -closure "${FINALOUTPUTFILE}" "${ACCOUTPUTFILE}" "${MC_FITINPUTFILENAME}" "${CLOSUREOUTPUTFILE}"
-    ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}"
-    ./AccEff/acceff -acc "${ACCINPUTFILE}"  "${ACCCORROUTPUTFILE}" "${YIELDFITOUTPUTFILE}"
-    ./AccEff/acceff -effcorr "${EFFINPUTFILE}" "${EFFCORROUTPUTFILE}" "${CONFIG}"
-    ./AccEff/acceff -final "${ACCCORROUTPUTFILE}" "${EFFCORROUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALCORROUTPUTFILE}"
+    acc
+    eff
+    final
+    closure
+    fit
+    acccorr
+    effcorr
+    finalcorr
     ;;
 esac
 fi

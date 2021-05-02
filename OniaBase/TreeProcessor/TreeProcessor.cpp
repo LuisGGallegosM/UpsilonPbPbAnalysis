@@ -14,7 +14,7 @@ void TreeProcessor::Process()
     {
         if ((i % (entries/20)) ==0)
         {
-            std::cout <<"Processing: " << block*5 << "% \n";
+            std::cout <<"Processing: " << block*5 << "%" << std::endl;
             ++block;
         }
         reader.readTree(i);

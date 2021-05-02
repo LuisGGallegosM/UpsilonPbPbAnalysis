@@ -9,6 +9,7 @@
 
 #include "../Common/AccEffAux.h"
 #include "../../Utils/Helpers/Helpers.h"
+#include "../../Drawing/Drawing.h"
 
 TH1F* toTH1F(const TEfficiency* asym);
 std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile);

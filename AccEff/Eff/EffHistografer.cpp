@@ -2,6 +2,7 @@
 #include "EffHistografer.h"
 
 #include "../Common/AccEffAux.h"
+#include "../../Drawing/Drawing.h"
 
 EffHistografer::EffHistografer()
 {

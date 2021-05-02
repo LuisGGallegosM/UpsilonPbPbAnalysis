@@ -3,6 +3,7 @@
 
 #include "../Common/AccEffAux.h"
 #include"../../Utils/Helpers/Helpers.h"
+#include "../../Drawing/Drawing.h"
 
 #include<iostream>
 
