@@ -3,6 +3,7 @@
 
 #include "TCanvas.h"
 #include "TGraphAsymmErrors.h"
+#include "THStack.h"
 
 constexpr std::array<double,7> pTBins  { 0.0f,2.0f,4.0f,6.0f,9.0f,12.0f,30.0f};
 constexpr std::array<double,6> EtaBins { 0.0f,0.5f,1.0f,1.5f,2.0f,2.4f};
@@ -54,18 +55,22 @@ void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yna
 
 void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::string& xname,const std::string& yname, const std::string& outname, bool yLog)
 {
-    TCanvas canvas((title+"_plot").data(),(title+" plot").data(),canvasWidth,canvasHeight);
+    TCanvas canvas((title+"_plot").data(),"",canvasWidth,canvasHeight);
     canvas.cd();
+
     TPad pad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);
     pad.Draw();
     pad.cd();
     if (yLog) pad.SetLogy();
+    THStack stack((title+"_stack").data(),(title+" plot").data());
     for(auto hist : hists)
     {
-        hist->GetYaxis()->SetTitle(yname.data());
-        hist->GetXaxis()->SetTitle(xname.data());
-        hist->Draw("same");
+        stack.Add(hist);
+        hist->Write();
     }
+    stack.Draw("nostack");
+    stack.GetYaxis()->SetTitle(yname.data());
+    stack.GetXaxis()->SetTitle(xname.data());
     pad.BuildLegend(0.7,0.8,1.0,1.0);
     canvas.Write();
     canvas.SaveAs(outname.data());
