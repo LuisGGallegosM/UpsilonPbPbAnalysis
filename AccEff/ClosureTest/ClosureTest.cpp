@@ -53,7 +53,7 @@ void ClosureTest(const char* accxeffFilename,const char* accFilename, const char
     TH1F* MC_reco_gen_ratio= new TH1F((*MC_reco_yields_corr)/(*MC_gen_yields));
     MC_reco_gen_ratio->SetName("MC_reco_gen_ratio");
     MC_reco_gen_ratio->SetTitle("#frac{MCreco corr}{MCgen}");
-    writeToCanvas(MC_reco_gen_ratio,"p^{#mu#mu}_{T} GeV/c","dN",outputname);
+    writeToCanvas(MC_reco_gen_ratio,"p^{#mu#mu}_{T} GeV/c","nSigY1S",outputname);
 
     MC_reco_gen_ratio->Write();
     MC_reco_yields_corr->Write();

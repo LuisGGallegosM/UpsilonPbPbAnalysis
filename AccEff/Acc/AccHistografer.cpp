@@ -38,8 +38,8 @@ void AccHistografer::FillDet(const inputs* in,float weight)
 void AccHistografer::Write(const std::string& basename)
 {
     //calculate acceptancy
-    ptQQAcceptancy=createTEff(ptHistQQDet,ptHistQQGen,"PtQQ_Acceptancy", "Acceptancy;p^{#mu#mu}_{T} ( GeV/c );#alpha");
-    etaVsPtQQAcceptancy=createTEff(etaVsPtQQDet,etaVsPtQQGen,"EtaPtQQ_Acceptancy","Acceptancy;|y^{#mu#mu}|;p^{#mu#mu}_{T} ( GeV/c )");
+    ptQQAcceptancy=createTEff(ptHistQQDet,ptHistQQGen,"PtQQ_Acceptancy", "Acceptance;p^{#mu#mu}_{T} ( GeV/c );#alpha");
+    etaVsPtQQAcceptancy=createTEff(etaVsPtQQDet,etaVsPtQQGen,"EtaPtQQ_Acceptancy","Acceptance;|y^{#mu#mu}|;p^{#mu#mu}_{T} ( GeV/c )");
 
     //write 2D plots
     writeToCanvas(etaVsPtQQGen,    "|y^{#mu#mu}|","p^{#mu#mu}_{T} ( GeV/c )",basename);

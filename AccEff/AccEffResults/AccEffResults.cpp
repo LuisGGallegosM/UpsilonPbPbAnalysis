@@ -47,7 +47,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     nSigRealData->SetName("DATA_nSigY1S");
 
     TH1F* nSigCorrected = calcCorrectedYields(nSigRealData,AccXEff.get());
-    writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","dN",outbasename);
+    writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","nSigY1S",outbasename);
     nSigCorrected->Write();
 
     TH1F* DATA_dN_dPt = calcDN_DpT(nSigCorrected);
@@ -77,7 +77,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     TH1F* nSigMC_gen = (TH1F*) accFile->Get(accDenName);
     nSigMC_gen->SetName("MC_nSigY1S_gen");
 
-    writeToCanvas(nSigMC_gen,"p^{#mu#mu}_{T} GeV/c","dN",outbasename);
+    writeToCanvas(nSigMC_gen,"p^{#mu#mu}_{T} GeV/c","nSigY1S",outbasename);
     nSigMC_gen->Write();
 
     TH1F* MC_dN_dPt= calcDN_DpT(nSigMC_gen);
@@ -85,7 +85,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     MC_dN_dPt_norm->SetLineColor(3);
 
     std::vector<TH1*> hists ={DATA_dN_dPt_norm,MC_dN_dPt_norm};
-    DATA_dN_dPt_norm->SetTitle("DATA reco");
+    DATA_dN_dPt_norm->SetTitle("DATA");
     MC_dN_dPt_norm->SetTitle("MC gen");
     writeToCanvas(hists,"#frac{dN}{dp_{T}} normalized","p^{#mu#mu}_{T} GeV/c"," ",outbasename+"_dNdPt.pdf");
     DATA_dN_dPt_norm->Write();
