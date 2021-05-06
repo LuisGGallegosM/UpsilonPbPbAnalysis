@@ -49,12 +49,13 @@ void Tester::showFailed(const std::string& behavor, const std::string& info)
     ++numOfTotalTest;
 }
 
-void Tester::assert_true(bool predicate,const std::string& behavor)
+bool Tester::assert_true(bool predicate,const std::string& behavor)
 {
     if(predicate)
         showPassed(behavor);
     else
         showFailed(behavor,"result FALSE");
+    return predicate;
 }
 
 template<typename T>

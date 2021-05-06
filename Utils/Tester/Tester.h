@@ -22,7 +22,7 @@ class Tester
 
     void test(void (*func)(Tester*), const char* testName);
 
-    void assert_true(bool predicate,const std::string& behavor);
+    bool assert_true(bool predicate,const std::string& behavor);
 
     void assert_eq(bool value, bool expected, const std::string& behavor);
     void assert_eq(int value, int expected, const std::string& behavor);

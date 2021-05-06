@@ -1,12 +1,31 @@
 
 #include<iostream>
-
+#include<sstream>
 #include"../Serialization/Serialization.h"
 #include"../Tester/Tester.h"
 //#include"../Helpers/Helpers.h"
 
 using std::cout;
 using std::string;
+
+void testSerializer(Tester* test)
+{
+    std::stringstream stream("var1 = 24\nvar2 = 33\nvar3 = [ 22 33 11 ]",std::ios_base::in);
+    Serializer ser(stream);
+    auto names= ser.getNames();
+    std::map<std::string,std::string> example 
+    {{"var1","24"},{"var2","33"},{"var3.0","22"},{"var3.1","33"},{"var3.2","11"}};
+    if(test->assert_true(names.size()==5,"must have 5 elements , actual: "+names.size()))
+    {
+        test->assert_eq(names[0],"var1", "must store same first name in order");
+        test->assert_eq(names[1],"var2", "must store same second name in order");
+        for(const auto& val : example)
+        {
+            if (test->assert_true(ser.exists(val.first),"variable must exist : " + val.first))
+            test->assert_eq(ser.read(val.first),val.second, "must store value "+val.second+ " in "+val.first);
+        }
+    }
+}
 
 void testStorage(Tester* test)
 {
@@ -56,6 +75,7 @@ void testGroupExtraction(Tester* test)
 int main()
 {
     Tester test("Utils test");
+    test.test(testSerializer,"serializer storage");
     test.test(testStorage,"variable storage");
     test.test(testGroupExtraction,"group extraction");
     return 0;

@@ -13,9 +13,12 @@ class Serializer
 {
     private:
     std::map<std::string,std::string> vars;
+
+    void readStream(std::istream& stream);
     
     public:
     Serializer();
+    Serializer(std::istream& stream);
     Serializer(const std::string& filename);
 
     void write(const std::string& name, const std::string& value);
@@ -24,16 +27,6 @@ class Serializer
     bool exists(const std::string& varname) const { return vars.find(varname)!=vars.end(); }
 
     void serialize(const std::string& filename) const;
-
-    template <typename T>
-    void read(const std::string& varname, T& output)
-    {
-    }
-
-    template <typename T>
-    void write(const std::string& varname, T input)
-    {
-    }
 
     void addPrefix(const std::string& prefix) {};
     void removePrefix() {};
