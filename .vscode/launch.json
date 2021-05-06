@@ -81,8 +81,8 @@
             "args": [ "-fit",
                 "../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.root", 
                 "../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.cutconf",
-                "../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/fit",
-                "../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.fitconf"
+                "../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.fitconf",
+                "../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/fit"
                 ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
