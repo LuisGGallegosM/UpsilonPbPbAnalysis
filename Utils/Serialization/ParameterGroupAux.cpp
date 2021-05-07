@@ -37,6 +37,18 @@ std::vector<int> getIntVector(const ParameterGroup& p, const std::string& name)
     return out;
 }
 
+std::vector<ParameterGroup*> getGroupVector(ParameterGroup& p, const std::string& name)
+{
+    std::vector<ParameterGroup*> out;
+    int i=0;
+    while( p.exists(name+"."+std::to_string(i)) )
+    {
+        out.push_back(p.get(name+"."+std::to_string(i)));
+        i++;
+    }
+    return out;
+}
+
 void setFloatVector(ParameterGroup& p, const std::string& name, const std::vector<float>& vec)
 {
     for(int i=0;i<vec.size();i++)
