@@ -24,10 +24,10 @@ class Tester
 
     bool assert_true(bool predicate,const std::string& behavor);
 
-    void assert_eq(bool value, bool expected, const std::string& behavor);
-    void assert_eq(int value, int expected, const std::string& behavor);
-    void assert_eq(float value, float expected, const std::string& behavor);
-    void assert_eq(const std::string& value, const std::string& expected, const std::string& behavor);
+    bool assert_eq(bool value, bool expected, const std::string& behavor);
+    bool assert_eq(int value, int expected, const std::string& behavor);
+    bool assert_eq(float value, float expected, const std::string& behavor);
+    bool assert_eq(const std::string& value, const std::string& expected, const std::string& behavor);
 
     void showPassed(const std::string& behavor);
     void showFailed(const std::string& behavor, const std::string& info);

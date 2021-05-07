@@ -52,6 +52,23 @@ void testStorage(Tester* test)
     }
 }
 
+void testStorageAux(Tester* test)
+{
+    std::vector<int> values {3,7,9};
+    ParameterGroup p;
+    setIntVector(p,"vector1",values);
+    
+    std::vector<int> returned= getIntVector(p,"vector1");
+
+    if (test->assert_eq((int)values.size(),(int)returned.size(), "must have same size"))
+    {
+        for(int i=0;i< values.size();i++)
+        {
+            test->assert_eq(values[i],returned[i],"must return same vector");
+        }
+    }
+}
+
 void testGroupExtraction(Tester* test)
 {
     ParameterGroup group;
@@ -77,6 +94,7 @@ int main()
     Tester test("Utils test");
     test.test(testSerializer,"serializer storage");
     test.test(testStorage,"variable storage");
+    test.test(testStorageAux,"variable storage aux");
     test.test(testGroupExtraction,"group extraction");
     return 0;
 }

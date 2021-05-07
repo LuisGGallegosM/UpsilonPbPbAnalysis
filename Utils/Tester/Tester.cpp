@@ -80,36 +80,40 @@ std::string expectString(bool value, bool expected,const std::string& type)
     " Result: " +colorText((expected? "true" : "false"),textColor::red);
 }
 
-void Tester::assert_eq(bool value,bool expected,const std::string& behavor)
+bool Tester::assert_eq(bool value,bool expected,const std::string& behavor)
 {
     if(value==expected)
         showPassed(behavor);
     else
         showFailed(behavor,expectString(value,expected,"boolean"));
+    return value==expected;
 }
 
-void Tester::assert_eq(int value,int expected,const std::string& behavor)
+bool Tester::assert_eq(int value,int expected,const std::string& behavor)
 {
     if(value==expected)
         showPassed(behavor);
     else
         showFailed(behavor,expectString(value,expected,"int"));
+    return value==expected;
 }
 
-void Tester::assert_eq(float value,float expected,const std::string& behavor)
+bool Tester::assert_eq(float value,float expected,const std::string& behavor)
 {
     if(value==expected)
         showPassed(behavor);
     else
         showFailed(behavor,expectString(value,expected,"float"));
+    return value==expected;
 }
 
-void Tester::assert_eq(const std::string& value,const std::string& expected,const std::string& behavor)
+bool Tester::assert_eq(const std::string& value,const std::string& expected,const std::string& behavor)
 {
     if(value==expected)
         showPassed(behavor);
     else
         showFailed(behavor,expectString(value,expected,"string"));
+    return value==expected;
 }
 
 Tester::~Tester()

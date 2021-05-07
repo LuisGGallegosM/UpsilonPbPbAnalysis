@@ -1,7 +1,6 @@
 
 #include"ParameterGroupAux.h"
 
-
 std::vector<float> getFloatVector(const ParameterGroup& p, const std::string& name)
 {
     std::vector<float> out;
@@ -36,4 +35,26 @@ std::vector<int> getIntVector(const ParameterGroup& p, const std::string& name)
         i++;
     }
     return out;
+}
+
+void setFloatVector(ParameterGroup& p, const std::string& name, const std::vector<float>& vec)
+{
+    for(int i=0;i<vec.size();i++)
+    {
+        p.setFloat(name+"."+std::to_string(i),vec[i]);
+    }
+}
+void setStringVector(ParameterGroup& p, const std::string& name,const std::vector<std::string>& vec)
+{
+    for(int i=0;i<vec.size();i++)
+    {
+        p.setString(name+"."+std::to_string(i),vec[i]);
+    }
+}
+void setIntVector(ParameterGroup& p, const std::string& name,const std::vector<int>& vec)
+{
+    for(int i=0;i<vec.size();i++)
+    {
+        p.setInt(name+"."+std::to_string(i),vec[i]);
+    }
 }
