@@ -12,6 +12,7 @@ std::string toInternalName(const std::string& name)
     if (name=="pt") return "reco_pT";
     if (name=="y") return "abs(reco_y)";
     if (name=="mass") return "reco_mass";
+    if (name=="jt_eta") return "abs(jt_eta)";
     return name;
 }
 
@@ -33,7 +34,7 @@ std::string getKineCutExpr(const ParameterGroup* cut)
     std::string str;
     for(const auto& name : subg)
     {
-        if (name=="mass") continue;
+        if ((name=="mass") || (name=="vars")) continue;
         if ( cut->exists( name+ ".low"))
             str+= "(("+ toInternalName(name) +") > "+std::to_string(cut->getFloat(name+ ".low"))+") && ";
         if ( cut->exists( name+ ".high"))

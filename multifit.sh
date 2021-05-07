@@ -24,8 +24,8 @@ do
 done
 
 #multifit input file
-MULTIFITFILE=${1:-"../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.multifit"}
-INPUTFILENAME=${2:-"merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.root"}
+MULTIFITFILE=${1:-"../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline_z.multifit"}
+INPUTFILENAME=${2:-"merged_HiForestAOD_DATA_skimjet/merged_HiForestAOD_DATA_skimjet.root"}
 #drawing configuration file
 DRAWCONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
 
@@ -92,7 +92,7 @@ if [ ${DOCDRAW} = "true" ]
 then
     echo "starting comparative drawings..."
     FITS=$(find ${OUTDIR} -maxdepth 1 -type d -name "fit*")
-    ./Fitting/fit -multidraw "${OUTDIR}" $FITS
+    ./Fitting/fit -multidraw "${MULTIFITFILE}" "${OUTDIR}" $FITS
 fi
 
 #cp -R "${WORKDIR}/report" "${WORKDIR}/${OUTDIR}/report"

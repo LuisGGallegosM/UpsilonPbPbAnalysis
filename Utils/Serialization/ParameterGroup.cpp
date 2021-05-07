@@ -155,6 +155,12 @@ void ParameterGroup::addGroup(const ParameterGroup& g,const std::string& name)
     subgroups[name].addGroup(g);
 }
 
+void ParameterGroup::remove(const std::string& name)
+{
+    data.erase(name);
+    subgroups.erase(name);
+}
+
 std::vector<std::string> ParameterGroup::getVarNames() const
 {
     std::vector<std::string> names;

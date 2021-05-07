@@ -9,7 +9,7 @@
 #include"TCanvas.h"
 
 void drawCompGraph(const std::string& varname, const std::vector<FitElement>& fits,TH1F* graph);
-std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs);
+std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs, const std::string& diffVar);
 std::vector<toGet> fillVariables(const ParameterGroup* fit);
 
 /**
@@ -19,11 +19,18 @@ std::vector<toGet> fillVariables(const ParameterGroup* fit);
  * @param size number of pT bins to draw
  * @param fitfilepaths array of paths to fit results, each corresponding to a different pT bin
  */
-void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
+void DrawCmp(const char* multifitpath,const char* outputpath,int size,const char** fitfilepaths)
 {
     std::cout << "\nDRAWING\n";
+    std::cout << "Input multifit file: " <<  multifitpath << " as differential variable\n";
+
     std::cout << "Output to folder : " << outputpath <<'\n';
     std::vector<std::string> fitpaths;
+
+    ParameterGroup multifit;
+    multifit.deserialize(multifitpath);
+
+    std::string diffVar=multifit.getString("diffVar.name");
     for(int i=0;i<size;i++)
     {
         std::cout << "Reading fit results from: " << fitfilepaths[i] <<'\n';
@@ -43,9 +50,9 @@ void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
 
     //sort fit bins in case they are unordered
     std::sort(fits.begin(),fits.end(),
-            [](FitElement& l,FitElement& r) {return l.configs.getFloat("cut.pt.low") < r.configs.getFloat("cut.pt.high");});
+            [&diffVar](FitElement& l,FitElement& r) {return l.configs.getFloat("cut."+diffVar+".low") < r.configs.getFloat("cut."+diffVar+".high");});
 
-    const std::vector<double> xbins = generateBinBoundaries(fits);
+    const std::vector<double> xbins = generateBinBoundaries(fits,diffVar);
     const std::vector<toGet> getters = fillVariables(&(fits[0].configs));
 
     //root output file
@@ -67,7 +74,7 @@ void DrawCmp(const char* outputpath,int size,const char** fitfilepaths)
         pad.Draw();
         pad.cd();
         TH1F compGraph(name,name,fits.size(),xbins.data());
-        compGraph.GetXaxis()->SetTitle("p_{T} ( GeV/c )");
+        compGraph.GetXaxis()->SetTitle(diffVar.data());
         compGraph.GetYaxis()->SetTitle(name);
         compGraph.GetXaxis()->SetLabelSize(0.03f);
         compGraph.GetYaxis()->SetLabelSize(0.03f);
@@ -116,13 +123,13 @@ std::vector<toGet> fillVariables(const ParameterGroup* fit)
  * @param configs vector of fits
  * @return std::vector<double> sequence of bins boundaries locations
  */
-std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs)
+std::vector<double> generateBinBoundaries(const std::vector<FitElement>& configs, const std::string& diffVar)
 {
     std::vector<double> xbins;
-    xbins.push_back(configs[0].configs.getFloat("cut.pt.low"));
+    xbins.push_back(configs[0].configs.getFloat("cut."+diffVar+".low"));
     for(const auto& config : configs)
     {
-        xbins.push_back(config.configs.getFloat("cut.pt.high"));
+        xbins.push_back(config.configs.getFloat("cut."+diffVar+".high"));
     }
     return xbins;
 }
@@ -139,10 +146,8 @@ void drawCompGraph(const std::string& varname, const std::vector<FitElement>& fi
     int i=0;
     for (const auto& fit : fits)
     {
-        float value = fit.fits.getFloat(varname+".value");
-        if (value == -1.0f) continue;
-        float pt =0.5f*(fit.configs.getFloat("cut.pt.high") + fit.configs.getFloat("cut.pt.low"));
-        graph->Fill(pt,value);
+        if (!fit.fits.exists(varname+".value")) continue;
+        graph->SetBinContent(i+1,fit.fits.getFloat(varname+".value"));
         graph->SetBinError(i+1,fit.fits.getFloat(varname+".error"));
         i++;
     }
