@@ -29,7 +29,7 @@ class EffHistografer
     };
     EffHistografer();
 
-    void FillDet(float y, float pT);
+    void FillDet(float y, float pT, float weight=1.0f);
     void FillRecoCut(const inputs* input, float weight=1.0f);
     void Write(const std::string& basename);
 };

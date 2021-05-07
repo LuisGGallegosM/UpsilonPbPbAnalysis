@@ -48,7 +48,7 @@ final () { $TIMECMD $TIMEARGS ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOU
 closure () { $TIMECMD $TIMEARGS ./AccEff/acceff -closure "${FINALOUTPUTFILE}" "${ACCOUTPUTFILE}" "${MC_FITINPUTFILENAME}" "${CLOSUREOUTPUTFILE}" |& tee "${CLOSUREOUTPUTFILE%.*}.log"; }
 fit () { $TIMECMD $TIMEARGS ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}" |& tee "${YIELDFITOUTPUTFILE%.*}.log";}
 acccorr () { $TIMECMD $TIMEARGS ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCCORROUTPUTFILE}" "${YIELDFITOUTPUTFILE}" |& tee  "${ACCCORROUTPUTFILE%.*}.log"; }
-effcorr () { $TIMECMD $TIMEARGS ./AccEff/acceff -effcorr "${EFFINPUTFILE}" "${EFFCORROUTPUTFILE}" "${CONFIG}" |& tee  "${EFFCORROUTPUTFILE%.*}.log"; }
+effcorr () { $TIMECMD $TIMEARGS ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFCORROUTPUTFILE}" "${CONFIG}" "${YIELDFITOUTPUTFILE}" |& tee  "${EFFCORROUTPUTFILE%.*}.log"; }
 finalcorr () { $TIMECMD $TIMEARGS ./AccEff/acceff -final "${ACCCORROUTPUTFILE}" "${EFFCORROUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALCORROUTPUTFILE}" |& tee  "${FINALCORROUTPUTFILE%.*}.log"; }
 
 #execute skim

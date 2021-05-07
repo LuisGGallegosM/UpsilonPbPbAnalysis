@@ -14,9 +14,7 @@ int main(int argc, char **argv)
     {
         case 5:
         if (flags=="-eff")
-            EffTest(argv[2],argv[3],argv[4],false);
-        else if (flags=="-effcorr")
-            EffTest(argv[2],argv[3],argv[4],true);
+            EffTest(argv[2],argv[3],argv[4],nullptr);
         else if (flags=="-acc")
             AccTest(argv[2],argv[3],argv[4]);
         else
@@ -26,6 +24,8 @@ int main(int argc, char **argv)
         case 6:
         if (flags=="-closure")
             ClosureTest(argv[2],argv[3],argv[4],argv[5]);
+        else if (flags=="-eff")
+            EffTest(argv[2],argv[3],argv[4],argv[5]);
         else
             std::cerr << "Incorrect number of parameters\n";
         break;

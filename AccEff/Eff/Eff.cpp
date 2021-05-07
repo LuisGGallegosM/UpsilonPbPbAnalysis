@@ -6,6 +6,7 @@
 
 #include "../../Utils/Helpers/Helpers.h"
 #include "../../OniaBase/Params/Params.h"
+#include "../Common/AccEffAux.h"
 #include "EffAnalyzer.h"
 
 /**
@@ -15,7 +16,7 @@
  * @param outputfilename output path to root file name
  * @param configname cut configuration file used for quality cuts.
  */
-void EffTest(const char* filename,const char* outputfilename, const char* configname, bool corr)
+void EffTest(const char* filename,const char* outputfilename, const char* configname,  const char* yieldfitfuncFilename)
 {
     std::cout << "\nEFFICIENCY TEST\n";
 
@@ -25,8 +26,14 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
 
     std::cout << "Reading cutconf file: " << configname <<'\n';
 
-    if(corr)
-        std::cout << "TNP correction enabled\n";
+    RooAbsReal* yieldfitFunc=nullptr;
+    if(yieldfitfuncFilename!=nullptr)
+    {
+        std::cout << "Reading yield weight function input file: " << yieldfitfuncFilename <<'\n';
+        TFile* yieldFitFile = OpenFile(yieldfitfuncFilename,"READ");
+        yieldfitFunc = dynamic_cast<RooAbsReal*>( yieldFitFile->Get(yieldFitFuncName) );
+    }
+
     //read cut parameters
     CutParams cut;
     cut.deserialize(configname);
@@ -43,7 +50,7 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
 
     TTree *myTree = GetTree(file,"hionia/myTree");
 
-    std::unique_ptr<EffAnalyzer> effAnalyzer = createEffAnalyzer(myTree,&cut,"RecoCutOnia",corr);
+    std::unique_ptr<EffAnalyzer> effAnalyzer = createEffAnalyzer(myTree,&cut,"RecoCutOnia",yieldfitFunc);
 
     //Run efficiency test
     effAnalyzer->Test();

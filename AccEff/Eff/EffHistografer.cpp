@@ -44,10 +44,10 @@ void EffHistografer::Write(const std::string& basename)
     etaVsPtQQEfficiency->Write(0,TObject::kOverwrite);
 }
 
-void EffHistografer::FillDet(float y, float pT)
+void EffHistografer::FillDet(float y, float pT, float weight)
 {
-    etaVsPtQQDet->Fill(y,pT);
-    ptHistQQDet->Fill(pT);
+    etaVsPtQQDet->Fill(y,pT,weight);
+    ptHistQQDet->Fill(pT,weight);
 }
 
 void EffHistografer::FillRecoCut(const inputs* input, float weight)

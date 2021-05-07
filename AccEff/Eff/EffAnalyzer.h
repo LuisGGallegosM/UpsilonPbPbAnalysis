@@ -1,6 +1,8 @@
 #ifndef EFFANALYZER
 #define EFFANALYZER
 
+#include"RooAbsReal.h"
+
 #include "../../OniaBase/TreeProcessor/TreeProcessor.h"
 #include "../../OniaBase/OniaIO/OniaIO.h"
 #include "EffCutter.h"
@@ -25,7 +27,7 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
     EffCutter effCutter;
     OniaWriterRecoQQ oniaWriter;
     std::unique_ptr<AccCutter> accCutter;
-    bool corrected;
+    RooAbsReal* weightFunc;
 
     void CaptureRecoQQ(Int_t index, Long64_t entry)
     {
@@ -33,9 +35,13 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
         EffHistografer::inputs data = extractRecoCut(input,index);
 
         float weight=1.0f;
-        if (corrected)
+        if (weightFunc!=nullptr)
+        {
             weight=calculateTnp(data.ptMuPl,data.ptMuMi,data.yMuPl,data.yMuMi);
-
+            weightFunc->getVariables()->setRealValue("pt",data.pT);
+            weight*=weightFunc->getVal();
+        }
+        
         hists.FillRecoCut(&data,weight);
         oniaWriter.writeData(input,SimpleSelector{entry,index});
         FillEntries();
@@ -46,12 +52,18 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
         TLorentzVector* mom4vec=(TLorentzVector*) oniaReader.getData()->genQQ.mom4->At(index);
         float pT = mom4vec->Pt();
         float y = fabs(mom4vec->Rapidity());
-        hists.FillDet(y,pT);
+        float weight = 1.0f;
+        if (weightFunc!=nullptr)
+        {
+            weightFunc->getVariables()->setRealValue("pt",pT);
+            weight=weightFunc->getVal();
+        }
+        hists.FillDet(y,pT,weight);
     }
 
     public:
-    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName, bool corr=false ): 
-        TreeProcessor(input,outTreeName),oniaReader(),oniaWriter(),effCutter(effCut),corrected(corr)
+    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName, RooAbsReal* weights=nullptr): 
+        TreeProcessor(input,outTreeName),oniaReader(),oniaWriter(),effCutter(effCut),weightFunc(weights)
     {
         registerInputs(&oniaReader);
         registerOutputs(&oniaWriter);
@@ -92,6 +104,5 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
 using EffAnalyzerRealData = EffAnalyzerBase<OniaRealData>;
 using EffAnalyzerMC = EffAnalyzerBase<OniaMCData>;
 
-std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, bool corr=false );
-
+std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, RooAbsReal* weights );
 #endif
