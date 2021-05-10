@@ -29,10 +29,10 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
     std::unique_ptr<AccCutter> accCutter;
     RooAbsReal* weightFunc;
 
-    void CaptureRecoQQ(Int_t index, Long64_t entry)
+    void CaptureGenQQ(Int_t index, Long64_t entry)
     {
         auto input = oniaReader.getData();
-        EffHistografer::inputs data = extractRecoCut(input,index);
+        EffHistografer::inputs data = extractGen(input,index);
 
         float weight=1.0f;
         if (weightFunc!=nullptr)
@@ -43,8 +43,6 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
         }
         
         hists.FillRecoCut(&data,weight);
-        oniaWriter.writeData(input,SimpleSelector{entry,index});
-        FillEntries();
     }
 
     void CaptureDetQQ(Int_t index, Long64_t entry)
@@ -94,7 +92,7 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
                 if (recoQQindex>=0)
                 {
                     if (effCutter.cut(input,recoQQindex,entry))
-                        CaptureRecoQQ(recoQQindex,entry);
+                        CaptureGenQQ(index,entry);
                 }
             }
         }

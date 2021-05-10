@@ -35,16 +35,16 @@ class EffHistografer
 };
 
 template<typename Data>
-EffHistografer::inputs extractRecoCut( const Data* input ,int index)
+EffHistografer::inputs extractGen( const Data* input ,int index)
 {
     EffHistografer::inputs data;
 
-    TLorentzVector* mom4vec=(TLorentzVector*) input->recoQQ.mom4->At(index);
+    TLorentzVector* mom4vec=(TLorentzVector*) input->genQQ.mom4->At(index);
 
-    int mupl_idx = input->recoQQ.mupl_idx[index];//plus muon index
-    int mumi_idx = input->recoQQ.mumi_idx[index];//minus muon index
-    TLorentzVector* mom4vecPl=(TLorentzVector*) input->recoMu.mom4->At(mupl_idx);
-    TLorentzVector* mom4vecMi=(TLorentzVector*) input->recoMu.mom4->At(mumi_idx);
+    int mupl_idx = input->genQQ.mupl_idx[index];//plus muon index
+    int mumi_idx = input->genQQ.mumi_idx[index];//minus muon index
+    TLorentzVector* mom4vecPl=(TLorentzVector*) input->genMu.mom4->At(mupl_idx);
+    TLorentzVector* mom4vecMi=(TLorentzVector*) input->genMu.mom4->At(mumi_idx);
 
     data.pT = mom4vec->Pt();
     data.y = fabs(mom4vec->Rapidity());
