@@ -32,7 +32,7 @@ void EffHistografer::Write(const std::string& basename)
     ptHistQQRecoCut->Write(0,TObject::kOverwrite);
 
     //calculate efficiency
-    ptQQEfficiency = createTEff(ptHistQQRecoCut,ptHistQQDet,"PtQQ_Efficiency","Efficiency;p^{#mu#mu}_{T} ( GeV/c );#epsilon");
+    ptQQEfficiency = createTEff(ptHistQQRecoCut,ptHistQQDet,effName,"Efficiency;p^{#mu#mu}_{T} ( GeV/c );#epsilon");
 
     etaVsPtQQEfficiency = createTEff(etaVsPtQQRecoCut,etaVsPtQQDet,"EtaPtQQ_Efficiency","Efficiency;|y^{#mu#mu}|;p^{#mu#mu}_{T} ( GeV/c )");
 

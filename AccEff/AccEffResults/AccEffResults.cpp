@@ -15,7 +15,6 @@ TH1F* toTH1F(const TEfficiency* asym);
 std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile);
 TH1F* calcDN_DpT(TH1F* nSigCorrected);
 TH1F* Normalize(TH1F* nSigCorrected);
-TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff);
 TH1F* generateRefCrossSection(const float* error);
 
 void AccEffResults(const char* accFilename, const char* effFilename, const char* fitFileRealDataPath, const char* fitFileMCPath, const char* outputname)

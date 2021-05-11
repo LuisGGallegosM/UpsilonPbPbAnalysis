@@ -30,12 +30,12 @@ TH1F* toTH1F(const TEfficiency* asym)
     return result;
 }
 
-TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff)
+TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff,const std::string& subfix)
 {
     TH1F* AccXEffth1f=toTH1F(AccXEff);
     TH1F* nSigCorrected = new TH1F((*nSig)/(*AccXEffth1f));
     std::string newname=nSigCorrected->GetName();
-    newname+="_corr";
+    newname+=subfix;
     nSigCorrected->SetName(newname.data());
     nSigCorrected->SetStats(false);
     return nSigCorrected;

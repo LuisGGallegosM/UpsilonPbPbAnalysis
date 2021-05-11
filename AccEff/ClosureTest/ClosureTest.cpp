@@ -10,8 +10,6 @@
 #include"TEfficiency.h"
 #include"TH1.h"
 
-TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff);
-
 void ClosureTest(const char* accxeffFilename,const char* accFilename, const char* fitFilename, const char* outputname)
 {
     std::cout << "\nCLOSURE TEST\n";
@@ -33,14 +31,21 @@ void ClosureTest(const char* accxeffFilename,const char* accFilename, const char
     TFile* outFile = OpenFile(outputname,"RECREATE");
 
     TEfficiency* accXEff = (TEfficiency*) accXEffFile->Get(accXEffName);
+    TEfficiency* acc = (TEfficiency*) accFile->Get(accName);
+
     TH1F* MC_gen_yields = (TH1F*) accFile->Get(accDenName);
+    TH1F* MC_gen_det_yields = (TH1F*) accFile->Get(accNumName);
     TH1F* MC_reco_yields = (TH1F*) fitFile->Get(nSigY1SName);
 
     MC_gen_yields->SetLineColor(3);
     MC_gen_yields->SetLineWidth(2);
-    MC_gen_yields->Scale(0.5);
 
     TH1F* MC_reco_yields_corr = calcCorrectedYields( MC_reco_yields,accXEff );
+    TH1F* MC_genonly_yields_acccorr = calcCorrectedYields(MC_gen_det_yields,acc,"_acccorr");
+
+    TH1F MC_genonly_yield_corr_acc_ratio = (*MC_genonly_yields_acccorr)/(*MC_gen_yields);
+    MC_genonly_yield_corr_acc_ratio.SetName("MC_gen_acc_corr_ratio_closure");
+    writeToCanvas(&MC_genonly_yield_corr_acc_ratio,"p^{#mu#mu}_{T} GeV/c", "ratio",outputname);
 
     MC_gen_yields->Scale( 1.0f/MC_gen_yields->Integral() );
     MC_reco_yields_corr->Scale( 1.0f/MC_reco_yields_corr->Integral());
