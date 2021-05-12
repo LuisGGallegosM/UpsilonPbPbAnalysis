@@ -30,7 +30,7 @@ void DrawCmp(const char* multifitpath,const char* outputpath,int size,const char
     ParameterGroup multifit;
     multifit.deserialize(multifitpath);
 
-    std::string diffVar=multifit.getString("diffVar.name");
+    std::string diffVar=multifit.getString("diffVar.name.0");
     for(int i=0;i<size;i++)
     {
         std::cout << "Reading fit results from: " << fitfilepaths[i] <<'\n';
@@ -74,6 +74,7 @@ void DrawCmp(const char* multifitpath,const char* outputpath,int size,const char
         pad.Draw();
         pad.cd();
         TH1F compGraph(name,name,fits.size(),xbins.data());
+        compGraph.SetStats(false);
         compGraph.GetXaxis()->SetTitle(diffVar.data());
         compGraph.GetYaxis()->SetTitle(name);
         compGraph.GetXaxis()->SetLabelSize(0.03f);
