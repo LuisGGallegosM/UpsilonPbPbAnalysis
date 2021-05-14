@@ -57,7 +57,7 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const ParameterGroup* fitConf):
     dcball1(mass,"Y1S",config.get("signal")),
     bkg()
 {
-    BkgFunc* b =BkgFactory(mass,config.get("bkg"));
+    FitFunc* b =BkgFactory(mass,config.get("bkg"));
     bkg.reset(b);
 }
 

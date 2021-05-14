@@ -6,6 +6,8 @@
 #include"RooDataHist.h"
 #include"TH1.h"
 
+#include"../../Utils/Serialization/Serialization.h"
+
 class YieldFitter
 {
     RooRealVar A;
@@ -23,6 +25,7 @@ class YieldFitter
     RooAbsReal* fit();
     RooRealVar* getVar() { return &pt;}
     RooDataHist* getHist() {return &dataHist2;}
+    ParameterGroup getParams() const;
 };
 
 #endif

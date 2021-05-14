@@ -2,15 +2,6 @@
 
 #include"FitFunctions.h"
 
-void ParameterWrite( ParameterGroup& p, const RooRealVar& var, const std::string& name)
-{
-    p.setFloat(name+".value",var.getVal());
-    p.setFloat(name+".low",var.getMin());
-    p.setFloat(name+".high", var.getMax());
-    p.setFloat(name+".error", var.getError());
-    p.setBool(name+".fixed",var.isConstant());
-}
-
 //Crystal ball member functions.
 
 CrystalBall::CrystalBall(RooRealVar& var, const char* name, const ParameterGroup* g):
@@ -88,40 +79,79 @@ DoubleCrystalBallSlave::DoubleCrystalBallSlave(RooRealVar& var,const char* name,
 
 }
 
-//BkgFunc
+//NoFitFunc
 
-ParameterGroup BkgFunc::getBkgParams() const
+RooAbsReal* NoFitFunc::getFunc()
+{ 
+    throw std::runtime_error("Error: accesing no bkg funcion"); 
+}
+
+ParameterGroup NoFitFunc::getBkgParams() const
 {
     ParameterGroup p;
     p.setString("type","none");
     return p;
 }
 
-//Chevychev2
+//Chevychev
 
-Chevychev2::Chevychev2(RooRealVar& var,const char* name,float* k, float* low, float* high):
-    ch4_k1("chk4_k1","chk4_k1",k[0],low[0],high[0]),
-    ch4_k2("chk4_k2","chk4_k2",k[1],low[1],high[1]),
-    chev(name,"Background",var,RooArgSet(ch4_k1,ch4_k2))
+std::vector<RooRealVar> produceChevVars(const ParameterGroup* init)
 {
+    std::vector<RooRealVar> chk;
+    std::vector<std::string> varNames;
+    
+    int i=1;
+    while ( init->exists("chk4_k"+std::to_string(i)) && (i<20))
+    {
+        varNames.push_back("chk4_k"+std::to_string(i));
+        i++;
+    };
 
+    chk.reserve(varNames.size());
+
+    for (auto& name : varNames)
+    {
+        chk.push_back( RooRealVar(name.data(),name.data(),getParamVal(*init,name),getParamLow(*init,name),getParamHigh(*init,name)) );
+    }
+    return chk;
 }
 
-ParameterGroup Chevychev2::getBkgParams() const
+RooArgSet produceChevArgSet(const std::vector<RooRealVar>& chk)
+{
+    RooArgSet set;
+    for(auto& v : chk)
+    {
+        set.add(v);
+    }
+    return set;
+}
+
+Chevychev::Chevychev(RooRealVar& var,const char* name,const ParameterGroup* init):
+    chk(produceChevVars(init)),
+    chev(name,"Background",var,produceChevArgSet(chk))
+{
+    
+}
+
+ParameterGroup Chevychev::getBkgParams() const
 {
     ParameterGroup p;
-    ParameterWrite(p,ch4_k1,"chk4_k1");
-    ParameterWrite(p,ch4_k2,"chk4_k2");
+    int i=0;
+    for(auto& v : chk)
+    {
+        ParameterWrite(p,v,v.GetName());
+        i++;
+    }
     p.setString("type","chev");
     return p;
 }
 
 //SpecialBkg
 
-SpecialBkg::SpecialBkg(RooRealVar& var,const char* name,float* initial,float* low, float* high):
-    mu(Form("mu_%s",name),"err_mu",initial[2],  low[2], high[2]),
-    sigma(Form("sigma_%s",name),"err_sigma", initial[1], low[1],high[1]),
-    lambda(Form("lambda_%s",name),"m_lambda",  initial[0], low[0],high[0]),
+SpecialBkg::SpecialBkg(RooRealVar& var,const char* name,const ParameterGroup* init):
+    mu(Form("mu_%s",name),"err_mu",getParamVal(*init,"mu"),  getParamLow(*init,"mu"), getParamHigh(*init,"mu")),
+    sigma(Form("sigma_%s",name),"err_sigma",getParamVal(*init,"sigma"), getParamLow(*init,"sigma"),getParamHigh(*init,"sigma")),
+    lambda(Form("lambda_%s",name),"m_lambda",getParamVal(*init,"lambda"),getParamLow(*init,"lambda"),getParamHigh(*init,"lambda")),
     bkgPdf()
 {
     RooGenericPdf* pdf=
@@ -142,8 +172,8 @@ ParameterGroup SpecialBkg::getBkgParams() const
 
 //ExponentialBkg
 
-ExponentialBkg::ExponentialBkg(RooRealVar& var,const char* name,float* initial,float* low, float* high):
-lambda(Form("lambda_%s",name),"m_lambda",  initial[0], low[0],high[0]),
+ExponentialBkg::ExponentialBkg(RooRealVar& var,const char* name,const ParameterGroup* init):
+lambda(Form("lambda_%s",name),"m_lambda",getParamVal(*init,"lambda"),  getParamLow(*init,"lambda"), getParamHigh(*init,"lambda")),
 bkgPdf()
 {
     RooGenericPdf* pdf=
@@ -160,70 +190,26 @@ ParameterGroup ExponentialBkg::getBkgParams() const
     return p;
 }
 
-//ExpChevBkg
-
-ExpChev2Bkg::ExpChev2Bkg(RooRealVar& var,const char* name,float* initial, float* low, float* high):
-    ch4_k1("chk4_k1","chk4_k1",initial[0],low[0],high[0]),
-    ch4_k2("chk4_k2","chk4_k2",initial[1],low[1],high[1]),
-    bkgPdf()
+FitFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config)
 {
-    RooGenericPdf* pdf=
-        new RooGenericPdf(name,"Background","TMath::Exp(@2*(2.0*@0*@0-1.0)+@1*@0+1.0)",
-                           RooArgList(var, ch4_k1,ch4_k2));
-    bkgPdf.reset(pdf);
-}
-ParameterGroup ExpChev2Bkg::getBkgParams() const
-{
-    ParameterGroup p;
-    ParameterWrite(p,ch4_k1,"chk4_k1");
-    ParameterWrite(p,ch4_k2,"chk4_k2");
-    p.setString("type","chev");
-    return p;
-}
-
-void setArray(float* initials, float* low, float* high,const std::string& name, int index,const ParameterGroup* config)
-{
-    initials[index]=config->getFloat(name+".value");
-    low[index]=config->getFloat(name+".low");
-    high[index]=config->getFloat(name+".high");
-}
-
-BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config)
-{
-    BkgFunc* b= nullptr;
+    FitFunc* b= nullptr;
     BkgType bkgType = getBkgByName(config->getString("type"));
-    float initials[3];
-    float low[3];
-    float high[3];
     switch (bkgType)
     {
         case BkgType::chev:
-        setArray(initials,low,high,"chk4_k1",0,config);
-        setArray(initials,low,high,"chk4_k2",1,config);
-        b = new Chevychev2(var,"bkg",initials,low,high);
-        break;
-
-        case BkgType::expChev2:
-        setArray(initials,low,high,"chk4_k1",0,config);
-        setArray(initials,low,high,"chk4_k2",1,config);
-        b = new ExpChev2Bkg(var,"bkg",initials,low,high);
+        b = new Chevychev(var,"bkg",config);
         break;
 
         case BkgType::special:
-        setArray(initials,low,high,"lambda",0,config);
-        setArray(initials,low,high,"sigma",1,config);
-        setArray(initials,low,high,"mu",2,config);
-        b = new SpecialBkg(var,"bkg",initials,low,high);
+        b = new SpecialBkg(var,"bkg",config);
         break;
 
         case BkgType::exponential:
-        setArray(initials,low,high,"lambda",0,config);
-        b = new ExponentialBkg(var,"bkg",initials,low,high);
-
+        b = new ExponentialBkg(var,"bkg",config);
         break;
 
         case BkgType::none:
-        b = new BkgFunc();
+        b = new NoFitFunc();
         break;
 
         default:

@@ -18,6 +18,7 @@ mkdir -p ../rootfiles/analysis
 
 ./HelperScripts/multifitGen.sh -MC
 ./HelperScripts/multifitGen.sh -DATA
+./HelperScripts/multifitGen.sh -DATAJET
 ./HelperScripts/cutconfGen.sh -MC
 ./HelperScripts/cutconfGen.sh -DATA
 ./HelperScripts/drawconfGen.sh

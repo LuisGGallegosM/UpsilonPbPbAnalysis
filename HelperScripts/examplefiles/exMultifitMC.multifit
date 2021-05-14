@@ -40,5 +40,5 @@ signal.f.high = 1.0
 signal.f.value = 0.5
 signal.f.low = 0.0
 signal.f.fixed = false
-diffVar.name = pt
-diffVar.values = [ 0.0 2.0 4.0 6.0 9.0 12.0 30.0 ]
+diffVar.name =  [ pt ]
+diffVar.values.0 = [ 0.0 2.0 4.0 6.0 9.0 12.0 30.0 ]

@@ -34,6 +34,9 @@ void YieldFit(const char* inputRatiosFile, const char* outputFile)
     YieldFitter fitter(ratios);
     RooAbsReal* fitFunc = fitter.fit();
 
+    ParameterGroup fittedParams = fitter.getParams();
+    fittedParams.serialize( ReplaceExtension(outputFile,".fit"));
+
     outFile->cd();
     fitFunc->Write();
     fitter.getHist()->Write();

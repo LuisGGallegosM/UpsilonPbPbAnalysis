@@ -21,7 +21,7 @@ class OniaMassFitter
     RooRealVar nSig_Y1S;
     RooRealVar nBkg;
     DoubleCrystalBall dcball1;
-    std::unique_ptr<BkgFunc> bkg;
+    std::unique_ptr<FitFunc> bkg;
     std::unique_ptr<RooDataSet> dataset;
     std::unique_ptr<RooFitResult> results;
     std::unique_ptr<RooAbsPdf> output;

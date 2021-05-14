@@ -11,92 +11,54 @@
 #include "RooGenericPdf.h"
 #include "RooExponential.h"
 
-//Using in CrystalBall function
-
-#define S1_MEAN_MAX     (9.56f)
-#define S1_MEAN_MIN     (9.36f)
-
-#define S1_SIGMA_MAX    (0.60f)
-#define S1_SIGMA_MIN    (0.01f)
-
-#define S1_ALPHA_MAX    (5.50f)
-#define S1_ALPHA_MIN    (0.50f)
-
-#define S1_N_MAX        (15.00f)
-#define S1_N_MIN        (0.05f)
-
-#define S1_CH4_MAX      (4.0f)
-#define S1_CH4_MIN      (-4.0f)
-
-#define S1_NSIG_MAX     (10000000.0f)
-#define S1_NBKG_MAX     (1000000.0f)
-
-#define BKG_LAMBDA_MAX (30.0f)
-#define BKG_SIGMA_MAX  (4.0f)
-#define BKG_MU_MAX     (20.0f)
-
-class BkgFunc
+class FitFunc
 {
     public:
-    virtual RooAbsReal* getFunc() { throw std::runtime_error("Error: accesing no bkg funcion"); }
-    virtual ParameterGroup getBkgParams() const;
+    virtual RooAbsReal* getFunc() = 0;
+    virtual ParameterGroup getBkgParams() const = 0;
+
+    virtual ~FitFunc() = default;
 };
 
-class Chevychev2 : public BkgFunc
+class NoFitFunc : public FitFunc
 {
-    RooRealVar ch4_k1;
-    RooRealVar ch4_k2;
-    RooChebychev chev;
-
-    public:
-    Chevychev2(RooRealVar& var,const char* name,float* k, float* low, float* high);
-
-    //getters
-    RooAbsReal* getFunc() override {return &chev;}
-    RooRealVar* getCh4_k1() {return &ch4_k1;}
-    RooRealVar* getCh4_k2() {return &ch4_k2;}
+    RooAbsReal* getFunc() override;
     ParameterGroup getBkgParams() const override;
 };
 
-class SpecialBkg : public BkgFunc
+class Chevychev : public FitFunc
+{
+    std::vector<RooRealVar> chk;
+    RooChebychev chev;
+
+    public:
+    Chevychev(RooRealVar& var,const char* name,const ParameterGroup* init);
+
+    //getters
+    RooAbsReal* getFunc() override {return &chev;}
+    ParameterGroup getBkgParams() const override;
+};
+
+class SpecialBkg : public FitFunc
 {
     RooRealVar mu;
     RooRealVar sigma;
     RooRealVar lambda;
     std::unique_ptr<RooGenericPdf> bkgPdf;
     public:
-    SpecialBkg(RooRealVar& var,const char* name,float* initial,float* low, float* high);
+    SpecialBkg(RooRealVar& var,const char* name,const ParameterGroup* init);
 
     //getters
     RooAbsReal* getFunc() override {return bkgPdf.get();}
-    RooRealVar* getMu()  {return &mu;}
-    RooRealVar* getSigma() {return &sigma;}
-    RooRealVar* getLambda() {return &lambda;}
     ParameterGroup getBkgParams() const override;
 };
 
-class ExponentialBkg : public BkgFunc
+class ExponentialBkg : public FitFunc
 {
     RooRealVar lambda;
     std::unique_ptr<RooGenericPdf> bkgPdf;
     public:
-    ExponentialBkg(RooRealVar& var,const char* name,float* initial,float* low, float* high);
-
-    RooAbsReal* getFunc() override {return bkgPdf.get();}
-    RooRealVar* getLambda() {return &lambda;}
-    ParameterGroup getBkgParams() const override;
-};
-
-class ExpChev2Bkg : public BkgFunc
-{
-    RooRealVar ch4_k1;
-    RooRealVar ch4_k2;
-    std::unique_ptr<RooGenericPdf> bkgPdf;
-    public:
-    ExpChev2Bkg(RooRealVar& var,const char* name,float* initial,float* low, float* high);
-
-    RooRealVar* getCh4_k1() {return &ch4_k1;}
-    RooRealVar* getCh4_k2() {return &ch4_k2;}
+    ExponentialBkg(RooRealVar& var,const char* name,const ParameterGroup* init);
 
     RooAbsReal* getFunc() override {return bkgPdf.get();}
     ParameterGroup getBkgParams() const override;
@@ -202,7 +164,7 @@ class DoubleCrystalBallSlave : protected CrystalBallSlave
 };
 
 void ParameterWrite( ParameterGroup& p, const RooRealVar& var, const std::string& name);
-BkgFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config);
+FitFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config);
 
 #if defined(__CLING__)
 #include "FitFunctions.cpp"

@@ -23,7 +23,7 @@ void testFitFunctionsBkg(Tester* t)
     p.deserialize(exPath+"/exFitMC.fitconf");
 
     const ParameterGroup* bkgParam=p.get("bkg");
-    std::unique_ptr<BkgFunc> bkg;
+    std::unique_ptr<FitFunc> bkg;
     RooRealVar mass("mass","mass",0.0);
     bkg.reset( BkgFactory(mass,bkgParam) );
 

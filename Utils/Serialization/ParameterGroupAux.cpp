@@ -1,6 +1,19 @@
 
 #include"ParameterGroupAux.h"
 
+float getParamHigh(const ParameterGroup& p, const std::string& name)
+{
+    return p.getFloat(name+".high");
+}
+float getParamLow(const ParameterGroup& p, const std::string& name)
+{
+    return p.getFloat(name+".low");
+}
+float getParamVal(const ParameterGroup& p, const std::string& name)
+{
+    return p.getFloat(name+".value");
+}
+
 std::vector<float> getFloatVector(const ParameterGroup& p, const std::string& name)
 {
     std::vector<float> out;
@@ -69,4 +82,13 @@ void setIntVector(ParameterGroup& p, const std::string& name,const std::vector<i
     {
         p.setInt(name+"."+std::to_string(i),vec[i]);
     }
+}
+
+void ParameterWrite( ParameterGroup& p, const RooRealVar& var, const std::string& name)
+{
+    p.setFloat(name+".value",var.getVal());
+    p.setFloat(name+".low",var.getMin());
+    p.setFloat(name+".high", var.getMax());
+    p.setFloat(name+".error", var.getError());
+    p.setBool(name+".fixed",var.isConstant());
 }
