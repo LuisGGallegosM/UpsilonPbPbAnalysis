@@ -3,7 +3,7 @@
 #include"../../Utils/Serialization/Serialization.h"
 
 std::vector<std::vector<float>> generateVals(const std::vector<std::string>& diffVars, const ParameterGroup& multifit);
-void generateFile( const std::string& varName,const std::vector<float> diffVarValues,const ParameterGroup* fixedGroup, const std::string& outputpath );
+void generateFile( const std::string& varName,const std::vector<float>& diffVarValues,const ParameterGroup* fixedGroup, const std::string& outputpath );
 
 void MultifitGen(const char* multifitfile, const char* outputpath)
 {
@@ -24,7 +24,7 @@ void MultifitGen(const char* multifitfile, const char* outputpath)
     generateFile(diffVars[0],diffVarValues[0],&fixedGroup,outputpath);
 }
 
-void generateFile( const std::string& varName,const std::vector<float> diffVarValues,const ParameterGroup* fixedGroup, const std::string& outputpath )
+void generateFile( const std::string& varName,const std::vector<float>& diffVarValues,const ParameterGroup* fixedGroup, const std::string& outputpath )
 {
     int size=diffVarValues.size()-1;
     
