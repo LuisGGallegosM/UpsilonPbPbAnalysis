@@ -52,17 +52,22 @@ void addInputs(OniaJetMCData* data ,TreeReader* reader);
 void addInputs(OniaJetRealData* data ,TreeReader* reader);
 
 template<typename Data>
-class OniaReader : public DataReader
+class OniaReader
 {
     Data data;
+    TreeReader reader;
     public:
-    OniaReader() = default;
-
-    void registerReader(TreeReader* reader) override
+    OniaReader(TTree* tree) : reader(tree)
     {
-        addInputs(&data,reader);
+        addInputs(&data,&reader);
     }
-    const Data* getData() { return &data;}
+    const Data* getData(Long64_t entry) 
+    { 
+        reader.readTree(entry);
+        return &data;
+    }
+    std::string getName() { return reader.getName();}
+    int getEntries() { return reader.getEntriesNumber();}
 };
 
 

@@ -5,7 +5,7 @@ CLING="NO"
 FLAGS=${1:-"-all"}
 ACCINPUTFILENAME="OniaTree_Ups1SMM_5p02TeV_TuneCUETP8M1_nofilter_pp502Fall15-MCRUN2_71_V1-v1_GENONLY.root"
 EFFINPUTFILENAME="merged_HiForestAOD_MCFix2.root"
-CONFIG="../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.cutconf"
+CONFIG="../rootfiles/analysis/merged_HiForestAOD_DATA_skim/merged_HiForestAOD_DATA_skim.cutconf"
 DATA_MULTIFITINPUTFILENAME="merged_HiForestAOD_DATA_skim/multifit_baseline"
 MC_MULTIFITINPUTFILENAME="merged_HiForestAOD_MCFix2_skim/multifit_baseline"
 
@@ -30,26 +30,49 @@ EFFCORROUTPUTFILE="${OUTPUTFOLDER}/EffCorr/outputEffCorr.root"
 FINALCORROUTPUTFILE="${OUTPUTFOLDER}/AccEffCorr/outputAccXEffCorr.root"
 
 mkdir -p "$OUTPUTFOLDER"
-mkdir -p "${OUTPUTFOLDER}/Acc"
-mkdir -p "${OUTPUTFOLDER}/Eff"
-mkdir -p "${OUTPUTFOLDER}/AccEff"
-mkdir -p "${OUTPUTFOLDER}/YieldFit"
-mkdir -p "${OUTPUTFOLDER}/ClosureTest"
-mkdir -p "${OUTPUTFOLDER}/AccCorr"
-mkdir -p "${OUTPUTFOLDER}/EffCorr"
-mkdir -p "${OUTPUTFOLDER}/AccEffCorr"
 
 TIMECMD=/usr/bin/time
 TIMEARGS=-v
 
-acc () { $TIMECMD $TIMEARGS ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}" |& tee "${ACCOUTPUTFILE%.*}.log"; }
-eff () { $TIMECMD $TIMEARGS ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}" |& tee "${EFFOUTPUTFILE%.*}.log";}
-final () { $TIMECMD $TIMEARGS ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALOUTPUTFILE}" |& tee "${FINALOUTPUTFILE%.*}.log";}
-closure () { $TIMECMD $TIMEARGS ./AccEff/acceff -closure "${FINALOUTPUTFILE}" "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${MC_FITINPUTFILENAME}" "${CLOSUREOUTPUTFILE}" |& tee "${CLOSUREOUTPUTFILE%.*}.log"; }
-fit () { $TIMECMD $TIMEARGS ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}" |& tee "${YIELDFITOUTPUTFILE%.*}.log";}
-acccorr () { $TIMECMD $TIMEARGS ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCCORROUTPUTFILE}" "${YIELDFITOUTPUTFILE}" |& tee  "${ACCCORROUTPUTFILE%.*}.log"; }
-effcorr () { $TIMECMD $TIMEARGS ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFCORROUTPUTFILE}" "${CONFIG}" "${YIELDFITOUTPUTFILE}" |& tee  "${EFFCORROUTPUTFILE%.*}.log"; }
-finalcorr () { $TIMECMD $TIMEARGS ./AccEff/acceff -final "${ACCCORROUTPUTFILE}" "${EFFCORROUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALCORROUTPUTFILE}" |& tee  "${FINALCORROUTPUTFILE%.*}.log"; }
+acc () {
+    mkdir -p "${OUTPUTFOLDER}/Acc"
+    $TIMECMD $TIMEARGS ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCOUTPUTFILE}" |& tee "${ACCOUTPUTFILE%.*}.log"
+    }
+
+eff () {
+    mkdir -p "${OUTPUTFOLDER}/Eff"
+    $TIMECMD $TIMEARGS ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}" |& tee "${EFFOUTPUTFILE%.*}.log"
+    }
+
+final () { 
+    mkdir -p "${OUTPUTFOLDER}/AccEff"
+    $TIMECMD $TIMEARGS ./AccEff/acceff -final "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALOUTPUTFILE}" |& tee "${FINALOUTPUTFILE%.*}.log"
+    }
+
+closure () { 
+    mkdir -p "${OUTPUTFOLDER}/ClosureTest"
+    $TIMECMD $TIMEARGS ./AccEff/acceff -closure "${FINALOUTPUTFILE}" "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${MC_FITINPUTFILENAME}" "${CLOSUREOUTPUTFILE}" |& tee "${CLOSUREOUTPUTFILE%.*}.log"
+    }
+
+fit () { 
+    mkdir -p "${OUTPUTFOLDER}/YieldFit"
+    $TIMECMD $TIMEARGS ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}" |& tee "${YIELDFITOUTPUTFILE%.*}.log"
+    }
+
+acccorr () { 
+    mkdir -p "${OUTPUTFOLDER}/AccCorr"
+    $TIMECMD $TIMEARGS ./AccEff/acceff -acc "${ACCINPUTFILE}" "${ACCCORROUTPUTFILE}" "${YIELDFITOUTPUTFILE}" |& tee  "${ACCCORROUTPUTFILE%.*}.log"
+    }
+
+effcorr () {
+    mkdir -p "${OUTPUTFOLDER}/EffCorr"
+    $TIMECMD $TIMEARGS ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFCORROUTPUTFILE}" "${CONFIG}" "${YIELDFITOUTPUTFILE}" |& tee  "${EFFCORROUTPUTFILE%.*}.log"
+    }
+
+finalcorr () {
+    mkdir -p "${OUTPUTFOLDER}/AccEffCorr"
+    $TIMECMD $TIMEARGS ./AccEff/acceff -final "${ACCCORROUTPUTFILE}" "${EFFCORROUTPUTFILE}" "${DATA_FITINPUTFILENAME}" "${MC_FITINPUTFILENAME}" "${FINALCORROUTPUTFILE}" |& tee  "${FINALCORROUTPUTFILE%.*}.log"
+    }
 
 #execute skim
 if [ $CLING = "YES" ]

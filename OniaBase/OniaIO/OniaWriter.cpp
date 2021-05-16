@@ -24,7 +24,7 @@ void addOutputs(OniaQQ* data,TreeWriter* writer, const char* prefix)
     data->oniaMuOut.addOutputs(writer,prefix);
 }
 
-void addOutputs(OniaJetQQRealData* data,TreeWriter* writer)
+void addOutputs(OniaJetQQRealData* data,TreeWriter* writer, const char* prefix)
 {
     data->oniaInfoOut.addOutputs(writer);
     data->recoQQOut.addOutputs(writer,"reco_");
@@ -32,7 +32,7 @@ void addOutputs(OniaJetQQRealData* data,TreeWriter* writer)
     data->jetOut.addOutputs(writer);
 }
 
-void addOutputs(OniaJetQQMC* data,TreeWriter* writer)
+void addOutputs(OniaJetQQMC* data,TreeWriter* writer, const char* prefix)
 {
     data->oniaInfoOut.addOutputs(writer);
     data->recoQQOut.addOutputs(writer,"reco_");
@@ -42,13 +42,13 @@ void addOutputs(OniaJetQQMC* data,TreeWriter* writer)
     data->refJetOut.addOutputs(writer);
 }
 
-void OniaWriterGenQQ::writeData(const OniaGenOnlyData* input, SimpleSelector sel)
+void writeGenQQ(const OniaGenOnlyData* input, OniaQQ* output, SimpleSelector sel)
 {
-  output.oniaInfoOut.Write(sel.entry,input->genQQ.id[sel.index]);
-  output.oniaQQOut.Write((TLorentzVector*) input->genQQ.mom4->At(sel.index));
+  output->oniaInfoOut.Write(sel.entry,input->genQQ.id[sel.index]);
+  output->oniaQQOut.Write((TLorentzVector*) input->genQQ.mom4->At(sel.index));
   TLorentzVector* mumi = (TLorentzVector*) input->genQQ.mumi_mom4->At(sel.index);
   TLorentzVector* mupl = (TLorentzVector*) input->genQQ.mupl_mom4->At(sel.index);
-  output.oniaMuOut.Write(mupl,mumi);
+  output->oniaMuOut.Write(mupl,mumi);
 }
 
 float getCorrectedPt(JetCorrector* JEC,const OniaJetInfo* inputJet, int iJet)

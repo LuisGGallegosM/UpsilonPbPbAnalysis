@@ -12,18 +12,35 @@ std::string LoadJEUFiles(bool isMC);
 int FindJet(const OniaJetInfo* jetInfo, JetCorrector* JEC, const TLorentzVector* RecoQQ4mom, const OniaJetRef* jetRef=nullptr);
 
 template<typename Reader,typename Writer>
-class OniaJetSkimmer : public TreeProcessor, public Skimmer
+class OniaJetSkimmer : public Skimmer
 {
     private:
     OniaReader<Reader> oniaReader;
     OniaJetCutterBase<Reader> oniaCutter;
-    OniaWriterJet<Writer> oniaWriter;
+    OniaWriter<Writer> oniaWriter;
     JetCorrector JEC;
     JetUncertainty JEU;
 
-    void ProcessEvent(Long64_t entry) override
+    public:
+    OniaJetSkimmer(TTree* tree , const CutParams* cutter, const char* outTreeName): 
+        oniaWriter(outTreeName,"reco_"), oniaReader(tree),oniaCutter(cutter),
+        JEC(LoadJECFiles(cutter->getIsMC())), JEU(LoadJEUFiles(cutter->getIsMC()))
     {
-        auto input = oniaReader.getData();
+    }
+
+    void Write() override 
+    { 
+        oniaWriter.getTree()->Write(); 
+    }
+    
+    void Skim() override 
+    {
+        TreeProcess(this,oniaReader.getName(),oniaReader.getEntries());
+    }
+
+    void ProcessEvent(Long64_t entry)
+    {
+        auto input = oniaReader.getData(entry);
         int size=input->recoQQ.size;
         
         for(int iQQ=0;iQQ<size;iQQ++)
@@ -33,31 +50,12 @@ class OniaJetSkimmer : public TreeProcessor, public Skimmer
                 int iJet=FindJet(input,&JEC,iQQ);
                 if(iJet>=0)
                 {
-                    oniaWriter.writeData(input,JetSelector{entry,iQQ,iJet,&JEC,&JEU});
-                    FillEntries();
+                    writeJet(input,oniaWriter.getDataBuffer(),JetSelector{entry,iQQ,iJet,&JEC,&JEU});
                 }
             }
         }
     }
 
-    public:
-    OniaJetSkimmer(TTree* tree , const CutParams* cutter, const char* outTreeName): 
-        TreeProcessor(tree,outTreeName),oniaWriter(), oniaReader(),
-        oniaCutter(cutter),JEC(LoadJECFiles(cutter->getIsMC())), JEU(LoadJEUFiles(cutter->getIsMC()))
-    {
-        registerOutputs(&oniaWriter);
-        registerInputs(&oniaReader);
-    }
-
-    void Write() override 
-    { 
-        TreeProcessor::write(); 
-    }
-    
-    void Skim() override 
-    {
-        Process(); 
-    }
 };
 
 using OniaJetSkimmerMC = OniaJetSkimmer<OniaJetMCData,OniaJetQQMC>;

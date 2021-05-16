@@ -5,31 +5,28 @@
 #include <array>
 
 AccAnalyzer::AccAnalyzer(TTree* input,const char* outTreeName, RooAbsReal* weights) : 
-    TreeProcessor(input,outTreeName),oniaWriter(), oniaReader(), weightFunc(weights)
+    oniaReader(input), weightFunc(weights)
 {
-    registerInputs(&oniaReader);
-    registerOutputs(&oniaWriter);
 }
 
 void AccAnalyzer::ProcessEvent(Long64_t entry)
 {
-    int size=oniaReader.getData()->genQQ.size;
+    auto input= oniaReader.getData(entry);
+    int size=input->genQQ.size;
     
     for(int i=0;i<size;++i)
     {
-        Analyze(i,entry);
+        Analyze(input,i,entry);
     }
 }
 
 void AccAnalyzer::Write(const std::string& basename)
 {
-    TreeProcessor::write();
     hists.Write(basename);
 }
 
-void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
+void AccAnalyzer::Analyze(const OniaGenOnlyData* input,Int_t index, Long64_t entry)
 {
-    const OniaGenOnlyData* input=oniaReader.getData();
     //read variables
     TLorentzVector* mom4vec=(TLorentzVector*) input->genQQ.mom4->At(index);
 
@@ -58,8 +55,6 @@ void AccAnalyzer::Analyze(Int_t index, Long64_t entry)
     if(accCutter.cut(input,index,entry))
     {
         hists.FillDet(&data,weight);
-        oniaWriter.writeData(input,SimpleSelector{entry,index});
-        FillEntries();
     }
 }
 

@@ -5,51 +5,28 @@
 #include "TreeReader.h"
 #include "TreeWriter.h"
 
-class DataReader
+#include <iostream>
+
+template<typename TreeProcessor>
+void TreeProcess(TreeProcessor processor, const std::string& treeName , Long64_t entries)
 {
-    public:
-    virtual void registerReader(TreeReader* reader) = 0;
-    virtual ~DataReader() = default;
-};
+    int block =0;
 
-class DataWriter
-{
-    public:
-    virtual void registerWriter(TreeWriter* writer) = 0;
-    virtual ~DataWriter() = default;
-};
+    std::cout << "Processing of " << treeName <<" tree starting...\n";
+    std::cout << entries <<" entries in tree\n";
 
-class TreeProcessor
-{
-    TreeReader reader;
-    TreeWriter writer;
-
-    protected:
-    virtual void ProcessEvent(Long64_t entry) = 0;
-
-    void Process();
-
-    public:
-    TreeProcessor(TTree* inputTree, const char* outTreeName) : 
-        reader(inputTree), writer(outTreeName)
+    for(Long64_t i=0;i<entries;++i)
     {
+        if ((i % (entries/20)) ==0)
+        {
+            std::cout <<"Processing: " << block*5 << "%" << std::endl;
+            ++block;
+        }
+        processor->ProcessEvent(i);
     }
-
-    void registerInputs( DataReader* in)
-    {
-        in->registerReader(&reader);
-    }
-
-    void registerOutputs( DataWriter* out)
-    {
-        out->registerWriter(&writer);
-    }
-
-    void FillEntries() { writer.FillEntries();}
-
-    void write() { writer.Write();}
-    
-    virtual ~TreeProcessor() =default;
-};
+    std::cout << "Total readed entries " << entries;
+    std::cout << " from '" << treeName << "' tree\n";
+    return;
+}
 
 #endif

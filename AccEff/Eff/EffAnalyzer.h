@@ -20,18 +20,16 @@ class EffAnalyzer
 };
 
 template<typename Reader>
-class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
+class EffAnalyzerBase : public EffAnalyzer
 {
     EffHistografer hists;
     OniaReader<Reader> oniaReader;
     EffCutter effCutter;
-    OniaWriterRecoQQ oniaWriter;
     std::unique_ptr<AccCutter> accCutter;
     RooAbsReal* weightFunc;
 
-    void CaptureGenQQ(Int_t index, Long64_t entry)
+    void CaptureGenQQ(const Reader* input,Int_t index, Long64_t entry)
     {
-        auto input = oniaReader.getData();
         EffHistografer::inputs data = extractGen(input,index);
 
         float weight=1.0f;
@@ -45,9 +43,9 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
         hists.FillRecoCut(&data,weight);
     }
 
-    void CaptureDetQQ(Int_t index, Long64_t entry)
+    void CaptureDetQQ(const Reader* input,Int_t index, Long64_t entry)
     {
-        TLorentzVector* mom4vec=(TLorentzVector*) oniaReader.getData()->genQQ.mom4->At(index);
+        TLorentzVector* mom4vec=(TLorentzVector*) input->genQQ.mom4->At(index);
         float pT = mom4vec->Pt();
         float y = fabs(mom4vec->Rapidity());
         float weight = 1.0f;
@@ -61,38 +59,35 @@ class EffAnalyzerBase : public TreeProcessor, public EffAnalyzer
 
     public:
     EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName, RooAbsReal* weights=nullptr): 
-        TreeProcessor(input,outTreeName),oniaReader(),oniaWriter(),effCutter(effCut),weightFunc(weights)
+        oniaReader(input),effCutter(effCut),weightFunc(weights)
     {
-        registerInputs(&oniaReader);
-        registerOutputs(&oniaWriter);
     }
 
     void Write(const std::string& basename) override
     {
-        TreeProcessor::write();
         hists.Write(basename);
     }
 
     void Test() override 
     { 
-        Process(); 
+        TreeProcess( this,oniaReader.getName(),oniaReader.getEntries());
     }
 
-    void ProcessEvent(Long64_t entry) override
+    void ProcessEvent(Long64_t entry)
     {
-        int size=oniaReader.getData()->genQQ.size;
+        auto input = oniaReader.getData(entry);
+        int size=input->genQQ.size;
         
         for(int index=0;index<size;++index)
         {
-            auto input=oniaReader.getData();
             if (accCutter->cut(input,index,entry))
             {
-                CaptureDetQQ(index,entry);
+                CaptureDetQQ(input,index,entry);
                 int recoQQindex= input->which.GenQQWhichReco[index];
                 if (recoQQindex>=0)
                 {
                     if (effCutter.cut(input,recoQQindex,entry))
-                        CaptureGenQQ(index,entry);
+                        CaptureGenQQ(input,index,entry);
                 }
             }
         }

@@ -22,8 +22,8 @@ TH2F* createTH2Z(const std::string& name,const std::string& title);
 void writeToCanvasZ(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option);
 
 void addOutputs(OniaQQ* data,TreeWriter* writer, const char* prefix);
-void addOutputs(OniaJetQQMC* data,TreeWriter* writer);
-void addOutputs(OniaJetQQRealData* data,TreeWriter* writer);
+void addOutputs(OniaJetQQMC* data,TreeWriter* writer, const char* prefix);
+void addOutputs(OniaJetQQRealData* data,TreeWriter* writer, const char* prefix);
 
 struct OniaQQ
 {
@@ -65,100 +65,66 @@ struct JetSelector
     JetUncertainty* JEU;
 };
 
-class OniaWriterRecoQQ : public DataWriter
+template<typename Data>
+class OniaWriter
 {
-    OniaQQ output;
+    Data output;
+    TreeWriter writer;
+
     public:
 
-    void registerWriter(TreeWriter* writer) override
+    OniaWriter(const char* treeOutName, const char* prefix =nullptr ) : writer(treeOutName)
     {
-        addOutputs(&output,writer,"reco_");
+        addOutputs(&output,&writer,prefix);
     }
 
-    template<typename Data>
-    void writeData(const Data* input, SimpleSelector sel)
-    {
-        output.oniaInfoOut.Write(sel.entry,0.0f);
-        output.oniaQQOut.Write((TLorentzVector*) input->recoQQ.mom4->At(sel.index));
-        int mumi_idx= input->recoQQ.mumi_idx[sel.index];
-        int mupl_idx= input->recoQQ.mupl_idx[sel.index];
-        TLorentzVector* mumi = (TLorentzVector*) input->recoMu.mom4->At(mumi_idx);
-        TLorentzVector* mupl = (TLorentzVector*) input->recoMu.mom4->At(mupl_idx);
-        output.oniaMuOut.Write(mupl,mumi);
-    }
+    Data* getDataBuffer() {return &output;}
+
+    void writeData() { writer.FillEntries(); }
+
+    TTree* getTree() { return writer.getTree();}
 };
 
-class OniaWriterGenQQ : public DataWriter
+template<typename Data>
+void writeRecoQQ(const Data* input, OniaQQ* output, SimpleSelector sel)
 {
-    OniaQQ output;
-    public:
+    output->oniaInfoOut.Write(sel.entry,0.0f);
+    output->oniaQQOut.Write((TLorentzVector*) input->recoQQ.mom4->At(sel.index));
+    int mumi_idx= input->recoQQ.mumi_idx[sel.index];
+    int mupl_idx= input->recoQQ.mupl_idx[sel.index];
+    TLorentzVector* mumi = (TLorentzVector*) input->recoMu.mom4->At(mumi_idx);
+    TLorentzVector* mupl = (TLorentzVector*) input->recoMu.mom4->At(mupl_idx);
+    output->oniaMuOut.Write(mupl,mumi);
+}
 
-    void registerWriter(TreeWriter* writer) override
-    {
-        addOutputs(&output,writer,"gen_");
-    }
-
-    template<typename Data>
-    void writeData(const Data* input, SimpleSelector sel)
-    {
-        output.oniaInfoOut.Write(sel.entry,input->genQQ.id[sel.index]);
-        output.oniaQQOut.Write((TLorentzVector*) input->genQQ.mom4->At(sel.index));
-        int mumi_idx= input->genQQ.mumi_idx[sel.index];
-        int mupl_idx= input->genQQ.mupl_idx[sel.index];
-        TLorentzVector* mumi = (TLorentzVector*) input->genMu.mom4->At(mumi_idx);
-        TLorentzVector* mupl = (TLorentzVector*) input->genMu.mom4->At(mupl_idx);
-        output.oniaMuOut.Write(mupl,mumi);
-    }
-
-    void writeData(const OniaGenOnlyData* input, SimpleSelector sel);
-};
-
-template <typename Data>
-class OniaWriterJet : DataWriter
+template<typename Data>
+void writeGenQQ(const Data* input, OniaQQ* output, SimpleSelector sel)
 {
+    output->oniaInfoOut.Write(sel.entry,input->genQQ.id[sel.index]);
+    output->oniaQQOut.Write((TLorentzVector*) input->genQQ.mom4->At(sel.index));
+    int mumi_idx= input->genQQ.mumi_idx[sel.index];
+    int mupl_idx= input->genQQ.mupl_idx[sel.index];
+    TLorentzVector* mumi = (TLorentzVector*) input->genMu.mom4->At(mumi_idx);
+    TLorentzVector* mupl = (TLorentzVector*) input->genMu.mom4->At(mupl_idx);
+    output->oniaMuOut.Write(mupl,mumi);
+}
 
-};
-
-template <>
-class OniaWriterJet<OniaJetQQMC> : public DataWriter
+template<typename Data>
+void writeJet(const Data* input, OniaJetQQMC* output, JetSelector sel)
 {
-    OniaJetQQMC output;
-    public:
+    writeQQ(input,output,sel.iQQ,sel.entry);
+    writeMu(input,output,sel.iQQ);
+    writeJet(input,output,sel.iQQ,sel.iJet,sel.JEC,sel.JEU);
+    writeRefJet(input,output,sel.iQQ,sel.iJet,output->jetOut.jt_pt_noZJEC);
+}
 
-    void registerWriter(TreeWriter* writer) override
-    {
-        addOutputs(&output,writer);
-    }
-
-    template<typename Data>
-    void writeData(const Data* input, JetSelector sel)
-    {
-        writeQQ(input,&output,sel.iQQ,sel.entry);
-        writeMu(input,&output,sel.iQQ);
-        writeJet(input,&output,sel.iQQ,sel.iJet,sel.JEC,sel.JEU);
-        writeRefJet(input,&output,sel.iQQ,sel.iJet,output.jetOut.jt_pt_noZJEC);
-    }
-};
-
-template <>
-class OniaWriterJet<OniaJetQQRealData> : public DataWriter
+template<typename Data>
+void writeJet(const Data* input, OniaJetQQRealData* output, JetSelector sel)
 {
-    OniaJetQQRealData output;
-    public:
-
-    void registerWriter(TreeWriter* writer) override
-    {
-        addOutputs(&output,writer);
-    }
-
-    template<typename Data>
-    void writeData(const Data* input, JetSelector sel)
-    {
-        writeQQ(input,&output,sel.iQQ,sel.entry);
-        writeMu(input,&output,sel.iQQ);
-        writeJet(input,&output,sel.iQQ,sel.iJet,sel.JEC,sel.JEU);
-    }
-};
+    writeQQ(input,output,sel.iQQ,sel.entry);
+    writeMu(input,output,sel.iQQ);
+    writeJet(input,output,sel.iQQ,sel.iJet,sel.JEC,sel.JEU);
+}
 
 template<typename Data>
 void writeQQ(const Data* input, OniaJetQQMC* output, int iQQ,int entry)

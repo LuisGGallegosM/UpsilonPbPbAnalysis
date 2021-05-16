@@ -8,41 +8,42 @@
 #include "OniaCutter.h"
 
 template<typename Reader>
-class OniaSkimmerBase : public TreeProcessor, public Skimmer
+class OniaSkimmerBase : public Skimmer
 {
     private:
     OniaReader<Reader> oniaReader;
     std::unique_ptr<Cutter<Reader>> oniaCutter;
-    OniaWriterRecoQQ oniaWriter;
-    void ProcessEvent(Long64_t entry) override
+    OniaWriter<OniaQQ> oniaWriter;
+
+    public:
+    OniaSkimmerBase(TTree* tree , Cutter<Reader>* cutter, const char* outTreeName): 
+       oniaCutter(cutter) ,oniaWriter(outTreeName,"reco_"), oniaReader(tree)
     {
-        auto input= oniaReader.getData();
+    }
+
+    void Write() override 
+    { 
+        oniaWriter.getTree()->Write();
+    }
+
+    void Skim() override 
+    { 
+        TreeProcess(this,oniaReader.getName(),oniaReader.getEntries());
+    }
+
+    void ProcessEvent(Long64_t entry)
+    {
+        auto input= oniaReader.getData(entry);
         int size=input->recoQQ.size;
         
         for(int iQQ=0;iQQ<size;++iQQ)
         {
             if (oniaCutter->cut(input,iQQ,entry))
             {
-                oniaWriter.writeData(input,SimpleSelector{entry,iQQ});
-                FillEntries();
+                writeRecoQQ(input,oniaWriter.getDataBuffer(),SimpleSelector{entry,iQQ});
+                oniaWriter.writeData();
             }
         }
-    }
-
-    public:
-    OniaSkimmerBase(TTree* tree , Cutter<Reader>* cutter, const char* outTreeName): 
-        TreeProcessor(tree,outTreeName),oniaCutter(cutter) ,oniaWriter(), oniaReader()
-    {
-        registerInputs(&oniaReader);
-        registerOutputs(&oniaWriter);
-    }
-    void Write() override 
-    { 
-        TreeProcessor::write();
-    }
-    void Skim() override 
-    { 
-        Process(); 
     }
 };
 
