@@ -69,3 +69,13 @@ TH1F* calcDN_DpT(TH1F* nSigCorrected)
     dN_dPt->SetTitle("#frac{dN}{p_{T}}");
     return dN_dPt;
 }
+
+float WeightFuncRooAbs::getWeight(float x)
+{
+    f->getVariables()->setRealValue("pt",x);
+    return f->getVal();
+}
+
+WeightFuncRooAbs::WeightFuncRooAbs(RooAbsReal* func): f(func)
+{
+}

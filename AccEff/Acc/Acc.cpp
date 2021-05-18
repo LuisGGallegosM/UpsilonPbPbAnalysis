@@ -24,12 +24,16 @@ void AccTest(const char* filename,const char* outputfilename, const char* yieldf
     TFile* file = OpenFile(filename,"READ");
 
     RooAbsReal* yieldfitFunc=nullptr;
+    
     if(yieldfitfuncFilename!=nullptr)
     {
         std::cout << "Reading yield weight function input file: " << yieldfitfuncFilename <<'\n';
         TFile* yieldFitFile = OpenFile(yieldfitfuncFilename,"READ");
         yieldfitFunc = dynamic_cast<RooAbsReal*>( yieldFitFile->Get(yieldFitFuncName) );
+        
     }
+    WeightFuncRooAbs yieldfit(yieldfitFunc);
+    WeightFunc* yieldfitPtr = (yieldfitFunc==nullptr) ? nullptr : &yieldfit;
     
     //output file
     std::string outfilename=outputfilename;
@@ -38,7 +42,7 @@ void AccTest(const char* filename,const char* outputfilename, const char* yieldf
 
     TTree *myTree = GetTree(file,"hionia/myTree");
 
-    AccAnalyzer accAnalyzer(myTree,"DetectableOnia",yieldfitFunc);
+    AccAnalyzer accAnalyzer(myTree,"DetectableOnia", yieldfitPtr );
 
     //Run acceptancy test
     accAnalyzer.Test();

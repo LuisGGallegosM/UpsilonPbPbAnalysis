@@ -33,6 +33,8 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
         TFile* yieldFitFile = OpenFile(yieldfitfuncFilename,"READ");
         yieldfitFunc = dynamic_cast<RooAbsReal*>( yieldFitFile->Get(yieldFitFuncName) );
     }
+    WeightFuncRooAbs yieldfit(yieldfitFunc);
+    WeightFunc* yieldfitPtr = (yieldfitFunc==nullptr) ? nullptr : &yieldfit;
 
     //read cut parameters
     CutParams cut;
@@ -50,7 +52,7 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
 
     TTree *myTree = GetTree(file,"hionia/myTree");
 
-    std::unique_ptr<EffAnalyzer> effAnalyzer = createEffAnalyzer(myTree,&cut,"RecoCutOnia",yieldfitFunc);
+    std::unique_ptr<EffAnalyzer> effAnalyzer = createEffAnalyzer(myTree,&cut,"RecoCutOnia",yieldfitPtr);
 
     //Run efficiency test
     effAnalyzer->Test();

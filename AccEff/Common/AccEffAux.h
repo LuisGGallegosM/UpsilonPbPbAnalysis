@@ -4,6 +4,8 @@
 #include"TH1.h"
 #include"TEfficiency.h"
 
+#include "../../OniaBase/Params/Params.h"
+
 TH1F* toTH1F(const TEfficiency* asym);
 TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff,const std::string& subfix="_corr");
 TH1F* calcDN_DpT(TH1F* nSigCorrected);
@@ -33,5 +35,14 @@ constexpr std::array<float,6> ref_cross_section_error_sys=
 
 constexpr std::array<double,7> pt_bins  
 { 0.0f,2.0f,4.0f,6.0f,9.0f,12.0f,30.0f};
+
+class WeightFuncRooAbs : public WeightFunc
+{
+    RooAbsReal* f;
+    public:
+    float getWeight(float x) override;
+
+    WeightFuncRooAbs(RooAbsReal* func);
+};
 
 #endif

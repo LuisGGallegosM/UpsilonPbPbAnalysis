@@ -1,11 +1,12 @@
 #!/bin/bash
+DEBUG="YES"
 
 CLING="NO"
 #input file for acceptancy located in datasets directory
 FLAGS=${1:-"-all"}
 ACCINPUTFILENAME="OniaTree_Ups1SMM_5p02TeV_TuneCUETP8M1_nofilter_pp502Fall15-MCRUN2_71_V1-v1_GENONLY.root"
 EFFINPUTFILENAME="merged_HiForestAOD_MCFix2.root"
-CONFIG="../rootfiles/analysis/merged_HiForestAOD_DATA_skim/merged_HiForestAOD_DATA_skim.cutconf"
+CONFIG="../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.cutconf"
 DATA_MULTIFITINPUTFILENAME="merged_HiForestAOD_DATA_skim/multifit_baseline"
 MC_MULTIFITINPUTFILENAME="merged_HiForestAOD_MCFix2_skim/multifit_baseline"
 
@@ -42,6 +43,7 @@ acc () {
 eff () {
     mkdir -p "${OUTPUTFOLDER}/Eff"
     $TIMECMD $TIMEARGS ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}" |& tee "${EFFOUTPUTFILE%.*}.log"
+    #$TIMECMD $TIMEARGS gdb --args ./AccEff/acceff -eff "${EFFINPUTFILE}" "${EFFOUTPUTFILE}" "${CONFIG}" |& tee "${EFFOUTPUTFILE%.*}.log"
     }
 
 final () { 

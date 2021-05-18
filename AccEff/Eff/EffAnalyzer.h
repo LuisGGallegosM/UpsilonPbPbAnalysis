@@ -25,8 +25,18 @@ class EffAnalyzerBase : public EffAnalyzer
     EffHistografer hists;
     OniaReader<Reader> oniaReader;
     EffCutter effCutter;
-    std::unique_ptr<AccCutter> accCutter;
-    RooAbsReal* weightFunc;
+    AccCutter accCutter;
+    WeightFunc* weightFunc;
+
+    void CaptureAcceptedQQ(float pt)
+    {
+        float weight=1.0f;
+        if (weightFunc!=nullptr)
+        {
+            weight= weightFunc->getWeight(pt);
+        }
+        hists.FillAcc(pt,weight);
+    }
 
     void CaptureGenQQ(const Reader* input,Int_t index, Long64_t entry)
     {
@@ -36,8 +46,7 @@ class EffAnalyzerBase : public EffAnalyzer
         if (weightFunc!=nullptr)
         {
             weight=calculateTnp(data.ptMuPl,data.ptMuMi,data.yMuPl,data.yMuMi);
-            weightFunc->getVariables()->setRealValue("pt",data.pT);
-            weight*=weightFunc->getVal();
+            weight*= weightFunc->getWeight(data.pT);
         }
         
         hists.FillRecoCut(&data,weight);
@@ -51,14 +60,13 @@ class EffAnalyzerBase : public EffAnalyzer
         float weight = 1.0f;
         if (weightFunc!=nullptr)
         {
-            weightFunc->getVariables()->setRealValue("pt",pT);
-            weight=weightFunc->getVal();
+            weight = weightFunc->getWeight(pT);
         }
         hists.FillDet(y,pT,weight);
     }
 
     public:
-    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName, RooAbsReal* weights=nullptr): 
+    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights=nullptr): 
         oniaReader(input),effCutter(effCut),weightFunc(weights)
     {
     }
@@ -80,14 +88,19 @@ class EffAnalyzerBase : public EffAnalyzer
         
         for(int index=0;index<size;++index)
         {
-            if (accCutter->cut(input,index,entry))
+            TLorentzVector* mom4vec=(TLorentzVector*) input->genQQ.mom4->At(index);
+            if (fabs(mom4vec->Rapidity()) <= 2.4f)
             {
-                CaptureDetQQ(input,index,entry);
-                int recoQQindex= input->which.GenQQWhichReco[index];
-                if (recoQQindex>=0)
+                CaptureAcceptedQQ(mom4vec->Pt());
+                if (accCutter.cut(input,index,entry))
                 {
-                    if (effCutter.cut(input,recoQQindex,entry))
-                        CaptureGenQQ(input,index,entry);
+                    CaptureDetQQ(input,index,entry);
+                    int recoQQindex= input->which.GenQQWhichReco[index];
+                    if (recoQQindex>=0)
+                    {
+                        if (effCutter.cut(input,recoQQindex,entry))
+                            CaptureGenQQ(input,index,entry);
+                    }
                 }
             }
         }
@@ -97,5 +110,5 @@ class EffAnalyzerBase : public EffAnalyzer
 using EffAnalyzerRealData = EffAnalyzerBase<OniaRealData>;
 using EffAnalyzerMC = EffAnalyzerBase<OniaMCData>;
 
-std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, RooAbsReal* weights );
+std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights );
 #endif

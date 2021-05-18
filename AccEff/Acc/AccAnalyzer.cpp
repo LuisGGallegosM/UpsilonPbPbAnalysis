@@ -4,7 +4,7 @@
 #include "TPie.h"
 #include <array>
 
-AccAnalyzer::AccAnalyzer(TTree* input,const char* outTreeName, RooAbsReal* weights) : 
+AccAnalyzer::AccAnalyzer(TTree* input,const char* outTreeName, WeightFunc* weights) : 
     oniaReader(input), weightFunc(weights)
 {
 }
@@ -38,8 +38,7 @@ void AccAnalyzer::Analyze(const OniaGenOnlyData* input,Int_t index, Long64_t ent
     float weight=1.0f;
     if(weightFunc!=nullptr)
     {
-        weightFunc->getVariables()->setRealValue("pt",data.pT);
-        weight=weightFunc->getVal();
+        weight=weightFunc->getWeight(data.pT);
     }
 
     TLorentzVector* mom4vecPl=(TLorentzVector*) input->genQQ.mupl_mom4->At(index);

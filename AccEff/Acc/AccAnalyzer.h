@@ -5,6 +5,7 @@
 
 #include "../../OniaBase/TreeProcessor/TreeProcessor.h"
 #include "../../OniaBase/OniaIO/OniaIO.h"
+#include "../../OniaBase/Params/Params.h"
 #include "../Common/AccEffAux.h"
 #include "../Common/AccCutter.h"
 #include "AccHistografer.h"
@@ -15,12 +16,12 @@ class AccAnalyzer
     AccHistografer hists;
     OniaReader<OniaGenOnlyData> oniaReader;
     AccCutter accCutter;
-    RooAbsReal* weightFunc;
+    WeightFunc* weightFunc;
 
     void Analyze(const OniaGenOnlyData* input,Int_t index, Long64_t entry);
 
     public:
-    AccAnalyzer(TTree* input,const char* outTreeName, RooAbsReal* weightFunc=nullptr);
+    AccAnalyzer(TTree* input,const char* outTreeName, WeightFunc* weightFunc=nullptr);
 
     void Write(const std::string& basename);
 

@@ -17,6 +17,13 @@ BkgType getBkgByName(const std::string& name);
  * 
  */
 
+class WeightFunc
+{
+    public:
+    virtual float getWeight(float x) =0;
+    virtual ~WeightFunc() = default;
+};
+
 #if defined(__CLING__)
 #include "Params.cpp"
 #endif
