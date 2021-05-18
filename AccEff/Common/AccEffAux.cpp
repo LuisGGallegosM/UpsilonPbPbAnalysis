@@ -70,7 +70,7 @@ TH1F* calcDN_DpT(TH1F* nSigCorrected)
     return dN_dPt;
 }
 
-float WeightFuncRooAbs::getWeight(float x)
+float WeightFuncRooAbs::getWeight(float x) const
 {
     f->getVariables()->setRealValue("pt",x);
     return f->getVal();
@@ -78,4 +78,9 @@ float WeightFuncRooAbs::getWeight(float x)
 
 WeightFuncRooAbs::WeightFuncRooAbs(RooAbsReal* func): f(func)
 {
+}
+
+float WeightFuncTEff::getWeight(float x) const
+{
+    return 1.0/hist->GetEfficiency(hist->FindFixBin(x));
 }

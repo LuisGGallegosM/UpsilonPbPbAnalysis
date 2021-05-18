@@ -28,16 +28,6 @@ class EffAnalyzerBase : public EffAnalyzer
     AccCutter accCutter;
     WeightFunc* weightFunc;
 
-    void CaptureAcceptedQQ(float pt)
-    {
-        float weight=1.0f;
-        if (weightFunc!=nullptr)
-        {
-            weight= weightFunc->getWeight(pt);
-        }
-        hists.FillAcc(pt,weight);
-    }
-
     void CaptureGenQQ(const Reader* input,Int_t index, Long64_t entry)
     {
         EffHistografer::inputs data = extractGen(input,index);
@@ -91,7 +81,6 @@ class EffAnalyzerBase : public EffAnalyzer
             TLorentzVector* mom4vec=(TLorentzVector*) input->genQQ.mom4->At(index);
             if (fabs(mom4vec->Rapidity()) <= 2.4f)
             {
-                CaptureAcceptedQQ(mom4vec->Pt());
                 if (accCutter.cut(input,index,entry))
                 {
                     CaptureDetQQ(input,index,entry);

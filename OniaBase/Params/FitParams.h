@@ -20,7 +20,7 @@ BkgType getBkgByName(const std::string& name);
 class WeightFunc
 {
     public:
-    virtual float getWeight(float x) =0;
+    virtual float getWeight(float x) const =0;
     virtual ~WeightFunc() = default;
 };
 

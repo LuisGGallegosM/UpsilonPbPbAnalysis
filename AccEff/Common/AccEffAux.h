@@ -40,9 +40,19 @@ class WeightFuncRooAbs : public WeightFunc
 {
     RooAbsReal* f;
     public:
-    float getWeight(float x) override;
+    float getWeight(float x) const override;
 
     WeightFuncRooAbs(RooAbsReal* func);
+};
+
+class WeightFuncTEff : public WeightFunc
+{
+    TEfficiency* hist;
+
+    public:
+    float getWeight(float x) const override;
+
+    WeightFuncTEff(TEfficiency* h) : hist(h) {} ;
 };
 
 #endif

@@ -12,10 +12,16 @@
 #include "../../Drawing/Drawing.h"
 
 TH1F* toTH1F(const TEfficiency* asym);
-std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile);
+std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile, const std::string& outbasename);
 TH1F* calcDN_DpT(TH1F* nSigCorrected);
 TH1F* Normalize(TH1F* nSigCorrected);
 TH1F* generateRefCrossSection(const float* error);
+
+void getCrossSections(const TH1F* DATA_dN_dPt, const std::string& outbasename);
+void getRatios(const TH1F* DATA_dN_dPt_norm, const TH1F* MC_dN_dPt_norm, const std::string& outbasename );
+TH1F* getNSigMC(TFile* accFile, const std::string& outbasename);
+
+const int colorGraph[2] = {4 ,2 } ;
 
 void AccEffResults(const char* accFilename, const char* effFilename, const char* fitFileRealDataPath, const char* fitFileMCPath, const char* outputname)
 {
@@ -37,10 +43,9 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     std::cout << "Writing to file: " << outputname <<'\n';
     TFile* outFile = OpenFile(outputname,"RECREATE");
 
-    std::unique_ptr<TEfficiency> AccXEff = getAccXEff(accFile,effFile);
-    AccXEff->Write();
     std::string outbasename= ReplaceExtension(outputname,"");
-    writeToCanvasEff(AccXEff.get(),"p_{T}","Acc x Eff",outbasename);
+
+    std::unique_ptr<TEfficiency> AccXEff = getAccXEff(accFile,effFile,outbasename);
     
     TH1F* nSigRealData = (TH1F*) fitFileRealData->Get(nSigY1SName);
     nSigRealData->SetName("DATA_nSigY1S");
@@ -51,55 +56,27 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
 
     TH1F* DATA_dN_dPt = calcDN_DpT(nSigCorrected);
 
-    TH1F* cross_section = new TH1F(*DATA_dN_dPt);
-    cross_section->SetName("cross_section");
-    cross_section->Scale((1.0f)/(yRange*integratedLum));
-    cross_section->SetTitle("calculated");
-
-    TH1F* ref_cross_section_sys = generateRefCrossSection(ref_cross_section_error_sys.data());
-    ref_cross_section_sys->SetLineColor(1);
-    ref_cross_section_sys->SetTitle(AnalysisNoteName);
-
-    TH1F* ref_cross_section_stat = generateRefCrossSection(ref_cross_section_error_stat.data());
-    ref_cross_section_stat->SetLineColor(1);
-    ref_cross_section_stat->SetTitle(AnalysisNoteName);
-    
-    std::vector<TH1*> cross_sec_sys = { cross_section,ref_cross_section_sys};
-    std::vector<TH1*> cross_sec_stat = { cross_section,ref_cross_section_stat};
-
-    writeToCanvas(cross_sec_sys,"B #frac{d#sigma}{dp_{T}dy}",xAxisLabel, "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_sys.pdf" );
-    writeToCanvas(cross_sec_stat,"B #frac{d#sigma}{dp_{T}dy}",xAxisLabel, "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_stat.pdf" );
+    getCrossSections(DATA_dN_dPt,outbasename);
 
     TH1F* DATA_dN_dPt_norm = Normalize(DATA_dN_dPt);
-    DATA_dN_dPt_norm->SetLineColor(1);
+    DATA_dN_dPt_norm->SetLineColor(colorGraph[0]);
+    DATA_dN_dPt_norm->SetTitle("DATA");
 
-    TH1F* nSigMC_gen = (TH1F*) accFile->Get(accDenName);
-    nSigMC_gen->SetName("MC_nSigY1S_gen");
-
-    writeToCanvas(nSigMC_gen,xAxisLabel,"nSigY1S",outbasename);
-    nSigMC_gen->Write();
+    TH1F* nSigMC_gen = getNSigMC(accFile,outbasename);
 
     TH1F* MC_dN_dPt= calcDN_DpT(nSigMC_gen);
     TH1F* MC_dN_dPt_norm =Normalize(MC_dN_dPt);
-    MC_dN_dPt_norm->SetLineColor(3);
+    MC_dN_dPt_norm->SetLineColor(colorGraph[1]);
+    MC_dN_dPt_norm->SetTitle("MC gen");
 
     std::vector<TH1*> hists ={DATA_dN_dPt_norm,MC_dN_dPt_norm};
-    DATA_dN_dPt_norm->SetTitle("DATA");
-    MC_dN_dPt_norm->SetTitle("MC gen");
+
     writeToCanvas(hists,"#frac{dN}{dp_{T}} normalized",xAxisLabel," ",outbasename+"_dNdPt.pdf");
+
     DATA_dN_dPt_norm->Write();
     MC_dN_dPt_norm->Write();
 
-    TH1F* ratio= new TH1F((*DATA_dN_dPt_norm)/(*MC_dN_dPt_norm));
-    ratio->SetName(yieldFitName);
-    ratio->SetTitle("#frac{DATA dN_{DATAcorr}/dp_{T} norm}{MC dN_{MC}/dp_{T} norm}");
-    ratio->SetTitleSize(0.004);
-    ratio->SetTitleSize(0.004);
-    ratio->SetFillColor(1);
-    ratio->SetLineColor(1);
-    ratio->SetStats(false);
-    writeToCanvas(ratio,xAxisLabel,"ratio", outbasename);
-    ratio->Write();
+    getRatios(DATA_dN_dPt_norm,MC_dN_dPt_norm,outbasename);    
 
     outFile->Close();
     accFile->Close();
@@ -107,7 +84,53 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     fitFileRealData->Close();
 }
 
- std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile)
+TH1F* getNSigMC(TFile* accFile, const std::string& outbasename)
+{
+    TH1F* nSigMC_gen = (TH1F*) accFile->Get(accDenName);
+    nSigMC_gen->SetName("MC_nSigY1S_gen");
+
+    writeToCanvas(nSigMC_gen,xAxisLabel,"nSigY1S",outbasename);
+    nSigMC_gen->Write();
+    return nSigMC_gen;
+}
+
+void getCrossSections(const TH1F* DATA_dN_dPt, const std::string& outbasename)
+{
+    TH1F* cross_section = new TH1F(*DATA_dN_dPt);
+    cross_section->SetName("cross_section");
+    cross_section->Scale((1.0f)/(yRange*integratedLum));
+    cross_section->SetTitle("calculated");
+
+    TH1F* ref_cross_section_sys = generateRefCrossSection(ref_cross_section_error_sys.data());
+    ref_cross_section_sys->SetLineColor(colorGraph[1]);
+    ref_cross_section_sys->SetTitle(AnalysisNoteName);
+
+    TH1F* ref_cross_section_stat = generateRefCrossSection(ref_cross_section_error_stat.data());
+    ref_cross_section_stat->SetLineColor(colorGraph[1]);
+    ref_cross_section_stat->SetTitle(AnalysisNoteName);
+    
+    std::vector<TH1*> cross_sec_sys = { cross_section,ref_cross_section_sys};
+    std::vector<TH1*> cross_sec_stat = { cross_section,ref_cross_section_stat};
+
+    writeToCanvas(cross_sec_sys,"B #frac{d#sigma}{dp_{T}dy}",xAxisLabel, "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_sys.pdf" );
+    writeToCanvas(cross_sec_stat,"B #frac{d#sigma}{dp_{T}dy}",xAxisLabel, "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_stat.pdf" );
+}
+
+void getRatios(const TH1F* DATA_dN_dPt_norm, const TH1F* MC_dN_dPt_norm, const std::string& outbasename )
+{
+    TH1F* ratio= new TH1F((*DATA_dN_dPt_norm)/(*MC_dN_dPt_norm));
+    ratio->SetName(yieldFitName);
+    ratio->SetTitle("#frac{DATA dN_{DATAcorr}/dp_{T} norm}{MC dN_{MC}/dp_{T} norm}");
+    ratio->SetTitleSize(0.004);
+    ratio->SetTitleSize(0.004);
+    ratio->SetFillColor(colorGraph[0]);
+    ratio->SetLineColor(colorGraph[0]);
+    ratio->SetStats(false);
+    writeToCanvas(ratio,xAxisLabel,"ratio", outbasename);
+    ratio->Write();
+}
+
+ std::unique_ptr<TEfficiency> getAccXEff(TFile* accFile, TFile* effFile, const std::string& outbasename)
  {
     TH1F* acc_num= (TH1F*) accFile->Get(accNumName);
     TH1F* eff_num= (TH1F*) effFile->Get(effNumName);
@@ -118,6 +141,8 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     TH1F* nums= new TH1F((*acc_num)*(*eff_num));
 
     std::unique_ptr<TEfficiency> AccXEff = createTEff(nums,dens,accXEffName,"#alpha #epsilon;"+ std::string(xAxisLabel)+"; #alpha#epsilon;");
+    AccXEff->Write();
+    writeToCanvasEff(AccXEff.get(),"p_{T}","Acc x Eff",outbasename);
     return AccXEff;
  }
 
