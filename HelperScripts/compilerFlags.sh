@@ -1,1 +1,1 @@
-echo -g -O0
+echo -g -O1

@@ -48,11 +48,13 @@ void ClosureTest(const char* accxeffFilename,const char* accFilename, const char
     TH1F* eff_num = (TH1F*) effFile->Get(effNumName);
     TH1F* MC_reco_yields = (TH1F*) fitFile->Get(nSigY1SName);
 
-    accOnlyClosureTest(acc_num,acc,acc_den,outputname);
+    std::string outputbasename=ReplaceExtension(outputname,"");
 
-    effOnlyClosureTest(eff_num,eff,eff_den,outputname);
+    accOnlyClosureTest(acc_num,acc,acc_den, outputbasename);
 
-    acceffClosureTest(acc_den,MC_reco_yields,accXEff,outputname);
+    effOnlyClosureTest(eff_num,eff,eff_den,outputbasename);
+
+    acceffClosureTest(acc_den,eff_num,accXEff,outputbasename);
     
     acc_den->Write();
 
@@ -85,16 +87,15 @@ void acceffClosureTest(TH1F* MC_gen_yields, TH1F* MC_reco_yields, TEfficiency* a
 {
     MC_gen_yields->SetLineColor(3);
     MC_gen_yields->SetLineWidth(2);
+    MC_gen_yields->Scale( 1.0f/MC_gen_yields->Integral() );
+    MC_gen_yields->SetTitle("MC generated normalized");
 
     TH1F* MC_reco_yields_corr = calcCorrectedYields( MC_reco_yields,accXEff );
-
-    MC_gen_yields->Scale( 1.0f/MC_gen_yields->Integral() );
     MC_reco_yields_corr->Scale( 1.0f/MC_reco_yields_corr->Integral());
-    MC_gen_yields->SetTitle("MC generated normalized");
     MC_reco_yields_corr->SetTitle("MC corrected yields normalized");
 
     std::vector<TH1*> vec={MC_reco_yields_corr, MC_gen_yields };
-    writeToCanvas(vec, "MC reco vs Gen" , "p^{#mu#mu}_{T} GeV/c","N_{Y1Scorr}",ReplaceExtension(outputname.data(),".pdf"),false);
+    writeToCanvas(vec, "MC reco vs Gen" , "p^{#mu#mu}_{T} GeV/c","N_{Y1Scorr}",outputname+".pdf",false);
 
     TH1F* MC_reco_gen_ratio= new TH1F((*MC_reco_yields_corr)/(*MC_gen_yields));
     MC_reco_gen_ratio->SetName("MC_reco_gen_ratio");

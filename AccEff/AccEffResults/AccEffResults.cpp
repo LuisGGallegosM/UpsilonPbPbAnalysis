@@ -58,17 +58,17 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
 
     TH1F* ref_cross_section_sys = generateRefCrossSection(ref_cross_section_error_sys.data());
     ref_cross_section_sys->SetLineColor(1);
-    ref_cross_section_sys->SetTitle("CMS AN -2016/354 sys error");
+    ref_cross_section_sys->SetTitle(AnalysisNoteName);
 
     TH1F* ref_cross_section_stat = generateRefCrossSection(ref_cross_section_error_stat.data());
     ref_cross_section_stat->SetLineColor(1);
-    ref_cross_section_stat->SetTitle("CMS AN -2016/354 stat error");
+    ref_cross_section_stat->SetTitle(AnalysisNoteName);
     
     std::vector<TH1*> cross_sec_sys = { cross_section,ref_cross_section_sys};
     std::vector<TH1*> cross_sec_stat = { cross_section,ref_cross_section_stat};
 
-    writeToCanvas(cross_sec_sys,"B #frac{d#sigma}{dp_{T}dy}","p^{#mu#mu}_{T} GeV/c", "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_sys.pdf" );
-    writeToCanvas(cross_sec_stat,"B #frac{d#sigma}{dp_{T}dy}","p^{#mu#mu}_{T} GeV/c", "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_stat.pdf" );
+    writeToCanvas(cross_sec_sys,"B #frac{d#sigma}{dp_{T}dy}",xAxisLabel, "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_sys.pdf" );
+    writeToCanvas(cross_sec_stat,"B #frac{d#sigma}{dp_{T}dy}",xAxisLabel, "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_stat.pdf" );
 
     TH1F* DATA_dN_dPt_norm = Normalize(DATA_dN_dPt);
     DATA_dN_dPt_norm->SetLineColor(1);
@@ -76,7 +76,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     TH1F* nSigMC_gen = (TH1F*) accFile->Get(accDenName);
     nSigMC_gen->SetName("MC_nSigY1S_gen");
 
-    writeToCanvas(nSigMC_gen,"p^{#mu#mu}_{T} GeV/c","nSigY1S",outbasename);
+    writeToCanvas(nSigMC_gen,xAxisLabel,"nSigY1S",outbasename);
     nSigMC_gen->Write();
 
     TH1F* MC_dN_dPt= calcDN_DpT(nSigMC_gen);
@@ -86,7 +86,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     std::vector<TH1*> hists ={DATA_dN_dPt_norm,MC_dN_dPt_norm};
     DATA_dN_dPt_norm->SetTitle("DATA");
     MC_dN_dPt_norm->SetTitle("MC gen");
-    writeToCanvas(hists,"#frac{dN}{dp_{T}} normalized","p^{#mu#mu}_{T} GeV/c"," ",outbasename+"_dNdPt.pdf");
+    writeToCanvas(hists,"#frac{dN}{dp_{T}} normalized",xAxisLabel," ",outbasename+"_dNdPt.pdf");
     DATA_dN_dPt_norm->Write();
     MC_dN_dPt_norm->Write();
 
@@ -95,11 +95,10 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     ratio->SetTitle("#frac{DATA dN_{DATAcorr}/dp_{T} norm}{MC dN_{MC}/dp_{T} norm}");
     ratio->SetTitleSize(0.004);
     ratio->SetTitleSize(0.004);
-    ratio->GetYaxis()->SetRangeUser(0.0,3.5);
     ratio->SetFillColor(1);
     ratio->SetLineColor(1);
     ratio->SetStats(false);
-    writeToCanvas(ratio,"p^{#mu#mu}_{T} GeV/c","ratio", outbasename);
+    writeToCanvas(ratio,xAxisLabel,"ratio", outbasename);
     ratio->Write();
 
     outFile->Close();
@@ -118,7 +117,7 @@ void AccEffResults(const char* accFilename, const char* effFilename, const char*
     TH1F* dens= new TH1F((*acc_den)*(*eff_den));
     TH1F* nums= new TH1F((*acc_num)*(*eff_num));
 
-    std::unique_ptr<TEfficiency> AccXEff = createTEff(nums,dens,accXEffName,"#alpha #epsilon;p^{#mu#mu}_{T} GeV/c; #alpha#epsilon;");
+    std::unique_ptr<TEfficiency> AccXEff = createTEff(nums,dens,accXEffName,"#alpha #epsilon;"+ std::string(xAxisLabel)+"; #alpha#epsilon;");
     return AccXEff;
  }
 
