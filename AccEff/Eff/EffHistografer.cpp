@@ -15,7 +15,7 @@ EffHistografer::EffHistografer()
     ptHistQQDet=        createTH1(effDenName,"p^{#mu#mu}_{t} QQ Detectable");
 }
 
-void EffHistografer::Write(const std::string& basename)
+void EffHistografer::finalCalculations(const std::string& basename)
 {
     //write 2D plots
     writeToCanvas(etaVsPtQQRecoCut,"|y^{#mu#mu}|","p^{#mu#mu}_{T} ( GeV/c )",basename);
@@ -26,11 +26,6 @@ void EffHistografer::Write(const std::string& basename)
     writeToCanvas(ptHistQQDet,      "p^{#mu#mu}_{T} ( GeV/c )", "N_{Det}^{#mu#mu}",basename);
     writeToCanvas(ptHistQQRecoCut,  "p^{#mu#mu}_{T} ( GeV/c )", "N_{Rec}^{#mu#mu}",basename);
 
-    etaVsPtQQRecoCut->Write(0,TObject::kOverwrite);
-    etaVsPtMuRecoCut->Write(0,TObject::kOverwrite);
-    ptHistQQDet->Write(0,TObject::kOverwrite);
-    ptHistQQRecoCut->Write(0,TObject::kOverwrite);
-
     //calculate efficiency
     ptQQEfficiency = createTEff(ptHistQQRecoCut,ptHistQQDet,effName,"Efficiency;p^{#mu#mu}_{T} ( GeV/c );#epsilon");
 
@@ -39,7 +34,14 @@ void EffHistografer::Write(const std::string& basename)
     writeToCanvasEff(ptQQEfficiency.get(), "p^{#mu#mu}_{T} ( GeV/c )", "#epsilon",    basename);
 
     writeToCanvasEff2D(etaVsPtQQEfficiency.get(),"|y^{#mu#mu}|", "p^{#mu#mu}_{T} ( GeV/c )",basename);
+}
 
+void EffHistografer::Write() const
+{
+    etaVsPtQQRecoCut->Write(0,TObject::kOverwrite);
+    etaVsPtMuRecoCut->Write(0,TObject::kOverwrite);
+    ptHistQQDet->Write(0,TObject::kOverwrite);
+    ptHistQQRecoCut->Write(0,TObject::kOverwrite);
     ptQQEfficiency->Write(0,TObject::kOverwrite);
     etaVsPtQQEfficiency->Write(0,TObject::kOverwrite);
 }

@@ -2,10 +2,10 @@
 #include "EffAnalyzer.h"
 #include "tnp_weight_lowptpp.h"
 
-std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights )
+std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights, bool onlyNum )
 {
     if (effCut->getIsMC())
-        return std::unique_ptr<EffAnalyzer>(new EffAnalyzerMC(input,effCut,outTreeName,weights));
+        return std::unique_ptr<EffAnalyzer>(new EffAnalyzerMC(input,effCut,outTreeName,weights,onlyNum));
     else
         return nullptr;
 }

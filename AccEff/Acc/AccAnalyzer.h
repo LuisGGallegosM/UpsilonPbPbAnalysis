@@ -17,15 +17,18 @@ class AccAnalyzer
     OniaReader<OniaGenOnlyData> oniaReader;
     AccCutter accCutter;
     WeightFunc* weightFunc;
-
-    void Analyze(const OniaGenOnlyData* input,Int_t index, Long64_t entry);
+    bool onlyNumCorr;
 
     public:
-    AccAnalyzer(TTree* input,const char* outTreeName, WeightFunc* weightFunc=nullptr);
+    AccAnalyzer(TTree* input,const char* outTreeName, WeightFunc* weightFunc=nullptr, bool onlyNCorr =false);
 
-    void Write(const std::string& basename);
+    const AccHistografer* getHists() const { return &hists;}
 
-    void Test() { TreeProcess(this,oniaReader.getName(),oniaReader.getEntries()); }
+    void Test(const std::string& basename) 
+    { 
+        TreeProcess(this,oniaReader.getName(),oniaReader.getEntries()); 
+        hists.finalCalculations(basename);
+    }
     void ProcessEvent(Long64_t entry);
 };
 

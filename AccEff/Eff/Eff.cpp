@@ -54,13 +54,11 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
 
     std::unique_ptr<EffAnalyzer> effAnalyzer = createEffAnalyzer(myTree,&cut,"RecoCutOnia",yieldfitPtr);
 
-    //Run efficiency test
-    effAnalyzer->Test();
-
     //write results to same folder as outputfilename
     std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
-    effAnalyzer->Write(outputfilesBasename);
-
+    //Run efficiency test
+    effAnalyzer->Test(outputfilesBasename);
+    effAnalyzer->getHists()->Write();
     //clean up
     outputfile->Close();
     file->Close();

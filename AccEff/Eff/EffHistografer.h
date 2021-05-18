@@ -7,6 +7,7 @@
 
 class EffHistografer
 {
+    public:
     TH2F* etaVsPtQQRecoCut;
     TH2F* etaVsPtMuRecoCut;
     TH2F* etaVsPtQQDet;
@@ -15,7 +16,6 @@ class EffHistografer
     std::unique_ptr<TEfficiency> ptQQEfficiency;
     std::unique_ptr<TEfficiency> etaVsPtQQEfficiency;
 
-    public:
     struct inputs
     {
         float pT;
@@ -29,9 +29,11 @@ class EffHistografer
     };
     EffHistografer();
 
+    void finalCalculations(const std::string& basename);
+
     void FillDet(float y, float pT, float weight=1.0f);
     void FillRecoCut(const inputs* input, float weight=1.0f);
-    void Write(const std::string& basename);
+    void Write() const;
 };
 
 template<typename Data>

@@ -13,8 +13,8 @@ float calculateTnp(float muplPt, float mumiPt, float muplY, float mumiY);
 class EffAnalyzer
 {
     public:
-    virtual void Write(const std::string& basename) = 0;
-    virtual void Test() = 0;
+    virtual const EffHistografer* getHists() const =0;
+    virtual void Test(const std::string& basename) = 0;
 
     virtual ~EffAnalyzer() = default;
 };
@@ -27,6 +27,7 @@ class EffAnalyzerBase : public EffAnalyzer
     EffCutter effCutter;
     AccCutter accCutter;
     WeightFunc* weightFunc;
+    bool onlyNumWeight;
 
     void CaptureGenQQ(const Reader* input,Int_t index, Long64_t entry)
     {
@@ -48,7 +49,7 @@ class EffAnalyzerBase : public EffAnalyzer
         float pT = mom4vec->Pt();
         float y = fabs(mom4vec->Rapidity());
         float weight = 1.0f;
-        if (weightFunc!=nullptr)
+        if ((!onlyNumWeight) && (weightFunc!=nullptr))
         {
             weight = weightFunc->getWeight(pT);
         }
@@ -56,20 +57,18 @@ class EffAnalyzerBase : public EffAnalyzer
     }
 
     public:
-    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights=nullptr): 
-        oniaReader(input),effCutter(effCut),weightFunc(weights)
+    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights=nullptr, bool onlyNum=false): 
+        oniaReader(input),effCutter(effCut),weightFunc(weights),onlyNumWeight(onlyNum)
     {
     }
 
-    void Write(const std::string& basename) override
-    {
-        hists.Write(basename);
-    }
-
-    void Test() override 
+    void Test(const std::string& basename) override 
     { 
         TreeProcess( this,oniaReader.getName(),oniaReader.getEntries());
+        hists.finalCalculations(basename);
     }
+
+    const EffHistografer* getHists() const override {return &hists;}
 
     void ProcessEvent(Long64_t entry)
     {
@@ -99,5 +98,5 @@ class EffAnalyzerBase : public EffAnalyzer
 using EffAnalyzerRealData = EffAnalyzerBase<OniaRealData>;
 using EffAnalyzerMC = EffAnalyzerBase<OniaMCData>;
 
-std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights );
+std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights, bool onlyNum =false );
 #endif

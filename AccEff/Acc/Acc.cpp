@@ -44,12 +44,12 @@ void AccTest(const char* filename,const char* outputfilename, const char* yieldf
 
     AccAnalyzer accAnalyzer(myTree,"DetectableOnia", yieldfitPtr );
 
-    //Run acceptancy test
-    accAnalyzer.Test();
-
     //write plots to same folder as outputfilename and prefixed with outputfilename
     std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
-    accAnalyzer.Write(outputfilesBasename);
+
+    //Run acceptancy test
+    accAnalyzer.Test(outputfilesBasename);
+    accAnalyzer.getHists()->Write();
 
     outputfile->Close();
     file->Close();
