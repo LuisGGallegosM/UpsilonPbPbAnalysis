@@ -5,16 +5,19 @@
 #include"../../Utils/Helpers/Helpers.h"
 #include "../../Drawing/Drawing.h"
 
+#include "../Acc/AccAnalyzer.h"
+#include "../Eff/EffAnalyzer.h"
+
 #include<iostream>
 
 #include"TEfficiency.h"
 #include"TH1.h"
 
+void accOnlyClosureTest(const TH1F* yields, const TEfficiency* acc, const TH1F* yields_original, const std::string& outputname );
+void effOnlyClosureTest(const TH1F* yields, const TEfficiency* eff,const TH1F* yields_original, const std::string& outputname);
 void acceffClosureTest(TH1F* MC_gen_yields, TH1F* MC_reco_yields, TEfficiency* accXEff, const std::string& outputname);
-void accOnlyClosureTest(TH1F* MC_gen_det_yields, TEfficiency* acc, TH1F* MC_gen_yields, const std::string& outputname);
-void effOnlyClosureTest(TH1F* yields, TEfficiency* eff, TH1F* yields_original, const std::string& outputname);
 
-void ClosureTest(const char* accxeffFilename,const char* accFilename, const char* effFilename, const char* fitFilename, const char* outputname)
+void ClosureTest(const char* accxeffFilename,const char* accFilename, const char* effFilename, const char* accSampleFilename, const char* effSampleFilename, const char* effCutParams, const char* outputname)
 {
     std::cout << "\nCLOSURE TEST\n";
 
@@ -31,8 +34,12 @@ void ClosureTest(const char* accxeffFilename,const char* accFilename, const char
     TFile* effFile = OpenFile(effFilename,"READ");
 
     //input file
-    std::cout << "Reading MC fit file: " << fitFilename <<'\n';
-    TFile* fitFile = OpenFile(fitFilename,"READ");
+    std::cout << "Reading Acc sample file: " << accSampleFilename <<'\n';
+    TFile* accSampleFile = OpenFile(accSampleFilename,"READ");
+
+    //input file
+    std::cout << "Reading Eff sample file: " << effSampleFilename <<'\n';
+    TFile* effSampleFile = OpenFile(effSampleFilename,"READ");
 
     //output file
     std::cout << "Writing to file: " << outputname <<'\n';
@@ -42,42 +49,49 @@ void ClosureTest(const char* accxeffFilename,const char* accFilename, const char
     TEfficiency* acc = (TEfficiency*) accFile->Get(accName);
     TEfficiency* eff = (TEfficiency*) effFile->Get(effName);
 
-    TH1F* acc_den = (TH1F*) accFile->Get(accDenName);
-    TH1F* acc_num = (TH1F*) accFile->Get(accNumName);
-    TH1F* eff_den = (TH1F*) effFile->Get(effDenName);
-    TH1F* eff_num = (TH1F*) effFile->Get(effNumName);
-    TH1F* MC_reco_yields = (TH1F*) fitFile->Get(nSigY1SName);
-
     std::string outputbasename=ReplaceExtension(outputname,"");
 
-    accOnlyClosureTest(acc_num,acc,acc_den, outputbasename);
+    WeightFuncTEff weightAcc(acc);
+    WeightFuncTEff weightEff(eff);
 
-    effOnlyClosureTest(eff_num,eff,eff_den,outputbasename);
+    TTree* accSampleTree= GetTree(accSampleFile,"hionia/myTree");
 
-    acceffClosureTest(acc_den,eff_num,accXEff,outputbasename);
-    
-    acc_den->Write();
+    AccAnalyzer accAnalyzer(accSampleTree,"DetectableOnia", &weightAcc, true );
+    accAnalyzer.Test(outputbasename+"_Acc");
+    const AccHistografer* accHist = accAnalyzer.getHists();
+
+    accOnlyClosureTest(accHist->ptHistQQDet,acc,accHist->ptHistQQGen, outputbasename);
+
+    TTree* effSampleTree= GetTree(effSampleFile,"hionia/myTree");
+
+    CutParams cut;
+    cut.deserialize(effCutParams);
+
+    EffAnalyzerMC effAnalyzer(effSampleTree,&cut,"DetectableOnia", &weightEff, true );
+    effAnalyzer.Test(outputbasename+"_Eff");
+    const EffHistografer* effHist = effAnalyzer.getHists();
+
+    effOnlyClosureTest(effHist->ptHistQQRecoCut,eff,effHist->ptHistQQDet,outputbasename);
+
+    acceffClosureTest(accHist->ptHistQQGen,effHist->ptHistQQRecoCut,accXEff,outputbasename);
 
     outFile->Close();
     accFile->Close();
-    fitFile->Close();
     accXEffFile->Close();
     
 }
 
-void accOnlyClosureTest(TH1F* yields, TEfficiency* acc, TH1F* yields_original, const std::string& outputname )
+void accOnlyClosureTest(const TH1F* yields, const TEfficiency* acc, const TH1F* yields_original, const std::string& outputname )
 {
-    TH1F* yields_acccorr = calcCorrectedYields(yields,acc,"_acccorr");
-    TH1F yield_ratio = (*yields_acccorr)/(*yields_original);
+    TH1F yield_ratio = (*yields)/(*yields_original);
     yield_ratio.SetName("MC_gen_acc_corr_ratio_closure");
     yield_ratio.SetTitle("acceptance closure test");
     writeToCanvas(&yield_ratio,"p^{#mu#mu}_{T} GeV/c", "ratio",outputname);
 }
 
-void effOnlyClosureTest(TH1F* yields, TEfficiency* eff, TH1F* yields_original, const std::string& outputname)
+void effOnlyClosureTest(const TH1F* yields, const TEfficiency* eff,const TH1F* yields_original, const std::string& outputname)
 {
-    TH1F* yields_effcorr = calcCorrectedYields(yields,eff,"_effcorr");
-    TH1F yield_ratio = (*yields_effcorr)/(*yields_original);
+    TH1F yield_ratio = (*yields)/(*yields_original);
     yield_ratio.SetName("MC_gen_eff_corr_ratio_closure");
     yield_ratio.SetTitle("efficiency closure test");
     writeToCanvas(&yield_ratio,"p^{#mu#mu}_{T} GeV/c", "ratio",outputname);

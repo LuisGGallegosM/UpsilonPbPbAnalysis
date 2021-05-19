@@ -40,9 +40,15 @@ int main(int argc, char **argv)
         case 7:
         if (flags=="-final")
             AccEffResults(argv[2],argv[3],argv[4],argv[5],argv[6]);
-        else if (flags=="-closure")
-            ClosureTest(argv[2],argv[3],argv[4],argv[5],argv[6]);
-        else 
+        else
+            std::cerr << "Incorrect number of parameters\n";
+        break;
+
+        case 9:
+        if (flags=="-closure")
+            ClosureTest(argv[2],argv[3],argv[4],argv[5],argv[6],argv[7],argv[8]);
+        else
+
         break;
 
         default:

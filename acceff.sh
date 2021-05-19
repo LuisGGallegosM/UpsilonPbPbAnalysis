@@ -53,7 +53,7 @@ final () {
 
 closure () { 
     mkdir -p "${OUTPUTFOLDER}/ClosureTest"
-    $TIMECMD $TIMEARGS ./AccEff/acceff -closure "${FINALOUTPUTFILE}" "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${MC_FITINPUTFILENAME}" "${CLOSUREOUTPUTFILE}" |& tee "${CLOSUREOUTPUTFILE%.*}.log"
+    $TIMECMD $TIMEARGS ./AccEff/acceff -closure "${FINALOUTPUTFILE}" "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${ACCINPUTFILE}" "${EFFINPUTFILE}" "${CONFIG}" "${CLOSUREOUTPUTFILE}" |& tee "${CLOSUREOUTPUTFILE%.*}.log"
     }
 
 fit () { 
