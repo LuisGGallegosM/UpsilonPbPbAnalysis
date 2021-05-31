@@ -51,6 +51,7 @@ class OniaJetSkimmer : public Skimmer
                 if(iJet>=0)
                 {
                     writeJet(input,oniaWriter.getDataBuffer(),JetSelector{entry,iQQ,iJet,&JEC,&JEU});
+                    oniaWriter.writeData();
                 }
             }
         }
