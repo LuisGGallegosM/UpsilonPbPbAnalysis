@@ -8,31 +8,31 @@
 class EffHistografer
 {
     public:
-    TH2F* etaVsPtQQRecoCut;
-    TH2F* etaVsPtMuRecoCut;
-    TH2F* etaVsPtQQDet;
-    TH1F* ptHistQQRecoCut;
-    TH1F* ptHistQQDet;
+    TH2D* etaVsPtQQRecoCut;
+    TH2D* etaVsPtMuRecoCut;
+    TH2D* etaVsPtQQDet;
+    TH1D* ptHistQQRecoCut;
+    TH1D* ptHistQQDet;
     std::unique_ptr<TEfficiency> ptQQEfficiency;
     std::unique_ptr<TEfficiency> etaVsPtQQEfficiency;
 
     struct inputs
     {
-        float pT;
-        float y;
-        float etaMuPl;
-        float etaMuMi;
-        float ptMuPl;
-        float ptMuMi;
-        float yMuPl;
-        float yMuMi;
+        double pT;
+        double y;
+        double etaMuPl;
+        double etaMuMi;
+        double ptMuPl;
+        double ptMuMi;
+        double yMuPl;
+        double yMuMi;
     };
     EffHistografer();
 
     void finalCalculations(const std::string& basename);
 
-    void FillDet(float y, float pT, float weight=1.0f);
-    void FillRecoCut(const inputs* input, float weight=1.0f);
+    void FillDet(double y, double pT, double weight=1.0);
+    void FillRecoCut(const inputs* input, double weight=1.0);
     void Write() const;
 };
 
@@ -49,9 +49,9 @@ EffHistografer::inputs extractGen( const Data* input ,int index)
     TLorentzVector* mom4vecMi=(TLorentzVector*) input->genMu.mom4->At(mumi_idx);
 
     data.pT = mom4vec->Pt();
-    data.y = fabs(mom4vec->Rapidity());
-    data.etaMuPl=fabs(mom4vecPl->Eta());
-    data.etaMuMi=fabs(mom4vecMi->Eta());
+    data.y = abs(mom4vec->Rapidity());
+    data.etaMuPl=abs(mom4vecPl->Eta());
+    data.etaMuMi=abs(mom4vecMi->Eta());
     data.ptMuPl=mom4vecPl->Pt();
     data.ptMuMi=mom4vecMi->Pt();
     data.yMuPl=mom4vecPl->Rapidity();

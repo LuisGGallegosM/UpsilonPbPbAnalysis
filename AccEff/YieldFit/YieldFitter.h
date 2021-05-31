@@ -16,12 +16,12 @@ class YieldFitter
     RooRealVar D;
     RooRealVar pt;
     RooFormulaVar fitFunc;
-    TH1F* data;
+    TH1D* data;
     RooDataHist dataHist;
     RooDataHist dataHist2;
 
     public:
-    YieldFitter(TH1F* yieldRatio);
+    YieldFitter(TH1D* yieldRatio);
     RooAbsReal* fit();
     RooRealVar* getVar() { return &pt;}
     RooDataHist* getHist() {return &dataHist2;}

@@ -6,10 +6,10 @@
 
 #include "../../OniaBase/Params/Params.h"
 
-TH1F* toTH1F(const TEfficiency* asym);
-TH1F* calcCorrectedYields(TH1F* nSig,TEfficiency* AccXEff,const std::string& subfix="_corr");
-TH1F* calcDN_DpT(TH1F* nSigCorrected);
-TH1F* Normalize(TH1F* nSigCorrected);
+TH1D* toTH1D(const TEfficiency* asym);
+TH1D* calcCorrectedYields(TH1D* nSig,TEfficiency* AccXEff,const std::string& subfix="_corr");
+TH1D* calcDN_DpT(TH1D* nSigCorrected);
+TH1D* Normalize(TH1D* nSigCorrected);
 
 const char accDenName[] ="PtQQ_Gen";
 const char accNumName[] ="PtQQ_Det_acc";
@@ -23,8 +23,11 @@ const char yieldFitFuncName[]= "ratio_fit";
 const char yieldFitName[] = "ratio_dN_dpT_norm";
 
 
-const float integratedLum = 302000.0f;// in nb^-1
-const float yRange = 4.8f;
+const double integratedLum = 302000.0;// in nb^-1
+const double yRange = 4.8;
+
+const double yMax = 2.4;
+const double ptMax = 30.0;
 
 constexpr std::array<float,6> ref_cross_section_value=
 { 0.102f, 0.193f , 0.176f, 0.093f, 0.039f, 0.0046f};
@@ -41,6 +44,7 @@ class WeightFuncRooAbs : public WeightFunc
     RooAbsReal* f;
     public:
     float getWeight(float x) const override;
+    double getWeight(double x) const override;
 
     WeightFuncRooAbs(RooAbsReal* func);
 };
@@ -51,6 +55,7 @@ class WeightFuncTEff : public WeightFunc
 
     public:
     float getWeight(float x) const override;
+    double getWeight(double x) const override;
 
     WeightFuncTEff(TEfficiency* h) : hist(h) {} ;
 };

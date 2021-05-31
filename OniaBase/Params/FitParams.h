@@ -21,6 +21,7 @@ class WeightFunc
 {
     public:
     virtual float getWeight(float x) const =0;
+    virtual double getWeight(double x) const =0;
     virtual ~WeightFunc() = default;
 };
 

@@ -7,28 +7,28 @@
 class AccHistografer
 {
     public:
-    TH2F* etaVsPtQQGen;
-    TH2F* etaVsPtQQDet;
-    TH2F* etaVsPtMuGen;
-    TH2F* etaVsPtMuDet;
-    TH1F* ptHistQQGen;
-    TH1F* ptHistQQDet;
+    TH2D* etaVsPtQQGen;
+    TH2D* etaVsPtQQDet;
+    TH2D* etaVsPtMuGen;
+    TH2D* etaVsPtMuDet;
+    TH1D* ptHistQQGen;
+    TH1D* ptHistQQDet;
     std::unique_ptr<TEfficiency> ptQQAcceptancy;
     std::unique_ptr<TEfficiency> etaVsPtQQAcceptancy;
 
     struct inputs
     {
-        float pT;
-        float y;
-        float etaMuPl;
-        float etaMuMi;
-        float ptMuPl;
-        float ptMuMi;
+        double pT;
+        double y;
+        double etaMuPl;
+        double etaMuMi;
+        double ptMuPl;
+        double ptMuMi;
     };
 
     AccHistografer();
-    void FillGen(const inputs* in,float weight=1.0f);
-    void FillDet(const inputs* in,float weight=1.0f);
+    void FillGen(const inputs* in,double weight=1.0);
+    void FillDet(const inputs* in,double weight=1.0);
     void finalCalculations(const std::string& basename);
     void Write() const;
 };

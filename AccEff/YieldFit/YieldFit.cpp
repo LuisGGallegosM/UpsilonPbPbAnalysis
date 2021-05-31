@@ -29,7 +29,7 @@ void YieldFit(const char* inputRatiosFile, const char* outputFile)
     std::cout << "Writing to file: " << outputFile <<'\n';
     TFile* outFile = OpenFile(outputFile,"RECREATE");
 
-    TH1F* ratios = (TH1F*) ratiosFile->Get(yieldFitName);
+    TH1D* ratios = (TH1D*) ratiosFile->Get(yieldFitName);
 
     YieldFitter fitter(ratios);
     RooAbsReal* fitFunc = fitter.fit();

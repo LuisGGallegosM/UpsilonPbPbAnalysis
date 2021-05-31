@@ -46,15 +46,15 @@ void EffHistografer::Write() const
     etaVsPtQQEfficiency->Write(0,TObject::kOverwrite);
 }
 
-void EffHistografer::FillDet(float y, float pT, float weight)
+void EffHistografer::FillDet(double y, double pT, double weight)
 {
     etaVsPtQQDet->Fill(y,pT,weight);
-    ptHistQQDet->Fill(pT,weight);
+    ptHistQQDet->Fill(pT,weight*0.5);
 }
 
-void EffHistografer::FillRecoCut(const inputs* input, float weight)
+void EffHistografer::FillRecoCut(const inputs* input, double weight)
 {
-    ptHistQQRecoCut->Fill(input->pT,weight);
+    ptHistQQRecoCut->Fill(input->pT,weight*0.5);
     etaVsPtQQRecoCut->Fill(input->y,input->pT,weight);
     etaVsPtMuRecoCut->Fill(input->etaMuPl,input->ptMuPl,weight);
     etaVsPtMuRecoCut->Fill(input->etaMuMi,input->ptMuMi,weight);

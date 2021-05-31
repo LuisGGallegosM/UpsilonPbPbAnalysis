@@ -6,7 +6,7 @@
 
 using namespace RooFit;
 
-YieldFitter::YieldFitter(TH1F* yieldRatio):
+YieldFitter::YieldFitter(TH1D* yieldRatio):
     A("A","A parameter",244.0,-1000.0,1000.0),
     B("B","B parameter",17.0,-100.0,100.0),
     C("C","C parameter",23.0,-100.0,100.0),

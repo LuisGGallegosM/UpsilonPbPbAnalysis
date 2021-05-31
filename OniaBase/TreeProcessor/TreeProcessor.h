@@ -8,14 +8,14 @@
 #include <iostream>
 
 template<typename TreeProcessor>
-void TreeProcess(TreeProcessor processor, const std::string& treeName , Long64_t entries)
+void TreeProcess(TreeProcessor processor, const std::string& treeName , Long64_t entries, Long64_t firstEntry=0)
 {
     int block =0;
 
     std::cout << "Processing of " << treeName <<" tree starting...\n";
     std::cout << entries <<" entries in tree\n";
 
-    for(Long64_t i=0;i<entries;++i)
+    for(Long64_t i=firstEntry;i<entries;++i)
     {
         if ((i % (entries/20)) ==0)
         {

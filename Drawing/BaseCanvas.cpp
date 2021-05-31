@@ -8,29 +8,29 @@
 constexpr std::array<double,7> pTBins  { 0.0f,2.0f,4.0f,6.0f,9.0f,12.0f,30.0f};
 constexpr std::array<double,6> EtaBins { 0.0f,0.5f,1.0f,1.5f,2.0f,2.4f};
 
-TH2F* createTH2QQ(const std::string& name,const std::string& title)
+TH2D* createTH2QQ(const std::string& name,const std::string& title)
 {
-    TH2F* result =new TH2F(name.data(),title.data(),EtaBins.size()-1,EtaBins.data(),pTBins.size()-1,pTBins.data());
+    TH2D* result =new TH2D(name.data(),title.data(),EtaBins.size()-1,EtaBins.data(),pTBins.size()-1,pTBins.data());
     result->SetStats(false);
     result->Sumw2();
     return result;
 }
 
-TH2F* createTH2Mu(const std::string& name,const std::string& title)
+TH2D* createTH2Mu(const std::string& name,const std::string& title)
 {
     const int binPtN = 40;
     const float ptMax = 20.0f;
     const int binEtaN = 40;
     const float etaMax = 4.0f;
-    TH2F* result =new TH2F(name.data(),title.data(),binEtaN,0.0,etaMax,binPtN,0.0,ptMax);
+    TH2D* result =new TH2D(name.data(),title.data(),binEtaN,0.0,etaMax,binPtN,0.0,ptMax);
     result->SetStats(false);
     result->Sumw2();
     return result;
 }
 
-TH1F* createTH1(const std::string& name,const std::string& title)
+TH1D* createTH1(const std::string& name,const std::string& title)
 {
-    TH1F* result=new TH1F(name.data(),title.data(),pTBins.size()-1,pTBins.data());
+    TH1D* result=new TH1D(name.data(),title.data(),pTBins.size()-1,pTBins.data());
     result->SetStats(false);
     result->Sumw2();
     return result;

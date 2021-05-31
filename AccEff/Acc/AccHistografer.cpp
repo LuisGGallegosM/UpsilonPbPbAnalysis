@@ -19,7 +19,7 @@ AccHistografer::AccHistografer()
     ptHistQQDet= createTH1(accNumName ,"p^{#mu#mu}_{t} QQ Detectable");
 }
 
-void AccHistografer::FillGen(const inputs* in,float weight)
+void AccHistografer::FillGen(const inputs* in,double weight)
 {
     ptHistQQGen->Fill(in->pT,weight);
     etaVsPtQQGen->Fill(in->y,in->pT,weight);
@@ -27,7 +27,7 @@ void AccHistografer::FillGen(const inputs* in,float weight)
     etaVsPtMuGen->Fill(in->etaMuMi,in->ptMuMi,weight);
 }
 
-void AccHistografer::FillDet(const inputs* in,float weight)
+void AccHistografer::FillDet(const inputs* in,double weight)
 {
     ptHistQQDet->Fill(in->pT,weight);
     etaVsPtQQDet->Fill(in->y,in->pT,weight);

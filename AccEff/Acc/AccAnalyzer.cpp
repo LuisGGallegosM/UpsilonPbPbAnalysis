@@ -21,10 +21,11 @@ void AccAnalyzer::ProcessEvent(Long64_t entry)
 
         AccHistografer::inputs data;
         data.pT = mom4vec->Pt();
-        data.y = fabs(mom4vec->Rapidity());
-        if(data.y > 2.4f) return;
+        data.y = abs(mom4vec->Rapidity());
+        if(data.y > yMax) continue;
+        if(data.pT > ptMax) continue;
         
-        float weight=1.0f;
+       double weight=1.0;
         if(weightFunc!=nullptr)
         {
             weight=weightFunc->getWeight(data.pT);
@@ -33,8 +34,8 @@ void AccAnalyzer::ProcessEvent(Long64_t entry)
         TLorentzVector* mom4vecPl=(TLorentzVector*) input->genQQ.mupl_mom4->At(index);
         TLorentzVector* mom4vecMi=(TLorentzVector*) input->genQQ.mumi_mom4->At(index);
 
-        data.etaMuPl=fabs(mom4vecPl->Eta());
-        data.etaMuMi=fabs(mom4vecMi->Eta());
+        data.etaMuPl=abs(mom4vecPl->Eta());
+        data.etaMuMi=abs(mom4vecMi->Eta());
         data.ptMuPl=mom4vecPl->Pt();
         data.ptMuMi=mom4vecMi->Pt();
 

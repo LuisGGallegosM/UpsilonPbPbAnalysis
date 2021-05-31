@@ -5,10 +5,11 @@
 
 #include "../../OniaBase/TreeProcessor/TreeProcessor.h"
 #include "../../OniaBase/OniaIO/OniaIO.h"
+#include "../Common/AccEffAux.h"
 #include "EffCutter.h"
 #include "EffHistografer.h"
 
-float calculateTnp(float muplPt, float mumiPt, float muplY, float mumiY);
+double calculateTnp(double muplPt, double mumiPt, double muplY, double mumiY);
 
 class EffAnalyzer
 {
@@ -33,7 +34,7 @@ class EffAnalyzerBase : public EffAnalyzer
     {
         EffHistografer::inputs data = extractGen(input,index);
 
-        float weight=1.0f;
+        double weight=1.0;
         if (weightFunc!=nullptr)
         {
             weight=calculateTnp(data.ptMuPl,data.ptMuMi,data.yMuPl,data.yMuMi);
@@ -46,9 +47,9 @@ class EffAnalyzerBase : public EffAnalyzer
     void CaptureDetQQ(const Reader* input,Int_t index, Long64_t entry)
     {
         TLorentzVector* mom4vec=(TLorentzVector*) input->genQQ.mom4->At(index);
-        float pT = mom4vec->Pt();
-        float y = fabs(mom4vec->Rapidity());
-        float weight = 1.0f;
+        double pT = mom4vec->Pt();
+        double y = fabs(mom4vec->Rapidity());
+        double weight = 1.0;
         if ((!onlyNumWeight) && (weightFunc!=nullptr))
         {
             weight = weightFunc->getWeight(pT);
@@ -78,7 +79,7 @@ class EffAnalyzerBase : public EffAnalyzer
         for(int index=0;index<size;++index)
         {
             TLorentzVector* mom4vec=(TLorentzVector*) input->genQQ.mom4->At(index);
-            if (fabs(mom4vec->Rapidity()) <= 2.4f)
+            if ((abs(mom4vec->Rapidity()) <= yMax) && ( mom4vec->Pt() <= ptMax ))
             {
                 if (accCutter.cut(input,index,entry))
                 {

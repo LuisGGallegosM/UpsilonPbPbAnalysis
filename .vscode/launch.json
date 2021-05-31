@@ -4,17 +4,15 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
-    
         {
-            "name": "g++ skim debug",
+            "name": "g++ skimjet debug",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Skimming/skim",
-            "args": ["-jet",
+            "args": ["-skimjet",
                     "../rootfiles/datasets/merged_HiForestAOD_DATA.root", 
-                    "/media/luisg/ALMACEN/rootfiles/skims/merged_HiForestAOD_DATA_skim_test/merged_HiForestAOD_DATA_skim.root",
-                    "../rootfiles/confFiles/merged_HiForestAOD_jetskim.cutconf"],
+                    "../rootfiles/analysis/test/skimjet/skimjet.root",
+                    "../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline.cutconf"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

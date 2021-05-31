@@ -10,7 +10,7 @@ std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, c
         return nullptr;
 }
 
-float calculateTnp(float muplPt, float mumiPt, float muplY, float mumiY)
+double calculateTnp(double muplPt, double mumiPt, double muplY, double mumiY)
 {
     auto muplGlb = tnp_weight_GlobalMuon_TightAcceptance_pp(muplPt,muplY);
 	auto mumiGlb = tnp_weight_GlobalMuon_TightAcceptance_pp(mumiPt,mumiY);

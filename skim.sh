@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #configuration flags
-FLAGS=${1:-"-skim"}
+FLAGS=${1:-"-skimjet"}
 #input file to skim
-INPUTFILE=${2:-"../rootfiles/datasets/merged_HiForestAOD_DATA.root"}
+INPUTFILE=${2:-"../rootfiles/datasets/merged_HiForestAOD_MCFix2.root"}
 #cut configuration file
-CONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline.cutconf"}
+CONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.cutconf"}
 
 INPUTFILENAME=$(basename $INPUTFILE)
 #folder name skim result file
