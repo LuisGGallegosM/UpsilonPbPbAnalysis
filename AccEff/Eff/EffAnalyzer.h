@@ -28,7 +28,7 @@ class EffAnalyzerBase : public EffAnalyzer
     EffCutter effCutter;
     AccCutter accCutter;
     WeightFunc* weightFunc;
-    bool onlyNumWeight;
+    bool onlyNcorr;
 
     void CaptureGenQQ(const Reader* input,Int_t index, Long64_t entry)
     {
@@ -37,8 +37,9 @@ class EffAnalyzerBase : public EffAnalyzer
         double weight=1.0;
         if (weightFunc!=nullptr)
         {
-            weight=calculateTnp(data.ptMuPl,data.ptMuMi,data.yMuPl,data.yMuMi);
-            weight*= weightFunc->getWeight(data.pT);
+            weight= weightFunc->getWeight(data.pT);
+            if (!onlyNcorr)
+                weight*=calculateTnp(data.ptMuPl,data.ptMuMi,data.yMuPl,data.yMuMi);
         }
         
         hists.FillRecoCut(&data,weight);
@@ -50,7 +51,7 @@ class EffAnalyzerBase : public EffAnalyzer
         double pT = mom4vec->Pt();
         double y = fabs(mom4vec->Rapidity());
         double weight = 1.0;
-        if ((!onlyNumWeight) && (weightFunc!=nullptr))
+        if ((!onlyNcorr) && (weightFunc!=nullptr))
         {
             weight = weightFunc->getWeight(pT);
         }
@@ -58,8 +59,8 @@ class EffAnalyzerBase : public EffAnalyzer
     }
 
     public:
-    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights=nullptr, bool onlyNum=false): 
-        oniaReader(input),effCutter(effCut),weightFunc(weights),onlyNumWeight(onlyNum)
+    EffAnalyzerBase(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights=nullptr, bool tnpcorr=true): 
+        oniaReader(input),effCutter(effCut),weightFunc(weights),onlyNcorr(tnpcorr)
     {
     }
 
@@ -99,5 +100,5 @@ class EffAnalyzerBase : public EffAnalyzer
 using EffAnalyzerRealData = EffAnalyzerBase<OniaRealData>;
 using EffAnalyzerMC = EffAnalyzerBase<OniaMCData>;
 
-std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights, bool onlyNum =false );
+std::unique_ptr<EffAnalyzer> createEffAnalyzer(TTree* input,CutParams* effCut, const char* outTreeName, WeightFunc* weights, bool onlyNumCorr =false );
 #endif
