@@ -7,6 +7,8 @@
 #include "RooFormulaVar.h"
 #include "RooExtendPdf.h"
 
+#include"../Common/Common.h"
+
 std::string toInternalName(const std::string& name)
 {
     if (name=="pt") return "reco_pT";
@@ -57,7 +59,7 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const ParameterGroup* fitConf):
     dcball1(mass,"Y1S",config.get("signal")),
     bkg()
 {
-    FitFunc* b =BkgFactory(mass,config.get("bkg"));
+    FitFunc* b =BkgFactory(mass,config.get(bkgName));
     bkg.reset(b);
 }
 
@@ -120,7 +122,7 @@ ParameterGroup OniaMassFitter::getFitParams() const
     output.setBool("moreUpsilon",false);
     ParameterWrite(output,nSig_Y1S,"signal.nSigY1S");
     ParameterWrite(output,nBkg,"bkg.nBkg");
-    output.addGroup(bkg->getBkgParams(),"bkg");
+    output.addGroup(bkg->getBkgParams(),bkgName);
     output.addGroup(dcball1.getParams(),"signal");
 
     return output;

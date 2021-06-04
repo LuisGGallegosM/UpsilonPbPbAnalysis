@@ -7,7 +7,7 @@
 #define RATIO_Y3S (10.355/9.460)
 
 
-enum class BkgType {error, none, chev, special,exponential,expChev2 };
+enum class BkgType {error, none, chev, special,exponential,expchev };
 
 BkgType getBkgByName(const std::string& name);
 

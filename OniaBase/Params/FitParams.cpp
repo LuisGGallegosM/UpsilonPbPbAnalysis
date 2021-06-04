@@ -6,8 +6,8 @@ const std::map<std::string,BkgType> bkgNames =
     {"none",BkgType::none},
      {"chev",BkgType::chev},
     {"special",BkgType::special},
-    {"exponential",BkgType::exponential},
-    {"expChev2",BkgType::expChev2}
+    {"exp",BkgType::exponential},
+    {"expchev",BkgType::expchev}
 };
 
 BkgType getBkgByName(const std::string& name)

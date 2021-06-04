@@ -39,6 +39,20 @@ class Chevychev : public FitFunc
     ParameterGroup getBkgParams() const override;
 };
 
+class ExpChevychev : public FitFunc
+{
+    std::vector<RooRealVar> chk;
+    std::string expr;
+    RooGenericPdf expo;
+
+    public:
+    ExpChevychev(RooRealVar& var,const char* name,const ParameterGroup* init);
+
+    //getters
+    RooAbsReal* getFunc() override {return &expo;}
+    ParameterGroup getBkgParams() const override;
+};
+
 class SpecialBkg : public FitFunc
 {
     RooRealVar mu;

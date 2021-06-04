@@ -2,6 +2,7 @@
 #include<fstream>
 #include"../../Utils/Serialization/Serialization.h"
 #include"../../Drawing/Drawing.h"
+#include"../Common/Common.h"
 
 struct VarAndFilename
 {
@@ -106,7 +107,7 @@ void generatePlots(std::ofstream& latexOut,const std::vector<VarAndFilename>& va
 std::vector<VarAndFilename> getVarNames(const ParameterGroup* fit)
 {
     std::vector<VarAndFilename> getters;
-    const std::vector<std::string> subgroups= {"signal","bkg"};
+    const std::vector<std::string> subgroups= {"signal",bkgName};
     for(auto subgroup : subgroups )
     {
         const auto vars=fit->get(subgroup)->getSubgroupNames();

@@ -1,6 +1,7 @@
 
 
 #include"FitFunctions.h"
+#include"../Common/Common.h"
 
 //Crystal ball member functions.
 
@@ -126,6 +127,17 @@ RooArgSet produceChevArgSet(const std::vector<RooRealVar>& chk)
     return set;
 }
 
+RooArgList produceChevArgList(const std::vector<RooRealVar>& chk,const RooRealVar& var)
+{
+    RooArgList set;
+    set.add(var);
+    for(auto& v : chk)
+    {
+        set.add(v);
+    }
+    return set;
+}
+
 Chevychev::Chevychev(RooRealVar& var,const char* name,const ParameterGroup* init):
     chk(produceChevVars(init)),
     chev(name,"Background",var,produceChevArgSet(chk))
@@ -143,6 +155,43 @@ ParameterGroup Chevychev::getBkgParams() const
         i++;
     }
     p.setString("type","chev");
+    return p;
+}
+
+std::string getChebPoly(int order)
+{
+    std::string str;
+    switch(order)
+    {
+        case 1:
+        str="TMath::Exp(@0*@1)";
+        break;
+        case 2:
+        str="TMath::Exp(@2*(2.0*@0*@0-1.0)+@1*@0+1.0)";
+        break;
+    }
+    return str;
+}
+
+//ExpChevycheb
+ExpChevychev::ExpChevychev(RooRealVar& var,const char* name,const ParameterGroup* init):
+    chk(produceChevVars(init)),
+    expr(getChebPoly(chk.size())),
+    expo(name,"Background",expr.data(),produceChevArgList(chk,var))
+{
+    
+}
+
+ParameterGroup ExpChevychev::getBkgParams() const
+{
+    ParameterGroup p;
+    int i=0;
+    for(auto& v : chk)
+    {
+        ParameterWrite(p,v,v.GetName());
+        i++;
+    }
+    p.setString("type", "expchev");
     return p;
 }
 
@@ -177,7 +226,7 @@ lambda(Form("lambda_%s",name),"m_lambda",getParamVal(*init,"lambda"),  getParamL
 bkgPdf()
 {
     RooGenericPdf* pdf=
-        new RooGenericPdf(name,"Background","TMath::Exp(-@0/@1)",
+        new RooGenericPdf(name,"Background","TMath::Exp(@0*@1)",
                            RooArgList(var, lambda));
     bkgPdf.reset(pdf);
 }
@@ -197,15 +246,19 @@ FitFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config)
     switch (bkgType)
     {
         case BkgType::chev:
-        b = new Chevychev(var,"bkg",config);
+        b = new Chevychev(var,bkgName,config);
+        break;
+
+        case BkgType::expchev:
+        b = new ExpChevychev(var,bkgName,config);
         break;
 
         case BkgType::special:
-        b = new SpecialBkg(var,"bkg",config);
+        b = new SpecialBkg(var,bkgName,config);
         break;
 
         case BkgType::exponential:
-        b = new ExponentialBkg(var,"bkg",config);
+        b = new ExponentialBkg(var,bkgName,config);
         break;
 
         case BkgType::none:

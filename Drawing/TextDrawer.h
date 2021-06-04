@@ -3,6 +3,8 @@
 
 #include "TLatex.h"
 
+std::string makePrettier(const std::string& name);
+
 class TextDrawer
 {
     float pos_text_x;
