@@ -1,0 +1,29 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+\usefonttheme{professionalfonts}
+
+\usetheme{Antibes}
+
+\newcommand{\drawFit}[2]{
+	\begin{frame}
+		\frametitle{Fit #2}
+		\includegraphics[scale=0.45]{../fit#1/fit#1.pdf}
+	\end{frame}
+}
+
+\newcommand{\drawFitLog}[2]{
+	\begin{frame}
+		\frametitle{Fit #2}
+		\includegraphics[scale=0.45]{../fit#1/fit#1_log.pdf}
+	\end{frame}
+}
+
+\newcommand{\draw}[2]{
+    \begin{frame}
+		\frametitle{#2}
+		\includegraphics[scale=0.40]{#1}
+	\end{frame}
+}
+
+\begin{document}

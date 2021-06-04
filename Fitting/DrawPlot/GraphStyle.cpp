@@ -12,11 +12,11 @@ void setGraphStyle(RooPlot* plot, const ParameterGroup* config, float topValue, 
     float minValue = bottomValue*div;
 
     //round to 
-    maxValue = ceil(maxValue/50.0f)*50.0+50.0f;
+    maxValue = ceil(maxValue/10.0f)*10.0+10.0f;
     minValue = ceil(minValue);
     if (isLog)
     {
-        minValue *= 0.7f;
+        minValue *= 0.4f;
         maxValue *= 50.0f;
     }
     else
