@@ -1,6 +1,7 @@
 
 #include<fstream>
 #include"../../Utils/Serialization/Serialization.h"
+#include"../../Utils/Latexer/Latexer.h"
 #include"../../Drawing/Drawing.h"
 #include"../Common/Common.h"
 
@@ -12,22 +13,18 @@ struct VarAndFilename
 };
 
 std::vector<VarAndFilename> getVarNames(const ParameterGroup* fit);
-void generateVarTable(std::ofstream& latexOut,const std::vector<VarAndFilename>& varnames,const std::vector<ParameterGroup>& fits,const char** fitfilepaths );
-void generatePlots(std::ofstream& latexOut,const std::vector<VarAndFilename>& varnames , int size);
-void drawCut(const ParameterGroup* cuts, std::ofstream& latexOut);
+void generateVarTable(Latexer& latexOut,const std::vector<VarAndFilename>& varnames,const std::vector<ParameterGroup>& fits,const char** fitfilepaths );
+void generatePlots(Latexer& latexOut,const std::vector<VarAndFilename>& varnames , int size);
+void drawCut(const ParameterGroup* cuts, Latexer& latexOut);
 
 void Report(const char* multifitpath,const char* outputpath,int size,const char** fitfilepaths)
 {
 
     std::string outputstr(outputpath);
     outputstr+= "/report/report.tex";
-    std::ofstream latexOut(outputstr);
 
-    std::ifstream latexHeader("./HelperScripts/examplefiles/latexHeaders.tex");
-
-    latexOut << latexHeader.rdbuf();
-
-    latexHeader.close();
+    Latexer latexOut(outputstr,"./HelperScripts/examplefiles/latexHeaders.tex");
+    latexOut.beginDoc();
 
     ParameterGroup multifit;
     multifit.deserialize(multifitpath);
@@ -51,56 +48,64 @@ void Report(const char* multifitpath,const char* outputpath,int size,const char*
 
     generatePlots(latexOut,varnames,size);
 
-    latexOut << "\n\\end{document}";
+    latexOut.endDoc();
 
-    latexOut.close();
 }
 
-void generateVarTable(std::ofstream& latexOut,const std::vector<VarAndFilename>& varnames,const std::vector<ParameterGroup>& fits,const char** fitfilepaths )
+void generateVarTable(Latexer& latexOut,const std::vector<VarAndFilename>& varnames,const std::vector<ParameterGroup>& fits,const char** fitfilepaths )
 {
     for(int startindex=0;startindex< fits.size();startindex+=4)
     {
         int endindex=startindex+4;
-        if (endindex > fits.size()) endindex= fits.size()-startindex;
+        if (endindex > fits.size()) endindex= fits.size();
 
-        latexOut << "\n\\begin{frame}\n\t\\begin{center}\n\t\\begin{tabular} { ";
-        for (int i=0;i<varnames.size();i++) { latexOut << "|c "; }
-        latexOut << "}\n";
+        std::vector<std::vector<std::string>> table;
 
-        latexOut << "\t\t- ";
+        table.emplace_back();
+        table.back().push_back("var");
         for(int i=startindex;i < endindex;i++) 
         {
-            std::string fitbasename = basename(fitfilepaths[i]);
-            latexOut << "& " << fitbasename; 
+            table.back().push_back(basename(fitfilepaths[i]));
         }
-        latexOut << "\\\\\n";
 
         for(const auto var : varnames)
         {
-            latexOut << "\t\t\\detokenize{" << var.varName << "}";
+            table.emplace_back();
+            table.back().push_back("\\detokenize{" + var.varName + "}");
             for(int i=startindex;i < endindex;i++)
             {
-                latexOut << " & " << fits[i].getFloat(var.varName+".value");
-                if ((fits[i].exists(var.varName+".fixed")) && (fits[i].getBool(var.varName+".fixed"))) latexOut << '*';
+                std::string value=std::to_string(fits[i].getFloat(var.varName+".value"));
+                if ((fits[i].exists(var.varName+".fixed")) && (fits[i].getBool(var.varName+".fixed"))) 
+                    value.append("*");
+                table.back().push_back(value);
             }
-            latexOut << "\\\\\n";
         }
-        latexOut << "\\end{tabular}\n\\end{center}\n\\end{frame}\n";
+        table.emplace_back();
+        table.back().push_back("bkg.type");
+        for(int i=startindex;i < endindex;i++)
+        {
+            table.back().push_back(fits[i].getString("bkg.type"));
+        }
+
+        latexOut.beginFrame();
+        latexOut.genTable(table);
+        latexOut.endFrame();
     }
 }
 
-void generatePlots(std::ofstream& latexOut,const std::vector<VarAndFilename>& varnames , int size)
+void generatePlots(Latexer& latexOut,const std::vector<VarAndFilename>& varnames , int size)
 {
     for(int i=0;i<size;i++)
     {
-        latexOut << "\n\t\\drawFit{"<< i << "}{ linear scale }" ;
-        latexOut << "\n\t\\drawFitLog{"<< i << "}{ log scale }" ;
+        std::string str = std::to_string(i);
+        latexOut.addLine("\\drawFit{"+ str + "}{ Fit" + str +" linear scale }") ;
+        latexOut.addLine("\\drawFitLog{"+ str + "}{ Fit" + str +" log scale }") ;
     }
 
     for(const auto var : varnames)
     {
         if (!var.isFixed)
-            latexOut << "\n\t\\draw{\\detokenize{../" << var.filename <<".pdf}}{\\detokenize{" << var.varName << "}}";
+            latexOut.addLine("\\draw{\\detokenize{../" + var.filename +".pdf}}{\\detokenize{" + var.varName + "}}");
     }
 }
 
@@ -124,11 +129,12 @@ std::vector<VarAndFilename> getVarNames(const ParameterGroup* fit)
     return getters;
 }
 
-void drawCut(const ParameterGroup* cuts, std::ofstream& latexOut)
+void drawCut(const ParameterGroup* cuts, Latexer& latexOut)
 {
     const auto vars= cuts->getSubgroupNames();
     std::string str;
-    latexOut << "\n\\begin{frame}\n\tQuality cuts: \n\t\\begin{itemize}\n";
+    latexOut.beginFrame();
+    latexOut.addLine("Quality cuts: \n\t\\begin{itemize}");
     for (auto var : vars)
     {
         bool lowexists=cuts->exists(var+".low");
@@ -151,8 +157,8 @@ void drawCut(const ParameterGroup* cuts, std::ofstream& latexOut)
         {
             str= Form("%s < %.2f",pretty.data(),cuts->getFloat(var+".high"));  
         }
-        latexOut << "\t\t\\item $" << str << "$ \n";
+        latexOut.addLine("\t\\item $"+str+"$");
     }
-    latexOut << "\t\\end{itemize}\n";
-    latexOut << "\\end{frame}\n";
+    latexOut.addLine("\t\\end{itemize}");
+    latexOut.endFrame();
 }
