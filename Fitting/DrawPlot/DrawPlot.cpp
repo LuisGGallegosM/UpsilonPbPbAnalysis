@@ -88,6 +88,7 @@ void DrawPlot(const char* inputdirectoryname, const char* drawconfigfilename  )
         RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
         float maxVal=fParams.getFloat("signal.nSigY1S.value")/( fParams.getFloat("signal.sigma.value") * 1.4142*1.7724 );
         float minVal=fParams.getFloat("bkg.nBkg.value")/( config.getFloat("cut.mass.high") - config.getFloat("cut.mass.low") );
+        maxVal+=minVal;
         setGraphStyle(graphPlot,&config,maxVal,minVal,isLog);
         drawLegend(graphPlot,config.getString("bkg.type")!="none",config.getBool("moreUpsilon"));
         drawGraphText(&fParams,&config);
