@@ -157,8 +157,19 @@ void ParameterGroup::addGroup(const ParameterGroup& g,const std::string& name)
 
 void ParameterGroup::remove(const std::string& name)
 {
-    data.erase(name);
-    subgroups.erase(name);
+    int index= name.find_first_of('.');
+    if (index==std::string::npos)
+    {
+        data.erase(name);
+        subgroups.erase(name);
+    }
+    else
+    {
+        const std::string str=name.substr(0,index);
+        auto found= subgroups.find(str);
+        if (found!=subgroups.end())
+            found->second.remove(name.substr(index+1));
+    }
 }
 
 std::vector<std::string> ParameterGroup::getVarNames() const

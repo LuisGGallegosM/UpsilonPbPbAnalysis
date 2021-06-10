@@ -72,6 +72,28 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
+            "name": "g++ fit-multifitgen debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Fitting/fit",
+            "args": [ "-multifitgen",
+                "../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline_z.multifit", 
+                "../rootfiles/analysis/test"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Habilitar la impresión con sangría para gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
             "name": "g++ fit-fit debug",
             "type": "cppdbg",
             "request": "launch",
