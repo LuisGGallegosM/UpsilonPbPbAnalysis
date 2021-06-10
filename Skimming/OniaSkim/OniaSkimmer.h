@@ -23,7 +23,7 @@ class OniaSkimmerBase : public Skimmer
 
     void Write() override 
     { 
-        oniaWriter.getTree()->Write();
+        oniaWriter.getTree()->Write(0,TObject::kOverwrite);
     }
 
     void Skim() override 
