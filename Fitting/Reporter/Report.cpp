@@ -13,13 +13,12 @@ struct VarAndFilename
 };
 
 std::vector<VarAndFilename> getVarNames(const ParameterGroup* fit);
-void generateVarTable(Latexer& latexOut,const std::vector<VarAndFilename>& varnames,const std::vector<ParameterGroup>& fits,const char** fitfilepaths );
+void generateVarTable(Latexer& latexOut,const std::vector<VarAndFilename>& varnames,const std::vector<ParameterGroup>& fits,const std::vector<std::string>& fitfilepaths );
 void generatePlots(Latexer& latexOut,const std::vector<VarAndFilename>& varnames , int size);
 void drawCut(const ParameterGroup* cuts, Latexer& latexOut);
 
 void Report(const char* multifitpath,const char* outputpath,int size,const char** fitfilepaths)
 {
-
     std::string outputstr(outputpath);
     outputstr+= "/report/report.tex";
 
@@ -35,16 +34,22 @@ void Report(const char* multifitpath,const char* outputpath,int size,const char*
 
     std::vector<ParameterGroup> fits;
     fits.reserve(size);
+
+    std::vector<std::string> fitpaths;
+    fitpaths.reserve(size);
+    for(int i=0;i<size;i++) fitpaths.push_back(fitfilepaths[i]);
+    std::sort(fitpaths.begin(),fitpaths.end());
+    
     for(int i=0;i<size;i++)
     {
         fits.emplace_back();
-        std::string fitfile= std::string(fitfilepaths[i])+'/'+basename(fitfilepaths[i])+".fit";
-        fits[i].deserialize(fitfile);
+        std::string fitfile= fitpaths[i]+'/'+basename(fitpaths[i].data())+".fit";
+        fits.back().deserialize(fitfile);
     }
 
     const auto varnames= getVarNames(&fits[0]);
 
-    generateVarTable(latexOut,varnames,fits,fitfilepaths);
+    generateVarTable(latexOut,varnames,fits,fitpaths);
 
     generatePlots(latexOut,varnames,size);
 
@@ -52,7 +57,7 @@ void Report(const char* multifitpath,const char* outputpath,int size,const char*
 
 }
 
-void generateVarTable(Latexer& latexOut,const std::vector<VarAndFilename>& varnames,const std::vector<ParameterGroup>& fits,const char** fitfilepaths )
+void generateVarTable(Latexer& latexOut,const std::vector<VarAndFilename>& varnames,const std::vector<ParameterGroup>& fits,const std::vector<std::string>& fitfilepaths )
 {
     for(int startindex=0;startindex< fits.size();startindex+=4)
     {
@@ -65,7 +70,7 @@ void generateVarTable(Latexer& latexOut,const std::vector<VarAndFilename>& varna
         table.back().push_back("var");
         for(int i=startindex;i < endindex;i++) 
         {
-            table.back().push_back(basename(fitfilepaths[i]));
+            table.back().push_back(basename(fitfilepaths[i].data()));
         }
 
         for(const auto var : varnames)
@@ -89,6 +94,7 @@ void generateVarTable(Latexer& latexOut,const std::vector<VarAndFilename>& varna
 
         latexOut.beginFrame();
         latexOut.genTable(table);
+        latexOut.addLine("*fixed parameter");
         latexOut.endFrame();
     }
 }

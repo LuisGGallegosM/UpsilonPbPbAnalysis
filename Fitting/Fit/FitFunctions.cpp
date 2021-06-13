@@ -40,7 +40,8 @@ DoubleCrystalBall::DoubleCrystalBall(RooRealVar& var,const char* name, const Par
     cBall_2(  Form("cball_%s_2",name),"crystalBall",var,mean_2,sigma_2,alpha_2,n_2),
     dcball(   Form("dcb_%s",name),    "double crystal ball", RooArgList(cBall,cBall_2),RooArgList(f) )
 {
-
+    x.setConstant(g->getBool("x.fixed"));
+    f.setConstant(g->getBool("f.fixed"));
 }
 
 ParameterGroup DoubleCrystalBall::getParams() const
