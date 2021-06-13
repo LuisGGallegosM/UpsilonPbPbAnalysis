@@ -96,6 +96,7 @@ struct OniaJetRef
     Float_t refphi[maxBranchSize];
     Float_t refm[maxBranchSize];
     Float_t refarea[maxBranchSize];
+    Float_t pthat;
 
     void addInputs(TreeReader* reader);
 };

@@ -85,4 +85,5 @@ void OniaJetRef::addInputs(TreeReader* reader)
     reader->addInput("refphi",refphi);
     reader->addInput("refm",refm);
     reader->addInput("refarea",refarea);
+    reader->addInput("pthat",&pthat);
 }

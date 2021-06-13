@@ -85,4 +85,6 @@ void OniaSimpleRefJet::addOutputs(TreeWriter* writer)
     writer->addOutput("jt_ref_phi",&jt_ref_phi);
     writer->addOutput("gen_z",&gen_z);
     writer->addOutput("jt_pt_genZJEC",&jt_pt_genZJEC);
+    writer->addOutput("pthat",&pthat);
+    writer->addOutput("accxeff",&accxeff);
 }
