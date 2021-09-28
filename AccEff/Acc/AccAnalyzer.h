@@ -17,10 +17,13 @@ class AccAnalyzer
     OniaReader<OniaGenOnlyData> oniaReader;
     AccCutter accCutter;
     WeightFunc* weightFunc;
+    WeightFunc2D* weightFunc2D;
     bool onlyNumCorr;
 
     public:
     AccAnalyzer(TTree* input,const char* outTreeName, WeightFunc* weightFunc=nullptr, bool onlyNCorr =false);
+
+    AccAnalyzer(TTree* input,const char* outTreeName, WeightFunc2D* weightFunc, bool onlyNCorr =false);
 
     const AccHistografer* getHists() const { return &hists;}
 

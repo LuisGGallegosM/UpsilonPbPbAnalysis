@@ -25,6 +25,14 @@ class WeightFunc
     virtual ~WeightFunc() = default;
 };
 
+class WeightFunc2D
+{
+    public:
+    virtual float getWeight(float x, float y) const =0;
+    virtual double getWeight(double x, double y) const =0;
+    virtual ~WeightFunc2D() = default;
+};
+
 #if defined(__CLING__)
 #include "Params.cpp"
 #endif

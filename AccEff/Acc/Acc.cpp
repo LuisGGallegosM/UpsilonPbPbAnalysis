@@ -8,6 +8,10 @@
 
 #include <iostream>
 
+void AccTestUnWeighted(TTree *myTree, const std::string& outfilename);
+void AccTestWeighted1D(TTree *myTree, const std::string& outfilename, WeightFunc* weights);
+void AccTestWeighted2D(TTree *myTree, const std::string& outfilename, WeightFunc2D* weights);
+
 /**
  * @brief Acceptancy test function
  * 
@@ -21,28 +25,56 @@ void AccTest(const char* filename,const char* outputfilename, const char* yieldf
 
     //input file
     std::cout << "Reading input file: " << filename <<'\n';
-    TFile* file = OpenFile(filename,"READ");
+    std::unique_ptr<TFile> file(OpenFile(filename,"READ"));
 
-    RooAbsReal* yieldfitFunc=nullptr;
-    
+    std::unique_ptr<TFile> yieldFitFile;
     if(yieldfitfuncFilename!=nullptr)
     {
         std::cout << "Reading yield weight function input file: " << yieldfitfuncFilename <<'\n';
-        TFile* yieldFitFile = OpenFile(yieldfitfuncFilename,"READ");
-        yieldfitFunc = dynamic_cast<RooAbsReal*>( yieldFitFile->Get(yieldFitFuncName) );
-        
+        yieldFitFile.reset(OpenFile(yieldfitfuncFilename,"READ"));
     }
-    WeightFuncRooAbs yieldfit(yieldfitFunc);
-    WeightFunc* yieldfitPtr = (yieldfitFunc==nullptr) ? nullptr : &yieldfit;
-    
+
     //output file
     std::string outfilename=outputfilename;
     std::cout << "Writing to output file: " << outfilename <<'\n';
-    TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
+    std::unique_ptr<TFile> outputfile(OpenFile(outfilename.data(), "RECREATE"));
 
-    TTree *myTree = GetTree(file,"hionia/myTree");
+    TTree *myTree = GetTree(file.get(),"hionia/myTree");
 
-    AccAnalyzer accAnalyzer(myTree,"DetectableOnia", yieldfitPtr );
+    if (yieldFitFile!=nullptr)
+    {
+        RooAbsReal* rooAbs = dynamic_cast<RooAbsReal*>( yieldFitFile->Get(weightFuncRooAbsName) );
+        if (rooAbs!=nullptr)
+        {
+            WeightFuncRooAbs weightFunc(rooAbs);
+            AccTestWeighted1D(myTree,outfilename,&weightFunc);
+        }
+        else
+        {
+            TH2F* th2 = dynamic_cast<TH2F*>( yieldFitFile->Get(weightFuncTH2Name) );
+            if (th2!=nullptr)
+            {
+                WeightFuncTH2 weightFunc(th2);
+                AccTestWeighted2D(myTree,outfilename,&weightFunc);
+            }
+            else
+            {
+                std::cout << "Error: No Weight function found in weight file\n";
+                std::cout << "names can be:\n";
+                std::cout << "RooAbs: " <<  weightFuncRooAbsName << "\n";
+                std::cout << "TH2" << weightFuncTH2Name << "\n";
+            }
+        }
+    }
+    else
+    {
+        AccTestUnWeighted(myTree,outfilename);
+    }
+}
+
+void AccTestUnWeighted(TTree *myTree, const std::string& outfilename)
+{
+    AccAnalyzer accAnalyzer(myTree,"DetectableOnia");
 
     //write plots to same folder as outputfilename and prefixed with outputfilename
     std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
@@ -51,9 +83,31 @@ void AccTest(const char* filename,const char* outputfilename, const char* yieldf
     accAnalyzer.Test(outputfilesBasename);
     accAnalyzer.getHists()->Write();
 
-    outputfile->Close();
-    file->Close();
-    delete file;
-    delete outputfile;
+    std::cout << "Success.\n TTrees wrote to '" << outfilename<< "' root file\n";
+}
+
+void AccTestWeighted1D(TTree *myTree, const std::string& outfilename, WeightFunc* weights)
+{
+    AccAnalyzer accAnalyzer(myTree,"DetectableOnia", weights);
+    //write plots to same folder as outputfilename and prefixed with outputfilename
+    std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
+
+    //Run acceptancy test
+    accAnalyzer.Test(outputfilesBasename);
+    accAnalyzer.getHists()->Write();
+
+    std::cout << "Success.\n TTrees wrote to '" << outfilename<< "' root file\n";
+}
+
+void AccTestWeighted2D(TTree *myTree, const std::string& outfilename, WeightFunc2D* weights)
+{
+    AccAnalyzer accAnalyzer(myTree,"DetectableOnia", weights);
+    //write plots to same folder as outputfilename and prefixed with outputfilename
+    std::string outputfilesBasename=ReplaceExtension(outfilename.data(),"");
+
+    //Run acceptancy test
+    accAnalyzer.Test(outputfilesBasename);
+    accAnalyzer.getHists()->Write();
+
     std::cout << "Success.\n TTrees wrote to '" << outfilename<< "' root file\n";
 }

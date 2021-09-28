@@ -88,10 +88,20 @@ WeightFuncRooAbs::WeightFuncRooAbs(RooAbsReal* func): f(func)
 
 float WeightFuncTEff::getWeight(float x) const
 {
-    return 1.0/hist->GetEfficiency(hist->FindFixBin(x));
+    return 1.0f/hist->GetEfficiency(hist->FindFixBin(x));
 }
 
 double WeightFuncTEff::getWeight(double x) const
 {
     return 1.0/hist->GetEfficiency(hist->FindFixBin(x));
+}
+
+float WeightFuncTH2::getWeight(float x, float y) const
+{
+    return 1.0f/hist->GetBinContent(hist->FindFixBin(x,y));
+}
+
+double WeightFuncTH2::getWeight(double x, double y) const
+{
+    return 1.0/hist->GetBinContent(hist->FindFixBin(x,y));
 }

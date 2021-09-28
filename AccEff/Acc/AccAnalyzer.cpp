@@ -5,7 +5,12 @@
 #include <array>
 
 AccAnalyzer::AccAnalyzer(TTree* input,const char* outTreeName, WeightFunc* weights, bool onlyNCorr) : 
-    oniaReader(input), weightFunc(weights), onlyNumCorr(onlyNCorr)
+    oniaReader(input), weightFunc(weights), weightFunc2D(nullptr), onlyNumCorr(onlyNCorr)
+{
+}
+
+AccAnalyzer::AccAnalyzer(TTree* input,const char* outTreeName, WeightFunc2D* weights, bool onlyNCorr) : 
+    oniaReader(input), weightFunc(nullptr), weightFunc2D(weights), onlyNumCorr(onlyNCorr)
 {
 }
 
@@ -22,13 +27,17 @@ void AccAnalyzer::ProcessEvent(Long64_t entry)
         AccHistografer::inputs data;
         data.pT = mom4vec->Pt();
         data.y = abs(mom4vec->Rapidity());
+        double eta = mom4vec->Eta();
         if(data.y > yMax) continue;
         if(data.pT > ptMax) continue;
         
-       double weight=1.0;
+        double weight=1.0;
         if(weightFunc!=nullptr)
         {
             weight=weightFunc->getWeight(data.pT);
+        } else if (weightFunc2D!=nullptr)
+        {
+            weight=weightFunc2D->getWeight(data.pT,eta);
         }
 
         TLorentzVector* mom4vecPl=(TLorentzVector*) input->genQQ.mupl_mom4->At(index);

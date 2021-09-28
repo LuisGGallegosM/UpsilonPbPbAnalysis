@@ -14,7 +14,7 @@ YieldFitter::YieldFitter(TH1D* yieldRatio):
     pt("pt","p_{T}",0.0,100.0),
     dataHist("ratioRooHist","ratio of yields rooHist",RooArgList(pt),Import(*yieldRatio,kTRUE)),
     dataHist2("ratioRooHist","ratio of yields rooHist",RooArgList(pt),Import(*yieldRatio,kFALSE)),
-    fitFunc(yieldFitFuncName,"fit of ratios","(@1+@2*@0+@3*(@0*@0))/((@0 - @4)^3)",RooArgList(pt,A,B,C,D))
+    fitFunc(weightFuncRooAbsName,"fit of ratios","(@1+@2*@0+@3*(@0*@0))/((@0 - @4)^3)",RooArgList(pt,A,B,C,D))
 {
 
 }

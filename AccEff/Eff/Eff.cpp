@@ -29,9 +29,9 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
     RooAbsReal* yieldfitFunc=nullptr;
     if(yieldfitfuncFilename!=nullptr)
     {
-        std::cout << "Reading yield weight function input file: " << yieldfitfuncFilename <<'\n';
+        std::cout << "Reading weight function input file: " << yieldfitfuncFilename <<'\n';
         TFile* yieldFitFile = OpenFile(yieldfitfuncFilename,"READ");
-        yieldfitFunc = dynamic_cast<RooAbsReal*>( yieldFitFile->Get(yieldFitFuncName) );
+        yieldfitFunc = dynamic_cast<RooAbsReal*>( yieldFitFile->Get(weightFuncRooAbsName) );
     }
     WeightFuncRooAbs yieldfit(yieldfitFunc);
     WeightFunc* yieldfitPtr = (yieldfitFunc==nullptr) ? nullptr : &yieldfit;

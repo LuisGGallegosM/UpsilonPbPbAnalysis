@@ -2,6 +2,7 @@
 #define ACCEFFAUX
 
 #include"TH1.h"
+#include"TH2.h"
 #include"TEfficiency.h"
 
 #include "../../OniaBase/Params/Params.h"
@@ -19,7 +20,8 @@ const char accXEffName[]= "ptQQ_AccXEff";
 const char accName[]    = "PtQQ_Acceptancy";
 const char effName[]    = "PtQQ_Efficiency";
 const char nSigY1SName[]= "signal_nSigY1S";
-const char yieldFitFuncName[]= "ratio_fit";
+const char weightFuncRooAbsName[]= "ratio_fit";
+const char weightFuncTH2Name[]= "hGenUpsilonPtvsEtaWeight";
 const char yieldFitName[] = "ratio_dN_dpT_norm";
 
 
@@ -57,7 +59,18 @@ class WeightFuncTEff : public WeightFunc
     float getWeight(float x) const override;
     double getWeight(double x) const override;
 
-    WeightFuncTEff(TEfficiency* h) : hist(h) {} ;
+    WeightFuncTEff(TEfficiency* h) : hist(h) {};
+};
+
+class WeightFuncTH2 : public WeightFunc2D
+{
+    TH2* hist;
+
+    public:
+    float getWeight(float x, float y) const override;
+    double getWeight(double x, double y) const override;
+
+    WeightFuncTH2(TH2* h) : hist(h) {};
 };
 
 #endif
