@@ -6,5 +6,6 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
 #include "AccEffResults/AccEffResults.h"
 #include "YieldFit/YieldFit.h"
 #include "ClosureTest/ClosureTest.h"
+#include "ClosureTest/ClosureTestJet.h"
 
 #endif

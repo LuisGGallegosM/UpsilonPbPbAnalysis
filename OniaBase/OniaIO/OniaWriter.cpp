@@ -145,3 +145,9 @@ void writeToCanvasZ(TH1* hist,const std::string& xname,const std::string& yname,
     canvas.Write();
     canvas.SaveAs(outname.data());
 }
+
+void addInputs(OniaJetQQMC* data, TreeReader* reader)
+{
+    data->recoQQOut.addInputs(reader,"reco_");
+    data->jetOut.addInputs(reader);
+}

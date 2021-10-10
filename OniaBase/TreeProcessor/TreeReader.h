@@ -14,7 +14,7 @@ class TreeReader
 
     void readTree(Long64_t index) const;
     bool addInputOpt(const char* varName,void* address);
-    void addInput(const char* varName,void* address);
+    void addInput(const char* varName,void* address, const char* prefix=nullptr);
     bool hasBranchInInputs(const char* varName) const;
     bool HasBranchInTree(const char* varName) const;
     Long64_t getEntriesNumber() const {return inputTree->GetEntries();}

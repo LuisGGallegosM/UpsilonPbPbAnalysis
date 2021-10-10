@@ -44,6 +44,12 @@ int main(int argc, char **argv)
             std::cerr << "Incorrect number of parameters\n";
         break;
 
+        case 8:
+        if (flags=="-closurejet")
+            ClosureTestJet(argv[2],argv[3],argv[4],argv[5],argv[6],argv[7]);
+        else
+            std::cerr << "Incorrect number of parameters\n";
+
         case 9:
         if (flags=="-closure")
             ClosureTest(argv[2],argv[3],argv[4],argv[5],argv[6],argv[7],argv[8]);

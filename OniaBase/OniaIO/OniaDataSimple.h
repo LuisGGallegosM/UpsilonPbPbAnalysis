@@ -9,6 +9,7 @@ struct OniaSimpleInfo
     Int_t Evt;
     Int_t pdgId;
 
+    void addInputs(TreeReader* reader );
     void addOutputs(TreeWriter* writer);
     void Write(int entry, int id)
     {
@@ -25,6 +26,7 @@ struct OniaSimpleQQ
     Float_t phi;
     Float_t eta;
 
+    void addInputs(TreeReader* reader, const char* prefix=nullptr );
     void addOutputs(TreeWriter* writer, const char* prefix=nullptr);
     void Write(TLorentzVector* dimuon);
 };
@@ -33,6 +35,7 @@ struct OniaSimpleExtraQQ : public OniaSimpleQQ
 {
     Float_t l;
 
+    void addInputs(TreeReader* reader, const char* prefix=nullptr );
     void addOutputs(TreeWriter* writer, const char* prefix=nullptr);
     void Write(TLorentzVector* dimuon, float ctau);
 };
@@ -46,6 +49,7 @@ struct OniaSimpleMu
     Float_t eta_pl;
     Float_t phi_pl;
 
+    void addInputs(TreeReader* reader );
     void addOutputs(TreeWriter* writer, const char* prefix=nullptr);
     void Write(TLorentzVector* muonPl, TLorentzVector* muonMi);
 };
@@ -63,6 +67,7 @@ struct OniaSimpleJet
     Float_t z_jettyCorr;
     Float_t jt_pt_noZJEC;
 
+    void addInputs(TreeReader* reader );
     void addOutputs(TreeWriter* writer);
 };
 
@@ -75,6 +80,7 @@ struct OniaSimpleRefJet
     Float_t gen_z;
     Float_t jt_pt_genZJEC;
 
+    void addInputs(TreeReader* reader );
     void addOutputs(TreeWriter* writer);
 };
 

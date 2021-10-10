@@ -98,10 +98,10 @@ double WeightFuncTEff::getWeight(double x) const
 
 float WeightFuncTH2::getWeight(float x, float y) const
 {
-    return 1.0f/hist->GetBinContent(hist->FindFixBin(x,y));
+    return hist->GetBinContent(hist->FindFixBin(x,y));
 }
 
 double WeightFuncTH2::getWeight(double x, double y) const
 {
-    return 1.0/hist->GetBinContent(hist->FindFixBin(x,y));
+    return hist->GetBinContent(hist->FindFixBin(x,y));
 }

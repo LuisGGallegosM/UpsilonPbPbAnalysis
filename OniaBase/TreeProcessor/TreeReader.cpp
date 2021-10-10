@@ -14,9 +14,11 @@ void TreeReader::readTree(Long64_t index) const
     }
 }
 
-void TreeReader::addInput(const char* varName,void* address)
+void TreeReader::addInput(const char* name,void* address, const char* prefix)
 {
-    TBranch* branch = inputTree->GetBranch(varName);
+    std::string varName(name);
+    if (prefix!=nullptr) varName = prefix+varName;
+    TBranch* branch = inputTree->GetBranch(varName.data());
     if (branch ==nullptr)
     {
         std::string error = std::string("Tried to read branch '")+varName+ "' does not exist.";

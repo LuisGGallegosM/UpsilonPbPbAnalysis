@@ -50,6 +50,8 @@ struct OniaJetQQMC
     OniaSimpleExtraQQ recoQQOut;
 };
 
+void addInputs(OniaJetQQMC* data, TreeReader* reader);
+
 struct SimpleSelector
 {
     long long int entry;

@@ -9,7 +9,20 @@ void OniaSimpleInfo::addOutputs(TreeWriter* writer)
     writer->addOutput("pdfId",&pdgId);
 }
 
+void OniaSimpleInfo::addInputs(TreeReader* reader)
+{
+    reader->addInput("Evt",&Evt);
+    reader->addInput("pdfId",&pdgId);
+}
+
 //OniaSimpleQQ
+
+void OniaSimpleQQ::addInputs(TreeReader* reader,const char* prefix)
+{
+    reader->addInput("pT",&pT,prefix);
+    reader->addInput("eta",&eta,prefix);
+    reader->addInput("y",&y,prefix);
+}
 
 void OniaSimpleQQ::addOutputs(TreeWriter* writer,const char* prefix)
 {
@@ -27,6 +40,11 @@ void OniaSimpleQQ::Write(TLorentzVector* dimuon)
     y = dimuon->Rapidity();
     phi = dimuon->Phi();
     eta = dimuon->Eta();
+}
+
+void OniaSimpleExtraQQ::addInputs(TreeReader* reader, const char* prefix)
+{
+    OniaSimpleQQ::addInputs(reader,prefix);
 }
 
 void OniaSimpleExtraQQ::addOutputs(TreeWriter* writer,const char* prefix)
@@ -61,6 +79,11 @@ void OniaSimpleMu::addOutputs(TreeWriter* writer, const char* prefix)
     writer->addOutput("eta_pl",&eta_pl, prefix);
     writer->addOutput("phi_mi",&phi_mi, prefix);
     writer->addOutput("phi_pl",&phi_pl, prefix);
+}
+
+void OniaSimpleJet::addInputs(TreeReader* reader)
+{
+    reader->addInput("z", &z);
 }
 
 void OniaSimpleJet::addOutputs(TreeWriter* writer)
