@@ -1,5 +1,6 @@
 
 #include"DrawCmp.h"
+#include"../Common/Common.h"
 #include"../../Utils/Helpers/Helpers.h"
 
 #include <vector>
@@ -102,7 +103,7 @@ void DrawCmp(const char* multifitpath,const char* outputpath,int size,const char
 std::vector<toGet> fillVariables(const ParameterGroup* fit)
 {
     std::vector<toGet> getters;
-    const std::vector<std::string> subgroups= {"signal","bkg"};
+    const std::vector<std::string> subgroups= {"signal",bkgName};
     for(auto subgroup : subgroups )
     {
         const auto vars=fit->get(subgroup)->getSubgroupNames();

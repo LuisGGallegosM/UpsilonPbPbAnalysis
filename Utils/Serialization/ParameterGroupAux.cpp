@@ -92,3 +92,31 @@ void ParameterWrite( ParameterGroup& p, const RooRealVar& var, const std::string
     p.setFloat(name+".error", var.getError());
     p.setBool(name+".fixed",var.isConstant());
 }
+
+float getFloatIndex(const ParameterGroup& p, const std::string& name,int index)
+{
+    return p.getFloat(name+"."+std::to_string(index));
+}
+int getIntIndex(const ParameterGroup& p, const std::string& name,int index)
+{
+    return p.getInt(name+"."+std::to_string(index));
+}
+std::string getStringIndex(const ParameterGroup& p, const std::string& name,int index)
+{
+    return p.getString(name+"."+std::to_string(index));
+}
+
+void setFloatIndex(ParameterGroup& p, const std::string& name, float value,int index)
+{
+    p.setFloat(name+"."+std::to_string(index),value);
+}
+
+void setIntIndex(ParameterGroup& p, const std::string& name, int value,int index)
+{
+    p.setInt(name+"."+std::to_string(index),value);
+}
+
+void setStringIndex(ParameterGroup& p, const std::string& name, const std::string& value,int index)
+{
+    p.setString(name+"."+std::to_string(index),value);
+}

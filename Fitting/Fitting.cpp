@@ -7,6 +7,7 @@ void Fit(const char* filename, const char* cutfilename, const char* outfilename,
 void DrawCmp(const char* xvar, const char* outputpath,int size,const char** fitfilepaths);
 void DrawPlot(const char* inputdirectoryname, const char* configfilename  );
 #include"MultifitGen/MultifitGen.h"
+#include"Reporter/Report.h"
 
 #if !defined(__CLING__)
 
@@ -25,6 +26,18 @@ int main(int argc, char **argv)
         for (int i=0;i<numFiles;i++) args[i]=argv[i+4];
 
         DrawCmp(argv[2],argv[3],numFiles,args);
+    }
+    else if (option=="-report")
+    {
+         //enter in multicomparation draw mode
+        int numFiles=(argc -4) ;
+        const char* args[64];
+
+        if (numFiles<=0) return 0;
+        
+        for (int i=0;i<numFiles;i++) args[i]=argv[i+4];
+
+        Report(argv[2],argv[3],numFiles,args);
     }
     else if (option=="-draw")
     {

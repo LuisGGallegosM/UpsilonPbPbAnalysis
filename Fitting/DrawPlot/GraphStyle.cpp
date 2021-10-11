@@ -12,17 +12,17 @@ void setGraphStyle(RooPlot* plot, const ParameterGroup* config, float topValue, 
     float minValue = bottomValue*div;
 
     //round to 
-    maxValue = ceil(maxValue/50.0f)*50.0+50.0f;
+    maxValue = ceil(maxValue/10.0f)*10.0+10.0f;
     minValue = ceil(minValue);
     if (isLog)
     {
-        minValue *= 0.7f;
-        maxValue *= 50.0f;
+        minValue *= config->getFloat("log.minValMultiplier");
+        maxValue *= config->getFloat("log.maxValMultiplier");
     }
     else
     {
         minValue = 0.0f;
-        maxValue *=2.00f;
+        maxValue *=config->getFloat("linear.maxValMultiplier");
     }
 
     if (config->getBool("isMC"))

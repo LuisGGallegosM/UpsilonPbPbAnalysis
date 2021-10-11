@@ -94,11 +94,13 @@ then
     echo "starting comparative drawings..."
     FITS=$(find ${OUTDIR} -maxdepth 1 -type d -name "fit*")
     ./Fitting/fit -multidraw "${MULTIFITFILE}" "${OUTDIR}" $FITS
+    ./HelperScripts/reportGen.sh "${MULTIFITFILE}" "${OUTDIR}" $FITS
 fi
 
 #cp -R "${WORKDIR}/report" "${WORKDIR}/${OUTDIR}/report"
 #cd "${WORKDIR}/${OUTDIR}/report"
 #pdflatex -interaction nonstopmode "report.tex" >/dev/null
 #cd "../../.."
+
 
 echo "all done"

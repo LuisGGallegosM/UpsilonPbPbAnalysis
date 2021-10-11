@@ -3,6 +3,8 @@
 #include "DrawPlotHelpers.h"
 #include "GraphStyle.h"
 
+#include"../Common/Common.h"
+
 using namespace RooFit;
 
 void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config);
@@ -86,6 +88,7 @@ void DrawPlot(const char* inputdirectoryname, const char* drawconfigfilename  )
         RooPlot* graphPlot =drawGraphs(massVar,dataset,fittedFunc,&config);
         float maxVal=fParams.getFloat("signal.nSigY1S.value")/( fParams.getFloat("signal.sigma.value") * 1.4142*1.7724 );
         float minVal=fParams.getFloat("bkg.nBkg.value")/( config.getFloat("cut.mass.high") - config.getFloat("cut.mass.low") );
+        maxVal+=minVal;
         setGraphStyle(graphPlot,&config,maxVal,minVal,isLog);
         drawLegend(graphPlot,config.getString("bkg.type")!="none",config.getBool("moreUpsilon"));
         drawGraphText(&fParams,&config);
@@ -136,7 +139,7 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,
     
     //draw background
     if (config->getString("bkg.type")!="none")
-      fittedFunc->plotOn(plot,Name("bkg"),Components("bkg"),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
+      fittedFunc->plotOn(plot,Name(bkgName),Components(bkgName),LineStyle(kDashed),LineColor(kBlue),Normalization(1.0,RooAbsReal::RelativeExpected));
     dataset->plotOn(plot,Name(datasetName), MarkerSize(0.4), XErrorSize(0));
     plot->Draw("same");
 
@@ -173,7 +176,7 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
     }
 
     if (bkgOn)
-      fitleg->AddEntry(plot->findObject("bkg"),"Background","l");
+      fitleg->AddEntry(plot->findObject(bkgName),"Background","l");
 
     fitleg->Draw("same");
 
@@ -194,7 +197,7 @@ void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config)
     tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
 
     drawParams(fParams->get("signal"),&tdrawer);
-    drawParams(fParams->get("bkg"),&tdrawer);
+    drawParams(fParams->get(bkgName),&tdrawer);
 
     TextDrawer tdrawer2(0.45,0.8);
 

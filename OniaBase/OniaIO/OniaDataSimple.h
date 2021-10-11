@@ -79,6 +79,8 @@ struct OniaSimpleRefJet
     Float_t jt_ref_phi;
     Float_t gen_z;
     Float_t jt_pt_genZJEC;
+    Float_t pthat;
+    Float_t accxeff;
 
     void addInputs(TreeReader* reader );
     void addOutputs(TreeWriter* writer);

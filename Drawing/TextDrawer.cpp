@@ -1,4 +1,16 @@
 #include "TextDrawer.h"
+#include<map>
+
+const std::map<std::string,std::string> prettyMap=
+{
+    {"pt","p_{t}^{#mu#mu}"},
+    {"eta","|#eta^{#mu#mu}|"},
+    {"y","|y^{#mu#mu}|"},
+    {"jt_pt", "jet p_{T}"},
+    {"jt_eta", "|jet #eta|"},
+    {"mass", "m^{#mu#mu}"},
+    {"z^2","z^{2}"}
+};
 
 TextDrawer::TextDrawer(float pos_x,float pox_y, float fontSize) :
     pos_text_x(pos_x), pos_text_y(pox_y),
@@ -28,4 +40,11 @@ void TextDrawer::drawText(const char *text)
    tex->SetNDC();
    tex->Draw("same");
    ++lines;
+}
+
+std::string makePrettier(const std::string& name)
+{
+    if (prettyMap.find(name)!= prettyMap.end()) 
+        return prettyMap.at(name);
+    return name;
 }

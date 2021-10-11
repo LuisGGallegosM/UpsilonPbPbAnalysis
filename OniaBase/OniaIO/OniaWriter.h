@@ -221,6 +221,8 @@ void writeRefJet(const Data* input,OniaJetQQMC* output, int index, int iJet, flo
     output->refJetOut.jt_ref_pt = inputJet->refpt[iJet];
     output->refJetOut.gen_z = gen_z;
     output->refJetOut.jt_pt_genZJEC = zjecCorr(jt_pt_noZJEC, input->jetInfo.rawpt[iJet], gen_z);
+    output->refJetOut.accxeff = 1.0f;
+    output->refJetOut.pthat = inputJet->pthat;
 }
 
 #endif

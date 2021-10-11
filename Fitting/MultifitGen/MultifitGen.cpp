@@ -3,7 +3,8 @@
 #include"../../Utils/Serialization/Serialization.h"
 
 std::vector<std::vector<float>> generateVals(const std::vector<std::string>& diffVars, const ParameterGroup& multifit);
-void generateFile( const std::string& varName,const std::vector<float>& diffVarValues,const ParameterGroup* fixedGroup, const std::string& outputpath );
+void generateFile( const std::string& varName,const std::vector<float>& diffVarValues,const ParameterGroup& multifit, const std::string& outputpath);
+std::vector<std::string> findDiffParameters(const ParameterGroup& multifit);
 
 void MultifitGen(const char* multifitfile, const char* outputpath)
 {
@@ -18,19 +19,23 @@ void MultifitGen(const char* multifitfile, const char* outputpath)
 
     const std::vector<std::vector<float>> diffVarValues = generateVals(diffVars,multifit);
 
-    ParameterGroup fixedGroup=multifit;
-    fixedGroup.remove("diffVar");
-
-    generateFile(diffVars[0],diffVarValues[0],&fixedGroup,outputpath);
+    generateFile(diffVars[0],diffVarValues[0],multifit,outputpath);
 }
 
-void generateFile( const std::string& varName,const std::vector<float>& diffVarValues,const ParameterGroup* fixedGroup, const std::string& outputpath )
+void generateFile( const std::string& varName,const std::vector<float>& diffVarValues,const ParameterGroup& multifit, const std::string& outputpath)
 {
-    int size=diffVarValues.size()-1;
+    const auto diffParams= findDiffParameters(multifit);
     
-    for(int i=0;i<size;i++)
+    for(int i=0;i<(diffVarValues.size()-1);i++)
     {
-        ParameterGroup g=*fixedGroup;
+        ParameterGroup g=multifit;
+        for(int j=0;j<diffParams.size();j++)
+        {
+            float value = getFloatIndex(multifit,diffParams[j],i);
+            g.remove(diffParams[j]);
+            g.setFloat(diffParams[j],value);
+        }
+        g.remove("diffVar");
 
         g.setFloat("cut."+varName+".low",diffVarValues[i]);
         g.setFloat("cut."+varName+".high",diffVarValues[i+1]);
@@ -56,4 +61,20 @@ std::vector<std::vector<float>> generateVals(const std::vector<std::string>& dif
         std::cout << "] \n";
     }
     return diffVarValues;
+}
+
+std::vector<std::string> findDiffParameters(const ParameterGroup& multifit)
+{
+    std::vector<std::string> result;
+    for(auto g : {"signal","bkg"})
+    {
+        auto pg = multifit.get(g);
+        auto params= pg->getSubgroupNames();
+        for(auto param : params)
+        {
+            if (pg->exists(param+".value.0"))
+                result.push_back(std::string(g)+"."+param+".value");
+        }
+    }
+    return result;
 }

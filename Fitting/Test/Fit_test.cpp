@@ -1,5 +1,6 @@
 
 #include"../Fit/Fit.h"
+#include"../Common/Common.h"
 #include"../../Utils/Tester/Tester.h"
 
 using std::cout;
@@ -22,7 +23,7 @@ void testFitFunctionsBkg(Tester* t)
     ParameterGroup p;
     p.deserialize(exPath+"/exFitMC.fitconf");
 
-    const ParameterGroup* bkgParam=p.get("bkg");
+    const ParameterGroup* bkgParam=p.get(bkgName);
     std::unique_ptr<FitFunc> bkg;
     RooRealVar mass("mass","mass",0.0);
     bkg.reset( BkgFactory(mass,bkgParam) );
