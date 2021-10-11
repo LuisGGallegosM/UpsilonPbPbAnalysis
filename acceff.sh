@@ -9,6 +9,7 @@ EFFINPUTFILENAME="merged_HiForestAOD_MCFix2.root"
 CONFIG="../rootfiles/analysis/merged_HiForestAOD_MCFix2_skim/merged_HiForestAOD_MCFix2_skim.cutconf"
 DATA_MULTIFITINPUTFILENAME="merged_HiForestAOD_DATA_skim/multifit_baseline"
 MC_MULTIFITINPUTFILENAME="merged_HiForestAOD_MCFix2_skim/multifit_baseline"
+SKIMFILE=
 
 #input file with relative path for Acceptancy
 ACCINPUTFILE="../rootfiles/datasets/${ACCINPUTFILENAME}"
@@ -56,6 +57,44 @@ closure () {
     $TIMECMD $TIMEARGS ./AccEff/acceff -closure "${FINALOUTPUTFILE}" "${ACCOUTPUTFILE}" "${EFFOUTPUTFILE}" "${ACCINPUTFILE}" "${EFFINPUTFILE}" "${CONFIG}" "${CLOSUREOUTPUTFILE}" |& tee "${CLOSUREOUTPUTFILE%.*}.log"
     }
 
+addw (){
+    INPUT="../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet/merged_HiForestAOD_DATA_skimjet.root"
+    OUTPUTDIR="../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet/weighted"
+    ACC="../rootfiles/analysis/daniel/ptvsrap/Acc/OutAcc2D.root"
+    EFF="../rootfiles/analysis/daniel/ptvsrap/Eff/OutEff2D.root"
+    OUTPUT="${OUTPUTDIR}/acceff/merged_HiForestAOD_DATA_skimjet_w.root"
+    mkdir -p $( dirname ${OUTPUT})
+    $TIMECMD $TIMEARGS ./AccEff/acceff -addw ${INPUT} ${ACC} ${EFF} ${OUTPUT}
+}
+
+closurejet () { 
+    INPUT="../rootfiles/analysis/merged_HiForestAOD_MC_skimjet/merged_HiForestAOD_MC_skimjet.root"
+    OUTPUTDIR="../rootfiles/analysis/merged_HiForestAOD_MC_skimjet/closurejet/ptvsrap"
+    ACCUNWEIGHTED="../rootfiles/analysis/daniel/ptvsrap/Acc/OutAcc2D.root"
+    EFFUNWEIGHTED="../rootfiles/analysis/daniel/ptvsrap/Eff/OutEff2D.root"
+    ACCWEIGHTED=$ACCUNWEIGHTED
+    EFFWEIGHTED=$EFFUNWEIGHTED
+    OUTPUT="${OUTPUTDIR}/acceff/output.root"
+    mkdir -p $( dirname ${OUTPUT})
+    $TIMECMD $TIMEARGS ./AccEff/acceff -closurejet ${INPUT} ${ACCUNWEIGHTED} ${EFFUNWEIGHTED} ${ACCWEIGHTED} ${EFFWEIGHTED} ${OUTPUT}
+
+    ACCUNWEIGHTED="../rootfiles/analysis/daniel/ptvsrap/Acc/OutAcc2Dfactor2.root"
+    EFFUNWEIGHTED="../rootfiles/analysis/daniel/ptvsrap/Eff/OutEff2Dfactor2.root"
+    ACCWEIGHTED=$ACCUNWEIGHTED
+    EFFWEIGHTED=$EFFUNWEIGHTED
+    OUTPUT="${OUTPUTDIR}/factor2/output.root"
+    mkdir -p $( dirname ${OUTPUT})
+    $TIMECMD $TIMEARGS ./AccEff/acceff -closurejet ${INPUT} ${ACCUNWEIGHTED} ${EFFUNWEIGHTED} ${ACCWEIGHTED} ${EFFWEIGHTED} ${OUTPUT} 
+
+    ACCUNWEIGHTED="../rootfiles/analysis/daniel/ptvsrap/Acc/OutAcc2Dfactor1over2.root"
+    EFFUNWEIGHTED="../rootfiles/analysis/daniel/ptvsrap/Eff/OutEff2Dfactor1over2.root"
+    ACCWEIGHTED=$ACCUNWEIGHTED
+    EFFWEIGHTED=$EFFUNWEIGHTED
+    OUTPUT="${OUTPUTDIR}/factor1over2/output.root"
+    mkdir -p $( dirname ${OUTPUT})
+    $TIMECMD $TIMEARGS ./AccEff/acceff -closurejet ${INPUT} ${ACCUNWEIGHTED} ${EFFUNWEIGHTED} ${ACCWEIGHTED} ${EFFWEIGHTED} ${OUTPUT} 
+    }
+
 fit () { 
     mkdir -p "${OUTPUTFOLDER}/YieldFit"
     $TIMECMD $TIMEARGS ./AccEff/acceff -fit "${FINALOUTPUTFILE}" "${YIELDFITOUTPUTFILE}" |& tee "${YIELDFITOUTPUTFILE%.*}.log"
@@ -93,8 +132,14 @@ case $FLAGS in
     "-final")
     final
     ;;
+    "-addw")
+    addw
+    ;;
     "-closure")
     closure
+    ;;
+    "-closurejet")
+    closurejet
     ;;
     "-fit")
     fit

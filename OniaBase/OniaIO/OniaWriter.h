@@ -10,7 +10,9 @@
 
 struct OniaQQ;
 struct OniaJetQQMC;
+struct OniaJetQQMCW;
 struct OniaJetQQRealData;
+struct OniaJetQQRealDataW;
 
 double jeuCorr (double jtPt, double z, double jeu);
 double jecCorr(double jtPt, double rawPt, double jpsiPt);
@@ -23,7 +25,9 @@ void writeToCanvasZ(TH1* hist,const std::string& xname,const std::string& yname,
 
 void addOutputs(OniaQQ* data,TreeWriter* writer, const char* prefix);
 void addOutputs(OniaJetQQMC* data,TreeWriter* writer, const char* prefix);
+void addOutputs(OniaJetQQMCW* data,TreeWriter* writer, const char* prefix);
 void addOutputs(OniaJetQQRealData* data,TreeWriter* writer, const char* prefix);
+void addOutputs(OniaJetQQRealDataW* data,TreeWriter* writer, const char* prefix);
 
 struct OniaQQ
 {
@@ -39,6 +43,14 @@ struct OniaJetQQRealData
     OniaSimpleJet jetOut;
     OniaSimpleExtraQQ recoQQOut;
 };
+struct OniaJetQQRealDataW
+{
+    OniaSimpleInfo oniaInfoOut;
+    OniaSimpleMu oniaMuOut;
+    OniaSimpleJet jetOut;
+    OniaSimpleExtraQQ recoQQOut;
+    OniaWeight weight;
+};
 
 struct OniaJetQQMC
 {
@@ -50,7 +62,19 @@ struct OniaJetQQMC
     OniaSimpleExtraQQ recoQQOut;
 };
 
+struct OniaJetQQMCW
+{
+    OniaSimpleInfo oniaInfoOut;
+    OniaSimpleQQ genQQOut;
+    OniaSimpleMu oniaMuOut;
+    OniaSimpleJet jetOut;
+    OniaSimpleRefJet refJetOut;
+    OniaSimpleExtraQQ recoQQOut;
+    OniaWeight weight;
+};
+
 void addInputs(OniaJetQQMC* data, TreeReader* reader);
+void addInputs(OniaJetQQRealData* data, TreeReader* reader);
 
 struct SimpleSelector
 {

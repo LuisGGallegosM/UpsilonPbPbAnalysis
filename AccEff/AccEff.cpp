@@ -24,6 +24,8 @@ int main(int argc, char **argv)
         case 6:
         if (flags=="-eff")
             EffTest(argv[2],argv[3],argv[4],argv[5]);
+        else if (flags=="-addw")
+            AddWeights(argv[2],argv[3],argv[4],argv[5]);
         else
             std::cerr << "Incorrect number of parameters\n";
         break;

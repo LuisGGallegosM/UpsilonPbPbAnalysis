@@ -24,7 +24,8 @@ std::vector<RooRealVar> getVars()
         RooRealVar ("reco_pT","momentum quarkonia",0,100,"GeV/c"),
         RooRealVar ("z", "z",0.0,1.0),
         RooRealVar ("jt_pt","jet momentum",0,100,"GeV/c"),
-        RooRealVar ("jt_eta","jet psedorapidity",0.0,4.0)
+        RooRealVar ("jt_eta","jet psedorapidity",0.0,4.0),
+        RooRealVar ("weight", "weight var",0.0,1.0)
     };
 }
 
@@ -92,9 +93,13 @@ RooAbsReal* OniaMassFitter::fit()
         if( tree->GetBranch(var.GetName()) != nullptr )
             set.add(var);
     }
-        
+    const char* weightVarName="weight";
+    if (tree->GetBranch(weightVarName)==nullptr)
+    {
+        weightVarName=nullptr;
+    }
 
-    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, set,getKineCutExpr(config.get("cut")).data());
+    RooDataSet* datas= new RooDataSet("dataset","mass dataset",tree, set,getKineCutExpr(config.get("cut")).data(),weightVarName);
     dataset.reset(datas);
     std::cout << "Reduced dataset:\n";
     dataset->Print();

@@ -32,6 +32,15 @@ void addOutputs(OniaJetQQRealData* data,TreeWriter* writer, const char* prefix)
     data->jetOut.addOutputs(writer);
 }
 
+void addOutputs(OniaJetQQRealDataW* data,TreeWriter* writer, const char* prefix)
+{
+    data->oniaInfoOut.addOutputs(writer);
+    data->recoQQOut.addOutputs(writer,"reco_");
+    data->oniaMuOut.addOutputs(writer, "reco_");
+    data->jetOut.addOutputs(writer);
+    data->weight.addOutputs(writer);
+}
+
 void addOutputs(OniaJetQQMC* data,TreeWriter* writer, const char* prefix)
 {
     data->oniaInfoOut.addOutputs(writer);
@@ -40,6 +49,35 @@ void addOutputs(OniaJetQQMC* data,TreeWriter* writer, const char* prefix)
     data->oniaMuOut.addOutputs(writer, "reco_");
     data->jetOut.addOutputs(writer);
     data->refJetOut.addOutputs(writer);
+}
+
+void addOutputs(OniaJetQQMCW* data,TreeWriter* writer, const char* prefix)
+{
+    data->oniaInfoOut.addOutputs(writer);
+    data->recoQQOut.addOutputs(writer,"reco_");
+    data->genQQOut.addOutputs(writer,"gen_");
+    data->oniaMuOut.addOutputs(writer, "reco_");
+    data->jetOut.addOutputs(writer);
+    data->refJetOut.addOutputs(writer);
+    data->weight.addOutputs(writer);
+}
+
+void addInputs(OniaJetQQMC* data, TreeReader* reader)
+{
+    data->oniaInfoOut.addInputs(reader);
+    data->recoQQOut.addInputs(reader,"reco_");
+    data->genQQOut.addInputs(reader,"gen_");
+    data->oniaMuOut.addInputs(reader,"reco_");
+    data->jetOut.addInputs(reader);
+    data->refJetOut.addInputs(reader);
+}
+
+void addInputs(OniaJetQQRealData* data, TreeReader* reader)
+{
+    data->oniaInfoOut.addInputs(reader);
+    data->recoQQOut.addInputs(reader,"reco_");
+    data->oniaMuOut.addInputs(reader,"reco_");
+    data->jetOut.addInputs(reader);
 }
 
 void writeGenQQ(const OniaGenOnlyData* input, OniaQQ* output, SimpleSelector sel)
@@ -144,10 +182,4 @@ void writeToCanvasZ(TH1* hist,const std::string& xname,const std::string& yname,
     hist->Draw(option.data());
     canvas.Write();
     canvas.SaveAs(outname.data());
-}
-
-void addInputs(OniaJetQQMC* data, TreeReader* reader)
-{
-    data->recoQQOut.addInputs(reader,"reco_");
-    data->jetOut.addInputs(reader);
 }

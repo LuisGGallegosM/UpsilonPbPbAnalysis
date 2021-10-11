@@ -50,6 +50,31 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
+            "name": "g++ closurejet debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/AccEff/acceff",
+            "args": [ "-closurejet",
+                    "../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet/merged_HiForestAOD_DATA_skimjet.root",
+                    "../rootfiles/analysis/OutAcc2D.root",
+                    "../rootfiles/analysis/OutEff2D.root",
+                    "../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet/closurejet/output.root"
+                ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Habilitar la impresión con sangría para gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
             "name": "g++ fit-draw debug",
             "type": "cppdbg",
             "request": "launch",

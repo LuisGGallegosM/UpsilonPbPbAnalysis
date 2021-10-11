@@ -49,7 +49,7 @@ struct OniaSimpleMu
     Float_t eta_pl;
     Float_t phi_pl;
 
-    void addInputs(TreeReader* reader );
+    void addInputs(TreeReader* reader, const char* prefix=nullptr );
     void addOutputs(TreeWriter* writer, const char* prefix=nullptr);
     void Write(TLorentzVector* muonPl, TLorentzVector* muonMi);
 };
@@ -82,6 +82,13 @@ struct OniaSimpleRefJet
 
     void addInputs(TreeReader* reader );
     void addOutputs(TreeWriter* writer);
+};
+
+struct OniaWeight
+{
+    Float_t w;
+    void addInputs(TreeReader* reader );
+    void addOutputs(TreeWriter* writer); 
 };
 
 #endif

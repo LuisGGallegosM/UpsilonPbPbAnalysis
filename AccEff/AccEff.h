@@ -7,5 +7,6 @@ void EffTest(const char* filename,const char* outputfilename, const char* config
 #include "YieldFit/YieldFit.h"
 #include "ClosureTest/ClosureTest.h"
 #include "ClosureTest/ClosureTestJet.h"
+#include "AddWeights/AddWeights.h"
 
 #endif
