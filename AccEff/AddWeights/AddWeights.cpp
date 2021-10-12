@@ -92,7 +92,7 @@ TTree* process(TTree* tree, WeightFunc2D* acc, WeightFunc2D* eff)
         out->oniaInfoOut= data->oniaInfoOut;
         out->oniaMuOut= data->oniaMuOut;
         out->recoQQOut= data->recoQQOut;
-        out->weight.w= 1.0f/ weight;
+        out->weight.accxeff= 1.0f/ weight;
 
         oniaWriter.writeData();
     }

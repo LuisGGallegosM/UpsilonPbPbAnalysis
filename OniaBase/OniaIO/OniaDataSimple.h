@@ -80,7 +80,6 @@ struct OniaSimpleRefJet
     Float_t gen_z;
     Float_t jt_pt_genZJEC;
     Float_t pthat;
-    Float_t accxeff;
 
     void addInputs(TreeReader* reader );
     void addOutputs(TreeWriter* writer);
@@ -88,7 +87,7 @@ struct OniaSimpleRefJet
 
 struct OniaWeight
 {
-    Float_t w;
+    Float_t accxeff;
     void addInputs(TreeReader* reader );
     void addOutputs(TreeWriter* writer); 
 };

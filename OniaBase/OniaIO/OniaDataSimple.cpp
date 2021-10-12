@@ -137,7 +137,6 @@ void OniaSimpleRefJet::addOutputs(TreeWriter* writer)
     writer->addOutput("gen_z",&gen_z);
     writer->addOutput("jt_pt_genZJEC",&jt_pt_genZJEC);
     writer->addOutput("pthat",&pthat);
-    writer->addOutput("accxeff",&accxeff);
 }
 
 void OniaSimpleRefJet::addInputs(TreeReader* reader)
@@ -153,11 +152,11 @@ void OniaSimpleRefJet::addInputs(TreeReader* reader)
 //OniaWeight
 void OniaWeight::addInputs(TreeReader* reader)
 {
-    reader->addInput("weight",&w);
+    reader->addInput("accxeff",&accxeff);
 }
 
 //OniaWeight
 void OniaWeight::addOutputs(TreeWriter* reader)
 {
-    reader->addOutput("weight",&w);
+    reader->addOutput("accxeff",&accxeff);
 }
