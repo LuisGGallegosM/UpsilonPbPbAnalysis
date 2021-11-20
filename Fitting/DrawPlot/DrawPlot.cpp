@@ -7,7 +7,7 @@
 
 using namespace RooFit;
 
-void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config);
+void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config, bool includeFit=true);
 void drawPullText(RooHist* hist, RooFitResult* fitResults);
 
 TLegend* drawLegend(RooPlot* plot, bool bkgOn,bool moreUpsilon);
@@ -15,6 +15,7 @@ TLegend* drawLegend(RooPlot* plot, bool bkgOn,bool moreUpsilon);
 RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const ParameterGroup* config);
 RooHist*  drawPull(RooPlot* plot, RooRealVar* var, const ParameterGroup* config);
 
+RooPlot* drawGraphsMassOnly(RooRealVar* var, RooDataSet* dataset,const ParameterGroup* config);
 /**
  * @brief Generate the plots for a Fit output
  * 
@@ -103,6 +104,32 @@ void DrawPlot(const char* inputdirectoryname, const char* drawconfigfilename  )
             canvas->SaveAs(generateNames(inputdir,"_log.pdf").data());
         else
             canvas->SaveAs(drawfilename.data());
+
+        TCanvas* canvasOnlyMass = getStyledCanvas();
+        canvasOnlyMass->cd();
+        TPad* graphOnlyMass = getStyledGraphPad(isLog);
+        graphOnlyMass->SetBottomMargin(0.98);
+
+        graphOnlyMass->cd();
+        RooPlot* graphPlotMass =drawGraphsMassOnly(massVar,dataset,&config);
+        setGraphStyle(graphPlotMass,&config,maxVal,minVal,isLog);
+        drawGraphText(&fParams,&config,false);
+
+        graphPlotMass->GetXaxis()->SetTitle(" ");
+        graphPlotMass->GetXaxis()->SetTitleOffset(1.30) ;
+        graphPlotMass->GetXaxis()->SetLabelOffset(0.03) ;
+        graphPlotMass->GetXaxis()->SetLabelSize(0.06) ;
+        graphPlotMass->GetXaxis()->SetTitleSize(0.06) ;
+        graphPlotMass->GetXaxis()->CenterTitle();
+        graphPlotMass->GetXaxis()->SetRangeUser(config.getFloat("cut.mass.low"),config.getFloat("cut.mass.high"));
+        graphPlotMass->GetXaxis()->SetTickSize(0.03);
+
+        //output to pdf file, log scale file with _log.pdf suffix
+        canvasOnlyMass->Update();
+        if (isLog)
+            canvasOnlyMass->SaveAs(generateNames(inputdir,"_mass_log.pdf").data());
+        else
+            canvasOnlyMass->SaveAs(generateNames(inputdir,"_mass.pdf").data());
     }
 
     return;
@@ -145,6 +172,18 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,
 
     return plot;
 }
+
+RooPlot* drawGraphsMassOnly(RooRealVar* var, RooDataSet* dataset,const ParameterGroup* config)
+{
+    RooPlot* plot = var->frame(config->getInt("nBins"));
+    
+    dataset->plotOn(plot,Name(datasetName), MarkerSize(0.4), XErrorSize(0));
+    plot->Draw("same");
+
+    return plot;
+}
+
+
 
 /**
  * @brief Draw plot legend
@@ -190,14 +229,17 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
  * @param fParams Fit parameters results of the fit.
  * @param config Draw configurations.
  */
-void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config)
+void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config, bool includeFit)
 {
     TextDrawer tdrawer(0.22f,0.8f,9.0f);
     
-    tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu");
+    tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu                  ");
 
-    drawParams(fParams->get("signal"),&tdrawer);
-    drawParams(fParams->get(bkgName),&tdrawer);
+    if (includeFit)
+    {
+        drawParams(fParams->get("signal"),&tdrawer);
+        drawParams(fParams->get(bkgName),&tdrawer);
+    }
 
     TextDrawer tdrawer2(0.45,0.8);
 

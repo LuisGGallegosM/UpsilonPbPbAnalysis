@@ -25,14 +25,14 @@ done
 
 #multifit input file
 MULTIFITFILE=${1:-"../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline_z.multifit"}
-INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet/weighted/acceff/merged_HiForestAOD_DATA_skimjet_w.root"}
+INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet_pt50/weighted/nominal/merged_HiForestAOD_DATA_skimjet_w.root"}
 #drawing configuration file
 DRAWCONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
 
 SKIMFILE="${INPUTFILENAME}"
-CUTFILE="${INPUTFILENAME%.*}.cutconf"
+CUTFILE=${4:-"${INPUTFILENAME%.*}.cutconf"}
 #directory where to save multifit results
-OUTDIR="${INPUTFILENAME%/*}/multifit"
+OUTDIR=${5:-"${INPUTFILENAME%/*}/multifit"}
 
 echo "multiple fitting"
 echo "saving files in '${OUTDIR}'"
@@ -40,7 +40,6 @@ mkdir -p "${OUTDIR}"
 
 #fitconf files to read
 ./HelperScripts/fitconfGen.sh "${MULTIFITFILE}" "${OUTDIR}"
-exit 0
 CONFIGFILES=$(find ${OUTDIR} -maxdepth 1 -name "*.fitconf")
 
 cp "$MULTIFITFILE" "${OUTDIR}"

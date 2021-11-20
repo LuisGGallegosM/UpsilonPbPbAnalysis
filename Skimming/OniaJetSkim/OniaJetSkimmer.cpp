@@ -62,6 +62,8 @@ int FindJet(const OniaJetMCData* input, JetCorrector* JEC, int iQQ)
         float jt_pt_noZJEC = getCorrectedPt(JEC,jetInfo,iJet);
         float z = RecoQQ4mom->Pt()/jt_pt_noZJEC;
 
+        if ((z<0.0f) || (z>1.0f)) continue;
+
         TLorentzVector v_jet;
         v_jet.SetPtEtaPhiM(jt_pt_noZJEC, jt_eta, jt_phi, jetInfo->m[iJet]);
         if (RecoQQ4mom->DeltaR(v_jet)<=drmin)
@@ -86,6 +88,8 @@ int FindJet(const OniaJetRealData* input, JetCorrector* JEC, int iQQ)
         float jt_phi=jetInfo->phi[iJet];
         float jt_pt_noZJEC = getCorrectedPt(JEC,jetInfo,iJet);
         float z = RecoQQ4mom->Pt()/jt_pt_noZJEC;
+
+        if ((z<0.0f) || (z>1.0f)) continue;
 
         TLorentzVector v_jet;
         v_jet.SetPtEtaPhiM(jt_pt_noZJEC, jt_eta, jt_phi, jetInfo->m[iJet]);

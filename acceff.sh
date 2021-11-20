@@ -58,10 +58,10 @@ closure () {
     }
 
 addw (){
-    INPUT="../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet/merged_HiForestAOD_DATA_skimjet.root"
-    OUTPUTDIR="../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet/weighted"
+    INPUT="../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet_pt50/merged_HiForestAOD_DATA_skimjet.root"
+    OUTPUTDIR="../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet_pt50/weighted"
     ACC="../rootfiles/analysis/daniel/ptvsrap/Acc/OutAcc2D.root"
-    EFF="../rootfiles/analysis/daniel/ptvsrap/Eff/OutEff2D.root"
+    EFF="../rootfiles/analysis/daniel/ptvsrap/systematic_errors/OutEff2DSyst.root"
     OUTPUT="${OUTPUTDIR}/acceff/merged_HiForestAOD_DATA_skimjet_w.root"
     mkdir -p $( dirname ${OUTPUT})
     $TIMECMD $TIMEARGS ./AccEff/acceff -addw ${INPUT} ${ACC} ${EFF} ${OUTPUT}

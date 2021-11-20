@@ -12,7 +12,7 @@
 
 constexpr std::array<double,5> ZBins { 0.0f,0.25f,0.50f,0.75f,1.0f};
 TTree* process(TTree* tree, WeightFunc2D* acc, WeightFunc2D* eff);
-TTree* execute(TFile* inputFile ,TFile* accFile, TFile* effFile, const char* th2Name);
+TTree* execute(TFile* inputFile ,TFile* accFile, TFile* effFile, const char* th2AccName, const char* th2EffName);
 
 void AddWeights(const char* inputFilename, const char* accFilename, const char* effFilename, const char* outputname)
 {
@@ -30,15 +30,28 @@ void AddWeights(const char* inputFilename, const char* accFilename, const char* 
     std::cout << "Reading Eff file: " << effFilename <<'\n';
     TFile* effFile = OpenFile(effFilename,"READ");
 
-    for(int i=5;i==5;i++)
+    const std::string prefix="hGenUpsilonPtvsRap";
+    const std::vector<std::string> effs
+    {
+        "Nominal",
+        "HSPlus1SystErr",
+        "HSMinus1SystErr",
+        "HSPlus1StatErr",
+        "HSMinus1StatErr",
+        "GMPlus1SystErr",
+        "GMMinus1SystErr",
+        "GMPlus1StatErr",
+        "GMMinus1StatErr"
+    };
+    for(const auto& str : effs)
     {
         //output file
-        const std::string numStr=std::to_string(i);
-        const std::string thName="hGenUpsilonPtvsRapSlide"+numStr;
-        const std::string of= outputname;
+        const std::string thEffName=prefix+str;
+        const std::string thAccName="hGenUpsilonPtvsRapSlide5";
+        const std::string of= std::string( ReplaceExtension(outputname,"_"))+str+".root";
         std::cout << "Writing to file: " << of <<'\n';
         TFile* outFile = OpenFile(of.data(),"CREATE");
-        TTree* output=execute(inputFile,accFile,effFile,thName.data());
+        TTree* output=execute(inputFile,accFile,effFile,thAccName.data(),thEffName.data());
 
         output->Write(0,TObject::kOverwrite );
         outFile->Close();
@@ -49,16 +62,16 @@ void AddWeights(const char* inputFilename, const char* accFilename, const char* 
     
 }
 
-TTree* execute(TFile* inputFile ,TFile* accFile, TFile* effFile, const char* th2Name)
+TTree* execute(TFile* inputFile ,TFile* accFile, TFile* effFile, const char* th2AccName, const char* th2EffName)
 {
-    TH2* acc = dynamic_cast<TH2*> (accFile->Get(th2Name));
+    TH2* acc = dynamic_cast<TH2*> (accFile->Get(th2AccName));
 
     if (acc==nullptr)
     {
         throw std::invalid_argument("acceptancy TH2 not found");
     }
 
-    TH2* eff = dynamic_cast<TH2*> (effFile->Get(th2Name));
+    TH2* eff = dynamic_cast<TH2*> (effFile->Get(th2EffName));
 
     if (eff== nullptr)
     {
