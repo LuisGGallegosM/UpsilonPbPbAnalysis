@@ -57,9 +57,19 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const ParameterGroup* fitConf):
         config.getFloat("bkg.nBkg.value"), config.getFloat("bkg.nBkg.low"), config.getFloat("bkg.nBkg.high")),
     mass( toInternalName("mass").data(),"onia mass",
         config.getFloat("cut.mass.low"),config.getFloat("cut.mass.high"),"GeV/c^{2}"),
-    dcball1(mass,"Y1S",config.get("signal")),
+    dcball1(nullptr),
     bkg()
 {
+    std::string type= config.get("signal")->getString("type");
+    if (type=="dcb")
+    {
+        std::cout << "using double crystal ball signal fit.\n";
+        dcball1.reset( new DoubleCrystalBall(mass,"Y1S",config.get("signal")) );
+    } else if (type=="cbgauss")
+    {
+        std::cout << "using crystal ball + gauss signal fit.\n";
+        dcball1.reset(new CrystalBallGauss(mass,"Y1S",config.get("signal")));
+    } else throw std::invalid_argument("ERROR: no valid signal type");
     FitFunc* b =BkgFactory(mass,config.get(bkgName));
     bkg.reset(b);
 }
@@ -73,14 +83,14 @@ void OniaMassFitter::combinePdf()
         RooAddPdf* dcballbkg = 
             new RooAddPdf(  "dcb_fit",
                             "double crystal ball + Bkg", 
-                            RooArgList(*(dcball1.getDCB()),
+                            RooArgList(*(dcball1->getDCB()),
                             *(bkg->getFunc()) ),
                             RooArgList(nSig_Y1S,nBkg) );
         output.reset(dcballbkg);
     }
     else
     {
-        RooExtendPdf* signal = new RooExtendPdf("dcb_fit","extended signal",*dcball1.getDCB(),nSig_Y1S);
+        RooExtendPdf* signal = new RooExtendPdf("dcb_fit","extended signal",*dcball1->getDCB(),nSig_Y1S);
         output.reset(signal);
     }
 }
@@ -129,7 +139,7 @@ ParameterGroup OniaMassFitter::getFitParams() const
     ParameterWrite(output,nSig_Y1S,"signal.nSigY1S");
     ParameterWrite(output,nBkg,"bkg.nBkg");
     output.addGroup(bkg->getBkgParams(),bkgName);
-    output.addGroup(dcball1.getParams(),"signal");
+    output.addGroup(dcball1->getParams(),"signal");
 
     return output;
 }
@@ -143,9 +153,19 @@ OniaMassFitter2::OniaMassFitter2(TTree* tree_,const ParameterGroup* fitConf):
         config.getFloat("signal.nSigY2S.value"), config.getFloat("signal.nSigY2S.low"), config.getFloat("signal.nSigY2S.high")),
     nSig_Y3S("nSig_Y3S","Upsilon Signal Y3S",
         config.getFloat("signal.nSigY3S.value"), config.getFloat("signal.nSigY3S.low"), config.getFloat("signal.nSigY3S.high")),
-    dcball2(mass,"Y2S",dcball1,RATIO_Y2S),
-    dcball3(mass,"Y3S",dcball1,RATIO_Y3S)
+    dcball2(nullptr),
+    dcball3(nullptr)
 {
+    std::string type= config.get("signal")->getString("type");
+    if (type=="dcb")
+    {
+        dcball2.reset( new DoubleCrystalBallSlave(mass,"Y2S", *dynamic_cast<DoubleCrystalBall*> (dcball1.get()),RATIO_Y2S) );
+        dcball3.reset( new DoubleCrystalBallSlave(mass,"Y3S", *dynamic_cast<DoubleCrystalBall*> (dcball1.get()),RATIO_Y3S) );
+    } else if (type=="cbgauss")
+    {
+        dcball2.reset( new CrystalGaussSlave(mass,"Y2S", *dynamic_cast<CrystalBallGauss*> (dcball1.get()),RATIO_Y2S) );
+        dcball3.reset( new CrystalGaussSlave(mass,"Y3S", *dynamic_cast<CrystalBallGauss*> (dcball1.get()),RATIO_Y3S) );
+    } else throw std::invalid_argument("ERROR: no valid signal type");
 }
 
 ParameterGroup OniaMassFitter2::getFitParams() const
@@ -165,7 +185,7 @@ void OniaMassFitter2::combinePdf()
     {
         RooAddPdf* dcballbkg = 
             new RooAddPdf("dcb_fit","3 double crystal ball + Bkg", 
-                    RooArgList(*dcball1.getDCB(),*dcball2.getDCB(),*dcball3.getDCB(),*(bkg->getFunc()) ),
+                    RooArgList(*(dcball1->getDCB()),*dcball2->getDCB(),*dcball3->getDCB(),*(bkg->getFunc()) ),
                     RooArgList(nSig_Y1S,nSig_Y2S,nSig_Y3S,nBkg) );
         output.reset(dcballbkg);
     }
@@ -173,7 +193,7 @@ void OniaMassFitter2::combinePdf()
     {
         RooAddPdf* dcball = 
             new RooAddPdf("dcb_fit","3 double crystal ball + Bkg", 
-                    RooArgList(*dcball1.getDCB(),*dcball2.getDCB(),*dcball3.getDCB()),
+                    RooArgList(*(dcball1->getDCB()),*dcball2->getDCB(),*dcball3->getDCB()),
                     RooArgList(nSig_Y1S,nSig_Y2S,nSig_Y3S) );
         output.reset(dcball);
     }

@@ -5,6 +5,7 @@ cut.pt.low = 0.0
 cut.pt.high = 2.0
 cut.y.low = 0.0
 cut.y.high = 2.4
+signal.type = dcb
 signal.nSigY1S.high = 10000000.0
 signal.nSigY1S.value = 50000.0
 signal.nSigY1S.low = 0.0

@@ -49,6 +49,7 @@ ParameterGroup DoubleCrystalBall::getParams() const
     ParameterGroup p;
     ParameterWrite(p,x,"x");
     ParameterWrite(p,f,"f");
+    p.setString("type","dcb");
     p.addGroup( CrystalBall::getParams() );
     return p;
 }
@@ -77,6 +78,43 @@ DoubleCrystalBallSlave::DoubleCrystalBallSlave(RooRealVar& var,const char* name,
     f(        Form("f_%s",name),        "1.0*@0",RooArgList(doublecb.f)),
     cBall_2(  Form("cball_%s_2",name),  "crystalBall",var,mean_2,sigma_2,alpha_2,n_2),
     dcball(   Form("dcb_%s",name),      "double crystal ball", RooArgList(cBall,cBall_2),RooArgList(f) )
+{
+
+}
+
+//crystalballexp
+
+CrystalBallGauss::CrystalBallGauss(RooRealVar& var,const char* name, const ParameterGroup* g):
+    CrystalBall(var,Form("%s_1",name),g),
+    mean_2(   Form("mean_%s_2",name), "1.0*@0",RooArgList(mean)),
+    x(        Form("x_%s",name),"sigma ratio",g->getFloat("x.value"),g->getFloat("x.low"),g->getFloat("x.high")),
+    sigma_2(  Form("sigma_%s_2",name),"@0*@1",RooArgList(x,sigma)),
+    f(        Form("f_%s",name),     "Crystal ball ratio", g->getFloat("f.value"),g->getFloat("f.low"),g->getFloat("f.high")),
+    gauss(  Form("cball_%s_2",name),"gaussian",var,mean_2,sigma_2),
+    cbexpball(   Form("dcb_%s",name),    "crystal ball and exp", RooArgList(cBall,gauss),RooArgList(f) )
+{
+    x.setConstant(g->getBool("x.fixed"));
+    f.setConstant(g->getBool("f.fixed"));
+}
+
+ParameterGroup CrystalBallGauss::getParams() const
+{
+    ParameterGroup p;
+    ParameterWrite(p,x,"x");
+    ParameterWrite(p,f,"f");
+    p.setString("type","cbgauss");
+    p.addGroup( CrystalBall::getParams() );
+    return p;
+}
+
+CrystalGaussSlave::CrystalGaussSlave(RooRealVar& var,const char* name,CrystalBallGauss& doublecb,float ratio):
+    CrystalBallSlave(var,doublecb,name,ratio),
+    mean_2(   Form("mean_%s_2",name),   "1.0*@0",RooArgList(mean)),
+    x(        Form("x_%s",name),        "1.0*@0",RooArgList(doublecb.x)),
+    sigma_2(  Form("sigma_%s_2",name),  "@0*@1", RooArgList(doublecb.x,sigma)),
+    f(        Form("f_%s",name),        "1.0*@0",RooArgList(doublecb.f)),
+    gauss(  Form("cball_%s_2",name),  "gaussian",var,mean_2,sigma_2),
+    dcball(   Form("dcb_%s",name),      "crystal ball and gauss", RooArgList(cBall,gauss),RooArgList(f) )
 {
 
 }

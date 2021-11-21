@@ -20,7 +20,7 @@ class OniaMassFitter
     RooRealVar mass;
     RooRealVar nSig_Y1S;
     RooRealVar nBkg;
-    DoubleCrystalBall dcball1;
+    std::unique_ptr<SignalFitFunc> dcball1;
     std::unique_ptr<FitFunc> bkg;
     std::unique_ptr<RooDataSet> dataset;
     std::unique_ptr<RooFitResult> results;
@@ -89,8 +89,8 @@ class OniaMassFitter2 : public OniaMassFitter
     private:
     RooRealVar nSig_Y2S;
     RooRealVar nSig_Y3S;
-    DoubleCrystalBallSlave dcball2;
-    DoubleCrystalBallSlave dcball3;
+    std::unique_ptr<SignalFitFunc> dcball2;
+    std::unique_ptr<SignalFitFunc> dcball3;
 
     /**
      * @brief Same as base method, this method includes Y2S and Y3S fields
