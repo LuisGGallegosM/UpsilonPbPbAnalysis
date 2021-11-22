@@ -10,7 +10,7 @@ using namespace RooFit;
 void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config, bool includeFit=true);
 void drawPullText(RooHist* hist, RooFitResult* fitResults);
 
-TLegend* drawLegend(RooPlot* plot, bool bkgOn,bool moreUpsilon);
+TLegend* drawLegend(RooPlot* plot, bool bkgOn,bool moreUpsilon, bool isgauss);
 
 RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,const ParameterGroup* config);
 RooHist*  drawPull(RooPlot* plot, RooRealVar* var, const ParameterGroup* config);
@@ -91,7 +91,7 @@ void DrawPlot(const char* inputdirectoryname, const char* drawconfigfilename  )
         float minVal=fParams.getFloat("bkg.nBkg.value")/( config.getFloat("cut.mass.high") - config.getFloat("cut.mass.low") );
         maxVal+=minVal;
         setGraphStyle(graphPlot,&config,maxVal,minVal,isLog);
-        drawLegend(graphPlot,config.getString("bkg.type")!="none",config.getBool("moreUpsilon"));
+        drawLegend(graphPlot,config.getString("bkg.type")!="none",config.getBool("moreUpsilon"), config.getString("signal.type")=="cbgauss");
         drawGraphText(&fParams,&config);
 
         pull->cd();
@@ -193,7 +193,7 @@ RooPlot* drawGraphsMassOnly(RooRealVar* var, RooDataSet* dataset,const Parameter
  * @param moreUpsilon is there more than 1S upsilon?
  * @return TLegend* 
  */
-TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
+TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon, bool isgauss)
 {
     TLegend* fitleg = new TLegend(0.70,0.65,0.85,0.85);
     fitleg->SetTextSize(12);
@@ -209,9 +209,19 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon)
     }
     else
     {
-        fitleg->AddEntry(plot->findObject("dcb"),"Signal","l");
-        fitleg->AddEntry(plot->findObject("cb1"),"CBall 1","l");
-        fitleg->AddEntry(plot->findObject("cb2"),"CBall 2","l");
+        if (isgauss)
+        {
+            fitleg->AddEntry(plot->findObject("dcb"),"Signal","l");
+            fitleg->AddEntry(plot->findObject("cb1"),"CBall","l");
+            fitleg->AddEntry(plot->findObject("cb2"),"Gaussian","l");
+        }
+        else
+        {
+            fitleg->AddEntry(plot->findObject("dcb"),"Signal","l");
+            fitleg->AddEntry(plot->findObject("cb1"),"CBall 1","l");
+            fitleg->AddEntry(plot->findObject("cb2"),"CBall 2","l");
+        }
+
     }
 
     if (bkgOn)
