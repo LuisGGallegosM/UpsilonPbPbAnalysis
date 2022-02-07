@@ -96,6 +96,27 @@ double WeightFuncTEff::getWeight(double x) const
     return 1.0/hist->GetEfficiency(hist->FindFixBin(x));
 }
 
+float WeightFuncTH1::getWeight(float x) const
+{
+    return hist->GetBinContent(hist->FindFixBin(x));
+}
+
+double WeightFuncTH1::getWeight(double x) const
+{
+    return hist->GetBinContent(hist->FindFixBin(x));
+}
+
+float WeightFuncTH1_2D::getWeight(float x, float y) const
+{
+    return hist->GetBinContent(hist->FindFixBin(x));
+}
+
+double WeightFuncTH1_2D::getWeight(double x, double y) const
+{
+    return hist->GetBinContent(hist->FindFixBin(x));
+}
+
+
 float WeightFuncTH2::getWeight(float x, float y) const
 {
     return hist->GetBinContent(hist->FindFixBin(x,y));

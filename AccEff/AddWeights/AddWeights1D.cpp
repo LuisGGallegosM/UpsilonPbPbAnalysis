@@ -1,5 +1,4 @@
-
-#include"AddWeights.h"
+#include"AddWeights1D.h"
 
 #include "../Common/AccEffAux.h"
 #include"../../Utils/Helpers/Helpers.h"
@@ -10,10 +9,10 @@
 #include"TEfficiency.h"
 #include"TH1.h"
 
-TTree* process(TTree* tree, WeightFunc2D* acc, WeightFunc2D* eff);
-TTree* execute(TFile* inputFile ,TFile* accFile, TFile* effFile, const char* th2AccName, const char* th2EffName);
+TTree* process1d(TTree* tree, WeightFunc2D* acc, WeightFunc2D* eff);
+TTree* execute1d(TFile* inputFile ,TFile* accFile, TFile* effFile, const char* th2AccName, const char* th2EffName);
 
-void AddWeights(const char* inputFilename, const char* accFilename, const char* effFilename, const char* outputname)
+void AddWeights2(const char* inputFilename, const char* accFilename, const char* effFilename, const char* outputname)
 {
     std::cout << "\nWEIGHT ADD FOR ACCXEFF\n";
 
@@ -50,7 +49,7 @@ void AddWeights(const char* inputFilename, const char* accFilename, const char* 
         const std::string of= std::string( ReplaceExtension(outputname,"_"))+str+".root";
         std::cout << "Writing to file: " << of <<'\n';
         TFile* outFile = OpenFile(of.data(),"CREATE");
-        TTree* output=execute(inputFile,accFile,effFile,thAccName.data(),thEffName.data());
+        TTree* output=execute1d(inputFile,accFile,effFile,thAccName.data(),thEffName.data());
 
         output->Write(0,TObject::kOverwrite );
         outFile->Close();
@@ -61,7 +60,7 @@ void AddWeights(const char* inputFilename, const char* accFilename, const char* 
     
 }
 
-TTree* execute(TFile* inputFile ,TFile* accFile, TFile* effFile, const char* th2AccName, const char* th2EffName)
+TTree* execute1d(TFile* inputFile ,TFile* accFile, TFile* effFile, const char* th2AccName, const char* th2EffName)
 {
     TH2* acc = dynamic_cast<TH2*> (accFile->Get(th2AccName));
 
@@ -82,28 +81,27 @@ TTree* execute(TFile* inputFile ,TFile* accFile, TFile* effFile, const char* th2
 
     TTree* tree= GetTree(inputFile,"onia_skimmed");
 
-    return process(tree,&accWeight,&effWeight);
+    return process1d(tree,&accWeight,&effWeight);
 }
 
-TTree* process(TTree* tree, WeightFunc2D* acc, WeightFunc2D* eff)
+TTree* process1d(TTree* tree, WeightFunc2D* acc, WeightFunc2D* eff)
 {
-    OniaReader<OniaJetQQRealData> oniaReader(tree);
-    OniaWriter<OniaJetQQRealDataW> oniaWriter(tree->GetName());
+    OniaReader<OniaQQ> oniaReader(tree);
+    OniaWriter<OniaQQW> oniaWriter(tree->GetName());
 
     const int size= oniaReader.getEntries();
 
     for(int i=0; i< size;i++)
     {
         auto data = oniaReader.getData(i);
-        const double pt=data->recoQQOut.pT;
-        const double y=data->recoQQOut.y;
+        const double pt=data->oniaQQOut.pT;
+        const double y=data->oniaQQOut.y;
         const double weight= acc->getWeight(pt,y) * eff->getWeight(pt,y);
 
         auto out= oniaWriter.getDataBuffer();
-        out->jetOut= data->jetOut;
         out->oniaInfoOut= data->oniaInfoOut;
         out->oniaMuOut= data->oniaMuOut;
-        out->recoQQOut= data->recoQQOut;
+        out->oniaQQOut= data->oniaQQOut;
         out->weight.accxeff= 1.0f/ weight;
 
         oniaWriter.writeData();

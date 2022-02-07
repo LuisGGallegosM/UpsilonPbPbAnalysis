@@ -8,6 +8,7 @@ void DrawCmp(const char* xvar, const char* outputpath,int size,const char** fitf
 void DrawPlot(const char* inputdirectoryname, const char* configfilename  );
 #include"MultifitGen/MultifitGen.h"
 #include"Reporter/Report.h"
+#include"LLRtest/LLRtest.h"
 
 #if !defined(__CLING__)
 
@@ -71,7 +72,16 @@ int main(int argc, char **argv)
             std::cerr << "Incorrect number of parameters\n";  
         }
     }
-    else
+    else if(option=="-llr")
+    {
+        int numFiles=(argc -3) ;
+        const char* args[64];
+
+        if (numFiles<=0) return 0;
+        
+        for (int i=0;i<numFiles;i++) args[i]=argv[i+3];
+        LLRtest( args, argv[2],numFiles );
+    } else
     {
         std::cerr << "Incorrect option flags\n";  
     }

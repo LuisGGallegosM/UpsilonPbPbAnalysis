@@ -9,6 +9,7 @@
 #include"TH2F.h"
 
 struct OniaQQ;
+struct OniaQQW;
 struct OniaJetQQMC;
 struct OniaJetQQMCW;
 struct OniaJetQQRealData;
@@ -24,6 +25,7 @@ TH2F* createTH2Z(const std::string& name,const std::string& title);
 void writeToCanvasZ(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option);
 
 void addOutputs(OniaQQ* data,TreeWriter* writer, const char* prefix);
+void addOutputs(OniaQQW* data,TreeWriter* writer, const char* prefix);
 void addOutputs(OniaJetQQMC* data,TreeWriter* writer, const char* prefix);
 void addOutputs(OniaJetQQMCW* data,TreeWriter* writer, const char* prefix);
 void addOutputs(OniaJetQQRealData* data,TreeWriter* writer, const char* prefix);
@@ -34,6 +36,14 @@ struct OniaQQ
     OniaSimpleInfo oniaInfoOut;
     OniaSimpleQQ oniaQQOut;
     OniaSimpleMu oniaMuOut;
+};
+
+struct OniaQQW
+{
+    OniaSimpleInfo oniaInfoOut;
+    OniaSimpleQQ oniaQQOut;
+    OniaSimpleMu oniaMuOut;
+    OniaWeight weight;
 };
 
 struct OniaJetQQRealData
@@ -73,6 +83,8 @@ struct OniaJetQQMCW
     OniaWeight weight;
 };
 
+void addInputs(OniaQQ* data, TreeReader* reader);
+void addInputs(OniaQQW* data, TreeReader* reader);
 void addInputs(OniaJetQQMC* data, TreeReader* reader);
 void addInputs(OniaJetQQRealData* data, TreeReader* reader);
 

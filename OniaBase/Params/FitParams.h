@@ -34,38 +34,6 @@ class WeightFunc2D
     virtual ~WeightFunc2D() = default;
 };
 
-class WeightFuncRooAbs : public WeightFunc
-{
-    RooAbsReal* f;
-    public:
-    float getWeight(float x) const override;
-    double getWeight(double x) const override;
-
-    WeightFuncRooAbs(RooAbsReal* func);
-};
-
-class WeightFuncTEff : public WeightFunc
-{
-    TEfficiency* hist;
-
-    public:
-    float getWeight(float x) const override;
-    double getWeight(double x) const override;
-
-    WeightFuncTEff(TEfficiency* h) : hist(h) {};
-};
-
-class WeightFuncTH2 : public WeightFunc2D
-{
-    TH2* hist;
-
-    public:
-    float getWeight(float x, float y) const override;
-    double getWeight(double x, double y) const override;
-
-    WeightFuncTH2(TH2* h) : hist(h) {};
-};
-
 #if defined(__CLING__)
 #include "Params.cpp"
 #endif

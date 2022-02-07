@@ -24,6 +24,14 @@ void addOutputs(OniaQQ* data,TreeWriter* writer, const char* prefix)
     data->oniaMuOut.addOutputs(writer,prefix);
 }
 
+void addOutputs(OniaQQW* data,TreeWriter* writer, const char* prefix)
+{
+    data->oniaInfoOut.addOutputs(writer);
+    data->oniaQQOut.addOutputs(writer,prefix);
+    data->oniaMuOut.addOutputs(writer,prefix);
+    data->weight.addOutputs(writer);
+}
+
 void addOutputs(OniaJetQQRealData* data,TreeWriter* writer, const char* prefix)
 {
     data->oniaInfoOut.addOutputs(writer);
@@ -60,6 +68,21 @@ void addOutputs(OniaJetQQMCW* data,TreeWriter* writer, const char* prefix)
     data->jetOut.addOutputs(writer);
     data->refJetOut.addOutputs(writer);
     data->weight.addOutputs(writer);
+}
+
+void addInputs(OniaQQ* data, TreeReader* reader)
+{
+  data->oniaInfoOut.addInputs(reader);
+  data->oniaMuOut.addInputs(reader,"reco_");
+  data->oniaQQOut.addInputs(reader,"reco_");
+}
+
+void addInputs(OniaQQW* data, TreeReader* reader)
+{
+  data->oniaInfoOut.addInputs(reader);
+  data->oniaMuOut.addInputs(reader,"reco_");
+  data->oniaQQOut.addInputs(reader,"reco_");
+  data->weight.addInputs(reader);
 }
 
 void addInputs(OniaJetQQMC* data, TreeReader* reader)

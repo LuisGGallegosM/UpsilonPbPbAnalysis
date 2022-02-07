@@ -34,7 +34,7 @@ class OniaMassFitter
     virtual void combinePdf();
 
     public:
-
+    
     /**
      * @brief Construct a new Onia Mass Fitter object. This objects allows
      * to fit a dataset using a double crystal ball function.

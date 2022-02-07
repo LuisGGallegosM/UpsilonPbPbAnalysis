@@ -17,6 +17,8 @@ int main(int argc, char **argv)
             EffTest(argv[2],argv[3],argv[4],nullptr);
         else if (flags=="-acc")
             AccTest(argv[2],argv[3],argv[4]);
+        else if (flags=="-acceff")
+            AccEffCalculate(argv[2],argv[3],argv[4]);
         else
             std::cerr << "Incorrect number of parameters\n";
         break;
@@ -26,6 +28,10 @@ int main(int argc, char **argv)
             EffTest(argv[2],argv[3],argv[4],argv[5]);
         else if (flags=="-addw")
             AddWeights(argv[2],argv[3],argv[4],argv[5]);
+        else if (flags=="-addw2")
+            AddWeights2(argv[2],argv[3],argv[4],argv[5]);
+        else if(flags=="-crosssection")
+            CrossSectionCalculate(argv[2],argv[3],argv[4],argv[5]);
         else
             std::cerr << "Incorrect number of parameters\n";
         break;
@@ -39,24 +45,18 @@ int main(int argc, char **argv)
             std::cerr << "Incorrect number of parameters\n";
         break;
 
-        case 7:
-        if (flags=="-final")
-            AccEffResults(argv[2],argv[3],argv[4],argv[5],argv[6]);
-        else
-            std::cerr << "Incorrect number of parameters\n";
-        break;
-
         case 8:
         if (flags=="-closurejet")
             ClosureTestJet(argv[2],argv[3],argv[4],argv[5],argv[6],argv[7]);
         else
             std::cerr << "Incorrect number of parameters\n";
+        break;
 
         case 9:
         if (flags=="-closure")
             ClosureTest(argv[2],argv[3],argv[4],argv[5],argv[6],argv[7],argv[8]);
         else
-
+            std::cerr << "Incorrect number of parameters\n";
         break;
 
         default:

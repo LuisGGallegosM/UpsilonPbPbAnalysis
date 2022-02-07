@@ -1,15 +1,15 @@
 #!/bin/bash
 
 #configuration flags
-FLAGS=${1:-"-skimjet"}
+FLAGS=${1:-"-skim"}
 #input file to skim
-INPUTFILE=${2:-"../rootfiles/datasets/merged_HiForestAOD_DATA.root"}
+INPUTFILE=${2:-"../rootfiles/datasets/merged_HiForestAOD_MC.root"}
 #cut configuration file
-CONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline.cutconf"}
+CONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD_MC_baseline.cutconf"}
 
 INPUTFILENAME=$(basename $INPUTFILE)
 #folder name skim result file
-OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_${FLAGS:1}_pt50"
+OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_${FLAGS:1}"
 
 CLING="NO"
 #output skimmed file, put in OUTPUTFOLDER and name based in inputfile

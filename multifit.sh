@@ -24,15 +24,15 @@ do
 done
 
 #multifit input file
-MULTIFITFILE=${1:-"../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline_z.multifit"}
-INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet/merged_HiForestAOD_DATA_skimjet.root"}
+MULTIFITFILE=${1:-"../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline.multifit"}
+INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_DATA_skim/merged_HiForestAOD_DATA_skim.root"}
 #drawing configuration file
 DRAWCONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
 
 SKIMFILE="${INPUTFILENAME}"
 CUTFILE=${4:-"${INPUTFILENAME%.*}.cutconf"}
 #directory where to save multifit results
-OUTDIR=${5:-"${INPUTFILENAME%/*}/testmultifit"}
+OUTDIR=${5:-"${INPUTFILENAME%/*}/multifit_baseline_cheb1"}
 
 echo "multiple fitting"
 echo "saving files in '${OUTDIR}'"
