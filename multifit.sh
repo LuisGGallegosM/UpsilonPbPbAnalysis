@@ -32,7 +32,7 @@ DRAWCONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
 SKIMFILE="${INPUTFILENAME}"
 CUTFILE=${4:-"${INPUTFILENAME%.*}.cutconf"}
 #directory where to save multifit results
-OUTDIR=${5:-"${INPUTFILENAME%/*}/multifit_baseline_cheb1"}
+OUTDIR=${5:-"${INPUTFILENAME%/*}/multifit_baseline_cheb1_fx"}
 
 echo "multiple fitting"
 echo "saving files in '${OUTDIR}'"

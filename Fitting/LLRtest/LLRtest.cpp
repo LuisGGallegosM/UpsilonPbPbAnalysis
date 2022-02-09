@@ -115,6 +115,9 @@ void LLRtest(const char** multifitpaths,const char* outputpath,int size)
         for(int i=0;i< bin.size();i++)
         {
             std::cout << ">>" << bin[i].name << "  NLL:" << bin[i].nll << "  NPAR:" << bin[i].npar << "AIC" << 2*(bin[i].npar+bin[i].nll) << "\n";
+            int     nParB      = bin[i].npar;
+            double  NLLB       = bin[i].nll;
+            double  AICB       = 2*(nParB + NLLB);
             for(int j=0;j< bin.size();j++)
             {
                 int     nParA      = bin[j].npar;
@@ -123,9 +126,6 @@ void LLRtest(const char** multifitpaths,const char* outputpath,int size)
 
                 if((nParA >= bin[i].npar) && ( j!=i ))
                 {
-                    int     nParB      = bin[i].npar;
-                    double  NLLB       = bin[i].nll;
-                    double  AICB       = 2*(nParB + NLLB);
                     double  diffNLL    = -2.0*(NLLA - NLLB);
                     double  diffNPar   =  2.0*(nParA-nParB);
                     double  probChi2   = TMath::Prob(diffNLL, diffNPar);
