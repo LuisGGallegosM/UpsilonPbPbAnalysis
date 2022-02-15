@@ -4,35 +4,15 @@ DOFIT="true"
 DODRAW="true"
 DOCDRAW="true"
 
-while : do
-do
-    case $1 in
-    "-nofit")
-    DOFIT="false"
-    ;;
-    "-nodraw")
-    DODRAW="false"
-    ;;
-    "-nocomp")
-    DOCDRAW="false"
-    ;;
-    *)
-    break
-    ;;
-    esac
-    shift
-done
-
 #multifit input file
 MULTIFITFILE=${1:-"../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline.multifit"}
 INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_DATA_skim/merged_HiForestAOD_DATA_skim.root"}
-#drawing configuration file
-DRAWCONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
-
-SKIMFILE="${INPUTFILENAME}"
+OUTDIR=${3:-"${INPUTFILENAME%/*}/multifit_baseline_tesst"}
 CUTFILE=${4:-"${INPUTFILENAME%.*}.cutconf"}
+DRAWCONFIG=${5:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
+SKIMFILE="${INPUTFILENAME}"
+
 #directory where to save multifit results
-OUTDIR=${5:-"${INPUTFILENAME%/*}/multifit_baseline_cheb1_fx"}
 
 echo "multiple fitting"
 echo "saving files in '${OUTDIR}'"
@@ -42,7 +22,7 @@ mkdir -p "${OUTDIR}"
 ./HelperScripts/fitconfGen.sh "${MULTIFITFILE}" "${OUTDIR}"
 CONFIGFILES=$(find ${OUTDIR} -maxdepth 1 -name "*.fitconf")
 
-cp "$MULTIFITFILE" "${OUTDIR}"
+cp "$MULTIFITFILE" "${OUTDIR}/config.multifit"
 
 #do the fits
 if [ ${DOFIT} = "true" ]

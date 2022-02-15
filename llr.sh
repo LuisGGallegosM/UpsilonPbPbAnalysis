@@ -1,15 +1,18 @@
 #!/bin/bash
 
-MAINDIR="../rootfiles/analysis/merged_HiForestAOD_DATA_skim"
-OUTPUTFILE="../rootfiles/analysis/merged_HiForestAOD_DATA_skim"
-FITFILENAME="merged_HiForestAOD_DATA_baseline.multifit"
+MAINDIR="../rootfiles/analysis/merged_HiForestAOD_MC_skimjet"
+OUTPUTFILE="../rootfiles/analysis/merged_HiForestAOD_MC_skimjet"
+FITFILENAME="config.multifit"
+PREFIX="multifit_baseline_z_jt3040"
 
-INPUTFILES=( ${MAINDIR}/multifit_baseline_cheb1_fx/${FITFILENAME} \
-${MAINDIR}/multifit_baseline_cheb2_fx/${FITFILENAME} \
-${MAINDIR}/multifit_baseline_cheb3_fx/${FITFILENAME} \
-${MAINDIR}/multifit_baseline_cheb4_fx/${FITFILENAME} \
-${MAINDIR}/multifit_baseline_cheb5_fx/${FITFILENAME} \
+INPUTFILES=( \
+${MAINDIR}/${PREFIX}_cheb0/${FITFILENAME} \
+${MAINDIR}/${PREFIX}_cheb1/${FITFILENAME} \
+${MAINDIR}/${PREFIX}_cheb2/${FITFILENAME} \
+${MAINDIR}/${PREFIX}_cheb3/${FITFILENAME} \
+${MAINDIR}/${PREFIX}_cheb4/${FITFILENAME} \
+${MAINDIR}/${PREFIX}_cheb5/${FITFILENAME} \
               )
 
 #echo ${INPUTFILES[@]}
-./Fitting/fit -llr "${OUTPUTFILE}" ${INPUTFILES[@]} > ${MAINDIR}/LLR_fx.log
+./Fitting/fit -llr "${OUTPUTFILE}" ${INPUTFILES[@]} > ${MAINDIR}/LLR_z_jt3040.log

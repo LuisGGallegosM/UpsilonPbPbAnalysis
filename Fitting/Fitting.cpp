@@ -9,6 +9,7 @@ void DrawPlot(const char* inputdirectoryname, const char* configfilename  );
 #include"MultifitGen/MultifitGen.h"
 #include"Reporter/Report.h"
 #include"LLRtest/LLRtest.h"
+#include"SuperMultifit/supermultifit.h"
 
 #if !defined(__CLING__)
 
@@ -81,6 +82,16 @@ int main(int argc, char **argv)
         
         for (int i=0;i<numFiles;i++) args[i]=argv[i+3];
         LLRtest( args, argv[2],numFiles );
+    }
+    else if(option=="-smult")
+    {
+        int numFiles=(argc -3) ;
+        const char* args[64];
+
+        if (numFiles<=0) return 0;
+        
+        for (int i=0;i<numFiles;i++) args[i]=argv[i+3];
+        Supermultifit( args, argv[2],numFiles );
     } else
     {
         std::cerr << "Incorrect option flags\n";  

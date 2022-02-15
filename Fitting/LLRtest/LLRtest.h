@@ -1,5 +1,5 @@
-#ifndef DRAWINGCMP
-#define DRAWINGCMP
+#ifndef LLRTEST
+#define LLRTEST
 
 #include"../../OniaBase/Params/Params.h"
 

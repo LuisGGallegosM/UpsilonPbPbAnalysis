@@ -63,10 +63,13 @@ void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::
     pad.cd();
     if (yLog) pad.SetLogy();
     THStack stack((title+"_stack").data(),(title+" plot").data());
+    int i=1;
     for(auto hist : hists)
     {
+        hist->SetLineColor(i);
         stack.Add(hist);
         hist->Write();
+        i++;
     }
     stack.Draw("nostack");
     stack.GetYaxis()->SetTitle(yname.data());
