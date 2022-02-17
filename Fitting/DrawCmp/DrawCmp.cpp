@@ -148,7 +148,7 @@ void drawCompGraph(const std::string& varname, const std::vector<FitElement>& fi
     int i=0;
     for (const auto& fit : fits)
     {
-        if (!fit.fits.exists(varname+".value")) continue;
+        if (!fit.fits.exists(varname+".value")) {i++;continue;}
         graph->SetBinContent(i+1,fit.fits.getFloat(varname+".value"));
         graph->SetBinError(i+1,fit.fits.getFloat(varname+".error"));
         i++;

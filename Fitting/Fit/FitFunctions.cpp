@@ -139,13 +139,27 @@ std::vector<RooRealVar> produceChevVars(const ParameterGroup* init)
 {
     std::vector<RooRealVar> chk;
     std::vector<std::string> varNames;
-    
-    int i=1;
-    while ( init->exists("chk4_k"+std::to_string(i)) && (i<20))
+
+    std::string type=init->getString("type");
+
+    if(type.length()==4)
     {
-        varNames.push_back("chk4_k"+std::to_string(i));
-        i++;
-    };
+        int i=1;
+        while ( init->exists("chk4_k"+std::to_string(i)) && (i<20))
+        {
+            varNames.push_back("chk4_k"+std::to_string(i));
+            i++;
+        };
+    } else
+    {
+        int order= std::atoi(type.data()+4);
+        if(order>10) order=10; 
+
+        for(int i=0; i< order;i++)
+        {
+            varNames.push_back("chk4_k"+std::to_string(i+1));
+        }
+    }
 
     chk.reserve(varNames.size());
 
@@ -193,7 +207,7 @@ ParameterGroup Chevychev::getBkgParams() const
         ParameterWrite(p,v,v.GetName());
         i++;
     }
-    p.setString("type","chev");
+    p.setString("type","cheb"+std::to_string(chk.size()));
     return p;
 }
 
@@ -282,6 +296,7 @@ FitFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config)
 {
     FitFunc* b= nullptr;
     BkgType bkgType = getBkgByName(config->getString("type"));
+
     switch (bkgType)
     {
         case BkgType::chev:

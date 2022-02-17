@@ -31,9 +31,18 @@ void generateFile( const std::string& varName,const std::vector<float>& diffVarV
         ParameterGroup g=multifit;
         for(int j=0;j<diffParams.size();j++)
         {
-            float value = getFloatIndex(multifit,diffParams[j],i);
-            g.remove(diffParams[j]);
-            g.setFloat(diffParams[j],value);
+            if ( diffParams[j].find("value")!=std::string::npos )
+            {
+                float value = getFloatIndex(multifit,diffParams[j],i);
+                g.remove(diffParams[j]);
+                g.setFloat(diffParams[j],value);
+            } else if ( diffParams[j].find("type")!=std::string::npos)
+            {
+                std::string value = getStringIndex(multifit,diffParams[j],i);
+                g.remove(diffParams[j]);
+                g.setString(diffParams[j],value);
+            }
+
         }
         g.remove("diffVar");
 
@@ -70,10 +79,15 @@ std::vector<std::string> findDiffParameters(const ParameterGroup& multifit)
     {
         auto pg = multifit.get(g);
         auto params= pg->getSubgroupNames();
+                
         for(auto param : params)
         {
             if (pg->exists(param+".value.0"))
                 result.push_back(std::string(g)+"."+param+".value");
+            else if (pg->exists( param + ".0"))
+            {
+                result.push_back(std::string(g)+"."+param);
+            }
         }
     }
     return result;
