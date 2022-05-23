@@ -87,7 +87,7 @@ TTree* execute1d(TFile* inputFile ,TFile* accFile, TFile* effFile, const char* t
 TTree* process1d(TTree* tree, WeightFunc2D* acc, WeightFunc2D* eff)
 {
     OniaReader<OniaQQ> oniaReader(tree);
-    OniaWriter<OniaQQW> oniaWriter(tree->GetName());
+    OniaWriter<OniaQQW> oniaWriter(tree->GetName(),"reco_");
 
     const int size= oniaReader.getEntries();
 

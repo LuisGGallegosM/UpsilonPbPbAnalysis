@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #configuration flags
-FLAGS=${1:-"-skim"}
+FLAGS=${1:-"-skimjet"}
 #input file to skim
 INPUTFILE=${2:-"../rootfiles/datasets/merged_HiForestAOD_MC.root"}
 #cut configuration file

@@ -13,7 +13,7 @@
 
 void getCrossSections(const TH1D* DATA_dN_dPt, const std::string& outbasename);
 TH1D* generateRefCrossSection(const float* error);
-void getRatios(const TH1D* DATA_dN_dPt_norm, const TH1D* MC_dN_dPt_norm, const std::string& outbasename );
+TH1D* getRatios(const TH1D* DATA_dN_dPt_norm, const TH1D* MC_dN_dPt_norm, const std::string& outbasename );
 TH1D* getNSigMC(TFile* accFile, const std::string& outbasename);
 TH1D* toTH1D(const TEfficiency* asym);
 TH1D* calcDN_DpT(TH1D* nSigCorrected);
@@ -22,13 +22,24 @@ TH1D* Normalize(TH1D* nSigCorrected);
 const int colorGraph[2] = {4 ,2 } ;
 const char xAxisLabel[] ="p^{#mu#mu}_{T} GeV/c";
 
+const bool alreadyCorrected = false;
+
 void CrossSectionCalculate(const char* acceffFilename, const char* fitFileRealDataPath, const char* fitFileMCPath, const char* outputname)
 {
     std::cout << "\nACCEPTANCY EFFICIENCY RESULT TEST\n";
 
+    TFile* acceffFile = nullptr;
+
     //input file
-    std::cout << "Reading acceptancy x efficiency input file: " << acceffFilename <<'\n';
-    TFile* acceffFile = OpenFile(acceffFilename,"READ");
+    if (alreadyCorrected)
+    {
+        std::cout << "File Already accXEff corrected\n";
+    } else
+    {
+        std::cout << "Reading acceptancy x efficiency input file: " << acceffFilename <<'\n';
+        acceffFile = OpenFile(acceffFilename,"READ");
+    }
+
     //input file
     std::cout << "Reading Real Data multifit file: " << fitFileRealDataPath <<'\n';
     TFile* fitFileRealData = OpenFile(fitFileRealDataPath,"READ");
@@ -41,16 +52,27 @@ void CrossSectionCalculate(const char* acceffFilename, const char* fitFileRealDa
 
     std::string outbasename= ReplaceExtension(outputname,"");
 
-    TEfficiency* AccXEff= (TEfficiency*) acceffFile->Get(accXEffName);
-    
     TH1D* nSigRealData = (TH1D*) fitFileRealData->Get(nSigY1SName);
     nSigRealData->SetName("DATA_nSigY1S");
 
-    TH1D* nSigCorrected = calcCorrectedYields(nSigRealData,AccXEff);
-    writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","nSigY1S",outbasename);
-    nSigCorrected->Write();
+    TH1D* DATA_dN_dPt =nullptr;
+    if(alreadyCorrected)
+    {
+        TH1D* nSigCorrected = nSigRealData;
+        writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","nSigY1S",outbasename);
+        nSigCorrected->Write();
 
-    TH1D* DATA_dN_dPt = calcDN_DpT(nSigCorrected);
+        DATA_dN_dPt = calcDN_DpT(nSigCorrected);
+    } else
+    {
+        TEfficiency* AccXEff= (TEfficiency*) acceffFile->Get(accXEffName);
+
+        TH1D* nSigCorrected = calcCorrectedYields(nSigRealData,AccXEff);
+        writeToCanvas(nSigCorrected,"p^{#mu#mu}_{T} GeV/c","nSigY1S",outbasename);
+        nSigCorrected->Write();
+
+        DATA_dN_dPt = calcDN_DpT(nSigCorrected);
+    }
 
     getCrossSections(DATA_dN_dPt,outbasename);
 
@@ -72,10 +94,12 @@ void CrossSectionCalculate(const char* acceffFilename, const char* fitFileRealDa
     DATA_dN_dPt_norm->Write();
     MC_dN_dPt_norm->Write();
 
-    getRatios(DATA_dN_dPt_norm,MC_dN_dPt_norm,outbasename);    
+    TH1D* ratio= getRatios(DATA_dN_dPt_norm,MC_dN_dPt_norm,outbasename);
+    writeToCanvas(ratio,xAxisLabel,"ratio", outbasename);
+    ratio->Write();
 
     outFile->Close();
-    acceffFile->Close();
+    if (acceffFile) acceffFile->Close();
     fitFileRealData->Close();
 }
 
@@ -101,7 +125,7 @@ void getCrossSections(const TH1D* DATA_dN_dPt, const std::string& outbasename)
     writeToCanvas(cross_sec_stat,"B #frac{d#sigma}{dp_{T}dy}",xAxisLabel, "B #frac{d#sigma}{dp_{T}dy} ( nb / GeV/c )", outbasename+"_cross_sections_stat.pdf" );
 }
 
-void getRatios(const TH1D* DATA_dN_dPt_norm, const TH1D* MC_dN_dPt_norm, const std::string& outbasename )
+TH1D* getRatios(const TH1D* DATA_dN_dPt_norm, const TH1D* MC_dN_dPt_norm, const std::string& outbasename )
 {
     TH1D* ratio= new TH1D((*DATA_dN_dPt_norm)/(*MC_dN_dPt_norm));
     ratio->SetName(yieldFitName);
@@ -111,8 +135,7 @@ void getRatios(const TH1D* DATA_dN_dPt_norm, const TH1D* MC_dN_dPt_norm, const s
     ratio->SetFillColor(colorGraph[0]);
     ratio->SetLineColor(colorGraph[0]);
     ratio->SetStats(false);
-    writeToCanvas(ratio,xAxisLabel,"ratio", outbasename);
-    ratio->Write();
+    return ratio;
 }
 
  TH1D* generateRefCrossSection(const float* error)

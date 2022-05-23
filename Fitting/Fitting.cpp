@@ -10,6 +10,7 @@ void DrawPlot(const char* inputdirectoryname, const char* configfilename  );
 #include"Reporter/Report.h"
 #include"LLRtest/LLRtest.h"
 #include"SuperMultifit/supermultifit.h"
+#include"ExtraAnalysis/ExtraAnalysis.h"
 
 #if !defined(__CLING__)
 
@@ -92,6 +93,9 @@ int main(int argc, char **argv)
         
         for (int i=0;i<numFiles;i++) args[i]=argv[i+3];
         Supermultifit( args, argv[2],numFiles );
+    }else if(option=="-extraan")
+    {
+        ExtraAnalysis(argv[2]);
     } else
     {
         std::cerr << "Incorrect option flags\n";  

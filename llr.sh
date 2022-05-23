@@ -1,9 +1,11 @@
 #!/bin/bash
 
-MAINDIR="../rootfiles/analysis/merged_HiForestAOD_MC_skimjet"
-OUTPUTFILE="../rootfiles/analysis/merged_HiForestAOD_MC_skimjet"
+TAGM="MC_skimjet"
+TAG="mc_z_tcb_jt3040"
+MAINDIR="../rootfiles/analysis/merged_HiForestAOD_${TAGM}"
+OUTPUTFILE="../rootfiles/analysis/merged_HiForestAOD_${TAGM}"
 FITFILENAME="config.multifit"
-PREFIX="multifit_baseline_z_jt3040"
+PREFIX="multifit_baseline_${TAG}"
 
 INPUTFILES=( \
 ${MAINDIR}/${PREFIX}_cheb0/${FITFILENAME} \
@@ -15,4 +17,4 @@ ${MAINDIR}/${PREFIX}_cheb5/${FITFILENAME} \
               )
 
 #echo ${INPUTFILES[@]}
-./Fitting/fit -llr "${OUTPUTFILE}" ${INPUTFILES[@]} > ${MAINDIR}/LLR_z_jt3040.log
+./Fitting/fit -llr "${OUTPUTFILE}" ${INPUTFILES[@]} > ${MAINDIR}/LLR_${TAG}.log

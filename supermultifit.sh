@@ -1,9 +1,10 @@
 #!/bin/bash
 
-INPUTROOTFILE="../rootfiles/analysis/merged_HiForestAOD_MC_skimjet/merged_HiForestAOD_MC_skimjet.root"
-INPUTDIR="../rootfiles/confFiles/jetmc_jt3040"
-OUTPUTDIR="../rootfiles/analysis/merged_HiForestAOD_MC_skimjet"
-TAG="z_jt3040"
+TAGM="MC_skimjet"
+TAG="mc_z_tcb_jt3040"
+INPUTROOTFILE="../rootfiles/analysis/merged_HiForestAOD_${TAGM}/merged_HiForestAOD_${TAGM}.root"
+INPUTDIR="../rootfiles/confFiles/MC/${TAG}"
+OUTPUTDIR="../rootfiles/analysis/merged_HiForestAOD_${TAGM}"
 OUTNAME="supermultifit_${TAG}"
 PREFIX="multifit_baseline_${TAG}"
 
@@ -26,6 +27,7 @@ do
     echo ">>multifitting ${INPUTDIR}/${FILE} to "
     ./multifit.sh "${INPUTDIR}/${FILE}" "$INPUTROOTFILE" "${MULTIFITOUT}"
     OUTPUTS=( ${OUTPUTS[@]}  ${MULTIFITOUT})
+    cp "${INPUTDIR}/${FILE}" "${OUTPUTDIR}/${OUTNAME}/${FILE}"
 done
 
 ./Fitting/fit "-smult" "${OUTPUTDIR}/${OUTNAME}" ${OUTPUTS[@]} > ${OUTPUTDIR}/${OUTNAME}.log

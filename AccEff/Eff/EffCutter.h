@@ -8,6 +8,9 @@
 #include "../../OniaBase/Params/Params.h"
 #include "../Common/AccCutter.h"
 
+const float massHigh=11.0;
+const float massLow=8.5;
+
 class EffCutter
 {
     private:
@@ -26,7 +29,7 @@ class EffCutter
         if (genQQIndex < 0) return false;
 
         TLorentzVector* mom4=(TLorentzVector*)input->recoQQ.mom4->At(index);
-        if ((mom4->M() < 8.5f) || (mom4->M() >11.0f)) return false;
+        if ((mom4->M() < massLow) || (mom4->M() >massHigh)) return false;
 
         return kineCut.cut(input,index,entry);
     }

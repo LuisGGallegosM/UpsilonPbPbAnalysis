@@ -79,10 +79,17 @@ void generateVarTable(Latexer& latexOut,const std::vector<VarAndFilename>& varna
             table.back().push_back("\\detokenize{" + var.varName + "}");
             for(int i=startindex;i < endindex;i++)
             {
-                std::string value=std::to_string(fits[i].getFloat(var.varName+".value"));
-                if ((fits[i].exists(var.varName+".fixed")) && (fits[i].getBool(var.varName+".fixed"))) 
-                    value.append("*");
-                table.back().push_back(value);
+                if(fits[i].exists(var.varName+".value") )
+                {
+                    std::string value=std::to_string(fits[i].getFloat(var.varName+".value"));
+                    if ((fits[i].exists(var.varName+".fixed")) && (fits[i].getBool(var.varName+".fixed"))) 
+                        value.append("*");
+                    table.back().push_back(value);
+                } else
+                {
+                    table.back().push_back("-");
+                }
+                
             }
         }
         table.emplace_back();

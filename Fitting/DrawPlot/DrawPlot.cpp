@@ -162,6 +162,7 @@ RooPlot* drawGraphs(RooRealVar* var, RooDataSet* dataset, RooAbsPdf* fittedFunc,
         fittedFunc->plotOn(plot,Name("dcb"),Components("dcb_Y1S"),LineStyle(9),LineColor(13),Normalization(1.0,RooAbsReal::RelativeExpected));
         fittedFunc->plotOn(plot,Name("cb1"),Components("cball_Y1S_1"),LineStyle(7),LineColor(kGreen-2),Normalization(1.0,RooAbsReal::RelativeExpected));
         fittedFunc->plotOn(plot,Name("cb2"),Components("cball_Y1S_2"),LineStyle(7),LineColor(kMagenta+1),Normalization(1.0,RooAbsReal::RelativeExpected));
+        fittedFunc->plotOn(plot,Name("cb3"),Components("cball_Y1S_3"),LineStyle(7),LineColor(kYellow+1),Normalization(1.0,RooAbsReal::RelativeExpected));
     }
     
     //draw background
@@ -220,6 +221,7 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon, bool isgauss)
             fitleg->AddEntry(plot->findObject("dcb"),"Signal","l");
             fitleg->AddEntry(plot->findObject("cb1"),"CBall 1","l");
             fitleg->AddEntry(plot->findObject("cb2"),"CBall 2","l");
+            fitleg->AddEntry(plot->findObject("cb3"),"CBall 3","l");
         }
 
     }

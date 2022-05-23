@@ -65,6 +65,10 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const ParameterGroup* fitConf):
     {
         std::cout << "using double crystal ball signal fit.\n";
         dcball1.reset( new DoubleCrystalBall(mass,"Y1S",config.get("signal")) );
+    } else if (type == "tcb")
+    {
+        std::cout << "using triple crystal ball signal fit.\n";
+        dcball1.reset( new TripleCrystalBall(mass,"Y1S",config.get("signal")) );
     } else if (type=="cbgauss")
     {
         std::cout << "using crystal ball + gauss signal fit.\n";
@@ -161,6 +165,10 @@ OniaMassFitter2::OniaMassFitter2(TTree* tree_,const ParameterGroup* fitConf):
     {
         dcball2.reset( new DoubleCrystalBallSlave(mass,"Y2S", *dynamic_cast<DoubleCrystalBall*> (dcball1.get()),RATIO_Y2S) );
         dcball3.reset( new DoubleCrystalBallSlave(mass,"Y3S", *dynamic_cast<DoubleCrystalBall*> (dcball1.get()),RATIO_Y3S) );
+    } else if (type=="tcb")
+    {
+        dcball2.reset( new TripleCrystalBallSlave(mass,"Y2S", *dynamic_cast<TripleCrystalBall*> (dcball1.get()),RATIO_Y2S) );
+        dcball3.reset( new TripleCrystalBallSlave(mass,"Y3S", *dynamic_cast<TripleCrystalBall*> (dcball1.get()),RATIO_Y3S) );
     } else if (type=="cbgauss")
     {
         dcball2.reset( new CrystalGaussSlave(mass,"Y2S", *dynamic_cast<CrystalBallGauss*> (dcball1.get()),RATIO_Y2S) );

@@ -169,6 +169,34 @@ class DoubleCrystalBall : public CrystalBall, public SignalFitFunc
     friend class DoubleCrystalBallSlave;
 };
 
+class TripleCrystalBall : public CrystalBall, public SignalFitFunc
+{
+    RooFormulaVar mean_2;
+    RooFormulaVar mean_3;
+    RooRealVar x_1;
+    RooRealVar x_2;
+    RooFormulaVar alpha_2;
+    RooFormulaVar alpha_3;
+    RooFormulaVar n_2;
+    RooFormulaVar n_3;
+    RooFormulaVar sigma_2;
+    RooFormulaVar sigma_3;
+    RooRealVar f_1;
+    RooRealVar f_2;
+    RooCBShape cBall_2;
+    RooCBShape cBall_3;
+    RooAddPdf tcball;
+
+    public:
+    TripleCrystalBall(RooRealVar& var,const char* name, const ParameterGroup* g);
+
+    //getters
+    RooAbsPdf* getDCB() override {return &tcball;}
+    ParameterGroup getParams() const override;
+
+    friend class TripleCrystalBallSlave;
+};
+
 class DoubleCrystalBallSlave : protected CrystalBallSlave, public SignalFitFunc
 {
     RooFormulaVar mean_2;
@@ -186,6 +214,32 @@ class DoubleCrystalBallSlave : protected CrystalBallSlave, public SignalFitFunc
     //getter
     RooAbsPdf* getDCB() override { return &dcball;}
     ParameterGroup getParams() const override { throw std::runtime_error("ERROR:DCBS");}
+};
+
+class TripleCrystalBallSlave : protected CrystalBallSlave, public SignalFitFunc
+{
+    RooFormulaVar mean_2;
+    RooFormulaVar mean_3;
+    RooFormulaVar x_1;
+    RooFormulaVar x_2;
+    RooFormulaVar alpha_2;
+    RooFormulaVar alpha_3;
+    RooFormulaVar n_2;
+    RooFormulaVar n_3;
+    RooFormulaVar sigma_2;
+    RooFormulaVar sigma_3;
+    RooFormulaVar f_1;
+    RooFormulaVar f_2;
+    RooCBShape cBall_2;
+    RooCBShape cBall_3;
+    RooAddPdf tcball;
+
+    public:
+    TripleCrystalBallSlave(RooRealVar& var,const char* name,TripleCrystalBall& triplecb,float ratio);
+
+    //getter
+    RooAbsPdf* getDCB() override { return &tcball;}
+    ParameterGroup getParams() const override { throw std::runtime_error("ERROR:TCBS");}
 };
 
 class CrystalBallGauss : public CrystalBall, public SignalFitFunc

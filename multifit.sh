@@ -5,9 +5,12 @@ DODRAW="true"
 DOCDRAW="true"
 
 #multifit input file
-MULTIFITFILE=${1:-"../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline.multifit"}
-INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_DATA_skim/merged_HiForestAOD_DATA_skim.root"}
-OUTDIR=${3:-"${INPUTFILENAME%/*}/multifit_baseline_tesst"}
+TAG="z_mc_tcb_jt3040"
+SAMPLETYPE="MC"
+TYPE="${SAMPLETYPE}_skimjet"
+MULTIFITFILE=${1:-"../rootfiles/confFiles/${SAMPLETYPE}/merged_HiForestAOD_${SAMPLETYPE}_baseline_${TAG}.multifit"}
+INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_${TYPE}/merged_HiForestAOD_${TYPE}.root"}
+OUTDIR=${3:-"${INPUTFILENAME%/*}/multifit_baseline_${TAG}"}
 CUTFILE=${4:-"${INPUTFILENAME%.*}.cutconf"}
 DRAWCONFIG=${5:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
 SKIMFILE="${INPUTFILENAME}"
