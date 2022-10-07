@@ -5,8 +5,8 @@ DODRAW="true"
 DOCDRAW="true"
 
 #multifit input file
-TAG="z_mc_tcb_jt3040"
-SAMPLETYPE="MC"
+TAG="z_data_tcb_int"
+SAMPLETYPE="DATA"
 TYPE="${SAMPLETYPE}_skimjet"
 MULTIFITFILE=${1:-"../rootfiles/confFiles/${SAMPLETYPE}/merged_HiForestAOD_${SAMPLETYPE}_baseline_${TAG}.multifit"}
 INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_${TYPE}/merged_HiForestAOD_${TYPE}.root"}

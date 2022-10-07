@@ -2,6 +2,8 @@
 #include "FileHelpers.h"
 #include <fstream>
 
+const std::string mainfilepath="../JECDatabase/textFiles";
+
 std::string ReplaceExtension(const char* outfilename,const char* newextension)
 {
     std::string outputfilenamestr=std::string(outfilename);
@@ -46,4 +48,35 @@ std::string getBasename(const std::string& dir)
 std::string generateNames(const std::string& dir, const std::string& extension)
 {
     return dir + "/" + getBasename(dir) + extension;
+}
+
+std::vector<std::string> LoadJECFiles(bool isMC)
+{
+    std::vector<std::string> jecFilenames;
+    if(isMC)
+    {
+        jecFilenames.push_back(mainfilepath+"/Spring18_ppRef5TeV_V4_MC/Spring18_ppRef5TeV_V4_MC_L2Relative_AK4PF.txt");
+     }
+    else
+    {
+        jecFilenames.push_back(mainfilepath+"/Spring18_ppRef5TeV_V4_DATA/Spring18_ppRef5TeV_V4_DATA_L2Relative_AK4PF.txt");
+        jecFilenames.push_back(mainfilepath+"/Spring18_ppRef5TeV_V4_DATA/Spring18_ppRef5TeV_V4_DATA_L2L3Residual_AK4PF.txt");
+    }
+
+    return jecFilenames;
+}
+
+std::string LoadJEUFiles(bool isMC)
+{
+    std::string jeuFilename;
+    if (isMC)
+    {
+        jeuFilename=mainfilepath+"/Spring18_ppRef5TeV_V4_MC/Spring18_ppRef5TeV_V4_MC_Uncertainty_AK4PF.txt";
+    }
+    else
+    {
+        jeuFilename=mainfilepath+"/Spring18_ppRef5TeV_V4_DATA/Spring18_ppRef5TeV_V4_DATA_Uncertainty_AK4PF.txt";
+    }
+    
+    return jeuFilename;
 }

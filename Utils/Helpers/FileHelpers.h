@@ -18,6 +18,9 @@ std::string getBasename(const std::string& dir);
 
 std::string generateNames(const std::string& dir, const std::string& extension);
 
+std::vector<std::string> LoadJECFiles(bool isMC);
+std::string LoadJEUFiles(bool isMC);
+
 #if defined(__CLING__)
 #include "../Utils/utils.cpp"
 #endif

@@ -8,6 +8,7 @@
 #include "AddWeights/AddWeights.h"
 #include "AddWeights/AddWeights1D.h"
 #include "CrossSection/CrossSectionCalculate.h"
+#include "Unfolding/Unfold.h"
 
 void AccTest(const char* filename,const char* outputfilename, const char* yieldfitfuncFilename);
 void EffTest(const char* filename,const char* outputfilename, const char* configname,  const char* yieldfitfuncFilename);

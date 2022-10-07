@@ -1,9 +1,9 @@
 #!/bin/bash
 
-TAGM="MC_skimjet"
-TAG="mc_z_tcb_jt3040"
+TAGM="DATA_skimjet"
+TAG="data_z_tcb_jt1020_ffix"
 INPUTROOTFILE="../rootfiles/analysis/merged_HiForestAOD_${TAGM}/merged_HiForestAOD_${TAGM}.root"
-INPUTDIR="../rootfiles/confFiles/MC/${TAG}"
+INPUTDIR="../rootfiles/confFiles/DATA/${TAG}"
 OUTPUTDIR="../rootfiles/analysis/merged_HiForestAOD_${TAGM}"
 OUTNAME="supermultifit_${TAG}"
 PREFIX="multifit_baseline_${TAG}"

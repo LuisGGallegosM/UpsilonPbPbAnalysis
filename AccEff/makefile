@@ -4,7 +4,7 @@ SOURCES:=$(shell find . -name  "*.cpp")
 HEADERS:=$(shell find . -name  "*.h")
 STATICLIBS:=../Utils/libUtils.a ../OniaBase/libOniaBase.a ../Drawing/libDrawing.a
 INC:=-I $(shell $(ROOTSYS)/bin/root-config --cflags)
-LIBS:=$(shell $(ROOTSYS)/bin/root-config --ldflags --glibs) -lRooFit -lRooFitCore -lMinuit
+LIBS:=$(shell $(ROOTSYS)/bin/root-config --ldflags --glibs) -lRooFit -lRooFitCore -lMinuit -lRooUnfold
 OUTPUT:=acceff
 
 acceff : ${SOURCES} ${HEADERS} ${STATICLIBS}

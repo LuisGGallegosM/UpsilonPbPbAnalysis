@@ -71,10 +71,12 @@ void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::
         hist->Write();
         i++;
     }
+   
     stack.Draw("nostack");
     stack.GetYaxis()->SetTitle(yname.data());
     stack.GetXaxis()->SetTitle(xname.data());
-    pad.BuildLegend(0.7,0.8,1.0,1.0);
+    
+    pad.BuildLegend(0.85,0.85,1.0,1.0);
     canvas.Write();
     canvas.SaveAs(outname.data());
 }

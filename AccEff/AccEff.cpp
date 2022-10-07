@@ -41,6 +41,14 @@ int main(int argc, char **argv)
             AccTest(argv[2],argv[3],nullptr);
         else if (flags=="-fit")
             YieldFit(argv[2],argv[3]);
+        else if (flags=="-unfoldtrain")
+            Unfold_Train(argv[2],argv[3]);
+        else if (flags=="-unfold")
+            Unfold(argv[2],argv[3]);
+        else if (flags=="-unfoldtrain1d")
+            Unfold_Train1D(argv[2],argv[3]);
+        else if (flags=="-unfold1d")
+            Unfold1D(argv[2],argv[3]);
         else
             std::cerr << "Incorrect number of parameters\n";
         break;

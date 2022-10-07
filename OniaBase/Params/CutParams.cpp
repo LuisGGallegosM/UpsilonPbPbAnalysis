@@ -32,7 +32,7 @@ void CutParams::deserialize(const std::string& filename)
     singleMuEtaHigh = g.getFloat("singleMuEtaHigh");
 }
 
-bool CutParams::isMatchedQQ(const OniaWhich* which,int mupl_idx, int mumi_idx, int index) const
+bool isMatchedQQ(const OniaWhich* which,int mupl_idx, int mumi_idx, int index)
 {
     //gen index of the two muon in generated muon array
     Int_t genMuonPl = which->RecoMuWhichGen[mupl_idx];
@@ -44,6 +44,11 @@ bool CutParams::isMatchedQQ(const OniaWhich* which,int mupl_idx, int mumi_idx, i
     if(genQQidx <0) return false;
     
     return true;
+}
+
+bool CutParams::isMatchedQQ(const OniaWhich* which,int mupl_idx, int mumi_idx, int index) const
+{
+    return ::isMatchedQQ(which,mupl_idx,mumi_idx,index);
 }
 
 bool CutParams::kineticQQCut(const OniaRecoQQ* recoQQ, int index)
@@ -124,4 +129,120 @@ bool CutParams::isSoft(const OniaRecoMu* recoMu,Int_t index) const
     && ( fabs(recoMu->dxy[index]) < maxDxy)
     && ( fabs(recoMu->dz[index]) < maxDz);
     return muplSoft;
+}
+
+int FindJetGen(const OniaJetMCData* input,int iQQ)
+{
+    auto jetInfo = &(input->jetRef);
+    const TLorentzVector* GenQQ4mom= (TLorentzVector*) input->genQQ.mom4->At(iQQ);
+    const int jetNumber= input->jetInfo.nref;
+    const float drmin=0.5f;
+    int result=-1;
+    for(int iJet=0;iJet< jetNumber;iJet++)
+    {
+        float jt_pt=input->jetRef.refpt[iJet];
+        if (jt_pt < 0.0f) continue;
+        float jt_eta=jetInfo->refeta[iJet];
+        float jt_phi=jetInfo->refphi[iJet];
+        float z = GenQQ4mom->Pt()/jt_pt;
+
+        if ((z<0.0f) || (z>1.0f)) continue;
+        if (jt_eta > 2.0) continue;
+
+        TLorentzVector v_jet;
+        v_jet.SetPtEtaPhiM(jt_pt, jt_eta, jt_phi, jetInfo->refm[iJet]);
+        if (GenQQ4mom->DeltaR(v_jet)<=drmin)
+        {
+            result=iJet;
+            break;
+        }
+    }
+    return result;
+}
+
+int FindJetNoCorr(const OniaJetMCData* input, int iQQ)
+{
+    auto jetInfo = &(input->jetInfo);
+    const TLorentzVector* RecoQQ4mom= (TLorentzVector*) input->recoQQ.mom4->At(iQQ);
+    const int jetNumber= jetInfo->nref;
+    const float drmin=0.5f;
+    int result=-1;
+    for(int iJet=0;iJet< jetNumber;iJet++)
+    {
+        if (input->jetRef.refpt[iJet] < 0.0f) continue;
+        float jt_eta=jetInfo->eta[iJet];
+        float jt_phi=jetInfo->phi[iJet];
+        float jt_pt = jetInfo->pt[iJet];
+        float z = RecoQQ4mom->Pt()/jt_pt;
+
+        if ((z<0.0f) || (z>1.0f)) continue;
+        if (jt_eta > 2.0) continue;
+
+        TLorentzVector v_jet;
+        v_jet.SetPtEtaPhiM(jt_pt, jt_eta, jt_phi, jetInfo->m[iJet]);
+        if (RecoQQ4mom->DeltaR(v_jet)<=drmin)
+        {
+            result=iJet;
+            break;
+        }
+    }
+    return result;
+}
+
+int FindJet(const OniaJetMCData* input, JetCorrector* JEC, int iQQ)
+{
+    auto jetInfo = &(input->jetInfo);
+    const TLorentzVector* RecoQQ4mom= (TLorentzVector*) input->recoQQ.mom4->At(iQQ);
+    const int jetNumber= jetInfo->nref;
+    const float drmin=0.5f;
+    int result=-1;
+    for(int iJet=0;iJet< jetNumber;iJet++)
+    {
+        if (input->jetRef.refpt[iJet] < 0.0f) continue;
+        float recoQQpt=RecoQQ4mom->Pt();
+        float jt_eta=jetInfo->eta[iJet];
+        float jt_phi=jetInfo->phi[iJet];
+        float jt_pt_noZJEC = getCorrectedPt(JEC,jetInfo,iJet);
+        float jt_pt=jecCorr(jt_pt_noZJEC, input->jetInfo.rawpt[iJet],recoQQpt);
+        float z = zTolerance(recoQQpt/jt_pt);
+
+        if ((z<0.0f) || (z>1.0f)) continue;
+        if (jt_eta > 2.0) continue;
+
+        TLorentzVector v_jet;
+        v_jet.SetPtEtaPhiM(jt_pt_noZJEC, jt_eta, jt_phi, jetInfo->m[iJet]);
+        if (RecoQQ4mom->DeltaR(v_jet)<=drmin)
+        {
+            result=iJet;
+            break;
+        }
+    }
+    return result;
+}
+
+int FindJet(const OniaJetRealData* input, JetCorrector* JEC, int iQQ)
+{
+    auto jetInfo = &(input->jetInfo);
+    const TLorentzVector* RecoQQ4mom= (TLorentzVector*) input->recoQQ.mom4->At(iQQ);
+    const int jetNumber= jetInfo->nref;
+    const float drmin=0.5f;
+    int result=-1;
+    for(int iJet=0;iJet< jetNumber;iJet++)
+    {
+        float jt_eta=jetInfo->eta[iJet];
+        float jt_phi=jetInfo->phi[iJet];
+        float jt_pt_noZJEC = getCorrectedPt(JEC,jetInfo,iJet);
+        float z = RecoQQ4mom->Pt()/jt_pt_noZJEC;
+
+        if ((z<0.0f) || (z>1.0f)) continue;
+
+        TLorentzVector v_jet;
+        v_jet.SetPtEtaPhiM(jt_pt_noZJEC, jt_eta, jt_phi, jetInfo->m[iJet]);
+        if (RecoQQ4mom->DeltaR(v_jet)<=drmin)
+        {
+            result=iJet;
+            break;
+        }
+    }
+    return result;
 }

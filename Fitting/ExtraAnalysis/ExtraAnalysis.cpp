@@ -25,7 +25,7 @@ void ExtraAnalysis(const char* multifitpath)
 
     std::cout << "OUTPUT:\n";
 
-    for(const auto& var : { "alpha", "n" , "sigma" })
+    for(const auto& var : { "alpha", "n" , "sigma","f1","f2","x1","x2" })
     {
         float val=weightedAverage(fits,var);
         std::cout << "average " << var <<": " << val << "\n";

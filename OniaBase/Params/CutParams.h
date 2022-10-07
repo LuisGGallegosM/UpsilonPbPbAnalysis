@@ -4,6 +4,14 @@
 #include "../OniaIO/OniaIO.h"
 #include "TLorentzVector.h"
 
+#include "../JetCorrections/JetCorrections.h"
+
+int FindJet(const OniaJetRealData* input, JetCorrector* JEC, int iQQ);
+int FindJet(const OniaJetMCData* input, JetCorrector* JEC, int iQQ);
+int FindJetNoCorr(const OniaJetMCData* input,int iQQ);
+int FindJetGen(const OniaJetMCData* input,int iQQ);
+bool isMatchedQQ(const OniaWhich* which,int mupl_idx, int mumi_idx, int index);
+
 /**
  * @brief stores the information for cut in skimming, such as
  * pt and y ranges and if is MC or Real Data.

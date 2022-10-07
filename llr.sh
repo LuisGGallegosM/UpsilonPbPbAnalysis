@@ -1,7 +1,7 @@
 #!/bin/bash
 
-TAGM="MC_skimjet"
-TAG="mc_z_tcb_jt3040"
+TAGM="DATA_skimjet"
+TAG="data_z_tcb_jt1020_ffix"
 MAINDIR="../rootfiles/analysis/merged_HiForestAOD_${TAGM}"
 OUTPUTFILE="../rootfiles/analysis/merged_HiForestAOD_${TAGM}"
 FITFILENAME="config.multifit"
