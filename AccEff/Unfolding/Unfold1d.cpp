@@ -97,7 +97,7 @@ void Unfold1D(const char* filename,const char* outputfilename)
     TH1D* measured_test= Get<TH1D>(file,"measured_test");
     TH1D* truth_test= Get<TH1D>(file,"truth_test");
     TH1D* measured_train = Get<TH1D>(file,"measured_train");
-    TH1D* truth_train= Get<TH1D>(file,"truth_train");
+    TH1D* truth_train= Get<TH1D>(file,"truth_train"); 
 
     std::vector<RooUnfold*>  unfolders;
 

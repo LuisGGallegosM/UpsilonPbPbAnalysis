@@ -5,12 +5,12 @@ DODRAW="true"
 DOCDRAW="true"
 
 #multifit input file
-TAG="z_data_tcb_int"
-SAMPLETYPE="DATA"
+TAG="z_mc_dcbg_jt1020"
+SAMPLETYPE="MC"
 TYPE="${SAMPLETYPE}_skimjet"
 MULTIFITFILE=${1:-"../rootfiles/confFiles/${SAMPLETYPE}/merged_HiForestAOD_${SAMPLETYPE}_baseline_${TAG}.multifit"}
 INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_${TYPE}/merged_HiForestAOD_${TYPE}.root"}
-OUTDIR=${3:-"${INPUTFILENAME%/*}/multifit_baseline_${TAG}"}
+OUTDIR=${3:-"${INPUTFILENAME%/*}/multifit_baseline_${TAG}_test"}
 CUTFILE=${4:-"${INPUTFILENAME%.*}.cutconf"}
 DRAWCONFIG=${5:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
 SKIMFILE="${INPUTFILENAME}"

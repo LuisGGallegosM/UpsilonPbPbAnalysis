@@ -73,6 +73,10 @@ OniaMassFitter::OniaMassFitter(TTree* tree_,const ParameterGroup* fitConf):
     {
         std::cout << "using crystal ball + gauss signal fit.\n";
         dcball1.reset(new CrystalBallGauss(mass,"Y1S",config.get("signal")));
+    } else if (type=="dcbgauss")
+    {
+        std::cout << "using double crystal ball + gauss signal fit.\n";
+        dcball1.reset(new DoubleCrystalBallGauss(mass,"Y1S",config.get("signal")));
     } else throw std::invalid_argument("ERROR: no valid signal type");
     FitFunc* b =BkgFactory(mass,config.get(bkgName));
     bkg.reset(b);
@@ -173,7 +177,12 @@ OniaMassFitter2::OniaMassFitter2(TTree* tree_,const ParameterGroup* fitConf):
     {
         dcball2.reset( new CrystalGaussSlave(mass,"Y2S", *dynamic_cast<CrystalBallGauss*> (dcball1.get()),RATIO_Y2S) );
         dcball3.reset( new CrystalGaussSlave(mass,"Y3S", *dynamic_cast<CrystalBallGauss*> (dcball1.get()),RATIO_Y3S) );
-    } else throw std::invalid_argument("ERROR: no valid signal type");
+    } else if(type == "dcbgauss")
+    {
+        dcball2.reset( new DoubleCrystalGaussSlave(mass,"Y2S", *dynamic_cast<DoubleCrystalBallGauss*> (dcball1.get()),RATIO_Y2S) );
+        dcball3.reset( new DoubleCrystalGaussSlave(mass,"Y3S", *dynamic_cast<DoubleCrystalBallGauss*> (dcball1.get()),RATIO_Y3S) );
+    }
+    else throw std::invalid_argument("ERROR: no valid signal type");
 }
 
 ParameterGroup OniaMassFitter2::getFitParams() const

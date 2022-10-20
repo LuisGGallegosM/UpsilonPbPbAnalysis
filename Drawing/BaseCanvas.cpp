@@ -53,7 +53,7 @@ void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yna
     canvas.SaveAs(outputFilename.data());
 }
 
-void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::string& xname,const std::string& yname, const std::string& outname, bool yLog)
+void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::string& xname,const std::string& yname, const std::string& outname, bool yLog, float lowlimit, float highlimit)
 {
     TCanvas canvas((title+"_plot").data(),"",canvasWidth,canvasHeight);
     canvas.cd();
@@ -63,6 +63,11 @@ void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::
     pad.cd();
     if (yLog) pad.SetLogy();
     THStack stack((title+"_stack").data(),(title+" plot").data());
+    if( ! isnanf(lowlimit) )
+    {
+        stack.SetMaximum(highlimit);
+        stack.SetMinimum(lowlimit);
+    } 
     int i=1;
     for(auto hist : hists)
     {

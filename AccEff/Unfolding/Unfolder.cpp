@@ -82,8 +82,10 @@ void Unfolder<T>::ProcessEvent(Long64_t entry)
                             float jt_pt_noZJEC = getCorrectedPt(&JEC,&(input->jetInfo),iJet);
                             float jtpt_measured=jecCorr(jt_pt_noZJEC, input->jetInfo.rawpt[iJet],recoQQpt);
                             float z_measured=zTolerance(recoQQpt/jtpt_measured);
+
+                            bool inRangeMeas= (z_measured>=zbins_low) && (z_measured <=zbins_high) && (jtpt_measured>=jtptbins_low) && (jtpt_measured <= jtptbins_high);
                             
-                            Fill(z_measured,z_truth,jtpt_measured,jtpt_truth,isForTrain);
+                            if(inRangeMeas) Fill(z_measured,z_truth,jtpt_measured,jtpt_truth,isForTrain);
                         }
                     }
 

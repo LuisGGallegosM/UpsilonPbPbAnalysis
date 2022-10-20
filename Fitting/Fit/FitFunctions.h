@@ -277,6 +277,55 @@ class CrystalGaussSlave : protected CrystalBallSlave, public SignalFitFunc
     ParameterGroup getParams() const override { throw std::runtime_error("ERROR:DCBS");}
 };
 
+class DoubleCrystalBallGauss : public CrystalBall, public SignalFitFunc
+{
+    public:
+    DoubleCrystalBallGauss(RooRealVar& var,const char* name, const ParameterGroup* g);
+    RooAbsPdf* getDCB() override {return &dcbexpball;}
+    ParameterGroup getParams() const override;
+    private:
+    RooFormulaVar mean_2;
+    RooFormulaVar mean_3;
+    RooRealVar x_1;
+    RooRealVar x_2;
+    RooFormulaVar alpha_2;
+    RooFormulaVar n_2;
+    RooFormulaVar sigma_2;
+    RooFormulaVar sigma_3;
+    RooRealVar f_1;
+    RooRealVar f_2;
+    RooCBShape cBall_2;
+    RooGaussian gauss;
+    RooAddPdf dcbexpball;
+
+    friend class DoubleCrystalGaussSlave;
+    
+};
+
+class DoubleCrystalGaussSlave : protected CrystalBallSlave, public SignalFitFunc
+{
+    RooFormulaVar mean_2;
+    RooFormulaVar mean_3;
+    RooFormulaVar x_1;
+    RooFormulaVar x_2;
+    RooFormulaVar alpha_2;
+    RooFormulaVar n_2;
+    RooFormulaVar sigma_2;
+    RooFormulaVar sigma_3;
+    RooFormulaVar f_1;
+    RooFormulaVar f_2;
+    RooCBShape cBall_2;
+    RooGaussian gauss;
+    RooAddPdf dcball;
+
+    public:
+    DoubleCrystalGaussSlave(RooRealVar& var,const char* name,DoubleCrystalBallGauss& doublecb,float ratio);
+
+    //getter
+    RooAbsPdf* getDCB() { return &dcball;}
+    ParameterGroup getParams() const override { throw std::runtime_error("ERROR:DCBS");}
+};
+
 void ParameterWrite( ParameterGroup& p, const RooRealVar& var, const std::string& name);
 FitFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config);
 

@@ -180,6 +180,62 @@ CrystalGaussSlave::CrystalGaussSlave(RooRealVar& var,const char* name,CrystalBal
 
 }
 
+//double crystal ball gauss
+//crystalballexp
+
+DoubleCrystalBallGauss::DoubleCrystalBallGauss(RooRealVar& var,const char* name, const ParameterGroup* g):
+    CrystalBall(var,Form("%s_1",name),g),
+    mean_2(   Form("mean_%s_2",name), "1.0*@0",RooArgList(mean)),
+    mean_3(   Form("mean_%s_3",name), "1.0*@0",RooArgList(mean)),
+    x_1(        Form("x_%s_1",name),"sigma ratio 1",g->getFloat("x1.value"),g->getFloat("x1.low"),g->getFloat("x1.high")),
+    x_2(        Form("x_%s_2",name),"sigma ratio 2",g->getFloat("x2.value"),g->getFloat("x2.low"),g->getFloat("x2.high")),
+    sigma_2(  Form("sigma_%s_2",name),"@0*@1",RooArgList(x_1,sigma)),
+    sigma_3(  Form("sigma_%s_3",name),"@0*@1",RooArgList(x_2,sigma)),
+    f_1(        Form("f_%s_1",name),     "Crystal ball ratio 1", g->getFloat("f1.value"),g->getFloat("f1.low"),g->getFloat("f1.high")),
+    f_2(        Form("f_%s_2",name),     "Exp ratio 2", g->getFloat("f2.value"),g->getFloat("f2.low"),g->getFloat("f2.high")),
+    alpha_2(  Form("alpha_%s_2",name),"1.0*@0",RooArgList(alpha)),
+    n_2(      Form("n_%s_2",name),    "1.0*@0",RooArgList(n)),
+    gauss(  Form("cball_%s_3",name),"gaussian",var,mean_3,sigma_3),
+    cBall_2(  Form("cball_%s_2",name),"crystalBall2",var,mean_2,sigma_2,alpha_2,n_2),
+    dcbexpball(   Form("dcb_%s",name),    "double crystal ball and exp", RooArgList(cBall,cBall_2,gauss),RooArgList(f_1,f_2) )
+{
+    x_1.setConstant(g->getBool("x1.fixed"));
+    x_2.setConstant(g->getBool("x2.fixed"));
+    f_1.setConstant(g->getBool("f1.fixed"));
+    f_2.setConstant(g->getBool("f2.fixed"));
+}
+
+ParameterGroup DoubleCrystalBallGauss::getParams() const
+{
+    ParameterGroup p;
+    ParameterWrite(p,x_1,"x1");
+    ParameterWrite(p,x_2,"x2");
+    ParameterWrite(p,f_1,"f1");
+    ParameterWrite(p,f_2,"f2");
+    p.setString("type","dcbgauss");
+    p.addGroup( CrystalBall::getParams() );
+    return p;
+}
+
+DoubleCrystalGaussSlave::DoubleCrystalGaussSlave(RooRealVar& var,const char* name,DoubleCrystalBallGauss& triplecb,float ratio):
+    CrystalBallSlave(var,triplecb,name,ratio),
+    mean_2(   Form("mean_%s_2",name),   "1.0*@0",RooArgList(mean)),
+    mean_3(   Form("mean_%s_3",name),   "1.0*@0",RooArgList(mean)),
+    x_1(        Form("x_%s_1",name),        "1.0*@0",RooArgList(triplecb.x_1)),
+    x_2(        Form("x_%s_2",name),        "1.0*@0",RooArgList(triplecb.x_2)),
+    sigma_2(  Form("sigma_%s_2",name),  "@0*@1", RooArgList(triplecb.x_1,sigma)),
+    sigma_3(  Form("sigma_%s_3",name),  "@0*@1", RooArgList(triplecb.x_2,sigma)),
+    alpha_2(  Form("alpha_%s_2",name),  "1.0*@0",RooArgList(alpha)),
+    n_2(      Form("n_%s_2",name),      "1.0*@0",RooArgList(n)),
+    f_1(        Form("f_%s_1",name),        "1.0*@0",RooArgList(triplecb.f_1)),
+    f_2(        Form("f_%s_2",name),        "1.0*@0",RooArgList(triplecb.f_2)),
+    cBall_2(  Form("cball_%s_2",name),  "crystalBall2",var,mean_2,sigma_2,alpha_2,n_2),
+    gauss(  Form("cball_%s_3",name),  "gaussian",var,mean_3,sigma_3),
+    dcball(   Form("dcb_%s",name),      "double crystal ball and gauss", RooArgList(cBall,cBall_2,gauss),RooArgList(f_1,f_2) )
+{
+
+}
+
 //NoFitFunc
 
 RooAbsReal* NoFitFunc::getFunc()
