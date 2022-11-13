@@ -76,13 +76,13 @@ int main(int argc, char **argv)
     }
     else if(option=="-llr")
     {
-        int numFiles=(argc -3) ;
+        int numFiles=(argc -4) ;
         const char* args[64];
 
         if (numFiles<=0) return 0;
         
-        for (int i=0;i<numFiles;i++) args[i]=argv[i+3];
-        LLRtest( args, argv[2],numFiles );
+        for (int i=0;i<numFiles;i++) args[i]=argv[i+4];
+        LLRtest( args, argv[2],argv[3],numFiles );
     }
     else if(option=="-smult")
     {
@@ -93,7 +93,28 @@ int main(int argc, char **argv)
         
         for (int i=0;i<numFiles;i++) args[i]=argv[i+3];
         Supermultifit( args, argv[2],numFiles );
-    }else if(option=="-extraan")
+    }
+    else if(option=="-expand")
+    {
+        if(argc<5)
+        {
+            std::cerr << "incorrect number of parameters\n";
+            return 0;
+        }
+        if(argc==5)
+        {
+            MultifitFileExpand(argv[2],argv[3],argv[4],0,nullptr);
+        } else
+        {
+            const char* args[64];
+            const int numFiles=argc-5;
+
+            for (int i=0;i<numFiles;i++) args[i]=argv[i+5];
+            MultifitFileExpand(argv[2],argv[3],argv[4],numFiles,args);
+        }
+        
+    }
+    else if(option=="-extraan")
     {
         ExtraAnalysis(argv[2]);
     } else

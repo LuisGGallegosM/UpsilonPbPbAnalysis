@@ -5,12 +5,12 @@ DODRAW="true"
 DOCDRAW="true"
 
 #multifit input file
-TAG="z_mc_dcbg_jt1020"
-SAMPLETYPE="MC"
-TYPE="${SAMPLETYPE}_skimjet"
+TAG="z_data_tcb_jt1020_ffxfix"
+SAMPLETYPE="DATA"
+TYPE="${SAMPLETYPE}_skimjet_w"
 MULTIFITFILE=${1:-"../rootfiles/confFiles/${SAMPLETYPE}/merged_HiForestAOD_${SAMPLETYPE}_baseline_${TAG}.multifit"}
 INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_${TYPE}/merged_HiForestAOD_${TYPE}.root"}
-OUTDIR=${3:-"${INPUTFILENAME%/*}/multifit_baseline_${TAG}_test"}
+OUTDIR=${3:-"${INPUTFILENAME%/*}/multifit_baseline_${TAG}"}
 CUTFILE=${4:-"${INPUTFILENAME%.*}.cutconf"}
 DRAWCONFIG=${5:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
 SKIMFILE="${INPUTFILENAME}"
@@ -79,10 +79,6 @@ then
     ./HelperScripts/reportGen.sh "${MULTIFITFILE}" "${OUTDIR}" $FITS
 fi
 
-#cp -R "${WORKDIR}/report" "${WORKDIR}/${OUTDIR}/report"
-#cd "${WORKDIR}/${OUTDIR}/report"
-#pdflatex -interaction nonstopmode "report.tex" >/dev/null
-#cd "../../.."
-
+./extranalysis.sh "${OUTDIR}"
 
 echo "all done"

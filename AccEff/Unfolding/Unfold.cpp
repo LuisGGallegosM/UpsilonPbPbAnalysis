@@ -47,14 +47,11 @@ void Unfold_Train(const char* filename,const char* outputfilename)
     TH2D* truth_test = unfolder.getTruthTest();
 
     auto response= unfolder.getResponse();
-    TMatrixD* Ruf = (TMatrixD*) (response->Mresponse()).Clone();
+    TMatrixD* R = (TMatrixD*) (response->Mresponse()).Clone();
     
     TH2* Rth = (TH2*) (response->Hresponse())->Clone();
-    TMatrixD* R = new TMatrixD(normalizeTH2D(Rth));
 
     R->Print();
-
-    DrawHist(Ruf, ReplaceExtension(outfilename.data(),"_response_matrix_lib.png"));
 
     DrawHist(R, ReplaceExtension(outfilename.data(),"_response_matrix.png"));
     DrawHist(Rth, ReplaceExtension(outfilename.data(),"_response_hist.png"));
@@ -98,7 +95,6 @@ void Unfold_Train(const char* filename,const char* outputfilename)
 
     response->Write("response");
     R->Write("responseMatrix");
-    Ruf->Write("responseMatrixTest");
     Rth->Write("responseTH");
     
     measured_train->Write();
@@ -153,7 +149,7 @@ void Unfold(const char* filename,const char* outputfilename)
 
     for(int its : iterations)
     {
-        RooUnfold* unfold= new RooUnfoldBayes(response,measured_test,its,false,false,"unfold");
+        RooUnfold* unfold= new RooUnfoldBayes(response,measured_test,its,false,"unfold");
         unfold->SetName(("unfold_"+std::to_string(its)).data());
         unfolders.push_back(unfold);
     } 
@@ -166,7 +162,7 @@ void Unfold(const char* filename,const char* outputfilename)
 
     for(int i=0;i < unfolders.size();i++)
     {
-        TH2* unfolded = dynamic_cast<TH2*>(unfolders[i]->Hunfold(RooUnfolding::kCovariance));
+        TH2* unfolded = dynamic_cast<TH2*>(unfolders[i]->Hreco(RooUnfold::kCovariance));
         unfolders[i]->PrintTable(std::cout,truth_test);
         std::string name="unfolded_hist_"+std::to_string(iterations[i]);
         unfolded->SetName(name.data());

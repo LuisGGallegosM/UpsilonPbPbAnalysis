@@ -26,7 +26,6 @@ struct Multifit
     }
 };
 
-
 void Supermultifit(const char **multifitpaths, const char *outputpath, int size)
 {
     std::cout << "\nLLR TEST\n";
@@ -39,6 +38,7 @@ void Supermultifit(const char **multifitpaths, const char *outputpath, int size)
     std::cout << "Output to folder : " << outputpath << '\n';
 
     std::map<std::string, std::vector<TH1*>> histograms;
+    std::vector<TFile*> opened_files;
 
     for (int i = 0; i < size; i++)
     {
@@ -46,6 +46,7 @@ void Supermultifit(const char **multifitpaths, const char *outputpath, int size)
 
         TFile *file = OpenFile(m.fitfile.data(), "READ");
         TList *keys = file->GetListOfKeys();
+        opened_files.push_back(file);
 
         for (int j = 0; j < keys->GetSize(); j++)
         {
@@ -81,7 +82,65 @@ void Supermultifit(const char **multifitpaths, const char *outputpath, int size)
 
     }
 
+    for(auto& file: opened_files) file->Close();
+    outFile->Close();
+
     std::cout << "\nsuccess";
 
     return;
+}
+
+void MultifitFileExpand(const char *multifitinput, const char *outputpath, const char* varname, int numvars, const char** vars )
+{
+    ParameterGroup input;
+
+    const std::string infile=std::string(multifitinput);
+
+    std::cout << "Expand config file parameter\n";
+    std::cout << "input file "<< infile << "\n";
+    std::cout << "expanding with variable named: " << varname << "\n";
+
+    if(numvars!=0)
+    {
+        std::cout << "reading " << numvars << " variables\n";
+        std::cout << "variable values: \n";
+        for(int i=0;i<numvars;i++) std::cout << " '" << vars[i]<<"'";
+    }
+    
+
+    input.deserialize(infile);
+
+    ParameterGroup* var = input.get(varname);
+
+    const std::string extension= infile.substr(infile.find_last_of('.')+1);
+
+    if(numvars!=0)
+    {
+        for(int i=0;i<numvars;i++)
+        {
+            ParameterGroup p=input;
+            const std::string val= vars[i];
+            const std::string outfilename=std::string(outputpath)+"/"+val+"."+extension;
+            std::cout <<"output file: " << outfilename << "  for var: " << val <<"\n";
+            p.remove(varname);
+            p.setString(varname,val);
+            p.serialize(outfilename);
+        }
+    }
+    else
+    {
+        int i=0;
+        while( var->exists(std::to_string(i)) )
+        {
+            ParameterGroup p=input;
+            const std::string val= var->getString(std::to_string(i));
+            const std::string outfilename=std::string(outputpath)+"/"+val+"."+extension;
+            std::cout <<"output file: " << outfilename << "  for var: " << val <<"\n";
+            p.remove(varname);
+            p.setString(varname,val);
+            p.serialize(outfilename);
+            i++;
+        }
+    }
+
 }

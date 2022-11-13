@@ -75,6 +75,8 @@
         "bitset": "cpp",
         "regex": "cpp",
         "shared_mutex": "cpp",
-        "*.tpp": "cpp"
+        "*.tpp": "cpp",
+        "complex": "cpp",
+        "csignal": "cpp"
     }
 }

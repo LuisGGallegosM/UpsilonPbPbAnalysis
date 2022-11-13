@@ -103,7 +103,7 @@ void Unfold1D(const char* filename,const char* outputfilename)
 
     for(int its : iterations)
     {
-        RooUnfold* unfold= new RooUnfoldBayes(response,measured_test,its,false,false,"unfold");
+        RooUnfold* unfold= new RooUnfoldBayes(response,measured_test,its,false,"unfold");
         unfold->SetName(("unfold_"+std::to_string(its)).data());
         unfolders.push_back(unfold);
     } 
@@ -114,7 +114,7 @@ void Unfold1D(const char* filename,const char* outputfilename)
 
     for(int i=0;i < unfolders.size();i++)
     {
-        TH1D* unfolded = dynamic_cast<TH1D*>(unfolders[i]->Hunfold(RooUnfolding::kCovariance));
+        TH1D* unfolded = dynamic_cast<TH1D*>(unfolders[i]->Hreco(RooUnfold::kCovariance));
         unfolders[i]->PrintTable(std::cout,truth_test);
         std::string name="unfolded_hist_"+std::to_string(iterations[i]);
         unfolded->SetName(name.data());

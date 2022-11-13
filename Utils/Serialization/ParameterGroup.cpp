@@ -142,6 +142,25 @@ ParameterGroup* ParameterGroup::get(const std::string& name)
     }
 }
 
+ParameterGroup* ParameterGroup::set(const std::string& name,const ParameterGroup* val)
+{
+    int index= name.find_first_of('.');
+
+    if (index==std::string::npos)
+    {
+        subgroups[name]=*val;
+        return &(subgroups.at(name));
+    }
+    else
+    {
+        const std::string gname=name.substr(0,index);
+        auto found=subgroups.find(gname);
+        const std::string sub=name.substr(index+1);
+
+        return subgroups[gname].set(sub,val);
+    }
+}
+
 void ParameterGroup::addGroup(const ParameterGroup& g)
 {
     for(const auto& var : g.data)

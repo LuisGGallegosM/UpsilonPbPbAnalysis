@@ -1,11 +1,11 @@
 #!/bin/bash
 
-TAGM="DATA_skimjet"
-TAG="data_z_tcb_jt1020_ffix"
-MAINDIR="../rootfiles/analysis/merged_HiForestAOD_${TAGM}"
-OUTPUTFILE="../rootfiles/analysis/merged_HiForestAOD_${TAGM}"
+TAGM="MC_skimjet"
+TAG="jt1020"
+MAINDIR=${1:-"../rootfiles/analysis/merged_HiForestAOD_${TAGM}"}
+OUTPUTFILE=${3}
 FITFILENAME="config.multifit"
-PREFIX="multifit_baseline_${TAG}"
+PREFIX=${2:-"multifit_baseline_${TAG}"}
 
 INPUTFILES=( \
 ${MAINDIR}/${PREFIX}_cheb0/${FITFILENAME} \
@@ -17,4 +17,4 @@ ${MAINDIR}/${PREFIX}_cheb5/${FITFILENAME} \
               )
 
 #echo ${INPUTFILES[@]}
-./Fitting/fit -llr "${OUTPUTFILE}" ${INPUTFILES[@]} > ${MAINDIR}/LLR_${TAG}.log
+./Fitting/fit -llr "bkg.type" "${OUTPUTFILE}" ${INPUTFILES[@]} > "${OUTPUTFILE}.log"

@@ -39,3 +39,6 @@ Utils:
 
 OniaBase:
 	$(MAKE) -C OniaBase
+
+analysis: all
+	$(MAKE) -f analysismake

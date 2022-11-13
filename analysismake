@@ -1,0 +1,50 @@
+
+ANDIR:=../rootfiles/analysis
+NAME:=merged_HiForestAOD
+MCFILE:=../rootfiles/datasets/merged_HiForestAOD_MC.root
+MCSKIMCONFIG:=../rootfiles/confFiles/${NAME}_MC_baseline.cutconf
+MCSKIMDIR:=${ANDIR}/${NAME}_MC_skimjet
+MCSKIM:=${MCSKIMDIR}/${NAME}_MC_skimjet.root
+MCSKIMW:=${MCSKIMDIR}_w/${NAME}_MC_skimjet_w.root
+MCMULTIFITFILE_1:=../rootfiles/confFiles/MC/${NAME}_MC_baseline_jt1020.multifit
+MCSUPERMULTIFIT_1:=${MCSKIMDIR}/supermultifit_jt1020/supermultifit.root
+MCMULTIFIT_1:=${MCSKIMDIR}/multifit_baseline_jt1020/fit.root
+MCUNFOLDINGFILE:=${MCSKIMDIR}/unfolding_baseline/unfold_testing.root
+
+allanalysis: ${MCMULTIFIT_1} ${MCSKIMW} ${MCUNFOLDINGFILE}
+
+.PHONY: allanalysis
+
+#do initial skimming
+
+${MCSKIM} : ${MCFILE} ${MCSKIMCONFIG}
+	rm -f ${MCSKIM}
+	./skim.sh -skimjet ${MCFILE} ${MCSKIMCONFIG}
+
+${MCSKIMW} : ${MCSKIM}
+	rm -f ${MCSKIMW}
+	./addw.sh ${MCSKIM} ${MCSKIMDIR}_w/systematics/${NAME}_MC_skimjet_w.root
+	cp ${MCSKIMDIR}_w/systematics/${NAME}_MC_skimjet_w_Nominal.root $@
+
+
+#do multiple multifits for LLR
+
+${MCSKIMDIR}/supermultifit_%/supermultifit.root : ${MCSKIM} ../rootfiles/confFiles/MC/${NAME}_MC_%.multifit
+	@echo building $@
+	mkdir -p ${MCSKIMDIR}/supermultifit_$*
+	./expandParams.sh ../rootfiles/confFiles/MC/${NAME}_MC_$*.multifit ${MCSKIMDIR}/supermultifit_$*
+	./supermultifit.sh ${MCSKIM} ${MCSKIMDIR}/supermultifit_$* ${MCSKIMDIR} supermultifit_$* multifit_$*
+
+${MCSKIMDIR}/supermultifit_%/llr.multifit : ${MCSKIMDIR}/supermultifit_%/supermultifit.root
+	./llr.sh ${MCSKIMDIR} multifit_$* $@
+
+#do proper final multifit with LLR selection
+
+${MCSKIMDIR}/multifit_%/fit.root : ${MCSKIMDIR}/supermultifit_%/llr.multifit
+	@echo building $@
+	rm -f ${MCSKIMDIR}/multifit_$*/*
+	./multifit.sh $< ${MCSKIM} ${MCSKIMDIR}/multifit_$*
+
+${MCUNFOLDINGFILE} : ${MCFILE}
+	@echo building $@
+	./unfold.sh $< ${MCSKIMDIR}/unfolding_baseline/unfold_training.root ${MCSKIMDIR}/unfolding_baseline/unfold_testing.root

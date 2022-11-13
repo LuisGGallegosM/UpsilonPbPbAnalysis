@@ -14,7 +14,7 @@ OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_${FLAGS:1}"
 CLING="NO"
 #output skimmed file, put in OUTPUTFOLDER and name based in inputfile
 OUTPUTFILENAME="${INPUTFILENAME%.*}_${FLAGS:1}.root"
-OUTPUTFILE="${OUTPUTFOLDER}/${OUTPUTFILENAME}"
+OUTPUTFILE=${4:-"${OUTPUTFOLDER}/${OUTPUTFILENAME}"}
 
 mkdir -p $OUTPUTFOLDER
 

@@ -29,6 +29,7 @@ class ParameterGroup
     std::vector<std::string> getVarNames() const;
     std::vector<std::string> getSubgroupNames() const;
     ParameterGroup* get(const std::string& name);
+    ParameterGroup* set(const std::string& name,const ParameterGroup* val);
     const ParameterGroup* get(const std::string& name) const;
     void addGroup(const ParameterGroup&);
     void addGroup(const ParameterGroup&,const std::string& name);

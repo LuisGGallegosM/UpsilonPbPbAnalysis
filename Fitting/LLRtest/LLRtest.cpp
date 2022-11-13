@@ -14,6 +14,7 @@
 struct fit_result
 {
     std::string name;
+    std::string var;
     int binNum;
     double nll;
     int npar;
@@ -34,7 +35,7 @@ const double pvalcut=0.05;
  * @param size number of pT bins to draw
  * @param fitfilepaths array of paths to fit results, each corresponding to a different pT bin
  */
-void LLRtest(const char** multifitpaths,const char* outputpath,int size)
+void LLRtest(const char** multifitpaths,const char* varname,const char* outputpath,int size)
 {
     std::cout << "\nLLR TEST\n";
 
@@ -57,6 +58,7 @@ void LLRtest(const char** multifitpaths,const char* outputpath,int size)
         multifit.deserialize(multifitconfig_file_path);
         fit_model model;
         model.directory= multifitconfig_file_path.substr(0,multifitconfig_file_path.rfind('/'));
+        
 
         const std::vector<float> fit_ranges= getFloatVector(multifit,"diffVar.values.0");
         const int numOfFits=fit_ranges.size()-1;
@@ -75,6 +77,7 @@ void LLRtest(const char** multifitpaths,const char* outputpath,int size)
             fresult.binNum= j;
             fresult.nll= nll->getVal();
             fresult.npar=npar;
+            fresult.var=multifit.getString(varname);
             model.fits.push_back(fresult);
         }
         multifits.push_back(model);
@@ -171,10 +174,21 @@ void LLRtest(const char** multifitpaths,const char* outputpath,int size)
 
     std::cout << "winners:\n";
 
+    std::vector<std::string> varvector;
+
     for(auto& winner : answer)
     {
         std::cout << winner.name << "\n";
+        varvector.push_back(winner.var);
     }
+
+    ParameterGroup output;
+    output.deserialize(multifitpaths[0]);
+    output.remove(varname);
+    
+    setStringVector(output,varname,varvector);
+
+    output.serialize(outputpath);
 
     std::cout << "\nsuccess";
 

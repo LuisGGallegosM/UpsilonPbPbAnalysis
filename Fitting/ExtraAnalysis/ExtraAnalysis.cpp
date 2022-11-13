@@ -25,11 +25,17 @@ void ExtraAnalysis(const char* multifitpath)
 
     std::cout << "OUTPUT:\n";
 
+    ParameterGroup output;
+
     for(const auto& var : { "alpha", "n" , "sigma","f1","f2","x1","x2" })
     {
         float val=weightedAverage(fits,var);
         std::cout << "average " << var <<": " << val << "\n";
+        output.setFloat(var,val);
     }
+
+    const std::string outputfilename=std::string(multifitpath)+"/an.txt";
+    output.serialize(outputfilename,"avg");
 
 }
 

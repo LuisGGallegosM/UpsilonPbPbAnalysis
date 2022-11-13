@@ -82,7 +82,7 @@ void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::
     stack.GetXaxis()->SetTitle(xname.data());
     
     pad.BuildLegend(0.85,0.85,1.0,1.0);
-    canvas.Write();
+    canvas.Write(0, TObject::kOverwrite);
     canvas.SaveAs(outname.data());
 }
 
