@@ -110,8 +110,6 @@ void MultifitFileExpand(const char *multifitinput, const char *outputpath, const
 
     input.deserialize(infile);
 
-    ParameterGroup* var = input.get(varname);
-
     const std::string extension= infile.substr(infile.find_last_of('.')+1);
 
     if(numvars!=0)
@@ -129,6 +127,7 @@ void MultifitFileExpand(const char *multifitinput, const char *outputpath, const
     }
     else
     {
+        ParameterGroup* var = input.get(varname);
         int i=0;
         while( var->exists(std::to_string(i)) )
         {

@@ -1,0 +1,59 @@
+
+ANDIR:=../rootfiles/analysis
+NAME:=merged_HiForestAOD
+TAG:=MC
+FILE:=../rootfiles/datasets/merged_HiForestAOD_${TAG}.root
+SKIMCONFIG:=../rootfiles/confFiles/${NAME}_${TAG}_baseline.cutconf
+SKIMDIR:=${ANDIR}/${NAME}_${TAG}_skimjet
+SKIMWDIR:=${ANDIR}/${NAME}_${TAG}_skimjet_w
+SKIM:=${SKIMDIR}/${NAME}_${TAG}_skimjet.root
+SKIMW:=${SKIMWDIR}/${NAME}_${TAG}_skimjet_w.root
+MULTIFITS=baseline_jt1020 baseline_jt2030 baseline_jt3040
+MULTIFIT:=$(foreach var,${MULTIFITS},${SKIMDIR}/multifit_${var}/fit.root)
+UNFOLDINGFILE:=${SKIMDIR}/unfolding_baseline/unfold_testing.root
+MULTIFITADJUSTEDDATA:=$(foreach var,${MULTIFITS},../rootfiles/confFiles/DATA/merged_HiForestAOD_DATA_${var}.multifit)
+
+allanalysis: ${MULTIFIT} ${SKIMW} ${UNFOLDINGFILE} ${MULTIFITADJUSTEDDATA}
+
+.PHONY: allanalysis
+
+.SECONDARY :
+
+#do initial skimming
+
+${SKIM} : ${FILE} ${MCSKIMCONFIG}
+	rm -f ${SKIM}
+	./skim.sh -skimjet ${FILE} ${MCSKIMCONFIG}
+
+${SKIMW} : ${SKIM}
+	rm -f ${SKIMW}
+	./addw.sh ${SKIM} ${SKIMWDIR}/systematics/${NAME}_${TAG}_skimjet_w.root
+	cp ${SKIMDIR}_w/systematics/${NAME}_${TAG}_skimjet_w_Nominal.root $@
+
+
+#do multiple multifits for LLR
+
+${SKIMDIR}/supermultifit_%/supermultifit.root : ${SKIM} ../rootfiles/confFiles/${TAG}/${NAME}_${TAG}_%.multifit
+	@echo building $@
+	rm -fr ${SKIMDIR}/supermultifit_$*
+	./expandParams.sh ../rootfiles/confFiles/${TAG}/${NAME}_${TAG}_$*.multifit ${SKIMDIR}/supermultifit_$*
+	./supermultifit.sh ${SKIM} ${SKIMDIR}/supermultifit_$* ${SKIMDIR}/supermultifit_$* multifit_$*
+
+${SKIMDIR}/supermultifit_%/llr.multifit : ${SKIMDIR}/supermultifit_%/supermultifit.root
+	./llr.sh ${SKIMDIR}/supermultifit_$* multifit_$* $@
+
+#do proper final multifit with LLR selection
+
+${SKIMDIR}/multifit_%/fit.root : ${SKIMDIR}/supermultifit_%/llr.multifit
+	@echo building $@
+	rm -fr ${SKIMDIR}/multifit_$*
+	./multifit.sh $< ${SKIM} ${SKIMDIR}/multifit_$*
+
+../rootfiles/confFiles/DATA/merged_HiForestAOD_DATA_%.multifit : ${SKIMDIR}/multifit_%/fit.root
+	./extranalysis.sh ${SKIMDIR}/multifit_$* "../rootfiles/confFiles/DATA/merged_HiForestAOD_DATA_$*_proto.multifit" $@
+
+#unfolding
+
+${UNFOLDINGFILE} : ${FILE}
+	@echo building $@
+	./unfold.sh $< ${SKIMDIR}/unfolding_baseline/unfold_training.root ${SKIMDIR}/unfolding_baseline/unfold_testing.root

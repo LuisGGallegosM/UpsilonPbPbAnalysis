@@ -40,5 +40,10 @@ Utils:
 OniaBase:
 	$(MAKE) -C OniaBase
 
-analysis: all
-	$(MAKE) -f analysismake
+analysis: analysis_mc analysis_data
+
+analysis_mc:
+	$(MAKE) -f analysismc_make
+
+analysis_data:
+	$(MAKE) -f analysisdata_make

@@ -5,7 +5,7 @@
 std::vector<ParameterGroup> getFits(const std::vector<std::string>& fitpaths);
 float weightedAverage(const std::vector<ParameterGroup>& fits, const std::string& varname);
 
-void ExtraAnalysis(const char* multifitpath)
+void ExtraAnalysis(const char* multifitpath, const char* multifitinput, const char* multifitoutput)
 {
     ParameterGroup multifit;
     multifit.deserialize(std::string(multifitpath)+"/config.multifit");
@@ -27,15 +27,20 @@ void ExtraAnalysis(const char* multifitpath)
 
     ParameterGroup output;
 
-    for(const auto& var : { "alpha", "n" , "sigma","f1","f2","x1","x2" })
+    ParameterGroup multifitout;
+    multifitout.deserialize(multifitinput);
+
+    for(const auto& var : { "signal.alpha", "signal.n" , "signal.sigma","signal.f1","signal.f2","signal.x1","signal.x2" })
     {
         float val=weightedAverage(fits,var);
         std::cout << "average " << var <<": " << val << "\n";
         output.setFloat(var,val);
+        multifitout.setFloat(std::string(var)+".value",val);
     }
 
     const std::string outputfilename=std::string(multifitpath)+"/an.txt";
     output.serialize(outputfilename,"avg");
+    multifitout.serialize(multifitoutput);
 
 }
 
@@ -46,8 +51,8 @@ float weightedAverage(const std::vector<ParameterGroup>& fits, const std::string
 
     for(const auto& fit : fits)
     {
-        float value= fit.getFloat("signal."+varname+".value");
-        float error= fit.getFloat("signal."+varname+".error");
+        float value= fit.getFloat(varname+".value");
+        float error= fit.getFloat(varname+".error");
 
         numerator+=value/error;
         denominator+=1.0f/error;

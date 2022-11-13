@@ -1,0 +1,48 @@
+ANDIR:=../rootfiles/analysis
+NAME:=merged_HiForestAOD
+TAG:=DATA
+FILE:=../rootfiles/datasets/merged_HiForestAOD_${TAG}.root
+SKIMCONFIG:=../rootfiles/confFiles/${NAME}_${TAG}_baseline.cutconf
+SKIMDIR:=${ANDIR}/${NAME}_${TAG}_skimjet
+SKIMWDIR:=${ANDIR}/${NAME}_${TAG}_skimjet_w
+SKIM:=${SKIMDIR}/${NAME}_${TAG}_skimjet.root
+SKIMW:=${SKIMWDIR}/${NAME}_${TAG}_skimjet_w.root
+MULTIFITS=baseline_jt1020 baseline_jt2030 baseline_jt3040
+MULTIFIT:=$(foreach var,${MULTIFITS},${SKIMDIR}/multifit_${var}/fit.root)
+UNFOLDINGFILE:=${SKIMDIR}/unfolding_baseline/unfold_testing.root
+
+allanalysis: ${MULTIFIT} ${SKIMW}
+
+.PHONY: allanalysis
+
+.SECONDARY :
+
+#do initial skimming
+
+${SKIM} : ${FILE} ${MCSKIMCONFIG}
+	rm -f ${SKIM}
+	./skim.sh -skimjet ${FILE} ${MCSKIMCONFIG}
+
+${SKIMW} : ${SKIM}
+	rm -f ${SKIMW}
+	./addw.sh ${SKIM} ${SKIMWDIR}/systematics/${NAME}_${TAG}_skimjet_w.root
+	cp ${SKIMDIR}_w/systematics/${NAME}_${TAG}_skimjet_w_Nominal.root $@
+
+
+#do multiple multifits for LLR
+
+${SKIMDIR}/supermultifit_%/supermultifit.root : ${SKIM} ../rootfiles/confFiles/${TAG}/${NAME}_${TAG}_%.multifit
+	@echo building $@
+	rm -fr ${SKIMDIR}/supermultifit_$*
+	./expandParams.sh ../rootfiles/confFiles/${TAG}/${NAME}_${TAG}_$*.multifit ${SKIMDIR}/supermultifit_$*
+	./supermultifit.sh ${SKIM} ${SKIMDIR}/supermultifit_$* ${SKIMDIR}/supermultifit_$* multifit_$*
+
+${SKIMDIR}/supermultifit_%/llr.multifit : ${SKIMDIR}/supermultifit_%/supermultifit.root
+	./llr.sh ${SKIMDIR}/supermultifit_$* multifit_$* $@
+
+#do proper final multifit with LLR selection
+
+${SKIMDIR}/multifit_%/fit.root : ${SKIMDIR}/supermultifit_%/llr.multifit
+	@echo building $@
+	rm -fr ${SKIMDIR}/multifit_$*
+	./multifit.sh $< ${SKIM} ${SKIMDIR}/multifit_$*

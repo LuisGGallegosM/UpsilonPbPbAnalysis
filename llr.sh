@@ -2,10 +2,10 @@
 
 TAGM="MC_skimjet"
 TAG="jt1020"
-MAINDIR=${1:-"../rootfiles/analysis/merged_HiForestAOD_${TAGM}"}
-OUTPUTFILE=${3}
-FITFILENAME="config.multifit"
+MAINDIR=${1:-"../rootfiles/analysis/merged_HiForestAOD_${TAGM}/supermultifit_${TAG}"}
 PREFIX=${2:-"multifit_baseline_${TAG}"}
+OUTPUTFILE=${3:-"../rootfiles/analysis/merged_HiForestAOD_${TAGM}/supermultifit_${TAG}/llr.multifit"}
+FITFILENAME="config.multifit"
 
 INPUTFILES=( \
 ${MAINDIR}/${PREFIX}_cheb0/${FITFILENAME} \

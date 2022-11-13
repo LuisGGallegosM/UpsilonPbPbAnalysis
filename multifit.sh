@@ -79,6 +79,4 @@ then
     ./HelperScripts/reportGen.sh "${MULTIFITFILE}" "${OUTDIR}" $FITS
 fi
 
-./extranalysis.sh "${OUTDIR}"
-
 echo "all done"

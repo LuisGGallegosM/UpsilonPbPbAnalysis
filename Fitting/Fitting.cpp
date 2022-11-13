@@ -116,7 +116,7 @@ int main(int argc, char **argv)
     }
     else if(option=="-extraan")
     {
-        ExtraAnalysis(argv[2]);
+        ExtraAnalysis(argv[2],argv[3],argv[4]);
     } else
     {
         std::cerr << "Incorrect option flags\n";  

@@ -4,9 +4,8 @@ TAGM="MC_skimjet"
 TAG="jt1020"
 INPUTROOTFILE=${1:-"../rootfiles/analysis/merged_HiForestAOD_${TAGM}/merged_HiForestAOD_${TAGM}.root"}
 INPUTDIR=${2:-"../rootfiles/analysis/merged_HiForestAOD_${TAGM}/supermultifit_${TAG}"}
-OUTPUTDIR=${3:-"../rootfiles/analysis/merged_HiForestAOD_${TAGM}"}
-OUTNAME=${4:-"supermultifit_${TAG}"}
-PREFIX=${5:-"multifit_baseline_${TAG}"}
+OUTPUTDIR=${3:-"../rootfiles/analysis/merged_HiForestAOD_${TAGM}/supermultifit_${TAG}"}
+PREFIX=${4:-"multifit_baseline_${TAG}"}
 
 INPUTFILES=( \
 cheb0.multifit \
@@ -19,7 +18,7 @@ cheb5.multifit \
 
 OUTPUTS=( )
 
-mkdir ${OUTPUTDIR}/${OUTNAME}
+mkdir ${OUTPUTDIR}
 
 for FILE in ${INPUTFILES[@]}
 do
@@ -27,7 +26,7 @@ do
     echo ">>multifitting ${INPUTDIR}/${FILE} to "
     ./multifit.sh "${INPUTDIR}/${FILE}" "$INPUTROOTFILE" "${MULTIFITOUT}"
     OUTPUTS=( ${OUTPUTS[@]}  ${MULTIFITOUT})
-    cp "${INPUTDIR}/${FILE}" "${OUTPUTDIR}/${OUTNAME}/${FILE}"
+    cp "${INPUTDIR}/${FILE}" "${OUTPUTDIR}/${FILE}"
 done
 
-./Fitting/fit "-smult" "${OUTPUTDIR}/${OUTNAME}" ${OUTPUTS[@]} > ${OUTPUTDIR}/${OUTNAME}/${OUTNAME}.log
+./Fitting/fit "-smult" "${OUTPUTDIR}" ${OUTPUTS[@]} > ${OUTPUTDIR}/smult.log
