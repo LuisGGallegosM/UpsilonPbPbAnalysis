@@ -244,22 +244,35 @@ TLegend* drawLegend(RooPlot* plot,bool bkgOn,bool moreUpsilon, bool isgauss)
 void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config, bool includeFit)
 {
     TextDrawer tdrawer(0.22f,0.8f,9.0f);
-    
-    tdrawer.drawText("#varUpsilon(1S) #rightarrow #mu#mu                  ");
 
     if (includeFit)
     {
-        drawParams(fParams->get("signal"),&tdrawer);
-        drawParams(fParams->get(bkgName),&tdrawer);
+        ParameterGroup spg= *fParams->get("signal");
+        spg.remove("nSigY1S");
+        if (spg.exists("nSigY2S"))
+        {
+            spg.remove("nSigY2S");
+            spg.remove("nSigY3S");
+        }
+
+        drawParams(&spg,&tdrawer);
+        ParameterGroup bpg=*fParams->get(bkgName);
+        bpg.remove("nBkg");
+        drawParams(&bpg,&tdrawer);
     }
 
     TextDrawer tdrawer2(0.45,0.8);
 
-    drawCut(config->get("cut"),&tdrawer2);
-    ParameterGroup extraCuts;
-    extraCuts.setFloat("p_{T}^{#mu}.low",config->getFloat("singleMuPtLow"));
-    extraCuts.setFloat("|#eta^{#mu}|.high",config->getFloat("singleMuEtaHigh"));
-    drawCut(&extraCuts,&tdrawer2);
+    const ParameterGroup* c =config->get("cut");
+
+    ParameterGroup Cuts;
+    Cuts.setFloat("jt_pt.high", c->getFloat("jt_pt.high"));
+    Cuts.setFloat("jt_pt.low", c->getFloat("jt_pt.low"));
+    Cuts.setFloat("z^2.high", c->getFloat("z^2.high"));
+    Cuts.setFloat("z^2.low", c->getFloat("z^2.low"));
+    Cuts.setFloat("p_{T}^{#mu}.low",config->getFloat("singleMuPtLow"));
+
+    drawCut(&Cuts,&tdrawer2);
 }
 
 /**

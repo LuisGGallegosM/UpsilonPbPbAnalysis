@@ -9,13 +9,22 @@ SKIM:=${SKIMDIR}/${NAME}_${TAG}_skimjet.root
 SKIMW:=${SKIMWDIR}/${NAME}_${TAG}_skimjet_w.root
 MULTIFITS=baseline_jt1020 baseline_jt2030 baseline_jt3040
 MULTIFIT:=$(foreach var,${MULTIFITS},${SKIMDIR}/multifit_${var}/fit.root)
-UNFOLDINGFILE:=${SKIMDIR}/unfolding_baseline/unfold_testing.root
+MULTIFITW:=$(foreach var,${MULTIFITS},${SKIMWDIR}/multifit_${var}/fit.root)
 
-allanalysis: ${MULTIFIT} ${SKIMW}
+SKIMMC:=${ANDIR}/merged_HiForestAOD_MC_skimjet
+UNFOLDINGFILEMC:=${SKIMMC}/unfolding_baseline/unfold_training.root
+UNFOLDINGFILE:=${SKIMDIR}/unfolding_baseline/unfolding.root
+UNFOLDINGWFILE:=${SKIMWDIR}/unfolding_baseline/unfolding.root
+
+ACCEFF_OUTPUTFILE=${ANDIR}/merged_HiForestAOD_MC_skimjet/acceff/AccEff/outputAccXEff.root
+
+allanalysis: ${MULTIFITW} ${SKIMW} ${UNFOLDINGFILE} ${UNFOLDINGWFILE}
 
 .PHONY: allanalysis
 
 .SECONDARY :
+
+.SILENT :
 
 #do initial skimming
 
@@ -40,9 +49,43 @@ ${SKIMDIR}/supermultifit_%/supermultifit.root : ${SKIM} ../rootfiles/confFiles/$
 ${SKIMDIR}/supermultifit_%/llr.multifit : ${SKIMDIR}/supermultifit_%/supermultifit.root
 	./llr.sh ${SKIMDIR}/supermultifit_$* multifit_$* $@
 
+#w
+
+${SKIMWDIR}/supermultifit_%/supermultifit.root : ${SKIMW} ../rootfiles/confFiles/${TAG}/${NAME}_${TAG}_%.multifit
+	@echo building $@
+	rm -fr ${SKIMWDIR}/supermultifit_$*
+	./expandParams.sh ../rootfiles/confFiles/${TAG}/${NAME}_${TAG}_$*.multifit ${SKIMWDIR}/supermultifit_$*
+	./supermultifit.sh ${SKIMW} ${SKIMWDIR}/supermultifit_$* ${SKIMWDIR}/supermultifit_$* multifit_$*
+
+${SKIMWDIR}/supermultifit_%/llr.multifit : ${SKIMWDIR}/supermultifit_%/supermultifit.root
+	./llr.sh ${SKIMWDIR}/supermultifit_$* multifit_$* $@
+
 #do proper final multifit with LLR selection
 
 ${SKIMDIR}/multifit_%/fit.root : ${SKIMDIR}/supermultifit_%/llr.multifit
 	@echo building $@
 	rm -fr ${SKIMDIR}/multifit_$*
 	./multifit.sh $< ${SKIM} ${SKIMDIR}/multifit_$*
+
+${UNFOLDINGFILE} : ${SKIM} ${UNFOLDINGFILEMC}
+	@echo building $@
+	./unfold_data.sh ${SKIM} ${UNFOLDINGFILEMC} ${SKIMDIR}/unfolding_baseline/unfolding.root
+
+${CROSSECTION_FILE} : ${ACCEFF_OUTPUTFILE}
+	@echo building $@
+	./crosssection.sh -nocorr
+
+#w
+
+${SKIMWDIR}/multifit_%/fit.root : ${SKIMWDIR}/supermultifit_%/llr.multifit
+	@echo building $@
+	rm -fr ${SKIMWDIR}/multifit_$*
+	./multifit.sh $< ${SKIMW} ${SKIMWDIR}/multifit_$*
+
+${UNFOLDINGWFILE} : ${SKIMW} ${UNFOLDINGFILEMC}
+	@echo building $@
+	./unfold_data.sh ${SKIMW} ${UNFOLDINGFILEMC} ${SKIMWDIR}/unfolding_baseline/unfolding.root
+
+../rootfiles/confFiles/${TAG}/${NAME}_${TAG}_%.multifit : ${SKIMMC}/multifit_%/fit.root
+	@echo "adjusting multifit file:"  $@
+	./extranalysis.sh ${SKIMMC}/multifit_$* $@ $@

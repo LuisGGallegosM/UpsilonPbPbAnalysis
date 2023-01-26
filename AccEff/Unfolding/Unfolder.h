@@ -63,6 +63,24 @@ class Unfolder
 
 };
 
+class THFiller_DATA
+{
+    using Reader=OniaJetQQRealData;
+    private:
+    OniaReader<Reader> oniaReader;
+    TH2D measured;
+    
+
+    public:
+    THFiller_DATA(TTree* tree);
+
+    TH2D* fill();
+
+    TH2D* getMeasured() {return &measured;}
+
+    void ProcessEvent(Long64_t entry);
+};
+
 using Unfolder2D = Unfolder<TH2D>;
 using Unfolder1D = Unfolder<TH1D>;
 

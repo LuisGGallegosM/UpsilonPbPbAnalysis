@@ -11,9 +11,6 @@ INPUTFILES=( \
 cheb0.multifit \
 cheb1.multifit \
 cheb2.multifit \
-cheb3.multifit \
-cheb4.multifit \
-cheb5.multifit \
               )
 
 OUTPUTS=( )

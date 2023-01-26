@@ -13,11 +13,21 @@ MULTIFIT:=$(foreach var,${MULTIFITS},${SKIMDIR}/multifit_${var}/fit.root)
 UNFOLDINGFILE:=${SKIMDIR}/unfolding_baseline/unfold_testing.root
 MULTIFITADJUSTEDDATA:=$(foreach var,${MULTIFITS},../rootfiles/confFiles/DATA/merged_HiForestAOD_DATA_${var}.multifit)
 
+ACC_INPUTFILE:=../rootfiles/datasets/OniaTree_Ups1SMM_5p02TeV_TuneCUETP8M1_nofilter_pp502Fall15-MCRUN2_71_V1-v1_GENONLY.root
+EFF_INPUTFILE:=${FILE}
+
+ACCEFF_OUTPUTDIR=${SKIMDIR}/acceff
+ACC_OUTPUTFILE:=${ACCEFF_OUTPUTDIR}/Acc/outputAcc.root
+EFF_OUTPUTFILE:=${ACCEFF_OUTPUTDIR}/Eff/outputEff.root
+ACCEFF_OUTPUTFILE="${ACCEFF_OUTPUTDIR}/AccEff/outputAccXEff.root"
+
 allanalysis: ${MULTIFIT} ${SKIMW} ${UNFOLDINGFILE} ${MULTIFITADJUSTEDDATA}
 
 .PHONY: allanalysis
 
 .SECONDARY :
+
+.SILENT :
 
 #do initial skimming
 
@@ -49,11 +59,12 @@ ${SKIMDIR}/multifit_%/fit.root : ${SKIMDIR}/supermultifit_%/llr.multifit
 	rm -fr ${SKIMDIR}/multifit_$*
 	./multifit.sh $< ${SKIM} ${SKIMDIR}/multifit_$*
 
-../rootfiles/confFiles/DATA/merged_HiForestAOD_DATA_%.multifit : ${SKIMDIR}/multifit_%/fit.root
-	./extranalysis.sh ${SKIMDIR}/multifit_$* "../rootfiles/confFiles/DATA/merged_HiForestAOD_DATA_$*_proto.multifit" $@
-
 #unfolding
 
 ${UNFOLDINGFILE} : ${FILE}
 	@echo building $@
 	./unfold.sh $< ${SKIMDIR}/unfolding_baseline/unfold_training.root ${SKIMDIR}/unfolding_baseline/unfold_testing.root
+
+${ACCEFF_OUTPUTFILE} : ${ACC_INPUTFILE} ${EFF_INPUTFILE}
+	@echo building $@
+	./acceff.sh -nocorr ${ACC_INPUTFILE} ${EFF_INPUTFILE} ${ACCEFF_OUTPUTDIR} ${SKIMCONFIG}

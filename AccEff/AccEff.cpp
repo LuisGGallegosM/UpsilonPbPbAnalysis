@@ -19,6 +19,8 @@ int main(int argc, char **argv)
             AccTest(argv[2],argv[3],argv[4]);
         else if (flags=="-acceff")
             AccEffCalculate(argv[2],argv[3],argv[4]);
+        else if (flags=="-unfold")
+            Unfold(argv[2],argv[3],argv[4]);
         else
             std::cerr << "Incorrect number of parameters\n";
         break;
@@ -43,8 +45,8 @@ int main(int argc, char **argv)
             YieldFit(argv[2],argv[3]);
         else if (flags=="-unfoldtrain")
             Unfold_Train(argv[2],argv[3]);
-        else if (flags=="-unfold")
-            Unfold(argv[2],argv[3]);
+        else if (flags=="-unfoldtest")
+            Unfold_Test(argv[2],argv[3]);
         else if (flags=="-unfoldtrain1d")
             Unfold_Train1D(argv[2],argv[3]);
         else if (flags=="-unfold1d")

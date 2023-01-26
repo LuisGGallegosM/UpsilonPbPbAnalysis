@@ -147,3 +147,26 @@ void Unfolder<TH1D>::Fill(float z_measured, float z_truth, float jtpt_measured, 
 
 template class Unfolder<TH2D>;
 template class Unfolder<TH1D>;
+
+THFiller_DATA::THFiller_DATA(TTree* tree): 
+        oniaReader(tree),
+        measured("measured","measured",zbins_n,zbins_low,zbins_high,jtptbins_n,jtptbins_low,jtptbins_high)
+    {
+    }
+
+TH2D* THFiller_DATA::fill()
+    {
+        const int size=oniaReader.getEntries();
+
+        for(int entry=0;entry<size;entry++)
+        {
+            auto input = oniaReader.getData(entry);
+            const float z=input->jetOut.z;
+            const float jt_pt= input->jetOut.jt_pt;
+
+            measured.Fill(z*z,jt_pt);
+        }
+
+        return &measured;
+    }
+

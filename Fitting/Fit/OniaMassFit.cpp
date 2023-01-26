@@ -26,7 +26,7 @@ std::vector<RooRealVar> getVars()
         RooRealVar ("reco_pT","momentum quarkonia",0,100,"GeV/c"),
         RooRealVar ("z", "z",0.0,1.0),
         RooRealVar ("jt_pt","jet momentum",0,100,"GeV/c"),
-        RooRealVar ("jt_eta","jet psedorapidity",0.0,4.0),
+        RooRealVar ("jt_eta","jet psedorapidity",-4.0,4.0),
         RooRealVar ("accxeff", "weight var",0.0,100.0)
     };
 }

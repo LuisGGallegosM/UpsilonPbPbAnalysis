@@ -16,7 +16,7 @@ const int jtptbins_n = 3;
 
 const double jtptbins_width= (jtptbins_high-jtptbins_low)/(jtptbins_n);
 
-const std::vector<int> iterations={1,2,3,5,11,31,50,100};
+const std::vector<int> iterations={1,3,5,10,20,50,100};
 
 const bool v1d_jtpt=true;
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MULTIFITDIR="merged_HiForestAOD_DATA_skim/multifit_baseline_data"
+MULTIFITDIR="merged_HiForestAOD_DATA_skimjet/multifit_baseline"
 
 ./acceff.sh -nocorr $MULTIFITDIR
 ./crosssection.sh -nocorr $MULTIFITDIR
