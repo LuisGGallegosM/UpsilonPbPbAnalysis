@@ -4,18 +4,19 @@
 const std::map<std::string,BkgType> bkgNames =
 {
     {"none",BkgType::none},
+    {"expchev",BkgType::expchev},
+    {"expcheb",BkgType::expchev},
      {"chev",BkgType::chev},
      {"cheb",BkgType::chev},
     {"special",BkgType::special},
-    {"exp",BkgType::exponential},
-    {"expchev",BkgType::expchev}
+    {"exponential",BkgType::exponential}
 };
 
 BkgType getBkgByName(const std::string& name)
 {
     for(const auto& bkgname : bkgNames )
     {
-        if(name.find(bkgname.first)!=std::string::npos)
+        if(name.substr(0,bkgname.first.size())==bkgname.first)
         {
             return bkgname.second;
         }
