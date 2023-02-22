@@ -2,6 +2,7 @@
 
 #include"FitFunctions.h"
 #include"../Common/Common.h"
+#include<stdio.h>
 
 //Crystal ball member functions.
 
@@ -252,14 +253,16 @@ ParameterGroup NoFitFunc::getBkgParams() const
 
 //Chevychev
 
-std::vector<RooRealVar> produceChevVars(const ParameterGroup* init)
+std::vector<RooRealVar> produceChevVars(const ParameterGroup* init, bool expon)
 {
     std::vector<RooRealVar> chk;
     std::vector<std::string> varNames;
 
     std::string type=init->getString("type");
 
-    if(type.length()==4)
+    const int l= expon ? 7 : 4;
+
+    if(type.length()==l)
     {
         int i=1;
         while ( init->exists("chk4_k"+std::to_string(i)) && (i<20))
@@ -269,7 +272,7 @@ std::vector<RooRealVar> produceChevVars(const ParameterGroup* init)
         };
     } else
     {
-        int order= std::atoi(type.data()+4);
+        int order= std::atoi(type.data()+l);
         if(order>10) order=10; 
 
         for(int i=0; i< order;i++)
@@ -309,7 +312,7 @@ RooArgList produceChevArgList(const std::vector<RooRealVar>& chk,const RooRealVa
 }
 
 Chevychev::Chevychev(RooRealVar& var,const char* name,const ParameterGroup* init):
-    chk(produceChevVars(init)),
+    chk(produceChevVars(init,false)),
     chev(name,"Background",var,produceChevArgSet(chk))
 {
     
@@ -333,6 +336,9 @@ std::string getChebPoly(int order)
     std::string str;
     switch(order)
     {
+        case 0:
+        str="TMath::Exp(@0)";
+        break;
         case 1:
         str="TMath::Exp(@0*@1)";
         break;
@@ -345,7 +351,7 @@ std::string getChebPoly(int order)
 
 //ExpChevycheb
 ExpChevychev::ExpChevychev(RooRealVar& var,const char* name,const ParameterGroup* init):
-    chk(produceChevVars(init)),
+    chk(produceChevVars(init,true)),
     expr(getChebPoly(chk.size())),
     expo(name,"Background",expr.data(),produceChevArgList(chk,var))
 {
@@ -361,7 +367,7 @@ ParameterGroup ExpChevychev::getBkgParams() const
         ParameterWrite(p,v,v.GetName());
         i++;
     }
-    p.setString("type", "expchev");
+    p.setString("type", "expchev"+std::to_string(chk.size()));
     return p;
 }
 
@@ -418,22 +424,27 @@ FitFunc* BkgFactory(RooRealVar& var, const ParameterGroup* config)
     {
         case BkgType::chev:
         b = new Chevychev(var,bkgName,config);
+        std::cout << "selected Chevychev Background\n";
         break;
 
         case BkgType::expchev:
         b = new ExpChevychev(var,bkgName,config);
+        std::cout << "selected Exponential Chevychev Background\n";
         break;
 
         case BkgType::special:
         b = new SpecialBkg(var,bkgName,config);
+        std::cout << "selected Special Background\n";
         break;
 
         case BkgType::exponential:
         b = new ExponentialBkg(var,bkgName,config);
+        std::cout << "selected Exponential Background\n";
         break;
 
         case BkgType::none:
         b = new NoFitFunc();
+        std::cout << "selected No Background\n";
         break;
 
         default:

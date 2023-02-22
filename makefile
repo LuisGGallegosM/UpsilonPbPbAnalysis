@@ -47,3 +47,9 @@ analysis_mc:
 
 analysis_data:
 	$(MAKE) -f analysisdata_make
+
+analysis_mc_jt1020:
+	$(MAKE) -f analysismc_make  ../rootfiles/analysis/merged_HiForestAOD_MC_skimjet/multifit_baseline_jt1020/fit.root
+
+analysis_mc_jt2030:
+	$(MAKE) -f analysismc_make  ../rootfiles/analysis/merged_HiForestAOD_MC_skimjet/multifit_baseline_jt2030/fit.root

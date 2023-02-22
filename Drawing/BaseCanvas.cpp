@@ -36,6 +36,22 @@ TH1D* createTH1(const std::string& name,const std::string& title)
     return result;
 }
 
+void writeToCanvas(TGraph* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option)
+{
+    const std::string canvasName=std::string(hist->GetName())+" plot";
+    const std::string outputFilename=outname+"_"+hist->GetName()+".pdf";
+    TCanvas canvas(canvasName.data(),canvasName.data(),canvasWidth,canvasHeight);
+    canvas.cd();
+    TPad pad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);
+    pad.Draw();
+    pad.cd();
+    hist->GetYaxis()->SetTitle(yname.data());
+    hist->GetXaxis()->SetTitle(xname.data());
+    hist->Draw(option.data());
+    canvas.Write();
+    canvas.SaveAs(outputFilename.data());
+}
+
 void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option, bool yLog)
 {
     const std::string canvasName=std::string(hist->GetName())+" plot";

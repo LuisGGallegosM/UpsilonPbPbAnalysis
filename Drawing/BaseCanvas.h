@@ -3,6 +3,7 @@
 
 #include"TH2.h"
 #include"TEfficiency.h"
+#include"TGraph.h"
 
 const float canvasWidth = 1200.0f;
 const float canvasHeight = 900.0f;
@@ -17,6 +18,7 @@ void writeToCanvas(TH2* hist,const std::string& xname,const std::string& yname, 
 void writeToCanvas(TH1* hist,const std::string& xname,const std::string& yname, const std::string& outname, bool yLog=false);
 void writeToCanvasEff(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname);
 void writeToCanvasEff2D(TEfficiency* hist,const std::string& xname,const std::string& yname, const std::string& outname);
+void writeToCanvas(TGraph* hist,const std::string& xname,const std::string& yname, const std::string& outname, const std::string& option);
 
 void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::string& xname,const std::string& yname, const std::string& outname, bool yLog=false, float lowlimit=NAN, float highlimit=NAN);
 

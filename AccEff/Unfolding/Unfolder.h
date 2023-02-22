@@ -10,6 +10,7 @@
 
 #include "RooUnfold.h"
 #include "RooUnfoldBayes.h"
+#include "RooUnfoldInvert.h"
 #include "Helpers.h"
 
 template<typename T>
