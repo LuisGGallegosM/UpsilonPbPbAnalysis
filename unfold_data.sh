@@ -6,4 +6,7 @@ RESPONSEFILE="${2:-../rootfiles/analysis/merged_HiForestAOD_MC_skimjet/unfolding
 OUTPUTFILE="${3:-../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet_w/unfolding_baseline/unfolding.root}"
 
 mkdir -p "$( dirname ${OUTPUTFILE} )"
+mkdir -p "$( dirname ${OUTPUTFILE} )/dagostini/refolded"
+mkdir -p "$( dirname ${OUTPUTFILE} )/dagostini/unfolded"
+mkdir -p "$( dirname ${OUTPUTFILE} )/inversion"
 ./AccEff/acceff -unfold ${INPUTFILE} ${RESPONSEFILE} ${OUTPUTFILE} > "${OUTPUTFILE%.*}.log"

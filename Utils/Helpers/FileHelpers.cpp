@@ -4,11 +4,19 @@
 
 const std::string mainfilepath="../JECDatabase/textFiles";
 
+std::string RemoveFilename(const std::string& filename)
+{
+    return filename.substr(0,filename.find_last_of('/'));
+}
+
+std::string RemoveExtension(const std::string& filename)
+{;
+    return filename.substr(0,filename.find_last_of('.'));
+}
+
 std::string ReplaceExtension(const char* outfilename,const char* newextension)
 {
-    std::string outputfilenamestr=std::string(outfilename);
-    std::string newextname = outputfilenamestr.substr(0,outputfilenamestr.find_last_of('.'));
-    return newextname + newextension;
+    return RemoveExtension(outfilename) + newextension;
 }
 
 void CopyFile(const char* inputpath, const char* outputpath)

@@ -6,6 +6,10 @@
 #include "TTree.h"
 #include "TFile.h"
 
+std::string RemoveFilename(const std::string& filename);
+
+std::string RemoveExtension(const std::string& filename);
+
 std::string ReplaceExtension(const char* outfilename,const char* newextension);
 
 void CopyFile(const char* inputpath, const char* outputpath);

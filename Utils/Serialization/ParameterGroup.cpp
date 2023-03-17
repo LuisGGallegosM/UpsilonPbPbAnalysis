@@ -1,6 +1,7 @@
 
 #include"ParameterGroup.h"
 #include<string>
+#include<stdexcept>
 
 bool ParameterGroup::exists(const std::string& name) const
 {
