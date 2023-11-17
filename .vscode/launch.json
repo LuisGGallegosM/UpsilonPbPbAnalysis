@@ -50,6 +50,28 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
+            "name": "g++ acceeff finebin debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/AccEff/acceff",
+            "args": ["-finebin", 
+            "/media/gabriel/STORAGE0/rootfiles/datasets/merged_HiForestAOD_MC.root",
+            "OutEff2D.root"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Habilitar la impresión con sangría para gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
             "name": "g++ acceef unfold debug",
             "type": "cppdbg",
             "request": "launch",

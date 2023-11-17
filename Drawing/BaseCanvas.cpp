@@ -84,10 +84,16 @@ void writeToCanvas(std::vector<TH1*>& hists,const std::string& title,const std::
         stack.SetMaximum(highlimit);
         stack.SetMinimum(lowlimit);
     } 
-    int i=1;
+    int i=2;
     for(auto hist : hists)
     {
-        hist->SetLineColor(i);
+        const int color= (i!=3) ? i : 30;
+        hist->SetLineColor(color);
+        hist->SetLineWidth(3);
+        if (hists.size()<5) 
+            hist->SetMarkerStyle(24+i);
+        else
+            hist->SetMarkerStyle(1);
         stack.Add(hist);
         hist->Write();
         i++;

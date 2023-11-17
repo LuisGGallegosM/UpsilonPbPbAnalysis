@@ -10,6 +10,18 @@ int main(int argc, char **argv)
 {
     std::string flags(argv[1]);
 
+    if(flags=="-yagg")
+    {
+        const int filesnum=argc-3;
+        const char* files[10];
+
+        for(int i=0;i<filesnum;i++)
+        files[i]= argv[i+2];
+
+        YieldAgg(files,filesnum,argv[argc-1]);
+        return 0;
+    }
+
     switch (argc)
     {
         case 5:
@@ -34,6 +46,8 @@ int main(int argc, char **argv)
             AddWeights2(argv[2],argv[3],argv[4],argv[5]);
         else if(flags=="-crosssection")
             CrossSectionCalculate(argv[2],argv[3],argv[4],argv[5]);
+        else if (flags=="-toys")
+            generateToys(argv[2],argv[3],argv[4],argv[5]);
         else
             std::cerr << "Incorrect number of parameters\n";
         break;
@@ -51,6 +65,10 @@ int main(int argc, char **argv)
             Unfold_Train1D(argv[2],argv[3]);
         else if (flags=="-unfold1d")
             Unfold1D(argv[2],argv[3]);
+        else if(flags=="-efffinebin")
+            EffFineBinning(argv[2],argv[3]);
+        else if (flags=="-accfinebin")
+            AccFineBinning(argv[2],argv[3]);
         else
             std::cerr << "Incorrect number of parameters\n";
         break;

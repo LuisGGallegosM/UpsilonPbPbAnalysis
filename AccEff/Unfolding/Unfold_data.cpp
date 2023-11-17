@@ -16,8 +16,10 @@
 
 using THgroup = std::map<std::string,TH1*>;
 
-THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,const std::string& outputdir,RooUnfoldResponse* response, const std::vector<int>& iterations);
-THgroup Unfolding_MatrixInversion(TH2D* measured,const std::vector<TH1D*>& measured_z,const std::string& outputdir,RooUnfoldResponse* response);
+THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,const std::string& outputdir,RooUnfoldResponse* response, TH1D* truth_z, const std::vector<int>& iterations);
+THgroup Unfolding_MatrixInversion(TH2D* measured,const std::vector<TH1D*>& measured_z,const std::string& outputdir,RooUnfoldResponse* response, TH1D* truth_z);
+
+void yieldComparison(TH1D* data_z, TH1D* mc_z, const std::string& outputdir);
 
 void Unfold(const char* filename, const char* responsefile,const char* outputfilename)
 {
@@ -30,36 +32,56 @@ void Unfold(const char* filename, const char* responsefile,const char* outputfil
     //response file
     std::cout << "Reading input response file: " << filename <<'\n';
     TFile* response_file = OpenFile(responsefile,"READ");
+
+    const std::string outfilename= outputfilename;
+
+    TFile* yagg_file = OpenFile( (RemoveFilename(outfilename)+"/yagg.root").data(),"READ");
+    TH2D* yagg = Get<TH2D>(yagg_file,"yields1S");
+    yagg->SetTitle("Measured");
     
     //output file
-    const std::string outfilename= outputfilename;
     const std::string outputDir= RemoveFilename(outfilename);
     std::cout << "Writing to output file: " << outfilename <<'\n';
     TFile* outputfile = OpenFile(outfilename.data(), "RECREATE");
 
     RooUnfoldResponse* response= Get<RooUnfoldResponse>(response_file,"response");
 
-    TTree *myTree = GetTree(file,"onia_skimmed");
+    TH1D* truth_2030 = Get<TH1D>(response_file,"truth_test_z_jtpt2030");
+    TH1D* recomc_measured_2030 = Get<TH1D>(response_file,"measured_test_z_jtpt2030");
+    recomc_measured_2030->SetTitle("PYTHIA8");
+
+    //TTree *myTree = GetTree(file,"onia_skimmed");
 
     std::cout << "Starting unfolding\n";
 
-    THFiller_DATA filler(myTree);
-    TH2D* measured= filler.fill();
+    TH2D* measured=yagg;
+
+    //THFiller_DATA filler(myTree);
+    //TH2D* measured= filler.fill();
 
     DrawHist(measured,ReplaceExtension(outfilename.data(),"_measured.png"));
     measured->Write();
 
-    std::vector<TH1D*> measured_z=generateProjectionsZ(measured,outfilename);
+    std::vector<TH1D*> measured_z=generateProjectionsZ(measured,outfilename,"measured_z");
+
+    // TH1D* measured_jtpt=measured->ProjectionY("measured_jtpt",1,zbins_n,"eo");
+    // DrawHist(measured_jtpt,ReplaceExtension(outfilename.data(),"_measured_jtpt2030.png"));
 
     TDecompSVD *svd= new TDecompSVD (response->Mresponse()); //this is the singular value decomposition (SVD) matrix
     auto singular_values = svd->GetSig(); //this is a vector with the singular values, i.e., the diagonal elements of S. They are ordered from largest to smallest.
     svd->Print();
     singular_values.Print();
 
-    std::cout << "\nMatrix inversion method\n";
-    auto inversion = Unfolding_MatrixInversion(measured,measured_z,outputDir+"/inversion",response);
+     std::cout << "\nMatrix inversion method\n";
+     auto inversion = Unfolding_MatrixInversion(measured,measured_z,outputDir+"/inversion",response,truth_2030);
     std::cout << "\nD'agostini method\n";
-    auto agostini = Unfolding_Dagostini(measured,measured_z,outputDir+"/dagostini",response,iterations);
+    auto agostini = Unfolding_Dagostini(measured,measured_z,outputDir+"/dagostini",response,truth_2030,iterations);
+
+    std::vector<TH1*> preunfold_comparison{measured_z[1],recomc_measured_2030};
+
+    yieldComparison(measured_z[1],recomc_measured_2030,outputDir+"/yield_comparison_preunfold.png");
+
+    writeToCanvas(preunfold_comparison,"DATA vs MC reco","z^2","1/N dN/dz^2",outputDir+"/comparison_preunfold.png");
 
     std::vector<TH1*> comparison{ inversion.at("unfolded_z"),agostini.at("unfolded_z"),measured_z[1] };
 
@@ -75,7 +97,7 @@ void Unfold(const char* filename, const char* responsefile,const char* outputfil
     std::cout << "Success.\n TTrees wrote to '" << outfilename<< "' root file\n";
 }
 
-THgroup Unfolding_MatrixInversion(TH2D* measured,const std::vector<TH1D*>& measured_z,const std::string& outputdir,RooUnfoldResponse* response)
+THgroup Unfolding_MatrixInversion(TH2D* measured,const std::vector<TH1D*>& measured_z,const std::string& outputdir,RooUnfoldResponse* response, TH1D* truth_z)
 {
     RooUnfoldInvert unfold(response,measured,"unfold");
     unfold.SetName("unfold_inv");
@@ -87,7 +109,7 @@ THgroup Unfolding_MatrixInversion(TH2D* measured,const std::vector<TH1D*>& measu
     TH2D* refolded = dynamic_cast<TH2D*>(response->ApplyToTruth(unfolded,refolded_name.data()));
     outputTH(refolded,refolded_name,outputdir);
 
-    THgroup out;
+    TH1D* out_th=nullptr;
 
     for(int j=0;j<jtptbins_n;j++)
     {
@@ -95,11 +117,11 @@ THgroup Unfolding_MatrixInversion(TH2D* measured,const std::vector<TH1D*>& measu
 
         const std::string obj_name="unfolded_z"+postfix_jt;
         TH1D* unfolded_z= unfolded->ProjectionX(obj_name.data(),1+j,1+j,"eo");
-        outputTH(unfolded_z,obj_name,"unfolded inversion",outputdir);
+        outputTH(unfolded_z,obj_name,"unfolded by inversion",outputdir);
 
         const std::string refolded_name_z="refolded_z"+postfix_jt;
         TH1D* refolded_z = refolded->ProjectionX(refolded_name_z.data(),1+j,1+j,"eo");
-        outputTH(refolded_z,refolded_name_z,"refolded inversion",outputdir);
+        outputTH(refolded_z,refolded_name_z,"refolded by inversion",outputdir);
 
         TH1D* ratio_refold = new TH1D((*refolded_z)/(*measured_z[j]));
         ratio_refold->GetXaxis()->SetTitle("z^2");
@@ -109,13 +131,24 @@ THgroup Unfolding_MatrixInversion(TH2D* measured,const std::vector<TH1D*>& measu
         std::vector<TH1*> measured_unfolded_comp{unfolded_z,measured_z[j]};
         writeToCanvas(measured_unfolded_comp,"measured vs unfolded","z^2","N",outputdir+"/measured_unfolded_z"+postfix_jt+".png");
 
-        if(j==1) out["unfolded_z"]=unfolded_z;
+        if(j==1) out_th=unfolded_z;
     }
 
+    const std::string unfolded_jtpt_name="unfolded_jtpt";
+    TH1D* unfolded_jtpt= unfolded->ProjectionY(unfolded_jtpt_name.data(),1,zbins_n,"eo");
+    outputTH(unfolded_jtpt,unfolded_jtpt_name,"unfolded",outputdir);
+
+    if(out_th!=nullptr);
+    yieldComparison( out_th,truth_z,outputdir+"/yield_comparison.png");
+
+    THgroup out;
+
+    out["unfolded_z"]=out_th;
+    
     return out;
 }
 
-THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,const std::string& outputdir,RooUnfoldResponse* response, const std::vector<int>& iterations)
+THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,const std::string& outputdir,RooUnfoldResponse* response, TH1D* truth_z, const std::vector<int>& iterations)
 {
     std::vector<float> Xi2;
     std::vector<float> Xi2_log;
@@ -129,8 +162,7 @@ THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,
     std::vector<std::vector<TH1*>> ratios_refolded_z;
     ratios_refolded_z.resize(jtptbins_n);
 
-    THgroup out;
-    bool don=false;
+    TH1D* out_th=nullptr;
 
     for(int i=0;i < iterations.size();i++)
     {
@@ -165,7 +197,7 @@ THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,
             TH1D* unfolded_z= unfolded->ProjectionX(obj_name.data(),1+j,1+j,"eo");
             outputTH(unfolded_z,obj_name,postfix+" iterations",outputdir+"/unfolded");
 
-            if(!(i % it_draw_skip)) measured_unfolded_z[j].push_back(unfolded_z);
+             if(!(i % it_draw_skip))  measured_unfolded_z[j].push_back(unfolded_z);
 
             const std::string refolded_name="refolded_z"+postfix_jt;
             TH1D* refolded_z = refolded->ProjectionX(refolded_name.data(),1+j,1+j,"eo");
@@ -175,15 +207,14 @@ THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,
             ratio_refold->GetXaxis()->SetTitle("z^2");
             ratio_refold->GetYaxis()->SetTitle("ratio");
             outputTH(ratio_refold,"refolded_ratio_z"+postfix_jt,postfix+" iterations",outputdir+"/refolded");
-            if(!(i % it_draw_skip)) ratios_refolded_z[j].push_back(ratio_refold);
+             if(!(i % it_draw_skip))  ratios_refolded_z[j].push_back(ratio_refold);
 
             std::vector<TH1*> measured_unfolded_comp{unfolded_z,measured_z[j]};
             writeToCanvas(measured_unfolded_comp,"measured vs unfolded","z^2","N",outputdir+"/unfolded/measured_unfolded_z"+postfix_jt+".png");
 
-            if((j==1) && ( p > 0.95f ) && (!don) )
+            if((j==1) && ( p > 0.5f ) && (!out_th) )
             {
-                out["unfolded_z"]=unfolded_z;
-                don=true;
+                out_th=unfolded_z;
             }
         }
     }
@@ -192,11 +223,11 @@ THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,
     {
         const std::string postfix=generatePostfix(i);
         const std::string outname_r=outputdir+"/ratios_z"+postfix+".png";
-        writeToCanvas(ratios_refolded_z[i],"data refolded/measured ratio","z^2","ratio",outname_r,false,0.90f,1.10f);
+        writeToCanvas(ratios_refolded_z[i],"data refolded/measured ratio "+generateJtptString(i),"z^2","ratio",outname_r,false,0.65f,1.30f);
 
         const std::string outname_m=outputdir+"/unfolded_z"+postfix+".png";
         measured_unfolded_z[i].push_back(measured_z[i]);
-        writeToCanvas(measured_unfolded_z[i],"data unfolded","z^2","Events",outname_m);
+        writeToCanvas(measured_unfolded_z[i],"data unfolded "+generateJtptString(i),"z^2","Events",outname_m);
     }
 
     outTGraph(itF,Xi2,"ChivsItGraph","#chi^{2} as a function of iterations","iterations","#chi^{2}",outputdir);
@@ -210,6 +241,27 @@ THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,
         std::cout << " it: " << iterations[i] << "  X^2: " << Xi2[i] << " pvalue: " << pvalue[i] << '\n';
     }
 
+    if(out_th!=nullptr);
+    yieldComparison(out_th,truth_z,outputdir+"/yield_comparison.png");
+
+    THgroup out;
+    out["unfolded_z"]=out_th;
+
     return out;
 }
 
+void yieldComparison(TH1D* data_z, TH1D* mc_z, const std::string& outputdir)
+{
+    TH1D unfolded_z_norm= *data_z;
+    unfolded_z_norm.Scale( 1.0f/ unfolded_z_norm.Integral() );
+    unfolded_z_norm.SetTitle("DATA");
+
+    TH1D truth_2030_norm= *mc_z;
+    truth_2030_norm.Scale(1.0f/ truth_2030_norm.Integral());
+    truth_2030_norm.SetTitle("PYTHIA8");
+
+    std::vector<TH1*> yields_comp{ &unfolded_z_norm, &truth_2030_norm};
+
+    writeToCanvas(yields_comp,"yields comparison","z^2","1/N dN/dz^2",outputdir);
+
+}

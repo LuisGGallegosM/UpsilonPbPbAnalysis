@@ -219,6 +219,10 @@ void writeJet(const Data* input,Writer* output, int index, int iJet, JetCorrecto
     JEU->SetJetPhi(inputJet->phi[iJet]);
     output->jetOut.jt_pt_JEU_Down = jeuCorr(jt_pt, z, -1*(JEU->GetUncertainty().first));
     output->jetOut.jt_pt_JEU_Up = jeuCorr(jt_pt, z, JEU->GetUncertainty().second);
+
+    const int jeccor=1;
+    if(jeccor==1) output->jetOut.jt_pt= output->jetOut.jt_pt_JEU_Up;
+    else if(jeccor==-1) output->jetOut.jt_pt= output->jetOut.jt_pt_JEU_Down;
 }
 
 template<typename Data>

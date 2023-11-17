@@ -5,7 +5,7 @@ DODRAW="true"
 DOCDRAW="true"
 
 #multifit input file
-TAG="jt1020_test"
+TAG="jt1020"
 SAMPLETYPE="DATA"
 TYPE="${SAMPLETYPE}_skimjet"
 MULTIFITFILE=${1:-"../rootfiles/confFiles/${SAMPLETYPE}/merged_HiForestAOD_${SAMPLETYPE}_baseline_${TAG}.multifit"}

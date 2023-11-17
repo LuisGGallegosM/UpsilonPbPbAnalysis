@@ -9,5 +9,6 @@ mkdir -p "$( dirname ${OUTPUTFILE_TRAINING} )"
 mkdir -p "$( dirname ${OUTPUTFILE_TESTING} )/dagostini/refolded"
 mkdir -p "$( dirname ${OUTPUTFILE_TESTING} )/dagostini/unfolded"
 mkdir -p "$( dirname ${OUTPUTFILE_TESTING} )/inversion"
-./AccEff/acceff -unfoldtrain ${INPUTFILE} ${OUTPUTFILE_TRAINING}
+mkdir -p "$( dirname ${OUTPUTFILE_TESTING} )/inversion_yagg"
+#./AccEff/acceff -unfoldtrain ${INPUTFILE} ${OUTPUTFILE_TRAINING}
 ./AccEff/acceff -unfoldtest ${OUTPUTFILE_TRAINING} ${OUTPUTFILE_TESTING} > "${OUTPUTFILE_TESTING%.*}.log"

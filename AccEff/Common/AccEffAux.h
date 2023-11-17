@@ -12,6 +12,8 @@ TH1D* calcCorrectedYields(TH1D* nSig,TEfficiency* AccXEff,const std::string& sub
 TH1D* calcDN_DpT(TH1D* nSigCorrected);
 TH1D* Normalize(TH1D* nSigCorrected);
 
+Double_t weightF(Double_t x);
+
 const char accDenName[] ="PtQQ_Gen";
 const char accNumName[] ="PtQQ_Det_acc";
 const char effDenName[] = "PtQQ_Det_eff";

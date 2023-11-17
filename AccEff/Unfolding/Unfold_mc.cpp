@@ -54,8 +54,8 @@ void Unfold_Train(const char* filename,const char* outputfilename)
 
     R->Print();
 
-    DrawHist(R, ReplaceExtension(outfilename.data(),"_response_matrix.png"));
-    DrawHist(Rth, ReplaceExtension(outfilename.data(),"_response_hist.png"));
+    DrawHistM(R, ReplaceExtension(outfilename.data(),"_response_matrix.png"));
+    DrawHistM(Rth, ReplaceExtension(outfilename.data(),"_response_hist.png"));
     DrawHist(measured_train,ReplaceExtension(outfilename.data(),"_measured_train.png"));
     DrawHist(truth_train,ReplaceExtension(outfilename.data(),"_truth_train.png"));
     DrawHist(measured_test,ReplaceExtension(outfilename.data(),"_measured_test.png"));
@@ -172,7 +172,7 @@ void Unfold_Test_MatrixInversion(TH2D* measured_test, TH2D* truth_test, const st
 
     TMatrixD inv_matrix = matrix.Invert() ;
     inv_matrix.Print();
-    DrawHist(& inv_matrix,outputdir+"/invertedMatrix.png");
+    DrawHistM(& inv_matrix,outputdir+"/invertedMatrix.png");
 
     TH2* unfolded = dynamic_cast<TH2*>(unfold.Hreco(RooUnfold::kCovariance));
     outputTH(unfolded,"unfolded_inv",outputdir);

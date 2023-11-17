@@ -126,3 +126,16 @@ double WeightFuncTH2::getWeight(double x, double y) const
 {
     return hist->GetBinContent(hist->FindFixBin(x,y));
 }
+
+//Defining weight function
+Double_t weightF(Double_t x) {
+     //Defining function parameters
+     Double_t A = 251.102;
+     Double_t B = 18.5373;
+     Double_t C = 23.5803;
+     Double_t D = -4.97668;
+
+     //Defining function
+     Double_t arg = ( A + B*x + C*pow(x,2) )/pow(x-D,3);
+     return arg;
+   }
