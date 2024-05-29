@@ -13,6 +13,7 @@
 #include "Unfolder.h"
 #include "Helpers.h"
 #include "TDecompSVD.h"
+#include "TRandom2.h"
 
 using THgroup = std::map<std::string,TH1*>;
 
@@ -169,8 +170,10 @@ THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,
         const int its=iterations[i];
         const std::string postfix=std::to_string(its);
 
-        RooUnfold* unfold= new RooUnfoldBayes(response,measured,its,false,"unfold");
+        RooUnfoldBayes* unfold= new RooUnfoldBayes(response,measured,its,false,"unfold");
         unfold->SetName(("unfold"+postfix).data());
+        unfold->IncludeSystematics(2);
+        
 
         TH2* unfolded = dynamic_cast<TH2*>(unfold->Hreco(RooUnfold::kCovariance));
         outputTH(unfolded,"unfolded_"+postfix,outputdir+"/unfolded");
@@ -241,7 +244,7 @@ THgroup Unfolding_Dagostini(TH2D* measured,const std::vector<TH1D*>& measured_z,
         std::cout << " it: " << iterations[i] << "  X^2: " << Xi2[i] << " pvalue: " << pvalue[i] << '\n';
     }
 
-    if(out_th!=nullptr);
+    if(out_th!=nullptr)
     yieldComparison(out_th,truth_z,outputdir+"/yield_comparison.png");
 
     THgroup out;
@@ -264,4 +267,101 @@ void yieldComparison(TH1D* data_z, TH1D* mc_z, const std::string& outputdir)
 
     writeToCanvas(yields_comp,"yields comparison","z^2","1/N dN/dz^2",outputdir);
 
+}
+
+
+THgroup Unfolding_Dagostini_forsystematics(TH2D* measured,const std::vector<TH1D*>& measured_z,const std::string& outputdir,RooUnfoldResponse* response, TH1D* truth_z, const std::vector<int>& iterations)
+{
+    std::vector<float> Xi2;
+    std::vector<float> Xi2_log;
+    std::vector<float> pvalue;
+    std::vector<float> itF;
+    int dof=0;
+
+    std::vector<std::vector<TH1*>> measured_unfolded_z;
+    measured_unfolded_z.resize(jtptbins_n);
+
+    std::vector<std::vector<TH1*>> ratios_refolded_z;
+    ratios_refolded_z.resize(jtptbins_n);
+
+    TH1D* out_th=nullptr;
+
+    for(int i=0;i < iterations.size();i++)
+    {
+        const int its=iterations[i];
+        const std::string postfix=std::to_string(its);
+
+        RooUnfold* unfold= new RooUnfoldBayes(response,measured,its,false,"unfold");
+        unfold->SetName(("unfold"+postfix).data());
+
+        TH2* unfolded = dynamic_cast<TH2*>(unfold->Hreco(RooUnfold::kCovariance));
+
+        const std::string refolded_name="refolded_"+postfix;
+        TH2D* refolded = dynamic_cast<TH2D*>(response->ApplyToTruth(unfolded,refolded_name.data()));
+
+        Double_t chi2;
+        Int_t ndf;
+        Int_t igood;
+        float p= refolded->Chi2TestX(measured,chi2,ndf,igood,"UUP");
+        Xi2.push_back(chi2);
+        Xi2_log.push_back(log10(chi2));
+        pvalue.push_back(p);
+        itF.push_back( iterations[i] );
+        dof=ndf;
+
+        for(int j=0;j<jtptbins_n;j++)
+        {
+            const std::string postfix_jt=generatePostfix(j)+'_'+postfix;
+
+            const std::string obj_name="unfolded_z"+postfix_jt;
+            TH1D* unfolded_z= unfolded->ProjectionX(obj_name.data(),1+j,1+j,"eo");
+
+             if(!(i % it_draw_skip))  measured_unfolded_z[j].push_back(unfolded_z);
+
+            const std::string refolded_name="refolded_z"+postfix_jt;
+            TH1D* refolded_z = refolded->ProjectionX(refolded_name.data(),1+j,1+j,"eo");
+
+            TH1D* ratio_refold = new TH1D((*refolded_z)/(*measured_z[j]));
+            ratio_refold->GetXaxis()->SetTitle("z^2");
+            ratio_refold->GetYaxis()->SetTitle("ratio");
+             if(!(i % it_draw_skip))  ratios_refolded_z[j].push_back(ratio_refold);
+
+            std::vector<TH1*> measured_unfolded_comp{unfolded_z,measured_z[j]};
+
+            if((j==1) && ( its>=45 ) && (!out_th) )
+            {
+                out_th=unfolded_z;
+            }
+        }
+    }
+
+    for(int i=0;i< jtptbins_n;i++)
+    {
+        const std::string postfix=generatePostfix(i);
+        const std::string outname_r=outputdir+"/ratios_z"+postfix+".png";
+        writeToCanvas(ratios_refolded_z[i],"data refolded/measured ratio "+generateJtptString(i),"z^2","ratio",outname_r,false,0.65f,1.30f);
+
+        const std::string outname_m=outputdir+"/unfolded_z"+postfix+".png";
+        measured_unfolded_z[i].push_back(measured_z[i]);
+        writeToCanvas(measured_unfolded_z[i],"data unfolded "+generateJtptString(i),"z^2","Events",outname_m);
+    }
+
+    outTGraph(itF,Xi2,"ChivsItGraph","#chi^{2} as a function of iterations","iterations","#chi^{2}",outputdir);
+    outTGraph(itF,Xi2_log,"ChivsItGraph_log","log_{10}(#chi^{2}) as a function of iterations","iterations","log_{10}(#chi^{2})",outputdir);
+    outTGraph(itF,pvalue,"ChivsItGraph_pvalue","pvalue as a function of iterations","iterations","pvalue",outputdir);
+
+    std::cout <<"X^2 comparison tests" << "\n";
+    std::cout <<"degrees of freedom:" << dof << "\n";
+    for(int i=0;i<Xi2.size();i++)
+    {
+        std::cout << " it: " << iterations[i] << "  X^2: " << Xi2[i] << " pvalue: " << pvalue[i] << '\n';
+    }
+
+    if(out_th!=nullptr)
+    yieldComparison(out_th,truth_z,outputdir+"/yield_comparison.png");
+
+    THgroup out;
+    out["unfolded_z"]=out_th;
+
+    return out;
 }

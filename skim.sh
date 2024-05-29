@@ -9,7 +9,7 @@ CONFIG=${3:-"../rootfiles/confFiles/merged_HiForestAOD_DATA_baseline.cutconf"}
 
 INPUTFILENAME=$(basename $INPUTFILE)
 #folder name skim result file
-OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_${FLAGS:1}"
+OUTPUTFOLDER="../rootfiles/analysis/${INPUTFILENAME%.*}_skimjet_test5"
 
 CLING="NO"
 #output skimmed file, put in OUTPUTFOLDER and name based in inputfile

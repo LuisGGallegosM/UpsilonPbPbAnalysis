@@ -16,33 +16,50 @@ int findRecoQQ(const OniaJetMCData* input,int iQQ)
     }
 
 template<>
-Unfolder<TH2D>::Unfolder(TTree* tree): 
+Unfolder<TH2D>::Unfolder(TTree* tree, bool fPrior): 
         oniaReader(tree),
         response(&measured_train,&truth_train),
         measured_train("measured_train","measured_train",zbins_n,zbins_low,zbins_high,jtptbins_n,jtptbins_low,jtptbins_high),
         truth_train("truth_train","truth_train",zbins_n,zbins_low,zbins_high,jtptbins_n,jtptbins_low,jtptbins_high),
         measured_test("measured_test","measured_test",zbins_n,zbins_low,zbins_high,jtptbins_n,jtptbins_low,jtptbins_high),
         truth_test("truth_test","truth_test",zbins_n,zbins_low,zbins_high,jtptbins_n,jtptbins_low,jtptbins_high),
-        JEC(LoadJECFiles(true)), JEU(LoadJEUFiles(true))
+        JEC(LoadJECFiles(true)), JEU(LoadJEUFiles(true)),
+        weighter(nullptr),
+        flatPrior(fPrior),
+        fillingWeights(false)
     {
     }
 
 template<>
-Unfolder<TH1D>::Unfolder(TTree* tree): 
+Unfolder<TH1D>::Unfolder(TTree* tree, bool fPrior): 
         oniaReader(tree),
         response(v1d_n,v1d_low,v1d_high),
         measured_train("measured_train","measured_train",v1d_n,v1d_low,v1d_high),
         truth_train("truth_train","truth_train",v1d_n,v1d_low,v1d_high),
         measured_test("measured_test","measured_test",v1d_n,v1d_low,v1d_high),
         truth_test("truth_test","truth_test",v1d_n,v1d_low,v1d_high),
-        JEC(LoadJECFiles(true)), JEU(LoadJEUFiles(true))
+        JEC(LoadJECFiles(true)), JEU(LoadJEUFiles(true)),
+        weighter(nullptr),
+        flatPrior(fPrior),
+        fillingWeights(false)
     {
     }
 
 template<typename T>
 void Unfolder<T>::Train()
 {
-    TreeProcess(this,oniaReader.getName(),oniaReader.getEntries());
+    if(flatPrior)
+    {
+        fillingWeights=true;
+        TreeProcess(this,oniaReader.getName(),oniaReader.getEntries());
+        fillingWeights=false;
+        weighter = (T*) truth_test.Clone("weighter");
+        weighter->Scale(1.0f/ weighter->Integral());
+        TreeProcess(this,oniaReader.getName(),oniaReader.getEntries());
+    } else
+    {
+        TreeProcess(this,oniaReader.getName(),oniaReader.getEntries());
+    }
 }
 
 template<typename T>
@@ -100,17 +117,40 @@ void Unfolder<T>::ProcessEvent(Long64_t entry)
 template<>
 void Unfolder<TH2D>::Fill(float z_measured, float z_truth, float jtpt_measured, float jtpt_truth, bool isForTrain)
 {
-    if(isForTrain)
+    if(flatPrior)
     {
-        response.Fill(z_measured*z_measured,jtpt_measured,z_truth*z_truth,jtpt_truth);
-        measured_train.Fill(z_measured*z_measured,jtpt_measured);
-        truth_train.Fill(z_truth*z_truth,jtpt_truth);
+        if(isForTrain)
+        {
+            if( fillingWeights )
+            {
+                measured_train.Fill(z_measured*z_measured,jtpt_measured);
+                truth_train.Fill(z_truth*z_truth,jtpt_truth);
+            } else
+            {
+                float z2_truth=z_truth*z_truth;
+                Int_t binn = weighter->FindBin(z2_truth,jtpt_truth);
+                float weight = 1.0f/ weighter->GetBinContent(binn);
+                response.Fill(z_measured*z_measured,jtpt_measured,z2_truth,jtpt_truth, weight);
+            }
+        }
+        else
+        {
+            measured_test.Fill(z_measured*z_measured,jtpt_measured);
+            truth_test.Fill(z_truth*z_truth,jtpt_truth);
+        }
     } else
     {
-        measured_test.Fill(z_measured*z_measured,jtpt_measured);
-        truth_test.Fill(z_truth*z_truth,jtpt_truth);
+        if(isForTrain)
+        {
+            response.Fill(z_measured*z_measured,jtpt_measured,z_truth*z_truth,jtpt_truth);
+            measured_train.Fill(z_measured*z_measured,jtpt_measured);
+            truth_train.Fill(z_truth*z_truth,jtpt_truth);
+        } else
+        {
+            measured_test.Fill(z_measured*z_measured,jtpt_measured);
+            truth_test.Fill(z_truth*z_truth,jtpt_truth);
+        }
     }
-
 }
 
 template<>

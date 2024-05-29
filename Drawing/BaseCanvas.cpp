@@ -5,6 +5,8 @@
 #include "TGraphAsymmErrors.h"
 #include "THStack.h"
 
+#include"CMS_lumi.h"
+
 constexpr std::array<double,7> pTBins  { 0.0f,2.0f,4.0f,6.0f,9.0f,12.0f,30.0f};
 constexpr std::array<double,6> EtaBins { 0.0f,0.5f,1.0f,1.5f,2.0f,2.4f};
 
@@ -59,6 +61,7 @@ void writeToCanvasBase(TH1* hist,const std::string& xname,const std::string& yna
     TCanvas canvas(canvasName.data(),canvasName.data(),canvasWidth,canvasHeight);
     canvas.cd();
     TPad pad("pad","fit", padSizes[0], padSizes[1], padSizes[2], padSizes[3]);
+    CMS_lumi( &pad);
     pad.Draw();
     pad.cd();
     if (yLog) pad.SetLogy();

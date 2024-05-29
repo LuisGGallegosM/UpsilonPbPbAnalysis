@@ -72,6 +72,28 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
+            "name": "g++ acceeff unfold_sys debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/AccEff/acceff",
+            "args": ["-unfold_syst", 
+            "../rootfiles/analysis/merged_HiForestAOD_MC_skimjet/unfolding_baseline/unfold_training.root",
+            "../rootfiles/analysis/merged_HiForestAOD_DATA_skimjet_w/unfolding_baseline"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Habilitar la impresión con sangría para gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
             "name": "g++ acceef unfold debug",
             "type": "cppdbg",
             "request": "launch",

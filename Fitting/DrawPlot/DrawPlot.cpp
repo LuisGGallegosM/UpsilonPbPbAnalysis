@@ -248,12 +248,12 @@ void drawGraphText(const ParameterGroup* fParams,const ParameterGroup* config, b
     if (includeFit)
     {
         ParameterGroup spg= *fParams->get("signal");
-        spg.remove("nSigY1S");
-        if (spg.exists("nSigY2S"))
-        {
-            spg.remove("nSigY2S");
-            spg.remove("nSigY3S");
-        }
+        // spg.remove("nSigY1S");
+        // if (spg.exists("nSigY2S"))
+        // {
+        //     spg.remove("nSigY2S");
+        //     spg.remove("nSigY3S");
+        // }
 
         drawParams(&spg,&tdrawer);
         ParameterGroup bpg=*fParams->get(bkgName);

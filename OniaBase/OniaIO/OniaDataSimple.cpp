@@ -110,6 +110,7 @@ void OniaSimpleJet::addInputs(TreeReader* reader)
     reader->addInput("z_jettyCorr",&z_jettyCorr);
     reader->addInput("jt_pt_noZJEC",&jt_pt_noZJEC);
     reader->addInput("z", &z);
+    reader->addInput("jec_corr",&jec_corr);
 }
 
 void OniaSimpleJet::addOutputs(TreeWriter* writer)
@@ -124,6 +125,7 @@ void OniaSimpleJet::addOutputs(TreeWriter* writer)
     writer->addOutput("jt_pt_jettyCorr",&jt_pt_jettyCorr);
     writer->addOutput("z_jettyCorr",&z_jettyCorr);
     writer->addOutput("jt_pt_noZJEC",&jt_pt_noZJEC);
+    writer->addOutput("jec_corr",&jec_corr);
 }
 
 //OniaSimpleRefJet

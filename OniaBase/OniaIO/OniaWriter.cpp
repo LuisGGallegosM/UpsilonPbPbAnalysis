@@ -49,6 +49,11 @@ void addOutputs(OniaJetQQRealDataW* data,TreeWriter* writer, const char* prefix)
     data->weight.addOutputs(writer);
 }
 
+void addOutputs(OniaOnlyW* data,TreeWriter* writer, const char* prefix)
+{
+    data->weight.addOutputs(writer);
+}
+
 void addOutputs(OniaJetQQMC* data,TreeWriter* writer, const char* prefix)
 {
     data->oniaInfoOut.addOutputs(writer);

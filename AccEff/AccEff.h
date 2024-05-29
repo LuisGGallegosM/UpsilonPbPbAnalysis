@@ -12,6 +12,9 @@
 #include "Unfolding/Unfold_data.h"
 #include "Unfolding/Unfold_mc.h"
 #include "Unfolding/YieldAgg.h"
+#include "AccEffResults/AccEffSys.h"
+#include "Syst/syst.h"
+#include "Syst/jecan.h"
 
 #include"Acc/AccFineBinned.h"
 #include"Eff/EffFineBinned.h"

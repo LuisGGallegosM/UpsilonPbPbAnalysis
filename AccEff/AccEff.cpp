@@ -24,6 +24,12 @@ int main(int argc, char **argv)
 
     switch (argc)
     {
+        case 3:
+        if(flags=="-syst")
+        {
+            systgraph(argv[2]);
+        }
+        break;
         case 5:
         if (flags=="-eff")
             EffTest(argv[2],argv[3],argv[4],nullptr);
@@ -41,13 +47,15 @@ int main(int argc, char **argv)
         if (flags=="-eff")
             EffTest(argv[2],argv[3],argv[4],argv[5]);
         else if (flags=="-addw")
-            AddWeights(argv[2],argv[3],argv[4],argv[5]);
+            AddWeights(argv[2],argv[3],argv[4],argv[5],false);
         else if (flags=="-addw2")
-            AddWeights2(argv[2],argv[3],argv[4],argv[5]);
+            AddWeights(argv[2],argv[3],argv[4],argv[5],true);
         else if(flags=="-crosssection")
             CrossSectionCalculate(argv[2],argv[3],argv[4],argv[5]);
         else if (flags=="-toys")
             generateToys(argv[2],argv[3],argv[4],argv[5]);
+        else if (flags=="-systoycnt")
+            acceff_systematics(argv[2],argv[3],argv[4],argv[5]);
         else
             std::cerr << "Incorrect number of parameters\n";
         break;
@@ -69,8 +77,16 @@ int main(int argc, char **argv)
             EffFineBinning(argv[2],argv[3]);
         else if (flags=="-accfinebin")
             AccFineBinning(argv[2],argv[3]);
+        else if (flags=="-jecan")
+        {
+            jecan(argv[2],argv[3]);
+        } else if(flags=="-unfold_syst")
+            unfolding_create_systematic_vars(argv[2],argv[3]);
         else
+        {
             std::cerr << "Incorrect number of parameters\n";
+        }
+            
         break;
 
         case 8:

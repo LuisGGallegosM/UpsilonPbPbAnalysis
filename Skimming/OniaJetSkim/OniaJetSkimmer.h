@@ -7,6 +7,8 @@
 #include "../Common/Skimmer.h"
 #include "OniaJetCutter.h"
 
+#include "../../Drawing/BaseCanvas.h"
+
 std::vector<std::string> LoadJECFiles(bool isMC);
 std::string LoadJEUFiles(bool isMC);
 int FindJet(const OniaJetInfo* jetInfo, JetCorrector* JEC, const TLorentzVector* RecoQQ4mom, const OniaJetRef* jetRef=nullptr);
@@ -26,6 +28,7 @@ class OniaJetSkimmer : public Skimmer
         oniaWriter(outTreeName,"reco_"), oniaReader(tree),oniaCutter(cutter),
         JEC(LoadJECFiles(cutter->getIsMC())), JEU(LoadJEUFiles(cutter->getIsMC()))
     {
+
     }
 
     void Write() override 
@@ -42,7 +45,7 @@ class OniaJetSkimmer : public Skimmer
     {
         auto input = oniaReader.getData(entry);
         int size=input->recoQQ.size;
-        
+
         for(int iQQ=0;iQQ<size;iQQ++)
         {
             if (oniaCutter.cut(input,iQQ,entry))

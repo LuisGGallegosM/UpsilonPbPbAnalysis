@@ -13,6 +13,8 @@
 #include "Unfolder.h"
 #include "Helpers.h"
 
+const bool flatPrior=true;
+
 void Unfold_Test_DAngostini(TH2D* measured_test, TH2D* truth_test, const std::vector<TH1D*>& measured_test_z,const std::vector<TH1D*>& truth_test_z,RooUnfoldResponse* response, const std::string& outputdir, const std::vector<int>& iterations);
 void Unfold_Test_MatrixInversion(TH2D* measured_test, TH2D* truth_test, const std::vector<TH1D*>& measured_test_z,const std::vector<TH1D*>& truth_test_z,RooUnfoldResponse* response, const std::string& outputdir);
 
@@ -36,7 +38,7 @@ void Unfold_Train(const char* filename,const char* outputfilename)
     myTree->AddFriend(jetTree);
     myTree->AddFriend(skimTree);
 
-    Unfolder2D unfolder(myTree);
+    Unfolder2D unfolder(myTree,flatPrior);
 
     std::cout << "Starting training\n";
 

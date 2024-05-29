@@ -5,14 +5,15 @@ DODRAW="true"
 DOCDRAW="true"
 
 #multifit input file
-TAG="jt1020"
+TAG="jt2030"
 SAMPLETYPE="DATA"
-TYPE="${SAMPLETYPE}_skimjet"
+TYPE="${SAMPLETYPE}_skimjet_jup_w"
 MULTIFITFILE=${1:-"../rootfiles/confFiles/${SAMPLETYPE}/merged_HiForestAOD_${SAMPLETYPE}_baseline_${TAG}.multifit"}
 INPUTFILENAME=${2:-"../rootfiles/analysis/merged_HiForestAOD_${TYPE}/merged_HiForestAOD_${TYPE}.root"}
 OUTDIR=${3:-"${INPUTFILENAME%/*}/multifit_baseline_${TAG}"}
-CUTFILE=${4:-"${INPUTFILENAME%.*}.cutconf"}
-DRAWCONFIG=${5:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
+CORRFILE=${4:-"../rootfiles/analysis/toys/merged_HiForestAOD_MC_skimjet_w/merged_HiForestAOD_MC_skimjet_w_Nominal.root"}
+CUTFILE=${5:-"${INPUTFILENAME%.*}.cutconf"}
+DRAWCONFIG=${6:-"../rootfiles/confFiles/merged_HiForestAOD.drawconf"}
 SKIMFILE="${INPUTFILENAME}"
 
 #directory where to save multifit results
@@ -41,7 +42,7 @@ then
         FITOUTPUTDIR="${OUTDIR}/${FITNAME%.*}"
         echo "fitting file: $CONFIG"
         mkdir "${FITOUTPUTDIR}"
-        ./fit.sh "$SKIMFILE" "$CUTFILE" "$FITFILE" "${FITOUTPUTDIR}" &
+        ./fit.sh "$SKIMFILE" "$CUTFILE" "$FITFILE" "${FITOUTPUTDIR}" ${CORRFILE} &
         JOBS=( $(jobs -p) )
         JOBNUM="${#JOBS[@]}"
         if [ $MAXJOBS = $JOBNUM ]

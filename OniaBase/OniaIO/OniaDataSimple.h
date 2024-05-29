@@ -66,6 +66,7 @@ struct OniaSimpleJet
     Float_t jt_pt_jettyCorr;
     Float_t z_jettyCorr;
     Float_t jt_pt_noZJEC;
+    Float_t jec_corr;
 
     void addInputs(TreeReader* reader );
     void addOutputs(TreeWriter* writer);

@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-void Fit(const char* filename, const char* cutfilename, const char* outfilename, const char* fitconfigname);
+void Fit(const char* filename, const char* cutfilename, const char* outfilename, const char* fitconfigname, const char* weightfilename);
 void DrawCmp(const char* xvar, const char* outputpath,int size,const char** fitfilepaths);
 void DrawPlot(const char* inputdirectoryname, const char* configfilename  );
 #include"MultifitGen/MultifitGen.h"
@@ -56,7 +56,17 @@ int main(int argc, char **argv)
     {
         if (argc ==6)
         {
-            Fit(argv[2],argv[3],argv[4],argv[5]);
+            Fit(argv[2],argv[3],argv[4],argv[5],nullptr);
+        }
+        else
+        {
+            std::cerr << "Incorrect number of parameters\n";  
+        }
+    }else if (option=="-fitw")
+    {
+        if (argc ==7)
+        {
+            Fit(argv[2],argv[3],argv[4],argv[5],argv[6]);
         }
         else
         {

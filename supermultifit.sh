@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAGM="MC_skimjet"
+TAGM="DATA_skimjet_jdown_w"
 TAG="jt1020"
 INPUTROOTFILE=${1:-"../rootfiles/analysis/merged_HiForestAOD_${TAGM}/merged_HiForestAOD_${TAGM}.root"}
 INPUTDIR=${2:-"../rootfiles/analysis/merged_HiForestAOD_${TAGM}/supermultifit_${TAG}"}

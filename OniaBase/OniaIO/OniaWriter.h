@@ -14,6 +14,7 @@ struct OniaJetQQMC;
 struct OniaJetQQMCW;
 struct OniaJetQQRealData;
 struct OniaJetQQRealDataW;
+struct OniaOnlyW;
 
 double jeuCorr (double jtPt, double z, double jeu);
 double jecCorr(double jtPt, double rawPt, double jpsiPt);
@@ -29,6 +30,7 @@ void addOutputs(OniaQQW* data,TreeWriter* writer, const char* prefix);
 void addOutputs(OniaJetQQMC* data,TreeWriter* writer, const char* prefix);
 void addOutputs(OniaJetQQMCW* data,TreeWriter* writer, const char* prefix);
 void addOutputs(OniaJetQQRealData* data,TreeWriter* writer, const char* prefix);
+void addOutputs(OniaOnlyW* data,TreeWriter* writer, const char* prefix);
 void addOutputs(OniaJetQQRealDataW* data,TreeWriter* writer, const char* prefix);
 
 struct OniaQQ
@@ -59,6 +61,11 @@ struct OniaJetQQRealDataW
     OniaSimpleMu oniaMuOut;
     OniaSimpleJet jetOut;
     OniaSimpleExtraQQ recoQQOut;
+    OniaWeight weight;
+};
+
+struct OniaOnlyW
+{
     OniaWeight weight;
 };
 
@@ -108,7 +115,7 @@ class OniaWriter
 {
     Data output;
     TreeWriter writer;
-
+    
     public:
 
     OniaWriter(const char* treeOutName, const char* prefix =nullptr ) : writer(treeOutName)
@@ -217,12 +224,15 @@ void writeJet(const Data* input,Writer* output, int index, int iJet, JetCorrecto
     JEU->SetJetPT(jt_pt_noZJEC);
     JEU->SetJetEta(inputJet->eta[iJet]);
     JEU->SetJetPhi(inputJet->phi[iJet]);
-    output->jetOut.jt_pt_JEU_Down = jeuCorr(jt_pt, z, -1*(JEU->GetUncertainty().first));
-    output->jetOut.jt_pt_JEU_Up = jeuCorr(jt_pt, z, JEU->GetUncertainty().second);
 
-    const int jeccor=1;
-    if(jeccor==1) output->jetOut.jt_pt= output->jetOut.jt_pt_JEU_Up;
-    else if(jeccor==-1) output->jetOut.jt_pt= output->jetOut.jt_pt_JEU_Down;
+    output->jetOut.jt_pt_JEU_Down = jeuCorr(1.0, z, -1*(JEU->GetUncertainty().first));
+    output->jetOut.jt_pt_JEU_Up = jeuCorr(1.0, z, JEU->GetUncertainty().second);
+    //output->jetOut.jec_corr = JEU->GetUncertainty().second;
+    output->jetOut.jec_corr = (1.0f-z)*(1.0f+JEU->GetUncertainty().second)+z;
+
+    // const int jeccor=0;
+    // if(jeccor==1) output->jetOut.jt_pt= output->jetOut.jt_pt_JEU_Up;
+    // else if(jeccor==-1) output->jetOut.jt_pt= output->jetOut.jt_pt_JEU_Down;
 }
 
 template<typename Data>

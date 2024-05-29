@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.s": "gas",
         "array": "cpp",
         "limits": "cpp",
         "atomic": "cpp",
@@ -77,6 +78,7 @@
         "shared_mutex": "cpp",
         "*.tpp": "cpp",
         "complex": "cpp",
-        "csignal": "cpp"
+        "csignal": "cpp",
+        "cms_lumi.h": "c"
     }
 }

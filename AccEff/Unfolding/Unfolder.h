@@ -23,13 +23,16 @@ class Unfolder
     T measured_train;
     T truth_test;
     T measured_test;
+    T* weighter;
     RooUnfoldResponse response;
     AccCutter accCutter;
     JetCorrector JEC;
     JetUncertainty JEU;
+    bool flatPrior;
+    bool fillingWeights;
 
     public:
-    Unfolder(TTree* tree);
+    Unfolder(TTree* tree, bool fPrior=false);
 
     void Train();
 

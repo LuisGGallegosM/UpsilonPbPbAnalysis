@@ -75,3 +75,20 @@ std::vector<ParameterGroup> getFits(const std::vector<std::string>& fitpaths)
     }
     return fits;
 }
+
+// float weightedAverage(const float* values,const float* errors, int num)
+// {
+//     float numerator=0.0f;
+//     float denominator=0.0f;
+
+//     for(int i=0;i<num;i++)
+//     {
+//         float value= values[i];
+//         float error= errors[i];
+
+//         numerator+=value/error;
+//         denominator+=1.0f/error;
+
+//     }
+//     return numerator/denominator;
+// }

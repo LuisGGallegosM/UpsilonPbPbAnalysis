@@ -1,6 +1,6 @@
 
-INPUTFILEACC="../rootfiles/analysis/acceff/mod/OutAcc2D.root"
-INPUTFILEEFF="../rootfiles/analysis/acceff/mod/OutEff2D.root"
-OUTFILE="../rootfiles/analysis/acceff/mod/toys"
+INPUTFILEACC="../rootfiles/analysis/acceff/toys/OutAcc2D.root"
+INPUTFILEEFF="../rootfiles/analysis/acceff/toys/OutEff2D.root"
+OUTFILE="../rootfiles/analysis/acceff/toys/acceffmaps"
 
 ./AccEff/acceff -toys ${INPUTFILEACC} ${INPUTFILEEFF} ${OUTFILE} 200
